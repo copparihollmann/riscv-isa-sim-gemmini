@@ -50,6 +50,8 @@ The model schema is `merlin.annotated_spike_model.v1`. It contains:
   label-engine digests; the runtime adds the actual model-file byte digest;
 - `cpu.isa`: the expanded ISA spelling reported by this pinned Spike parser;
 - `scope`: `whole_program`, or `counter_pair` with a zero-based `index`;
+- `scope.kind=counter_pc_pair`: use an explicit per-execution
+  `--timing-scope-binding=FILE` instead of consecutive counter reads;
 - `resources`: explicit IDs, names, capacities and queue capacities;
 - `parameters`: explicit nonnegative prices; missing prices remain unknown;
 - `cpu_execution_resources`: instruction-class to execution-resource mapping;
@@ -94,6 +96,19 @@ the whole executed trace; selected `feature_counts` and `estimated_cycles`
 describe the selected scope. Counter-derived control, addresses, stored data or
 unmodeled architectural state inside/before the selected scope refuse timing.
 The model never substitutes estimated cycles into the guest counter.
+
+For a capsule kernel-call label, an internal counter read must not become a
+boundary. `counter_pc_pair` requires a bounded JSON binding with schema
+`merlin.spike_scope_binding.v1`, exact `elf_sha256`, `input_sha256` and
+`scope_sha256`, distinct aligned numeric `begin_pc`/`end_pc`, zero-based
+`occurrence`, and `evidence_sha256` identifying the independent boundary review.
+Only matching executed counter instructions delimit its windows. The report
+records the binding and its original file digest. Missing or unmatched boundaries
+refuse timing. Bindings supply addresses, never prices; keeping them outside the
+model lets different linked ELFs share one frozen pricing-model identity.
+The importer must independently verify that these PCs bracket the declared
+kernel entry through completion wait; the observer cannot infer clock semantics
+or hardware scope from the `rdcycle` mnemonic.
 
 Software budgets bound scoreboard values, cache entries, address dependencies,
 features, diagnostics, transfer work and counter windows. Only the selected

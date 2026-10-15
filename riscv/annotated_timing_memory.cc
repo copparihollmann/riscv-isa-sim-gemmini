@@ -24,6 +24,13 @@ MemorySystem::MemorySystem(const Model &model, merlin_timing::Engine &engine,
                            std::function<void(const std::string &)> unresolved)
     : model_(model), engine_(engine), allocate_(std::move(allocate)),
       feature_(std::move(feature)), unresolved_(std::move(unresolved)) {
+  for (const auto *name : {"modeled.dram_request_bytes", "modeled.writeback_bytes",
+                           "modeled.coherence_probes", "modeled.coherence_writeback_bytes",
+                           "modeled.immutable_requested_bytes"}) feature_(name, 0);
+  for (const auto *path : {"cpu_fetch", "cpu_data", "device"}) {
+    feature_(std::string(path) + ".requested_read_bytes", 0);
+    feature_(std::string(path) + ".requested_write_bytes", 0);
+  }
   if (const auto granule = model.number("memory.coherence_granule")) {
     if (*granule >= 1 && *granule <= (1 << 20) && std::floor(*granule) == *granule &&
         !(static_cast<std::uint64_t>(*granule) & (static_cast<std::uint64_t>(*granule) - 1)))
@@ -41,6 +48,8 @@ MemorySystem::MemorySystem(const Model &model, merlin_timing::Engine &engine,
         throw std::invalid_argument("cache allocation policy is unsupported");
       caches_.emplace(entry.first, std::make_unique<merlin_timing::SetAssociativeCache>(
           merlin_timing::CacheSpec{sets, ways, line}));
+      feature_("modeled.cache." + entry.first + ".hits", 0);
+      feature_("modeled.cache." + entry.first + ".misses", 0);
       lines_[entry.first] = line;
       cache_tokens_[entry.first] = allocate_(sets * ways);
     }

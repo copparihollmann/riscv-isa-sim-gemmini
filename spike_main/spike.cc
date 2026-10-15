@@ -87,6 +87,7 @@ static void help(int exit_code = 1)
   fprintf(stderr, "  --blocksz=<size>      Cache block size (B) for CMO operations(powers of 2) [default 64]\n");
   fprintf(stderr, "  --instructions=<n>    Stop after n instructions\n");
   fprintf(stderr, "  --timing-model=<json> Annotate execution with a pinned approximate timing model\n");
+  fprintf(stderr, "  --timing-scope-binding=<json> Exact ELF/input/counter-PC binding for counter_pc_pair policy\n");
   fprintf(stderr, "  --timing-report=<json> Write separate timing observations; guest counters unchanged\n");
   fprintf(stderr, "  --timing-input-sha256=<digest> Identity of the selected program input\n");
 
@@ -337,7 +338,7 @@ int main(int argc, char** argv)
   bool log_commits = false;
   const char *log_path = nullptr;
   std::vector<std::function<extension_t*()>> extensions;
-  std::string timing_model, timing_report, timing_input_digest;
+  std::string timing_model, timing_report, timing_input_digest, timing_scope_binding;
   const char* initrd = NULL;
   const char* dtb_file = NULL;
   uint16_t rbb_port = 0;
@@ -375,6 +376,7 @@ int main(int argc, char** argv)
   parser.option(0, "timing-model", 1, [&](const char* value){timing_model = value;});
   parser.option(0, "timing-report", 1, [&](const char* value){timing_report = value;});
   parser.option(0, "timing-input-sha256", 1, [&](const char* value){timing_input_digest = value;});
+  parser.option(0, "timing-scope-binding", 1, [&](const char* value){timing_scope_binding = value;});
   parser.help(&suggest_help);
   parser.option('h', "help", 0, [&](const char UNUSED *s){help(0);});
   parser.option('d', 0, 0, [&](const char UNUSED *s){debug = true;});
@@ -571,7 +573,7 @@ int main(int argc, char** argv)
     }
     try {
       timing = std::make_unique<spike_timing::Session>(timing_model, timing_report, htif_args.front(), timing_input_digest, timing_libraries,
-          [&s](std::uint64_t address, std::size_t bytes) { return s.classify_timing_memory(address, bytes); });
+          [&s](std::uint64_t address, std::size_t bytes) { return s.classify_timing_memory(address, bytes); }, timing_scope_binding);
       s.get_core(0)->get_mmu()->register_memtracer(timing.get());
     } catch (const std::exception& error) {
       fprintf(stderr, "Timing model setup failed: %s\n", error.what());

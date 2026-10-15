@@ -85,9 +85,19 @@ public:
 
   Impl(const std::string &path, const std::string &output, const std::string &elf,
        const std::string &input, const std::vector<std::string> &libraries,
-       std::function<unsigned(std::uint64_t, std::size_t)> classify)
+       std::function<unsigned(std::uint64_t, std::size_t)> classify,
+       const std::string &scope_binding)
       : model(path), engine(model.max_values, model.resources), report_path(output),
         elf_digest(sha256_file(elf)), input_digest(input), memory_kind(std::move(classify)) {
+    model.bind_scope(scope_binding, elf_digest, input_digest);
+    for (const auto *name : cpu_feature_classes) {
+      add_feature(name, 0);
+      const std::string kind(name);
+      if (kind.compare(0, 7, "cpu.fp_") == 0 || kind == "cpu.int_to_fp")
+        for (const auto width : {32, 64}) add_feature(kind + ".f" + std::to_string(width), 0);
+    }
+    for (const auto *name : {"cpu.fp_convert.f32_to_f64", "cpu.fp_convert.f64_to_f32",
+                             "cpu.branch_taken", "cpu.branch_not_taken"}) add_feature(name, 0);
     issue_resource = model.resource("cpu.issue");
     issue_cost = model.cycles("cpu.issue_cycles");
     branch_taken = model.cycles("cpu.branch.taken_penalty_cycles");
@@ -345,23 +355,26 @@ public:
         }
       }
     } else if (command_pending) unknown("target command was attached to a non-custom instruction");
-    if (decoded.counter_read) {
-      if (!counter_pending) {
+    if (decoded.counter_read && (!model.scope_pc_pair || pc == model.scope_begin_pc || pc == model.scope_end_pc)) {
+      const bool opening = model.scope_pc_pair ? pc == model.scope_begin_pc : !counter_pending;
+      if (opening) {
+        if (counter_pending) unknown("counter scope opened again before completion");
         counter_pending = true; first_counter = cpu.start;
         first_counter_pc = pc; first_counter_instruction = instructions;
         first_counter_features = features;
       } else {
+        if (!counter_pending) { unknown("counter scope closed without its opening boundary"); return; }
         if (windows.size() >= model.max_counter_windows)
           throw std::runtime_error("counter-window observation budget exceeded");
         std::optional<Cycle> elapsed;
         if (first_counter && cpu.start && *cpu.start >= *first_counter) elapsed = *cpu.start - *first_counter;
         std::map<std::string, std::uint64_t> scoped;
-        const bool selected = model.document.get<std::string>("scope.kind") == "counter_pair" &&
-            model.document.get<std::size_t>("scope.index") == windows.size();
+        const bool selected = model.document.get<std::string>("scope.kind") != "whole_program" &&
+            model.scope_window == windows.size();
         if (selected) for (const auto &feature : features) {
           const auto before = first_counter_features.find(feature.first);
           const auto delta = feature.second - (before == first_counter_features.end() ? 0 : before->second);
-          if (delta) scoped.emplace(feature.first, delta);
+          scoped.emplace(feature.first, delta);
         }
         windows.push_back({first_counter_pc, pc, instructions - first_counter_instruction, elapsed, std::move(scoped),
                            selected ? unresolved : std::set<std::string>{}, engine.report().complete && !trapped});
@@ -378,18 +391,17 @@ public:
     if (counter_pending) unknown("unmatched cycle counter boundary");
     std::optional<Cycle> estimate = observed.modeled_makespan;
     const auto scope_kind = model.document.get<std::string>("scope.kind");
-    if (scope_kind == "counter_pair") {
-      const auto index = model.document.get<std::size_t>("scope.index");
+    if (scope_kind == "counter_pair" || scope_kind == "counter_pc_pair") {
+      const auto index = model.scope_window;
       if (index >= windows.size()) { unknown("selected counter window was not executed"); estimate.reset(); }
       else estimate = windows[index].cycles;
     } else if (scope_kind != "whole_program") {
       unknown("unsupported measurement boundary"); estimate.reset();
     }
-    const auto scope_features = scope_kind == "counter_pair" && model.document.get<std::size_t>("scope.index") < windows.size()
-        ? &windows[model.document.get<std::size_t>("scope.index")].features : &features;
-    const bool scoped = scope_kind == "counter_pair" && model.document.get<std::size_t>("scope.index") < windows.size();
-    const auto &scope_reasons = scoped ? windows[model.document.get<std::size_t>("scope.index")].unresolved : unresolved;
-    const bool event_complete = scoped ? windows[model.document.get<std::size_t>("scope.index")].timing_complete : observed.complete;
+    const bool scoped = scope_kind != "whole_program" && model.scope_window < windows.size();
+    const auto scope_features = scoped ? &windows[model.scope_window].features : &features;
+    const auto &scope_reasons = scoped ? windows[model.scope_window].unresolved : unresolved;
+    const bool event_complete = scoped ? windows[model.scope_window].timing_complete : observed.complete;
     const bool complete = completed && event_complete && scope_reasons.empty() && exit_code == 0 && estimate.has_value();
     const std::string estimated_json = complete ? std::to_string(estimate.value_or(0)) : "null";
     std::ostringstream out;
@@ -444,7 +456,14 @@ public:
           << ",\"unknown_events\":" << resource.unknown_events
           << ",\"peak_queue_entries\":" << resource.peak_queue_entries << '}';
     }
-    out << "]},\"counter_windows\":["; first = true;
+    out << "]}";
+    if (model.scope_pc_pair)
+      out << ",\"scope_binding_sha256\":" << json_string(model.scope_binding_digest)
+          << ",\"scope_binding\":{\"schema\":\"merlin.spike_scope_binding.v1\",\"elf_sha256\":" << json_string(elf_digest)
+          << ",\"input_sha256\":" << json_string(input_digest) << ",\"scope_sha256\":" << json_string(model.scope)
+          << ",\"begin_pc\":" << model.scope_begin_pc << ",\"end_pc\":" << model.scope_end_pc
+          << ",\"occurrence\":" << model.scope_window << ",\"evidence_sha256\":" << json_string(model.scope_binding_evidence) << '}';
+    out << ",\"counter_windows\":["; first = true;
     for (const auto &window : windows) {
       if (!first) out << ',';
       first = false;
@@ -465,8 +484,9 @@ public:
 Session::Session(const std::string &model, const std::string &report,
                  const std::string &elf, const std::string &input_digest,
                  const std::vector<std::string> &libraries,
-                 std::function<unsigned(std::uint64_t, std::size_t)> memory_kind)
-    : impl_(std::make_unique<Impl>(model, report, elf, input_digest, libraries, std::move(memory_kind))) {
+                 std::function<unsigned(std::uint64_t, std::size_t)> memory_kind,
+                 const std::string &scope_binding)
+    : impl_(std::make_unique<Impl>(model, report, elf, input_digest, libraries, std::move(memory_kind), scope_binding)) {
   if (active) throw std::logic_error("only one annotated session is supported");
   active = this;
 }

@@ -12,9 +12,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def fixture_model(engine_sha):
-    kinds = set(
-        re.findall(r'"(cpu\.[a-z_]+)"', (ROOT / "timing/cpu_decode.hpp").read_text())
-    ) - {"cpu.unknown"}
+    kinds = {"cpu." + name for name in re.findall(
+        r"X\(([a-z_]+)\)", (ROOT / "timing/cpu_decode.hpp").read_text())} - {"cpu.unknown"}
     priced = kinds | {
         kind + ".f" + str(width)
         for kind in kinds
@@ -124,8 +123,13 @@ def main():
     base_args = ["--isa=rv64gc_zicntr_zihpm", "--priv=m", "-m64"]
     baseline = run([args.baseline or build / "spike", *base_args, elf])
 
-    def observe(changed, executable=None):
+    def observe(changed, executable=None, scope_binding=None):
         profile.write_text(json.dumps(changed))
+        binding_args = []
+        if scope_binding is not None:
+            binding_path = build / "native-scope-binding.json"
+            binding_path.write_text(json.dumps(scope_binding))
+            binding_args = ["--timing-scope-binding=" + str(binding_path)]
         execution = run(
             [
                 build / "spike",
@@ -133,6 +137,7 @@ def main():
                 "--timing-model=" + str(profile),
                 "--timing-report=" + str(output),
                 "--timing-input-sha256=" + hashlib.sha256(b"").hexdigest(),
+                *binding_args,
                 executable or elf,
             ]
         )
@@ -145,9 +150,46 @@ def main():
     assert report["estimated_cycles"] > 0
     assert report["engine_qualification"] == "not_established"
     assert report["unresolved"] == []
+    assert report["feature_counts"]["cpu.fp_sqrt"] == 0
+    assert report["feature_counts"]["device.requested_read_bytes"] == 0
+    assert report["feature_counts"]["cpu_fetch.requested_write_bytes"] == 0
+    assert "cpu.fetch.requested_write_bytes" not in report["feature_counts"]
+    assert "arbitrary.unsupported_feature" not in report["feature_counts"]
     assert report["aborted_instructions"] == 0
     (build / "native-complete-report.json").write_text(json.dumps(report))
     (build / "native-complete-model.json").write_text(json.dumps(model))
+    # Kernels can read counters internally; selected call boundaries must not
+    # silently become consecutive internal reads. No guest counter is replaced.
+    inner_source = build / "native-inner-counters.S"
+    inner_source.write_text((ROOT / "timing/tests/elf/cpu.S").read_text().replace(
+        "  li t0, 7", "  rdcycle zero\n  rdcycle zero\n  li t0, 7", 1))
+    inner_elf = build / "native-inner-counters.elf"
+    run(["clang", "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
+         "-nostdlib", "-fuse-ld=lld", "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
+         inner_source, "-o", inner_elf])
+    _, adjacent = observe(model, inner_elf)
+    binding = {
+        "schema": "merlin.spike_scope_binding.v1",
+        "elf_sha256": hashlib.sha256(inner_elf.read_bytes()).hexdigest(),
+        "input_sha256": hashlib.sha256(b"").hexdigest(),
+        "scope_sha256": model["domain"]["scope_sha256"],
+        "begin_pc": adjacent["counter_windows"][0]["begin_pc"],
+        "end_pc": adjacent["counter_windows"][-1]["end_pc"],
+        "occurrence": 0, "evidence_sha256": hashlib.sha256(inner_source.read_bytes()).hexdigest(),
+    }
+    pc_model = json.loads(json.dumps(model))
+    pc_model["scope"] = {"kind": "counter_pc_pair"}
+    _, pinned = observe(pc_model, inner_elf, binding)
+    assert pinned["timing_complete"] and len(pinned["counter_windows"]) == 1
+    assert pinned["scope_binding"] == binding
+    assert pinned["counter_windows"][0]["instructions"] == report["counter_windows"][0]["instructions"] + 2
+    assert pinned["estimated_cycles"] > adjacent["estimated_cycles"]
+    wrong_boundary = dict(binding, end_pc=binding["end_pc"] + 2)
+    _, unclosed = observe(pc_model, inner_elf, wrong_boundary)
+    assert not unclosed["timing_complete"] and unclosed["estimated_cycles"] is None
+    # One pricing file is shared by every ELF; scope bindings are per execution.
+    assert pinned["model_sha256"] == unclosed["model_sha256"]
+    profile.write_text(json.dumps(model))
     limited = subprocess.run(
         [
             str(build / "spike"),

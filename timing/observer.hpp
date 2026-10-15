@@ -18,7 +18,8 @@ public:
   Session(const std::string &model, const std::string &report,
           const std::string &elf, const std::string &input_digest,
           const std::vector<std::string> &libraries,
-          std::function<unsigned(std::uint64_t, std::size_t)> memory_kind);
+          std::function<unsigned(std::uint64_t, std::size_t)> memory_kind,
+          const std::string &scope_binding = "");
   ~Session();
   bool interested_in_range(std::uint64_t, std::uint64_t, access_type type) override;
   void trace(std::uint64_t address, std::size_t bytes, access_type type) override;

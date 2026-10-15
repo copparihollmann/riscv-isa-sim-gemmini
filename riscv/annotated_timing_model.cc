@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <fstream>
+#include <filesystem>
 #include <iomanip>
 #include <limits>
 #include <set>
@@ -132,9 +133,13 @@ Model::Model(const std::string &path) {
     resources.push_back({id, capacity, queue});
   }
   const auto scope_kind = document.get<std::string>("scope.kind");
-  if (scope_kind != "counter_pair" && scope_kind != "whole_program")
+  if (scope_kind != "counter_pair" && scope_kind != "counter_pc_pair" && scope_kind != "whole_program")
     throw std::invalid_argument("unknown timing scope kind");
-  if (scope_kind == "counter_pair" && document.get<std::size_t>("scope.index") >= max_counter_windows)
+  scope_pc_pair = scope_kind == "counter_pc_pair";
+  if (scope_kind == "counter_pair") {
+    scope_window = document.get<std::size_t>("scope.index");
+  }
+  if (scope_kind != "whole_program" && scope_window >= max_counter_windows)
     throw std::invalid_argument("selected counter window exceeds report budget");
   if (resources.empty()) throw std::invalid_argument("timing model requires explicit resources");
   const auto parameters = document.get_child_optional("parameters");
@@ -150,6 +155,38 @@ Model::Model(const std::string &path) {
       prices.emplace(row.first, price);
     }
   }
+}
+void Model::bind_scope(const std::string &path, const std::string &elf, const std::string &input) {
+  if (!scope_pc_pair) {
+    if (!path.empty()) throw std::invalid_argument("scope binding requires counter_pc_pair policy");
+    return;
+  }
+  if (path.empty() || std::filesystem::is_symlink(path) ||
+      !std::filesystem::is_regular_file(path) || std::filesystem::file_size(path) > 16384)
+    throw std::invalid_argument("counter_pc_pair requires a bounded original scope binding");
+  std::ifstream stream(path, std::ios::binary);
+  std::ostringstream raw; raw << stream.rdbuf();
+  if (!stream || raw.str().size() > 16384) throw std::invalid_argument("scope binding read failed");
+  boost::property_tree::ptree binding;
+  std::istringstream json(raw.str()); boost::property_tree::read_json(json, binding);
+  unique_keys(binding);
+  const std::set<std::string> expected{"schema", "elf_sha256", "input_sha256", "scope_sha256",
+      "begin_pc", "end_pc", "occurrence", "evidence_sha256"};
+  std::set<std::string> observed;
+  for (const auto &entry : binding) observed.insert(entry.first);
+  if (observed != expected || binding.get<std::string>("schema") != "merlin.spike_scope_binding.v1" ||
+      binding.get<std::string>("elf_sha256") != elf || binding.get<std::string>("input_sha256") != input ||
+      binding.get<std::string>("scope_sha256") != scope)
+    throw std::invalid_argument("scope binding differs from exact ELF/input/scope identity");
+  scope_begin_pc = binding.get<std::uint64_t>("begin_pc");
+  scope_end_pc = binding.get<std::uint64_t>("end_pc");
+  scope_window = binding.get<std::size_t>("occurrence");
+  scope_binding_evidence = binding.get<std::string>("evidence_sha256");
+  if (!scope_begin_pc || !scope_end_pc || scope_begin_pc == scope_end_pc ||
+      scope_begin_pc % 2 || scope_end_pc % 2 || scope_window >= max_counter_windows ||
+      !is_digest(scope_binding_evidence))
+    throw std::invalid_argument("scope binding has invalid boundaries, occurrence or evidence identity");
+  scope_binding_digest = sha256_bytes(raw.str());
 }
 std::optional<double> Model::number(const std::string &path) const {
   const auto value = document.get_optional<std::string>(path);

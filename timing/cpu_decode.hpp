@@ -6,9 +6,52 @@
 
 namespace spike_timing {
 
+// One vocabulary supplies both decoder spellings and explicit zero counts.
+#define SPIKE_TIMING_CPU_CLASSES(X) \
+  X(atomic) \
+  X(branch) \
+  X(csr) \
+  X(custom) \
+  X(divide) \
+  X(fence) \
+  X(fp_add) \
+  X(fp_classify) \
+  X(fp_compare) \
+  X(fp_convert) \
+  X(fp_divide) \
+  X(fp_fma) \
+  X(fp_load) \
+  X(fp_minmax) \
+  X(fp_move_from_int) \
+  X(fp_move_to_int) \
+  X(fp_multiply) \
+  X(fp_sign) \
+  X(fp_sqrt) \
+  X(fp_store) \
+  X(fp_subtract) \
+  X(fp_to_int) \
+  X(int_to_fp) \
+  X(integer) \
+  X(load) \
+  X(multiply) \
+  X(store) \
+  X(system) \
+  X(unknown)
+struct CpuKinds {
+#define SPIKE_TIMING_CPU_NAME(name) static constexpr const char *name = "cpu." #name;
+  SPIKE_TIMING_CPU_CLASSES(SPIKE_TIMING_CPU_NAME)
+#undef SPIKE_TIMING_CPU_NAME
+};
+inline constexpr const char *cpu_feature_classes[] = {
+#define SPIKE_TIMING_CPU_VALUE(name) CpuKinds::name,
+  SPIKE_TIMING_CPU_CLASSES(SPIKE_TIMING_CPU_VALUE)
+#undef SPIKE_TIMING_CPU_VALUE
+};
+#undef SPIKE_TIMING_CPU_CLASSES
+
 // ISA operand classification only. Latencies and microarchitecture are data.
 struct CpuInstruction {
-  const char *kind = "cpu.unknown";
+  const char *kind = CpuKinds::unknown;
   std::array<std::uint64_t, 4> reads{};
   std::array<std::uint64_t, 2> writes{};
   unsigned read_count = 0, write_count = 0;
@@ -39,15 +82,15 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     const unsigned q = bits & 3, f = (bits >> 13) & 7;
     const unsigned a = 8 + ((bits >> 7) & 7), b = 8 + ((bits >> 2) & 7);
     const unsigned r = (bits >> 2) & 31;
-    d.kind = "cpu.integer";
+    d.kind = CpuKinds::integer;
     if (q == 0) {
       if (f == 0) { d.read(2); d.write(b); }
       else if (f == 1 || f == 2 || f == 3) {
-        d.kind = f == 1 ? "cpu.fp_load" : "cpu.load";
+        d.kind = f == 1 ? CpuKinds::fp_load : CpuKinds::load;
         d.read(a); d.write(b, f == 1);
         if (f == 1) d.fp_width = 64;
       } else if (f == 5 || f == 6 || f == 7) {
-        d.kind = f == 5 ? "cpu.fp_store" : "cpu.store";
+        d.kind = f == 5 ? CpuKinds::fp_store : CpuKinds::store;
         d.read(a); d.read(b, f == 5);
         if (f == 5) d.fp_width = 64;
       } else d.known = false;
@@ -59,20 +102,20 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
         d.read(a); d.write(a);
         if (((bits >> 10) & 3) == 3) d.read(b);
       } else {
-        d.kind = "cpu.branch"; d.branch = true;
+        d.kind = CpuKinds::branch; d.branch = true;
         if (f == 6 || f == 7) d.read(a);
       }
     } else if (q == 2) {
       if (f == 0) { d.read(rd); d.write(rd); }
       else if (f == 1 || f == 2 || f == 3) {
-        d.kind = f == 1 ? "cpu.fp_load" : "cpu.load";
+        d.kind = f == 1 ? CpuKinds::fp_load : CpuKinds::load;
         d.read(2); d.write(rd, f == 1);
         if (f == 1) d.fp_width = 64;
       } else if (f == 4) {
         if (!r) {
-          if (rd == 0 && ((bits >> 12) & 1)) d.kind = "cpu.system";
+          if (rd == 0 && ((bits >> 12) & 1)) d.kind = CpuKinds::system;
           else {
-            d.kind = "cpu.branch"; d.branch = true; d.read(rd);
+            d.kind = CpuKinds::branch; d.branch = true; d.read(rd);
             if ((bits >> 12) & 1) d.write(1);
           }
         } else {
@@ -80,7 +123,7 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
           d.read(r); d.write(rd);
         }
       } else if (f == 5 || f == 6 || f == 7) {
-        d.kind = f == 5 ? "cpu.fp_store" : "cpu.store";
+        d.kind = f == 5 ? CpuKinds::fp_store : CpuKinds::store;
         d.read(2); d.read(r, f == 5);
         if (f == 5) d.fp_width = 64;
       } else d.known = false;
@@ -90,37 +133,37 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
   if ((bits & 31) == 31) { d.known = false; return d; }
   const unsigned op = bits & 127, f7 = (bits >> 25) & 127;
   switch (op) {
-  case 0x37: case 0x17: d.kind = "cpu.integer"; d.write(rd); break;
+  case 0x37: case 0x17: d.kind = CpuKinds::integer; d.write(rd); break;
   case 0x13: case 0x1b:
-    d.kind = "cpu.integer"; d.read(r1); d.write(rd); break;
+    d.kind = CpuKinds::integer; d.read(r1); d.write(rd); break;
   case 0x33: case 0x3b:
-    d.kind = f7 == 1 ? (f3 < 4 ? "cpu.multiply" : "cpu.divide") : "cpu.integer";
+    d.kind = f7 == 1 ? (f3 < 4 ? CpuKinds::multiply : CpuKinds::divide) : CpuKinds::integer;
     d.read(r1); d.read(r2); d.write(rd); break;
   case 0x03:
-    d.kind = "cpu.load"; d.read(r1); d.write(rd); break;
+    d.kind = CpuKinds::load; d.read(r1); d.write(rd); break;
   case 0x07:
     if (f3 != 2 && f3 != 3) { d.known = false; break; }
-    d.kind = "cpu.fp_load"; d.fp_width = f3 == 2 ? 32 : 64;
+    d.kind = CpuKinds::fp_load; d.fp_width = f3 == 2 ? 32 : 64;
     d.read(r1); d.write(rd, true); break;
   case 0x23:
-    d.kind = "cpu.store"; d.read(r1); d.read(r2); break;
+    d.kind = CpuKinds::store; d.read(r1); d.read(r2); break;
   case 0x27:
     if (f3 != 2 && f3 != 3) { d.known = false; break; }
-    d.kind = "cpu.fp_store"; d.fp_width = f3 == 2 ? 32 : 64;
+    d.kind = CpuKinds::fp_store; d.fp_width = f3 == 2 ? 32 : 64;
     d.read(r1); d.read(r2, true); break;
   case 0x63:
-    d.kind = "cpu.branch"; d.branch = true; d.read(r1); d.read(r2); break;
+    d.kind = CpuKinds::branch; d.branch = true; d.read(r1); d.read(r2); break;
   case 0x6f: case 0x67:
-    d.kind = "cpu.branch"; d.branch = true; d.write(rd);
+    d.kind = CpuKinds::branch; d.branch = true; d.write(rd);
     if (op == 0x67) d.read(r1);
     break;
   case 0x0f:
-    d.kind = "cpu.fence"; d.fence = true; d.icache_fence = f3 == 1; break;
+    d.kind = CpuKinds::fence; d.fence = true; d.icache_fence = f3 == 1; break;
   case 0x73: {
-    d.kind = "cpu.system";
+    d.kind = CpuKinds::system;
     if (f3) {
       if (f3 == 4) { d.known = false; break; }
-      d.kind = "cpu.csr"; d.write(rd);
+      d.kind = CpuKinds::csr; d.write(rd);
       if (f3 < 4) d.read(r1);
       const auto csr = (bits >> 20) & 4095;
       d.counter_read = (f3 == 2 || f3 == 3) && !r1 &&
@@ -140,7 +183,7 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     if (((bits >> 25) & 3) > 1 || (f3 >= 5 && f3 != 7)) {
       d.known = false; break;
     }
-    d.kind = "cpu.fp_fma"; d.fp_width = ((bits >> 25) & 1) ? 64 : 32;
+    d.kind = CpuKinds::fp_fma; d.fp_width = ((bits >> 25) & 1) ? 64 : 32;
     d.read(r1, true); d.read(r2, true); d.read((bits >> 27) & 31, true);
     d.write(rd, true); d.reads_rounding_mode = f3 == 7;
     d.accumulates_fflags = true; break;
@@ -154,49 +197,49 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     };
     switch (f7) {
     case 0: case 1: case 4: case 5: case 8: case 9: case 12: case 13:
-      d.kind = f7 < 4 ? "cpu.fp_add" : f7 < 8 ? "cpu.fp_subtract" :
-               f7 < 12 ? "cpu.fp_multiply" : "cpu.fp_divide";
+      d.kind = f7 < 4 ? CpuKinds::fp_add : f7 < 8 ? CpuKinds::fp_subtract :
+               f7 < 12 ? CpuKinds::fp_multiply : CpuKinds::fp_divide;
       d.read(r1, true); d.read(r2, true); d.write(rd, true); rounding(); break;
     case 44: case 45:
       if (r2 != 0) { d.known = false; break; }
-      d.kind = "cpu.fp_sqrt"; d.read(r1, true); d.write(rd, true); rounding(); break;
+      d.kind = CpuKinds::fp_sqrt; d.read(r1, true); d.write(rd, true); rounding(); break;
     case 16: case 17:
       if (f3 > 2) { d.known = false; break; }
-      d.kind = "cpu.fp_sign"; d.read(r1, true); d.read(r2, true); d.write(rd, true); break;
+      d.kind = CpuKinds::fp_sign; d.read(r1, true); d.read(r2, true); d.write(rd, true); break;
     case 20: case 21:
       if (f3 > 1) { d.known = false; break; }
-      d.kind = "cpu.fp_minmax"; d.read(r1, true); d.read(r2, true); d.write(rd, true);
+      d.kind = CpuKinds::fp_minmax; d.read(r1, true); d.read(r2, true); d.write(rd, true);
       d.accumulates_fflags = true; break;
     case 32: case 33:
       if (r2 != (f7 == 32 ? 1u : 0u)) { d.known = false; break; }
-      d.kind = "cpu.fp_convert"; d.fp_source_width = r2 == 0 ? 32 : 64;
+      d.kind = CpuKinds::fp_convert; d.fp_source_width = r2 == 0 ? 32 : 64;
       d.read(r1, true); d.write(rd, true); rounding(); break;
     case 80: case 81:
       if (f3 > 2) { d.known = false; break; }
-      d.kind = "cpu.fp_compare"; d.read(r1, true); d.read(r2, true); d.write(rd);
+      d.kind = CpuKinds::fp_compare; d.read(r1, true); d.read(r2, true); d.write(rd);
       d.accumulates_fflags = true; break;
     case 96: case 97:
       if (r2 > 3) { d.known = false; break; }
-      d.kind = "cpu.fp_to_int"; d.read(r1, true); d.write(rd); rounding(); break;
+      d.kind = CpuKinds::fp_to_int; d.read(r1, true); d.write(rd); rounding(); break;
     case 104: case 105:
       if (r2 > 3) { d.known = false; break; }
-      d.kind = "cpu.int_to_fp"; d.read(r1); d.write(rd, true); rounding(); break;
+      d.kind = CpuKinds::int_to_fp; d.read(r1); d.write(rd, true); rounding(); break;
     case 112: case 113:
       if (r2 != 0 || f3 > 1) { d.known = false; break; }
-      d.kind = f3 == 0 ? "cpu.fp_move_to_int" : "cpu.fp_classify";
+      d.kind = f3 == 0 ? CpuKinds::fp_move_to_int : CpuKinds::fp_classify;
       d.read(r1, true); d.write(rd); break;
     case 120: case 121:
       if (r2 != 0 || f3 != 0) { d.known = false; break; }
-      d.kind = "cpu.fp_move_from_int"; d.read(r1); d.write(rd, true); break;
+      d.kind = CpuKinds::fp_move_from_int; d.read(r1); d.write(rd, true); break;
     default: d.known = false;
     }
     if (d.known) d.fp_width = (f7 & 1) ? 64 : 32;
     break;
   }
   case 0x2f:
-    d.kind = "cpu.atomic"; d.read(r1); d.read(r2); d.write(rd); break;
+    d.kind = CpuKinds::atomic; d.read(r1); d.read(r2); d.write(rd); break;
   case 0x0b: case 0x2b: case 0x5b: case 0x7b:
-    d.kind = "cpu.custom"; d.custom = true;
+    d.kind = CpuKinds::custom; d.custom = true;
     if ((bits >> 13) & 1) d.read(r1);
     if ((bits >> 12) & 1) d.read(r2);
     if ((bits >> 14) & 1) d.write(rd);
