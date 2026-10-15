@@ -1,0 +1,55 @@
+{
+  "schema": "merlin.functional_spike_profile.v1",
+  "target_config": "FireSimGemminiRocketConfig",
+  "platform": "xilinx_alveo_u250",
+  "claim": "functional Gemmini software ABI only",
+  "functional_only": true,
+  "timing_model_included": false,
+  "timing_qualification": "not_established",
+  "rtl_elaboration_source_lineage": "unrecovered_from_archive",
+  "physical_cpu_isa_match": "not_established",
+  "hardware_association": {
+    "evidence": "operator-supplied stock U250 ABI pins; archive not re-opened by this build",
+    "archive_sha256": "a9a190b9fc26d577b1e8af0e3b46a94c8efaf2976f7fca6650236e0fd6d4eca1",
+    "embedded_bitstream_sha256": "6bfb72e3d69d0bed14eaa8db9fd5faf53f82780ef9ecded6b2d49983dfcbc229",
+    "generated_params_sha256": "3758ae967af3a179497660970201093a7fb624be00173990ce33d3f5c38da924",
+    "scope": "functional parameter/header association only; physical equivalence unestablished"
+  },
+  "candidate_access": {
+    "runner": "broker access to runtime/bin/spike and runtime/lib/libgemmini.so only",
+    "source_archives": "trusted operator build inputs; never candidate grants",
+    "header_include_roots": "none; build headers stay outside runtime deployment"
+  },
+  "launch": {
+    "isa": "rv64gc_zicntr_zihpm",
+    "isa_status": "explicit executable compatibility selection; not proof of bitstream ISA",
+    "additional_extensions": "disabled by default; require independent evidence and an explicit deployment choice",
+    "privilege": "m",
+    "harts": 1,
+    "extension": "gemmini",
+    "memory_mib": null,
+    "memory_status": "required explicit deployment choice, not inferred board capacity"
+  },
+  "software_abi": {
+    "custom_opcode": 123,
+    "custom_opcode_mask": 127,
+    "dim": 16,
+    "address_bits": 32,
+    "scratchpad_banks": 4,
+    "scratchpad_rows_per_bank": 4096,
+    "scratchpad_rows": 16384,
+    "accumulator_rows": 1024,
+    "element_bytes": 1,
+    "accumulator_bytes": 4,
+    "maximum_software_transfer_bytes": 64,
+    "full_width_accumulator_readout": true,
+    "first_layer_optimizations": true
+  },
+  "unmodeled_physical_behavior": [
+    "Rocket pipeline, physical register and cache timing",
+    "accelerator command queues, latency and overlap",
+    "physical memory mapping, capacity and bandwidth",
+    "interrupt, loader, console and physical board deployment equivalence"
+  ],
+  "policy": "stock receiver unchanged; no-FSM policy is enforced independently by the compiler grader"
+}

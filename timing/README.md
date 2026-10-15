@@ -40,11 +40,14 @@ A target timing provider is a separate shared library loaded with `--extlib`,
 alongside the unchanged functional extension. Its source export supplies only
 hardware semantics and event observation. Target scheduling/compiler code is not
 loaded. Every loaded library digest, **in load order**, must match `libraries` in
-the selected model. The Gemmini provider and stock U250 facts belong in the
-`gemmini-mlir` OOT repository under `examples/annotated_spike`. Generic source
-packaging, provider builds and calibration live in Merlin's standalone
-`merlin-timing` package. The target exporter calls that shared package; exported
-bundles build independently using its canonical standard-library helper.
+the selected model. The Gemmini provider and pinned U250 facts live in this
+simulator repository under `examples/gemmini/timing`. The unannotated Phase 1
+baseline packaging is alongside it in `examples/gemmini/functional_baseline`.
+Generic source packaging, provider builds and calibration live in Merlin's
+standalone `merlin-timing` package. The target exporter calls that shared package;
+exported bundles build independently using its canonical standard-library helper.
+Neither route depends on the OOT compiler repository. Phase 1 produces that
+compiler independently; simulator sources and selfchecks are operator inputs.
 
 The model schema is `merlin.annotated_spike_model.v1`. It contains:
 
