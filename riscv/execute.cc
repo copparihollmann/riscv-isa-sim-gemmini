@@ -1,4 +1,5 @@
 // See LICENSE for license details.
+#include "../timing/observer.hpp"
 
 #include "config.h"
 #include "processor.h"
@@ -158,7 +159,24 @@ inline void processor_t::update_histogram(reg_t pc)
 
 // These two functions are expected to be inlined by the compiler separately in
 // the processor_t::step() loop. The logged variant is used in the slow path
+static inline reg_t execute_insn_annotated(processor_t* p, reg_t pc, insn_fetch_t fetch) {
+  spike_timing::before(p, pc, fetch.insn.bits());
+  try {
+    const reg_t npc = fetch.func(p, fetch.insn, pc);
+    spike_timing::after(npc == PC_SERIALIZE_AFTER ? p->get_state()->pc : npc,
+                        npc != PC_SERIALIZE_BEFORE);
+    return npc;
+  } catch (wait_for_interrupt_t&) {
+    spike_timing::after(pc + fetch.insn.length(), true);
+    throw;
+  } catch (...) {
+    spike_timing::aborted();
+    throw;
+  }
+}
 static inline reg_t execute_insn_fast(processor_t* p, reg_t pc, insn_fetch_t fetch) {
+  if (unlikely(spike_timing::enabled()))
+    return execute_insn_annotated(p, pc, fetch);
   return fetch.func(p, fetch.insn, pc);
 }
 static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t fetch)
@@ -171,7 +189,8 @@ static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t f
   reg_t npc;
 
   try {
-    npc = fetch.func(p, fetch.insn, pc);
+    npc = unlikely(spike_timing::enabled()) ? execute_insn_annotated(p, pc, fetch) :
+                                            fetch.func(p, fetch.insn, pc);
     if (npc != PC_SERIALIZE_BEFORE) {
       if (p->get_log_commits_enabled()) {
         commit_log_print_insn(p, pc, fetch.insn);
@@ -328,6 +347,7 @@ void processor_t::step(size_t n)
     }
     catch(trap_t& t)
     {
+      if (spike_timing::enabled()) spike_timing::aborted();
       take_trap(t, pc);
       n = instret;
 
@@ -352,14 +372,17 @@ void processor_t::step(size_t n)
     }
     catch (triggers::matched_t& t)
     {
+      if (spike_timing::enabled()) spike_timing::aborted();
       take_trigger_action(t.action, t.address, pc, t.gva);
     }
     catch(trap_debug_mode&)
     {
+      if (spike_timing::enabled()) spike_timing::aborted();
       enter_debug_mode(DCSR_CAUSE_SWBP, 0);
     }
     catch (wait_for_interrupt_t &t)
     {
+      if (spike_timing::enabled()) spike_timing::aborted();
       // Return to the outer simulation loop, which gives other devices/harts a
       // chance to generate interrupts.
       //

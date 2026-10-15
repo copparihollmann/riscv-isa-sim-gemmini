@@ -21,6 +21,7 @@
 #include <cinttypes>
 #include <sstream>
 #include "../VERSION"
+#include "../timing/observer.hpp"
 
 static void help(int exit_code = 1)
 {
@@ -85,6 +86,9 @@ static void help(int exit_code = 1)
   fprintf(stderr, "  --dm-no-impebreak     Debug module won't support implicit ebreak in program buffer\n");
   fprintf(stderr, "  --blocksz=<size>      Cache block size (B) for CMO operations(powers of 2) [default 64]\n");
   fprintf(stderr, "  --instructions=<n>    Stop after n instructions\n");
+  fprintf(stderr, "  --timing-model=<json> Annotate execution with a pinned approximate timing model\n");
+  fprintf(stderr, "  --timing-report=<json> Write separate timing observations; guest counters unchanged\n");
+  fprintf(stderr, "  --timing-input-sha256=<digest> Identity of the selected program input\n");
 
   exit(exit_code);
 }
@@ -333,6 +337,7 @@ int main(int argc, char** argv)
   bool log_commits = false;
   const char *log_path = nullptr;
   std::vector<std::function<extension_t*()>> extensions;
+  std::string timing_model, timing_report, timing_input_digest;
   const char* initrd = NULL;
   const char* dtb_file = NULL;
   uint16_t rbb_port = 0;
@@ -367,6 +372,9 @@ int main(int argc, char** argv)
   };
 
   option_parser_t parser;
+  parser.option(0, "timing-model", 1, [&](const char* value){timing_model = value;});
+  parser.option(0, "timing-report", 1, [&](const char* value){timing_report = value;});
+  parser.option(0, "timing-input-sha256", 1, [&](const char* value){timing_input_digest = value;});
   parser.help(&suggest_help);
   parser.option('h', "help", 0, [&](const char UNUSED *s){help(0);});
   parser.option('d', 0, 0, [&](const char UNUSED *s){debug = true;});
@@ -404,7 +412,9 @@ int main(int argc, char** argv)
   parser.option(0, "bootargs", 1, [&](const char* s){cfg.bootargs = s;});
   parser.option(0, "real-time-clint", 0, [&](const char UNUSED *s){cfg.real_time_clint = true;});
   parser.option(0, "triggers", 1, [&](const char *s){cfg.trigger_count = atoul_safe(s);});
+  std::vector<std::string> timing_libraries;
   parser.option(0, "extlib", 1, [&](const char *s){
+    timing_libraries.emplace_back(s);
     void *lib = dlopen(s, RTLD_NOW | RTLD_GLOBAL);
     if (lib == NULL) {
       fprintf(stderr, "Unable to load extlib '%s': %s\n", s, dlerror());
@@ -462,6 +472,11 @@ int main(int argc, char** argv)
 
   if (!*argv1)
     help();
+
+  if (timing_model.empty() != timing_report.empty()) {
+    fprintf(stderr, "--timing-model and --timing-report must be selected together\n");
+    return 1;
+  }
 
   std::vector<std::pair<reg_t, abstract_mem_t*>> mems =
       make_mems(cfg.mem_layout);
@@ -548,7 +563,37 @@ int main(int argc, char** argv)
   s.configure_log(log, log_commits);
   s.set_histogram(histogram);
 
-  auto return_code = s.run();
+  std::unique_ptr<spike_timing::Session> timing;
+  if (!timing_model.empty()) {
+    if (cfg.nprocs() != 1 || cfg.real_time_clint) {
+      fprintf(stderr, "Annotated timing requires one hart and deterministic virtual time\n");
+      return 1;
+    }
+    try {
+      timing = std::make_unique<spike_timing::Session>(timing_model, timing_report, htif_args.front(), timing_input_digest, timing_libraries,
+          [&s](std::uint64_t address, std::size_t bytes) { return s.classify_timing_memory(address, bytes); });
+      s.get_core(0)->get_mmu()->register_memtracer(timing.get());
+    } catch (const std::exception& error) {
+      fprintf(stderr, "Timing model setup failed: %s\n", error.what());
+      return 1;
+    }
+  }
+
+  int return_code = 1;
+  try { return_code = s.run(); }
+  catch (const std::exception &error) {
+    fprintf(stderr, "Simulation failed: %s\n", error.what());
+    if (timing) timing->finish(return_code, false);
+    return return_code;
+  }
+
+  if (timing) {
+    try { timing->finish(return_code, s.timing_completed_normally()); }
+    catch (const std::exception& error) {
+      fprintf(stderr, "Timing report failed: %s\n", error.what());
+      return 1;
+    }
+  }
 
   for (auto& mem : mems)
     delete mem.second;

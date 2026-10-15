@@ -55,6 +55,8 @@ public:
     this->remote_bitbang = remote_bitbang;
   }
   const char* get_dts() { return dts.c_str(); }
+  bool timing_completed_normally() const { return !timing_limit_reached && received_exit_code(); }
+  unsigned classify_timing_memory(reg_t paddr, size_t bytes);
   processor_t* get_core(size_t i) { return procs.at(i); }
   abstract_interrupt_controller_t* get_intctrl() const { assert(plic.get()); return plic.get(); }
   virtual const cfg_t &get_cfg() const override { return *cfg; }
@@ -86,6 +88,7 @@ private:
   FILE *cmd_file; // pointer to debug command input file
 
   std::optional<unsigned long long> instruction_limit;
+  bool timing_limit_reached = false;
 
   socketif_t *socketif;
   std::ostream sout_; // used for socket and terminal interface

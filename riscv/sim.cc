@@ -433,6 +433,7 @@ void sim_t::idle()
       if (*instruction_limit < INTERLEAVE) {
         // Final step.
         step(*instruction_limit);
+        timing_limit_reached = true;
         htif_exit(0);
         *instruction_limit = 0;
         return;
@@ -469,4 +470,17 @@ endianness_t sim_t::get_target_endianness() const
 void sim_t::proc_reset(unsigned id)
 {
   debug_module.proc_reset(id);
+}
+
+// Classification only, used by optional observation; no memory is read/written.
+unsigned sim_t::classify_timing_memory(reg_t address, size_t bytes) {
+  // HTIF mailboxes live in RAM but are asynchronously modified by the host.
+  // Their polling trace is not a stable target execution trace.
+  for (const auto mailbox : {get_tohost_addr(), get_fromhost_addr()})
+    if (mailbox && bytes && ((address >= mailbox && address - mailbox < 8) ||
+                            (mailbox >= address && mailbox - address < bytes))) return 0;
+  const auto device = bus.find_device(address, bytes).second;
+  if (dynamic_cast<abstract_mem_t*>(device)) return 1;
+  if (dynamic_cast<rom_device_t*>(device)) return 2;
+  return 0;
 }

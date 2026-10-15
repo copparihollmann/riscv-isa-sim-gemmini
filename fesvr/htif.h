@@ -29,6 +29,7 @@ class htif_t : public chunked_memif_t
 
   int run();
   bool done();
+  bool received_exit_code() const { return exitcode.has_value(); }
   int exit_code();
   void set_expected_xlen(unsigned int m) { expected_xlen = m; }
   virtual memif_t& memif() { return mem; }

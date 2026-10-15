@@ -1,0 +1,31 @@
+{
+  "members": [
+    {
+      "bytes": 18369,
+      "path": "include/merlin_timing/engine.hpp",
+      "sha256": "938000dbab04276be63e37b1a148c8fe0927fe0d6143f08ec5f92e6fb7ef4018"
+    },
+    {
+      "bytes": 765,
+      "path": "CMakeLists.txt",
+      "sha256": "80b57d8bc513beb5d6a7bc47e5c24b5f7418a09544802d882c6701293d6a3aa2"
+    },
+    {
+      "bytes": 15327,
+      "path": "tests/test_engine.cpp",
+      "sha256": "fcf416201274e1cfedd0c8a93c46526ccc50d41321c8965e30b52750908ab99a"
+    },
+    {
+      "bytes": 3164,
+      "path": "README.md",
+      "sha256": "0ccfbd4ebbfffac67cfd5f11162e6c6f751b783f196bb4cc621b3d4a1c5eacb5"
+    },
+    {
+      "bytes": 13139,
+      "path": "LICENSE",
+      "sha256": "d1343a273045ca4e0abe4c7dc8b39fb066b699d3c16060b468d08347b7d41d0e"
+    }
+  ],
+  "schema": "merlin_timing.cpp_export.v1",
+  "scope": "source byte identity only; no model, hardware or timing qualification"
+}

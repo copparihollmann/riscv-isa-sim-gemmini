@@ -7,7 +7,7 @@ riscv_subproject_deps = \
 	fesvr \
 	softfloat \
 
-riscv_CFLAGS = -fPIC -I$(src_dir)/fdt
+riscv_CFLAGS = -fPIC -I$(src_dir)/fdt -I$(src_dir)/timing -I$(src_dir)/timing/core/include
 
 riscv_install_shared_lib = yes
 
@@ -51,6 +51,9 @@ riscv_precompiled_hdrs = \
 	insn_template.h \
 
 riscv_srcs = \
+	annotated_timing.cc \
+	annotated_timing_memory.cc \
+	annotated_timing_model.cc \
 	processor.cc \
 	execute.cc \
 	dts.cc \

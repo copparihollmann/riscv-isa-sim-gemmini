@@ -8,3 +8,7 @@ autom4te.cache/
 .#*
 *~
 config.log
+
+# Python build/test helpers
+__pycache__/
+*.pyc
