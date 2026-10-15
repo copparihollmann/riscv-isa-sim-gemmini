@@ -41,7 +41,10 @@ alongside the unchanged functional extension. Its source export supplies only
 hardware semantics and event observation. Target scheduling/compiler code is not
 loaded. Every loaded library digest, **in load order**, must match `libraries` in
 the selected model. The Gemmini provider and stock U250 facts belong in the
-`gemmini-mlir` OOT repository under `support/annotated_spike`.
+`gemmini-mlir` OOT repository under `examples/annotated_spike`. Generic source
+packaging, provider builds and calibration live in Merlin's standalone
+`merlin-timing` package. The target exporter calls that shared package; exported
+bundles build independently using its canonical standard-library helper.
 
 The model schema is `merlin.annotated_spike_model.v1`. It contains:
 
