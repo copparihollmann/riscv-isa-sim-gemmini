@@ -9,11 +9,14 @@ These trusted simulator sources are independent of the generated OOT compiler.
 Phase 1 receives runtime endpoints through its broker; these sources, vendor
 headers and selfcheck fixtures are not candidate inputs.
 
-The implementation uses public `libgemmini` semantics at
-`ea8f7ed7afd68e001fb06ddccad9a023c990961d`. `export_config.py` verifies the exact
-public source, generated parameter-header and Spike RoCC declaration bytes
-before exporting the stock U250 configuration. It imports no compiler, kernel,
-scheduler or model code.
+The observer has two separately pinned target profiles. `stock_u250.json` uses
+public `libgemmini` `ea8f7ed7afd68e001fb06ddccad9a023c990961d` and the
+`a9a190b9` archive. `fire_aligned_30mhz.json` uses the receiver
+`5b1254a7dc72f757442280e7f28ef30542c78533` selected by Gemmini
+`63f0b68a68f185a016a2993f2fb32e1661ea9e6c` and the `0af6f26e` archive.
+Both have the same generated parameter-header bytes, but their receiver source
+bytes differ. `export_config.py` verifies each source and the Spike RoCC header
+before exporting. It imports no compiler, kernel, scheduler or model code.
 
 ## Standalone source bundle
 
@@ -26,6 +29,7 @@ contains those canonical bytes and requires only Python's standard library.
 
 ```sh
 python3 examples/gemmini/timing/export_config.py \
+  --profile stock_u250 \
   --public-library /path/to/public/libgemmini \
   --spike-rocc /path/to/riscv-isa-sim/riscv/rocc.h \
   --bundle-dir /path/to/new/provider-source
@@ -33,6 +37,14 @@ python3 /path/to/new/provider-source/build_provider.py \
   --spike-root /path/to/riscv-isa-sim \
   --output-library /path/to/libtiming_provider.so
 ```
+
+For the selected 30 MHz FireSim build, pass `--profile fire_aligned_30mhz`
+and the `software/libgemmini` checkout at `5b1254a7` from the pinned Gemmini
+tree. Its exported source bundle contains `fire_aligned_30mhz.json` instead of
+`stock_u250.json`. The generated profile pins the 16 GiB board's archive,
+source revisions and DTS; its embedded bitstream digest remains unknown because
+the source-only handoff excludes that file. Prices and queue capacities remain
+unset until Phase 1 measurements and calibration establish them.
 
 The closed bundle contains only the observer, bridge, shared build helper, this README,
 generated stock facts and a hash manifest, within one MiB. It contains no kernels

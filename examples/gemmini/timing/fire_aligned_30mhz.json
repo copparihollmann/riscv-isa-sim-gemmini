@@ -1,0 +1,272 @@
+{
+  "limitations": {
+    "local_dependency_granularity": "complete local rows, conservative",
+    "physical_queue_capacities": "unknown",
+    "primitive_latencies": "unknown",
+    "qualification": "unqualified timing until explicit parameters and resources are selected",
+    "requested_dma_bytes": "command payload, not physical DRAM transactions"
+  },
+  "provenance": {
+    "archive_identity": "operator_verified_pin",
+    "archive_sha256": "0af6f26e1cbad1c03f9e5873217505a5100bf2d0d068205cfa486522b24fc603",
+    "chipyard_revision": "009e85b05ca817a15fcd6c3fe4eedd86cc2a3617",
+    "embedded_bitstream_sha256": null,
+    "firesim_revision": "b084672c2f8cf32e55d78f73a001074c23f8a2b8",
+    "functional_extension_revision": "5b1254a7dc72f757442280e7f28ef30542c78533",
+    "gemmini_revision": "63f0b68a68f185a016a2993f2fb32e1661ea9e6c",
+    "generated_params_sha256": "3758ae967af3a179497660970201093a7fb624be00173990ce33d3f5c38da924",
+    "hardware_pin_registry": "merlin/contract/hardware_pins.yaml",
+    "host_dts_sha256": "c4a2009a405945ea98f731713e0f4e7dc483031ab8cd5156d871e4eb7594f1df",
+    "platform": "xilinx_alveo_u250",
+    "public_architecture_headers": {
+      "riscv/rocc.h": "08bdaf6f3f6e846125c937f4c19d54ab11efaf3026ffab55aad609e2c6a52eea"
+    },
+    "public_sources": {
+      "gemmini.cc": "c468a86deb68cb2e12e3fb1177821075b0eb87e27a37ff835280ee7caf61b13a",
+      "gemmini.h": "506d6857dd0a02a2921535e1a5725639c0b6374e83a95935426fc9b5c6349ac3"
+    },
+    "rtl_elaboration_source_lineage": "009e85b05ca817a15fcd6c3fe4eedd86cc2a3617; historical dirty overlay unproven",
+    "saturn_revision": "e16a301d261fa4b5a374eb7069b78107a8c9aefb"
+  },
+  "resources": {
+    "accelerator.config": {
+      "capacity": null,
+      "queue_capacity": null
+    },
+    "accelerator.dma_read": {
+      "capacity": null,
+      "queue_capacity": null
+    },
+    "accelerator.dma_write": {
+      "capacity": null,
+      "queue_capacity": null
+    },
+    "accelerator.execute": {
+      "capacity": null,
+      "queue_capacity": null
+    },
+    "accelerator.load": {
+      "capacity": null,
+      "queue_capacity": null
+    },
+    "accelerator.store": {
+      "capacity": null,
+      "queue_capacity": null
+    }
+  },
+  "schema": "gemmini.annotated_spike.target.v1",
+  "target": {
+    "hardware": {
+      "accumulator_bytes": 4,
+      "accumulator_rows": 1024,
+      "address_bits": 32,
+      "custom_opcode": 123,
+      "custom_opcode_mask": 127,
+      "dim": 16,
+      "element_bytes": 1,
+      "first_layer_optimizations": 1,
+      "full_width_accumulator_readout": 1,
+      "reset_accumulator_activation": null,
+      "scratchpad_rows": 16384
+    },
+    "prices": {
+      "compute_os": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "compute_os_relu": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "compute_ws": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "compute_ws_relu": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "config": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "counter": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "dma": {
+        "read_bytes_per_cycle": null,
+        "write_bytes_per_cycle": null
+      },
+      "fence": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "flush": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "load": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize1": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize2": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize3": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize4": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize5": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize6": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "normalize7": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "pool_store": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "pool_store_act1": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "preload": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "store": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "store_act1": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "store_act2": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "store_act3": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      },
+      "store_act4": {
+        "latency_cycles": null,
+        "latency_per_byte_cycles": null,
+        "latency_per_mac_cycles": null,
+        "occupancy_cycles": null,
+        "occupancy_per_byte_cycles": null,
+        "occupancy_per_mac_cycles": null
+      }
+    }
+  },
+  "target_config": "FireSimGemminiRocketConfig"
+}

@@ -2,7 +2,7 @@
 #define GEMMINI_ANNOTATED_SPIKE_PROVIDER_HPP
 
 // Observation only. Encodings and state transitions follow public libgemmini
-// ea8f7ed7afd68e001fb06ddccad9a023c990961d; no kernel library is included.
+// Receiver source is selected by the target profile; no kernel library is included.
 #include <merlin_timing/engine.hpp>
 
 #include <array>

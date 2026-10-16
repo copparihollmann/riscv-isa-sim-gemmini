@@ -12,9 +12,11 @@ See [the baseline instructions](functional_baseline/README.md),
 [the observer instructions](timing/README.md), and
 [the generic timing API](../../timing/README.md).
 
-The accelerator's original functional semantics come from public `libgemmini`
-revision `ea8f7ed7afd68e001fb06ddccad9a023c990961d`. Source packaging verifies that
-revision and its parameter/header bytes; it does not maintain another receiver.
+The functional receiver follows the selected board: public `libgemmini`
+`ea8f7ed7afd68e001fb06ddccad9a023c990961d` for the stock U250 archive, or
+`5b1254a7dc72f757442280e7f28ef30542c78533` for the 30 MHz archive. Source
+packaging verifies the selected revision and parameter/header bytes; it does
+not maintain another receiver.
 The Spike base `9c190a07c6838f6392bafa4ad83acea462c7f759` is Chipyard's pinned
 Spike revision. The newer Chipyard checkout also selects this public extension;
 the older 30 MHz checkout selects `5b1254a7dc72f757442280e7f28ef30542c78533`
@@ -36,6 +38,7 @@ second maintained simulator branch. Existing build/execute receipts retain their
 original source and binary identities when this packaging moves.
 
 `stock_u250.json` names the stock build whose bitstream archive starts with
-`a9a190b9`. The separately audited 30 MHz archive starting with `0af6f26e` needs its
-own device/provenance binding. Profile names and compatible software headers do
-not establish timing equivalence. Neither profile has qualified timing prices.
+`a9a190b9`. `fire_aligned_30mhz.json` separately pins the selected 30 MHz
+archive starting with `0af6f26e` and its different `libgemmini` receiver at
+`5b1254a7`. Profile names and compatible software headers do not establish
+timing equivalence. Neither profile has qualified timing prices.

@@ -1,6 +1,6 @@
-# Stock functional Spike baseline
+# Functional Spike baseline
 
-This standalone package builds pristine public Spike and its stock Gemmini
+This standalone package builds pristine public Spike and a selected Gemmini
 functional extension. It carries no timing observer, timing provider, compiler
 or kernel implementation. No compiler checkout or network access is needed to
 build the exported package.
@@ -10,18 +10,22 @@ build the exported package.
 | Component | Public revision |
 | --- | --- |
 | Spike | `9c190a07c6838f6392bafa4ad83acea462c7f759` |
-| libgemmini | `ea8f7ed7afd68e001fb06ddccad9a023c990961d` |
+| libgemmini for stock U250 `a9a190b9` | `ea8f7ed7afd68e001fb06ddccad9a023c990961d` |
+| libgemmini for 30 MHz U250 `0af6f26e` | `5b1254a7dc72f757442280e7f28ef30542c78533` |
 
-`sources.json` pins both original source archives and the Gemmini receiver,
-parameter header and public RoCC header. `profile.json` records the software ABI
-associated with the stock U250 `FireSimGemminiRocketConfig`: DIM 16, 16,384
+`sources.json` pins both original source archives and the selected Gemmini
+receiver, parameter header and public RoCC header. `profile.json` records the
+software ABI associated with `FireSimGemminiRocketConfig`: DIM 16, 16,384
 scratchpad rows, 1,024 accumulator rows, int8 elements, int32 accumulators,
 custom opcode `0x7b`, full accumulator readout and first-layer optimizations.
 The builder checks these facts against the pinned header before compiling.
 Every extracted source file and symlink is checked against a complete public
 source roster before and after building; extra instrumentation is rejected.
 
-The exact RTL elaboration lineage of the archived bitstream is unrecovered.
+The 30 MHz profile records exact Chipyard, Gemmini and receiver source revisions
+from the U250 handoff; the complete historical dirty FireSim overlay and matched
+FPGA execution remain unproven. The stock profile retains its original source
+limitations.
 These source pins establish a functional ABI baseline, not physical deployment
 equivalence. Rocket caches, accelerator queues, memory bandwidth and cycle
 counts are not modeled or inferred. The explicit launch ISA is an executable
@@ -47,12 +51,18 @@ The original functional source and Makefile are unmodified. The installation
 contains `bin/spike`, `lib/libgemmini.so`, upstream headers and `deployment.json`
 with source, binary, compiler and build-command receipts. Its initial status is
 `built_not_executed`; building does not establish numerical or RTL correctness.
-The separate `runtime/` deployment contains only the executable, compiled
-functional library and receipts. Move it by rename to the stable task `out/`
+The separate `runtime/` deployment contains the executable, compiled
+functional library, receipts and, when a staged Boost root was selected, the
+exact Boost regex shared library. Move it by rename to the stable task `out/`
 directory as shown above. The build's `sources/` and `install/include/` remain
 trusted operator build material in `.tmp/`, outside candidate grants. Historical
 execution receipts retain their original argv when a deployment moves; a current
 deployment location record identifies the relocated endpoints.
+
+When Boost is staged outside system paths, pass both `--boost-root` and
+`--boost-libdir`. Those exact dependency paths and the version-header hash enter
+the deployment receipt. Set `LD_LIBRARY_PATH` to `runtime/lib` when using a
+staged Boost build; this selects the packaged regex library and Gemmini receiver.
 
 ## Functional launch
 
@@ -63,13 +73,16 @@ Additional host extensions require independent deployment justification and an
 explicit launch choice.
 
 ```sh
-/your/task/out/runtime/bin/spike \
-  --isa=rv64gc_zicntr_zihpm --priv=m -p1 -m256 \
-  --extlib=/your/task/out/runtime/lib/libgemmini.so \
+LD_LIBRARY_PATH=/your/task/out/runtime/lib /your/task/out/runtime/bin/spike \
+  --isa=rv64imafdcb_zicsr_zifencei_zihpm_zfh_zba_zbb_zbs \
+  --priv=m -p1 -m0x80000000:0x400000000 \
+  --extlib=libgemmini.so \
   --extension=gemmini /path/to/program.elf
 ```
 
-Only this baseline library should be loaded. No annotated extension is needed.
+The 16 GiB launch span above is for the 30 MHz profile; select the declared
+span of each other board explicitly. Only the selected baseline library should
+be loaded. No annotated extension is needed.
 The receiver implements its original public instruction set, including hardware
 loop instructions. The experiment's no-FSM instruction constraint remains an
 independent compiler/grader policy; this baseline does not silently change the
@@ -93,6 +106,7 @@ so no timing code reaches the functional runtime. It imports no OOT compiler.
 
 ```sh
 python3 examples/gemmini/functional_baseline/export.py \
+  --profile fire_aligned_30mhz \
   --spike-repo /path/to/riscv-isa-sim \
   --libgemmini-repo /path/to/public/libgemmini \
   --output /path/to/new/task-temporary-package
