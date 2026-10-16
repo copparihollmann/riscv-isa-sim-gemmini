@@ -10,6 +10,8 @@
     "archive_identity": "operator_verified_pin",
     "archive_sha256": "0af6f26e1cbad1c03f9e5873217505a5100bf2d0d068205cfa486522b24fc603",
     "chipyard_revision": "009e85b05ca817a15fcd6c3fe4eedd86cc2a3617",
+    "dram_base": 2147483648,
+    "dram_bytes": 17179869184,
     "embedded_bitstream_sha256": null,
     "firesim_revision": "b084672c2f8cf32e55d78f73a001074c23f8a2b8",
     "functional_extension_revision": "5b1254a7dc72f757442280e7f28ef30542c78533",
@@ -17,6 +19,7 @@
     "generated_params_sha256": "3758ae967af3a179497660970201093a7fb624be00173990ce33d3f5c38da924",
     "hardware_pin_registry": "merlin/contract/hardware_pins.yaml",
     "host_dts_sha256": "c4a2009a405945ea98f731713e0f4e7dc483031ab8cd5156d871e4eb7594f1df",
+    "host_isa": "rv64imafdcbzicsr_zifencei_zihpm_zfh_zba_zbb_zbs_xrocket",
     "platform": "xilinx_alveo_u250",
     "public_architecture_headers": {
       "riscv/rocc.h": "08bdaf6f3f6e846125c937f4c19d54ab11efaf3026ffab55aad609e2c6a52eea"
