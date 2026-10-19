@@ -29,16 +29,18 @@ def main():
     parser.add_argument("--timing-provider", type=Path, required=True)
     parser.add_argument("--build-dir", type=Path, required=True)
     parser.add_argument("--clang", default="clang")
+    parser.add_argument("--linker", default="lld", help="linker name or absolute executable path")
     parser.add_argument("--staged", action="store_true", help="exercise separately selected v2 scheduling with synthetic prices")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     build = args.build_dir.absolute()
     build.mkdir(parents=True, exist_ok=False)
     elf = build / "primitive.elf"
+    linker = "--ld-path=" + args.linker if Path(args.linker).is_absolute() else "-fuse-ld=" + args.linker
     _, compile_seconds = run([args.clang, "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
                              "-mcmodel=medany", "-O1", "-Wall", "-Wextra", "-Werror", "-ffreestanding",
                              "-fno-builtin", "-fno-stack-protector", "-msmall-data-limit=0",
-                             "-nostdlib", "-fuse-ld=lld", "-Wl,-T," + str(root / "tests/elf/link.ld"),
+                             "-nostdlib", linker, "-Wl,-T," + str(root / "tests/elf/link.ld"),
                              root / "tests/elf/start.S", root / "tests/elf/primitive.c", "-o", elf])
     spec = importlib.util.spec_from_file_location("spike_native_tests", args.spike_root / "timing/tests/run_native.py")
     module = importlib.util.module_from_spec(spec)

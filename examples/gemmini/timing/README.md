@@ -118,6 +118,35 @@ not a count of nonzero arithmetic. Queueing, resource overlap and read/write
 hazards come from the generic engine. Physical banking and intra-command phase
 overlap are not independently resolved by this provider.
 
+## Explicit staged scheduling selection
+
+`target.scheduling.version = 2` separately selects `staged.hpp`. The legacy
+selection remains unchanged. This selection distinguishes reservation admission,
+controller issue, FIFO consumption, effects and retirement. It requires explicit
+LD/EX/ST reservation and controller-queue capacities, DMA command-tracker
+capacities, six `accelerator.{issue,controller}.{load,execute,store}` resources,
+and issue latency/occupancy prices. Missing prices remain unknown.
+
+A pending solitary PRELOAD survives a fence and starts only when its following
+execute command is observed. Non-garbage destination tags retain their reservation
+through the following compute result, rather than retiring at descriptor
+readiness. Admission timestamps are clamped to the CPU issue frontier, including
+after a fence. Load/store configuration reservations release on controller issue;
+their configuration effects remain ordered at controller consumption.
+
+`require_fenced_phases = 1` restricts the initial model domain to explicitly
+fenced controller phases and rejects a COMPUTE-to-PRELOAD transition without a
+completion fence. Such transitions require independent cross-controller bank or
+overlapped mesh/tag semantics. The command-order audit continues when prices are
+unknown, and an observed fence remains ordering evidence even when its cost is
+unknown. These refusals affect native timing, not complete instruction counts.
+
+These mechanisms and the synthetic tests do not establish accelerator timing
+qualification. The selected source/fact correspondence, supported semantic
+subset, all prices and held-out timing gates require separate review. Resource
+breakdowns in native reports remain explicitly scoped whole-trace diagnostics;
+they must not be summed into counter-window costs or physical traffic.
+
 ## Verification
 
 Run bounded independent C++ and source-pinning checks:

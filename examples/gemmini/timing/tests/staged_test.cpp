@@ -45,6 +45,8 @@ int main() {
     Event fence{3, {}, {}, {}, 0};
     assert(scheduler.submit("fence", fence, 0, 127, 0, 0).ready == 51);
     assert(scheduler.pending_preload());
+    Event stale{10, {&descriptor, 1}, {}, {}, 2};
+    assert(scheduler.submit("compute_ws", stale, 1, 4, 0, 0).issue == 51);
   }
   // Ordinary entries remain owned until actual effects complete, not until
   // service starts or the controller queue dequeues.
@@ -54,6 +56,21 @@ int main() {
     Event first{0, {}, {}, {}, 50}, second{1, {}, {}, {}, 2};
     assert(scheduler.submit("load", first, 1, 2, 0, 0).ready == 51);
     assert(scheduler.submit("load", second, 1, 2, 0, 0).issue == 51);
+  }
+  // A non-garbage PRELOAD's entry is not released at descriptor readiness.
+  // With two EX slots, compute occupies the other slot; the next EX admission
+  // must wait for actual output/tag completion.
+  {
+    auto selected = config(); selected.reservations[1] = 2;
+    Engine engine(8, resources()); StagedObserver scheduler(engine, selected, 4);
+    const ValueId descriptor = 5;
+    Event preload{0, {}, {&descriptor, 1}, {}, 2};
+    scheduler.submit("preload", preload, 1, 6, 0, 0x80000000u);
+    Event compute{1, {&descriptor, 1}, {}, {}, 50};
+    const auto result = scheduler.submit("compute_ws", compute, 1, 4, 0, 0);
+    Event following{2, {}, {}, {}, 1};
+    const auto next = scheduler.submit("config", following, 1, 0, 0, 0);
+    assert(result.ready && next.issue == result.ready);
   }
   // EX config waits all prior execute completion. ST config uses ST's path.
   {
@@ -71,5 +88,26 @@ int main() {
     Event load{0, {}, {}, {}, 5};
     assert(!scheduler.submit("load", load, 1, 2, 0, 0).ready);
     assert(!engine.report().complete && !engine.barrier());
+  }
+  // Unknown prices do not erase observed ordering fences or hide a later
+  // unsupported phase transition. These are semantic-domain refusals, not
+  // prices to be fitted away.
+  {
+    auto selected = config(); selected.require_fenced_phases = true;
+    selected.issue_latency.reset();
+    std::vector<std::string> missing;
+    Engine engine(8, resources());
+    StagedObserver scheduler(engine, selected, 4, [&](const auto &s) { missing.push_back(s); });
+    Event event{0, {}, {}, {}, 1};
+    scheduler.submit("load", event, 1, 2, 0, 0);
+    scheduler.submit("fence", event, 0, 127, 0, 0);
+    scheduler.submit("preload", event, 1, 6, 0, 0);
+    scheduler.submit("compute_ws", event, 1, 4, 0, 0);
+    assert(missing.empty());
+    scheduler.submit("preload", event, 1, 6, 0, 0);
+    assert(missing.size() == 1);
+    assert(missing[0] == "staged:compute_preload_overlap_without_completion_fence");
+    scheduler.submit("store", event, 1, 3, 0, 0);
+    assert(missing.back() == "staged:cross_controller_phase_without_completion_fence");
   }
 }
