@@ -99,8 +99,28 @@ instructions after the opening observation through the closing observation.
 The selected window freezes timing eligibility at its closing boundary; later
 logging does not alter that window. `instructions` and `cycle_breakdown` describe
 the whole executed trace; selected `feature_counts` and `estimated_cycles`
-describe the selected scope. Counter-derived control, addresses, stored data or
-unmodeled architectural state inside/before the selected scope refuse timing.
+describe the selected scope. Counter-derived control, addresses, accelerator
+operands or unmodeled architectural state inside/before the selected scope
+refuse timing and count portability. Ordinary counter-value spills propagate
+sparse byte taint through actual loads/stores; partial overwrites retain the
+remaining taint. A counter spill alone is not a refusal. Device input reads
+must be independent of those counter values.
+
+Fresh reports use `merlin.annotated_spike_report.v2`. The independent
+`feature_observation` contract (`merlin.spike_feature_observation.v1`) records
+count completeness, exact scope, primary instruction vocabulary and coverage,
+and unresolved count semantics. Complete counts do not imply complete native
+timing, hardware qualification or independent output equivalence. Missing
+prices/resources can leave counts usable while native cycles remain unknown.
+Target providers may export `spike_timing_provider_feature_observation_v1`
+without changing the original provider ABI. Missing provider status refuses
+count completeness; it cannot silently clear unknown semantics.
+
+Configured scalar Zba/Zbb/Zbs instructions require exact simulator-defined
+encodings and actual register dependencies. They have a separate bit-manipulation
+price class. Enabled but unused Zfh does not invalidate an otherwise supported
+trace; executed half-precision forms still refuse. Other integer-extension
+encodings sharing a major opcode remain unknown.
 The model never substitutes estimated cycles into the guest counter.
 
 For a capsule kernel-call label, an internal counter read must not become a

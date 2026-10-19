@@ -2,6 +2,7 @@
 #include "cpu_decode.hpp"
 #include "memory.hpp"
 #include "model.hpp"
+#include "counter_taint.hpp"
 #include "processor.h"
 #include <dlfcn.h>
 #include <array>
@@ -45,6 +46,7 @@ struct CounterWindow {
   std::map<std::string, std::uint64_t> features;
   std::set<std::string> unresolved;
   bool timing_complete;
+  std::set<std::string> count_unresolved;
 };
 } // namespace
 
@@ -62,9 +64,12 @@ public:
   std::string report_path, elf_digest, input_digest;
   std::map<std::string, std::uint64_t> features;
   std::set<std::string> unresolved;
+  std::set<std::string> count_unresolved;
+  CounterMemoryTaint counter_memory;
   std::unique_ptr<MemorySystem> memory;
   std::unique_ptr<Services> services;
   std::unique_ptr<TargetProvider> target;
+  ObserveProviderFeatures target_features = nullptr;
   ValueId next_token = 67;
   std::optional<Cycle> pending_flags = Cycle{0};
   std::array<bool,64> time_dependent{};
@@ -88,7 +93,8 @@ public:
        std::function<unsigned(std::uint64_t, std::size_t)> classify,
        const std::string &scope_binding)
       : model(path), engine(model.max_values, model.resources), report_path(output),
-        elf_digest(sha256_file(elf)), input_digest(input), memory_kind(std::move(classify)) {
+        elf_digest(sha256_file(elf)), input_digest(input), counter_memory(model.max_memory_entries),
+        memory_kind(std::move(classify)) {
     model.bind_scope(scope_binding, elf_digest, input_digest);
     for (const auto *name : cpu_feature_classes) {
       add_feature(name, 0);
@@ -102,10 +108,10 @@ public:
     issue_cost = model.cycles("cpu.issue_cycles");
     branch_taken = model.cycles("cpu.branch.taken_penalty_cycles");
     branch_not_taken = model.cycles("cpu.branch.not_taken_penalty_cycles");
-    if (input_digest.empty()) unknown("external input identity is unspecified");
+    if (input_digest.empty()) unsafe("external input identity is unspecified");
     else if (!is_digest(input_digest)) throw std::invalid_argument("invalid input SHA-256");
     if (model.domain.at("feature_engine_sha256") != SPIKE_TIMING_SOURCE_SHA256)
-      unknown("feature engine source identity differs from selected profile");
+      unsafe("feature engine source identity differs from selected profile");
     for (const auto &library : libraries) library_digests.push_back(sha256_file(library));
     std::vector<std::string> expected_libraries;
     if (const auto expected = model.document.get_child_optional("libraries"))
@@ -114,7 +120,7 @@ public:
         expected_libraries.push_back(entry.second.data());
       }
     if (library_digests != expected_libraries)
-      unknown("loaded functional or timing libraries differ from selected profile");
+      unsafe("loaded functional or timing libraries differ from selected profile");
     auto allocate = [this](std::size_t count) { return allocate_tokens(count); };
     auto feature = [this](const std::string &name, std::uint64_t count) { add_feature(name, count); };
     auto missing = [this](const std::string &reason) { unknown(reason); };
@@ -134,7 +140,12 @@ public:
       }, allocate,
       [this](const std::vector<MemoryEffect> &effects) {
         for (const auto &effect : effects) if (effect.bytes && memory_kind(effect.address, effect.bytes) != 1) {
-          unknown("device transfer outside stable RAM is unsupported"); return SharedEffects{};
+          unsafe("device transfer outside stable RAM is unsupported"); return SharedEffects{};
+        }
+        for (const auto &effect : effects) {
+          if (!effect.write && counter_memory.read(effect.address, effect.bytes))
+            unsafe("device input depends on architectural counters");
+          if (effect.write) counter_memory.write(effect.address, effect.bytes, false);
         }
         return memory->access(effects, "device");
       },
@@ -144,6 +155,8 @@ public:
     if (factory) {
       target.reset(factory(services.get()));
       if (!target) throw std::runtime_error("timing provider factory returned no provider");
+      target_features = reinterpret_cast<ObserveProviderFeatures>(
+          dlsym(RTLD_DEFAULT, "spike_timing_provider_feature_observation_v1"));
     }
     accesses.reserve(std::min<std::size_t>(model.max_accesses_per_instruction, 64));
     namespace fs = std::filesystem;
@@ -153,11 +166,13 @@ public:
         throw std::invalid_argument("timing output conflicts with an input or nonregular file");
       std::ifstream old(report_path); std::array<char,128> prefix{};
       old.read(prefix.data(),prefix.size());
-      if (std::string(prefix.data(),old.gcount()).find("merlin.annotated_spike_report.v1") == std::string::npos)
+      const std::string previous(prefix.data(), old.gcount());
+      if (previous.find("merlin.annotated_spike_report.v1") == std::string::npos &&
+          previous.find("merlin.annotated_spike_report.v2") == std::string::npos)
         throw std::invalid_argument("timing output would replace a nonreport file");
     }
     std::ofstream pending(report_path, std::ios::binary | std::ios::trunc);
-    if (!pending || !(pending << "{\"schema\":\"merlin.annotated_spike_report.v1\",\"timing_complete\":false,\"status\":\"running\"}\n"))
+    if (!pending || !(pending << "{\"schema\":\"merlin.annotated_spike_report.v2\",\"timing_complete\":false,\"status\":\"running\"}\n"))
       throw std::runtime_error("cannot initialize incomplete timing output");
   }
   CpuCost cpu_cost(const std::string &priced, const std::string &kind) {
@@ -184,12 +199,28 @@ public:
       throw std::runtime_error("timing diagnostic budget exceeded");
     unresolved.insert(reason);
   }
+  void unsafe(const std::string &reason) {
+    unknown(reason);
+    count_unresolved.insert(reason);
+  }
+  std::set<std::string> feature_reasons() const {
+    auto reasons = count_unresolved;
+    if (target) {
+      if (!target_features) reasons.insert("target provider has no feature observation interface");
+      else {
+        const auto status = target_features(target.get());
+        reasons.insert(status.unresolved.begin(), status.unresolved.end());
+        if (!status.complete) reasons.insert("target feature observation is incomplete");
+      }
+    }
+    return reasons;
+  }
   void add_feature(const std::string &name, std::uint64_t amount) {
     if (features.size() >= 512 && !features.count(name))
       throw std::runtime_error("timing feature budget exceeded");
     auto &value = features[name];
     if (amount > std::numeric_limits<std::uint64_t>::max() - value) {
-      unknown("feature counter overflow"); return;
+      unsafe("feature counter overflow"); return;
     }
     value += amount;
   }
@@ -209,23 +240,27 @@ public:
       const auto isa = processor->get_isa().get_isa_string();
       const auto split = isa.find('_');
       const auto base = isa.substr(4, split == std::string::npos ? split : split - 4);
-      bool supported = isa.compare(0, 4, "rv64") == 0 && !base.empty() && base.find_first_not_of("imafdc") == std::string::npos;
+      bool supported = isa.compare(0, 4, "rv64") == 0 && !base.empty() && base.find_first_not_of("imafdcb") == std::string::npos;
       std::istringstream extensions(split == std::string::npos ? "" : isa.substr(split + 1));
       std::string extension;
       while (std::getline(extensions, extension, '_'))
-        if (extension != "zicsr" && extension != "zifencei" && extension != "zicntr" && extension != "zihpm") supported = false;
-      if (!supported) unknown("architectural extensions are outside the supported scalar timing domain");
+        if (extension != "zicsr" && extension != "zifencei" && extension != "zicntr" && extension != "zihpm" &&
+            extension != "zba" && extension != "zbb" && extension != "zbs" && extension != "zfh") supported = false;
+      // Enabled-but-unused half precision does not invalidate a scalar S/D
+      // trace. Executed half forms still refuse in decode_cpu; B instructions
+      // require exact encodings/operands and a separately priced class.
+      if (!supported) unsafe("architectural extensions are outside the supported scalar timing domain");
       if (model.document.get<std::string>("cpu.isa", "") != isa)
-        unknown("architectural ISA differs from selected timing profile");
+        unsafe("architectural ISA differs from selected timing profile");
     }
     if (decoded.floating_register_operands &&
         (processor->get_isa().extension_enabled(EXT_ZFINX) ||
          processor->get_isa().extension_enabled(EXT_ZDINX)))
-      unknown("floating operands in integer registers are outside this timing domain");
+      unsafe("floating operands in integer registers are outside this timing domain");
     if (processor->get_state()->mstatus->read() & MSTATUS_MPRV)
-      unknown("effective data privilege translation is outside the baremetal timing domain");
+      unsafe("effective data privilege translation is outside the baremetal timing domain");
     if (processor->get_xlen() != 64 || processor->get_state()->prv != 3)
-      unknown("timing profile currently requires single-hart RV64 baremetal execution");
+      unsafe("timing profile currently requires single-hart RV64 baremetal execution");
   }
   void record_memory(std::uint64_t address, std::size_t bytes, access_type type) {
     if (!in_instruction || accelerator_depth || type == FETCH) return;
@@ -234,7 +269,7 @@ public:
     }
     const auto kind = memory_kind(address, bytes);
     if (!kind || (kind == 2 && type == STORE)) {
-      unknown("unmodeled MMIO or nonstable memory access"); access_overflow = true; return;
+      unsafe("unmodeled MMIO or nonstable memory access"); access_overflow = true; return;
     }
     accesses.push_back({address, bytes, type == STORE, kind == 2});
   }
@@ -266,22 +301,32 @@ public:
     bool temporal = clock_csr;
     const auto csr_mode = (bits >> 12) & 7;
     if (clock_csr && (csr_mode == 1 || csr_mode == 5 || ((bits >> 15) & 31)))
-      unknown("writes to architectural performance counters are outside the timing trace contract");
+      unsafe("writes to architectural performance counters are outside the timing trace contract");
     for (unsigned i=0; i<decoded.read_count; ++i) temporal = temporal || time_dependent[decoded.reads[i]];
+    for (const auto &access : accesses)
+      if (!access.write) temporal = temporal || counter_memory.read(access.address, access.bytes);
     if (decoded.reads_rounding_mode) temporal = temporal || temporal_rounding;
     if (decoded.reads_fflags) temporal = temporal || temporal_flags;
     if (decoded.writes_rounding_mode) temporal_rounding = temporal;
     if (decoded.writes_fflags) temporal_flags = temporal;
     if (decoded.accumulates_fflags) temporal_flags = temporal_flags || temporal;
     if (temporal && (bits & 127) == 0x73 && !clock_csr && csr_address > 3)
-      unknown("counter-derived architectural state is outside the timing trace contract");
-    if (temporal && (decoded.branch || !accesses.empty() || decoded.custom))
-      unknown("counter-derived control, address or stored data is outside the timing trace contract");
+      unsafe("counter-derived architectural state is outside the timing trace contract");
+    if (time_dependent[decoded.memory_address_register] && !accesses.empty())
+      unsafe("counter-derived memory address is outside the timing trace contract");
+    if (temporal && (decoded.branch || decoded.custom))
+      unsafe("counter-derived control or accelerator operand is outside the timing trace contract");
+    // A harness may spill its opening cycle value for subtraction after the
+    // window. Track those actual bytes instead of rejecting every such spill.
+    // Loads propagate labels; control, address, device input and state uses
+    // still refuse. Unlabelled overwrites remove only the bytes they replace.
+    for (const auto &access : accesses)
+      if (access.write) counter_memory.write(access.address, access.bytes, temporal);
     for (unsigned i=0; i<decoded.write_count; ++i) time_dependent[decoded.writes[i]] = temporal;
-    if (!decoded.known) unknown("unsupported CPU instruction semantics");
-    if (access_overflow) unknown("instruction memory observation budget exceeded");
+    if (!decoded.known) unsafe("unsupported CPU instruction semantics");
+    if (access_overflow) unsafe("instruction memory observation budget exceeded");
     if (accelerator_depth && !(decoded.custom && accelerator_depth == 1)) {
-      unknown("accelerator observation begin/end is incomplete"); accelerator_depth = 0;
+      unsafe("accelerator observation begin/end is incomplete"); accelerator_depth = 0;
     }
     accelerator_depth = 0;
     if (decoded.fence) {
@@ -292,7 +337,7 @@ public:
     const auto instruction_bytes = (bits & 3) == 3 ? 4u : 2u;
     const auto instruction_space = memory_kind(pc, instruction_bytes);
     SharedEffects fetch;
-    if (!instruction_space) unknown("instruction fetch outside stable memory is unsupported");
+    if (!instruction_space) unsafe("instruction fetch outside stable memory is unsupported");
     else fetch = memory->access({MemoryEffect{pc, instruction_bytes, false, instruction_space == 2}}, "cpu_fetch");
     const ValueId fetch_token = 64;
     fetch.writes.push_back(fetch_token);
@@ -343,7 +388,7 @@ public:
           std::optional<Cycle>{std::max(*pending_flags, *cpu.ready)} : std::nullopt;
     if (decoded.writes_fflags) pending_flags = cpu.ready;
     if (decoded.custom) {
-      if (!target || !command_pending) unknown("custom instruction has no successful target observation");
+      if (!target || !command_pending) unsafe("custom instruction has no successful target observation");
       else {
         if (command[0] != pc || command[1] != bits)
           throw std::logic_error("target command does not match committed instruction");
@@ -354,16 +399,16 @@ public:
           else unknown("asynchronous result has unknown command admission");
         }
       }
-    } else if (command_pending) unknown("target command was attached to a non-custom instruction");
+    } else if (command_pending) unsafe("target command was attached to a non-custom instruction");
     if (decoded.counter_read && (!model.scope_pc_pair || pc == model.scope_begin_pc || pc == model.scope_end_pc)) {
       const bool opening = model.scope_pc_pair ? pc == model.scope_begin_pc : !counter_pending;
       if (opening) {
-        if (counter_pending) unknown("counter scope opened again before completion");
+        if (counter_pending) unsafe("counter scope opened again before completion");
         counter_pending = true; first_counter = cpu.start;
         first_counter_pc = pc; first_counter_instruction = instructions;
         first_counter_features = features;
       } else {
-        if (!counter_pending) { unknown("counter scope closed without its opening boundary"); return; }
+        if (!counter_pending) { unsafe("counter scope closed without its opening boundary"); return; }
         if (windows.size() >= model.max_counter_windows)
           throw std::runtime_error("counter-window observation budget exceeded");
         std::optional<Cycle> elapsed;
@@ -377,7 +422,8 @@ public:
           scoped.emplace(feature.first, delta);
         }
         windows.push_back({first_counter_pc, pc, instructions - first_counter_instruction, elapsed, std::move(scoped),
-                           selected ? unresolved : std::set<std::string>{}, engine.report().complete && !trapped});
+                           selected ? unresolved : std::set<std::string>{}, engine.report().complete && !trapped,
+                           selected ? feature_reasons() : std::set<std::string>{}});
         counter_pending = false;
       }
     }
@@ -385,27 +431,40 @@ public:
   void write_report(int exit_code, bool completed) {
     if (finished) throw std::logic_error("timing report already finalized");
     finished = true;
-    if (in_instruction) unknown("instruction observation is unfinished");
-    if (trapped) unknown("trapping instruction timing and exception transition are unsupported");
+    if (in_instruction) unsafe("instruction observation is unfinished");
+    if (trapped) unsafe("trapping instruction timing and exception transition are unsupported");
     const auto observed = engine.report();
-    if (counter_pending) unknown("unmatched cycle counter boundary");
+    if (counter_pending) unsafe("unmatched cycle counter boundary");
     std::optional<Cycle> estimate = observed.modeled_makespan;
     const auto scope_kind = model.document.get<std::string>("scope.kind");
     if (scope_kind == "counter_pair" || scope_kind == "counter_pc_pair") {
       const auto index = model.scope_window;
-      if (index >= windows.size()) { unknown("selected counter window was not executed"); estimate.reset(); }
+      if (index >= windows.size()) { unsafe("selected counter window was not executed"); estimate.reset(); }
       else estimate = windows[index].cycles;
     } else if (scope_kind != "whole_program") {
-      unknown("unsupported measurement boundary"); estimate.reset();
+      unsafe("unsupported measurement boundary"); estimate.reset();
     }
     const bool scoped = scope_kind != "whole_program" && model.scope_window < windows.size();
     const auto scope_features = scoped ? &windows[model.scope_window].features : &features;
     const auto &scope_reasons = scoped ? windows[model.scope_window].unresolved : unresolved;
     const bool event_complete = scoped ? windows[model.scope_window].timing_complete : observed.complete;
+    auto count_reasons = scoped ? windows[model.scope_window].count_unresolved : feature_reasons();
+    const auto counted_instructions = scoped ? windows[model.scope_window].instructions : instructions;
+    std::uint64_t cpu_total = 0;
+    for (const auto *name : cpu_feature_classes) {
+      const auto found = scope_features->find(name);
+      if (found == scope_features->end() || found->second > std::numeric_limits<std::uint64_t>::max() - cpu_total)
+        count_reasons.insert("primary CPU feature coverage is incomplete or overflows");
+      else cpu_total += found->second;
+    }
+    if (cpu_total != counted_instructions) count_reasons.insert("CPU class counts do not cover every scoped instruction");
+    if (!completed || exit_code != 0 || (!scoped && scope_kind != "whole_program") || trapped)
+      count_reasons.insert("functional execution or selected observation scope is incomplete");
+    const bool counts_complete = count_reasons.empty();
     const bool complete = completed && event_complete && scope_reasons.empty() && exit_code == 0 && estimate.has_value();
     const std::string estimated_json = complete ? std::to_string(estimate.value_or(0)) : "null";
     std::ostringstream out;
-    out << "{\"schema\":\"merlin.annotated_spike_report.v1\",\"profile\":" << json_string(model.profile)
+    out << "{\"schema\":\"merlin.annotated_spike_report.v2\",\"profile\":" << json_string(model.profile)
         << ",\"device_sha256\":" << json_string(model.device)
         << ",\"domain_sha256\":" << json_string(sha256_bytes(model.domain_json()))
         << ",\"domain\":" << model.domain_json()
@@ -423,9 +482,25 @@ public:
         << ",\"engine_qualification\":\"not_established\""
         << ",\"uncertainty\":{\"status\":\"unqualified\",\"interval_cycles\":null}"
         << ",\"instructions\":" << instructions << ",\"aborted_instructions\":" << aborted_instructions
+        << ",\"feature_observation\":{\"schema\":\"merlin.spike_feature_observation.v1\",\"complete\":"
+        << (counts_complete ? "true" : "false") << ",\"scope_instructions\":" << counted_instructions
+        << ",\"counted_cpu_instructions\":" << cpu_total << ",\"scope_kind\":" << json_string(scope_kind)
+        << ",\"window_index\":" << (scoped ? std::to_string(model.scope_window) : "null")
+        << ",\"primary_cpu_features\":[";
+    bool first = true;
+    for (const auto *name : cpu_feature_classes) {
+      if (!first) out << ',';
+      first = false; out << json_string(name);
+    }
+    out << "],\"unresolved\":["; first = true;
+    for (const auto &reason : count_reasons) {
+      if (!first) out << ',';
+      first = false; out << json_string(reason);
+    }
+    out << "],\"qualification\":\"not_established\"}"
         << ",\"memory_dependency_entries\":" << memory->pending_tokens()
         << ",\"feature_counts\":{";
-    bool first = true;
+    first = true;
     for (const auto &feature : *scope_features) {
       if (!first) out << ',';
       first = false;

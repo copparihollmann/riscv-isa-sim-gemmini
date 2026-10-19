@@ -106,6 +106,7 @@ public:
   merlin_timing::Result command(std::uint64_t pc, std::uint64_t bits, std::uint64_t rs1,
                                 std::uint64_t rs2, merlin_timing::Cycle earliest) override {
     if ((bits & opcode_mask_) != opcode_) {
+      count_errors_.insert("foreign_custom_opcode");
       services_.unresolved("foreign_custom_opcode");
       services_.feature("target.foreign_custom_opcode", 1);
       merlin_timing::Event unknown;
@@ -119,6 +120,7 @@ public:
     // The functional extension supplies a dummy/random custom counter return.
     // It cannot qualify control/data that depends on a hardware counter result.
     if (((bits >> 25) & 127) == 126 && (bits & (1ull << 14))) {
+      count_errors_.insert("custom_counter_result_not_hardware_equivalent");
       services_.unresolved("custom_counter_result_not_hardware_equivalent");
       services_.feature("target.custom_counter_result_unknown", 1);
       merlin_timing::Event unknown;
@@ -133,6 +135,13 @@ public:
     observer_.observe_fence(earliest);
     features();
   }
+  spike_timing::FeatureObservationStatus feature_status() const {
+    auto reasons = count_errors_;
+    for (const auto &entry : observer_.unknown_semantics()) reasons.insert("target:" + entry.first);
+    if (observer_.counters().accounting_overflow) reasons.insert("target_counter_overflow");
+    if (observer_.counters().illegal_events) reasons.insert("target_illegal_events");
+    return {reasons.empty(), {reasons.begin(), reasons.end()}};
+  }
 
 private:
   Services services_; // Own callback closures for the complete provider lifetime.
@@ -141,6 +150,7 @@ private:
   G::Counters previous_{};
   std::map<std::string, std::uint64_t> previous_classes_;
   std::set<std::string> reported_unknowns_;
+  std::set<std::string> count_errors_;
 
   void features() {
     const auto &now = observer_.counters();
@@ -151,6 +161,7 @@ private:
       feature(counter.name, now.*counter.member, previous_.*counter.member);
     for (const auto &entry : observer_.primitive_classes()) {
       if (!G::registered_primitive_class(entry.first)) {
+        count_errors_.insert("unregistered_target_primitive_class");
         services_.unresolved("unregistered_target_primitive_class");
         continue;
       }
@@ -181,4 +192,11 @@ extern "C" spike_timing::TargetProvider *spike_timing_create_provider_v1(spike_t
     services->unresolved(std::string("target_provider_configuration:") + error.what());
     return nullptr;
   }
+}
+
+extern "C" spike_timing::FeatureObservationStatus
+spike_timing_provider_feature_observation_v1(const spike_timing::TargetProvider *provider) {
+  const auto selected = dynamic_cast<const Provider *>(provider);
+  if (!selected) return {false, {"feature observation belongs to a different provider"}};
+  return selected->feature_status();
 }

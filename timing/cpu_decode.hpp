@@ -3,12 +3,14 @@
 
 #include <array>
 #include <cstdint>
+#include "../riscv/encoding.h"
 
 namespace spike_timing {
 
 // One vocabulary supplies both decoder spellings and explicit zero counts.
 #define SPIKE_TIMING_CPU_CLASSES(X) \
   X(atomic) \
+  X(bitmanip) \
   X(branch) \
   X(csr) \
   X(custom) \
@@ -49,12 +51,59 @@ inline constexpr const char *cpu_feature_classes[] = {
 };
 #undef SPIKE_TIMING_CPU_CLASSES
 
+struct ScalarEncoding { std::uint64_t match, mask; };
+// Use this simulator's independently maintained ISA definitions. Enabling an
+// extension is not permission to classify arbitrary instructions by opcode.
+inline constexpr ScalarEncoding integer_encodings[] = {
+#define TIMING_ENCODING(name) {MATCH_##name, MASK_##name},
+  TIMING_ENCODING(ADDI) TIMING_ENCODING(ADDIW)
+  TIMING_ENCODING(SLTI) TIMING_ENCODING(SLTIU)
+  TIMING_ENCODING(XORI) TIMING_ENCODING(ORI) TIMING_ENCODING(ANDI)
+  TIMING_ENCODING(SLLI) TIMING_ENCODING(SRLI) TIMING_ENCODING(SRAI)
+  TIMING_ENCODING(SLLIW) TIMING_ENCODING(SRLIW) TIMING_ENCODING(SRAIW)
+  TIMING_ENCODING(ADD) TIMING_ENCODING(SUB) TIMING_ENCODING(SLL)
+  TIMING_ENCODING(SLT) TIMING_ENCODING(SLTU) TIMING_ENCODING(XOR)
+  TIMING_ENCODING(SRL) TIMING_ENCODING(SRA) TIMING_ENCODING(OR) TIMING_ENCODING(AND)
+  TIMING_ENCODING(ADDW) TIMING_ENCODING(SUBW) TIMING_ENCODING(SLLW)
+  TIMING_ENCODING(SRLW) TIMING_ENCODING(SRAW)
+  TIMING_ENCODING(MUL) TIMING_ENCODING(MULH) TIMING_ENCODING(MULHSU) TIMING_ENCODING(MULHU)
+  TIMING_ENCODING(DIV) TIMING_ENCODING(DIVU) TIMING_ENCODING(REM) TIMING_ENCODING(REMU)
+  TIMING_ENCODING(MULW) TIMING_ENCODING(DIVW) TIMING_ENCODING(DIVUW)
+  TIMING_ENCODING(REMW) TIMING_ENCODING(REMUW)
+};
+inline constexpr ScalarEncoding bitmanip_encodings[] = {
+  TIMING_ENCODING(SH1ADD) TIMING_ENCODING(SH2ADD) TIMING_ENCODING(SH3ADD)
+  TIMING_ENCODING(SH1ADD_UW) TIMING_ENCODING(SH2ADD_UW) TIMING_ENCODING(SH3ADD_UW)
+  TIMING_ENCODING(ADD_UW) TIMING_ENCODING(SLLI_UW)
+  TIMING_ENCODING(ANDN) TIMING_ENCODING(ORN) TIMING_ENCODING(XNOR)
+  TIMING_ENCODING(CLZ) TIMING_ENCODING(CTZ) TIMING_ENCODING(CPOP)
+  TIMING_ENCODING(CLZW) TIMING_ENCODING(CTZW) TIMING_ENCODING(CPOPW)
+  TIMING_ENCODING(MIN) TIMING_ENCODING(MINU) TIMING_ENCODING(MAX) TIMING_ENCODING(MAXU)
+  TIMING_ENCODING(SEXT_B) TIMING_ENCODING(SEXT_H)
+  TIMING_ENCODING(ROL) TIMING_ENCODING(ROR) TIMING_ENCODING(RORI)
+  TIMING_ENCODING(ROLW) TIMING_ENCODING(RORW) TIMING_ENCODING(RORIW)
+  TIMING_ENCODING(BCLR) TIMING_ENCODING(BCLRI) TIMING_ENCODING(BEXT) TIMING_ENCODING(BEXTI)
+  TIMING_ENCODING(BINV) TIMING_ENCODING(BINVI) TIMING_ENCODING(BSET) TIMING_ENCODING(BSETI)
+  // The simulator defines these Zbb aliases through restricted older forms.
+  {MATCH_GORCI | (7u << 20), MASK_GORCI | (63u << 20)},
+  {MATCH_GREVI | (56u << 20), MASK_GREVI | (63u << 20)},
+  {MATCH_PACKW, MASK_PACKW | (31u << 20)},
+#undef TIMING_ENCODING
+};
+template <std::size_t N>
+inline bool matches_scalar(std::uint64_t bits, const ScalarEncoding (&encodings)[N]) {
+  for (const auto &encoding : encodings)
+    if ((bits & encoding.mask) == encoding.match) return true;
+  return false;
+}
+
 // ISA operand classification only. Latencies and microarchitecture are data.
 struct CpuInstruction {
   const char *kind = CpuKinds::unknown;
   std::array<std::uint64_t, 4> reads{};
   std::array<std::uint64_t, 2> writes{};
   unsigned read_count = 0, write_count = 0;
+  unsigned memory_address_register = 0; // x0 is an explicitly untainted base.
   bool known = true, branch = false, fence = false, custom = false;
   bool counter_read = false, icache_fence = false;
   bool floating_register_operands = false;
@@ -86,10 +135,12 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     if (q == 0) {
       if (f == 0) { d.read(2); d.write(b); }
       else if (f == 1 || f == 2 || f == 3) {
+        d.memory_address_register = a;
         d.kind = f == 1 ? CpuKinds::fp_load : CpuKinds::load;
         d.read(a); d.write(b, f == 1);
         if (f == 1) d.fp_width = 64;
       } else if (f == 5 || f == 6 || f == 7) {
+        d.memory_address_register = a;
         d.kind = f == 5 ? CpuKinds::fp_store : CpuKinds::store;
         d.read(a); d.read(b, f == 5);
         if (f == 5) d.fp_width = 64;
@@ -108,6 +159,7 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     } else if (q == 2) {
       if (f == 0) { d.read(rd); d.write(rd); }
       else if (f == 1 || f == 2 || f == 3) {
+        d.memory_address_register = 2;
         d.kind = f == 1 ? CpuKinds::fp_load : CpuKinds::load;
         d.read(2); d.write(rd, f == 1);
         if (f == 1) d.fp_width = 64;
@@ -123,6 +175,7 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
           d.read(r); d.write(rd);
         }
       } else if (f == 5 || f == 6 || f == 7) {
+        d.memory_address_register = 2;
         d.kind = f == 5 ? CpuKinds::fp_store : CpuKinds::store;
         d.read(2); d.read(r, f == 5);
         if (f == 5) d.fp_width = 64;
@@ -135,19 +188,27 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
   switch (op) {
   case 0x37: case 0x17: d.kind = CpuKinds::integer; d.write(rd); break;
   case 0x13: case 0x1b:
-    d.kind = CpuKinds::integer; d.read(r1); d.write(rd); break;
+    d.known = matches_scalar(bits, integer_encodings) || matches_scalar(bits, bitmanip_encodings);
+    d.kind = matches_scalar(bits, bitmanip_encodings) ? CpuKinds::bitmanip : CpuKinds::integer;
+    d.read(r1); d.write(rd); break;
   case 0x33: case 0x3b:
-    d.kind = f7 == 1 ? (f3 < 4 ? CpuKinds::multiply : CpuKinds::divide) : CpuKinds::integer;
+    d.known = matches_scalar(bits, integer_encodings) || matches_scalar(bits, bitmanip_encodings);
+    d.kind = f7 == 1 ? (f3 < 4 ? CpuKinds::multiply : CpuKinds::divide) :
+             matches_scalar(bits, bitmanip_encodings) ? CpuKinds::bitmanip : CpuKinds::integer;
     d.read(r1); d.read(r2); d.write(rd); break;
   case 0x03:
+    d.memory_address_register = r1;
     d.kind = CpuKinds::load; d.read(r1); d.write(rd); break;
   case 0x07:
+    d.memory_address_register = r1;
     if (f3 != 2 && f3 != 3) { d.known = false; break; }
     d.kind = CpuKinds::fp_load; d.fp_width = f3 == 2 ? 32 : 64;
     d.read(r1); d.write(rd, true); break;
   case 0x23:
+    d.memory_address_register = r1;
     d.kind = CpuKinds::store; d.read(r1); d.read(r2); break;
   case 0x27:
+    d.memory_address_register = r1;
     if (f3 != 2 && f3 != 3) { d.known = false; break; }
     d.kind = CpuKinds::fp_store; d.fp_width = f3 == 2 ? 32 : 64;
     d.read(r1); d.read(r2, true); break;
@@ -237,6 +298,7 @@ inline CpuInstruction decode_cpu(std::uint64_t bits) {
     break;
   }
   case 0x2f:
+    d.memory_address_register = r1;
     d.kind = CpuKinds::atomic; d.read(r1); d.read(r2); d.write(rd); break;
   case 0x0b: case 0x2b: case 0x5b: case 0x7b:
     d.kind = CpuKinds::custom; d.custom = true;

@@ -5,6 +5,8 @@
 #include <set>
 
 extern "C" spike_timing::TargetProvider *spike_timing_create_provider_v1(spike_timing::Services *);
+extern "C" spike_timing::FeatureObservationStatus
+spike_timing_provider_feature_observation_v1(const spike_timing::TargetProvider *);
 
 int main() {
   merlin_timing::Engine engine(128, {{0, 1, 4}, {1, 1, 4}, {2, 1, 4}, {3, 1, 4}, {4, 1, 4}, {5, 1, 4}});
@@ -82,6 +84,7 @@ int main() {
   assert(provider->command(16, 3ull << 25 | enabled, 0x2000, packet, 3).ready);
   provider->fence(4);
   assert(memory_calls == 2 && engine.report().complete && unresolved.empty());
+  assert(spike_timing_provider_feature_observation_v1(provider.get()).complete);
   assert(features["target.commands"] == 4 && features["target.fences"] == 1);
   assert(features["target.requested_read_bytes"] == 8 && features["target.requested_write_bytes"] == 8);
   assert(features["target.class.load"] == 1 && features["target.class.store"] == 1);
@@ -92,6 +95,8 @@ int main() {
   assert(!provider->command(19, 126ull << 25 | enabled | 1ull << 14, 0, 0, 4).ready);
   assert(features["target.custom_counter_result_unknown"] == 1);
   assert(unresolved.back() == "custom_counter_result_not_hardware_equivalent");
+  assert(!spike_timing_provider_feature_observation_v1(provider.get()).complete);
+  assert(!spike_timing_provider_feature_observation_v1(nullptr).complete);
   assert(provider->command(20, 2ull << 25 | 123 | 1ull << 12, 0, 1ull << 32 | 1ull << 48, 5).ready);
   assert(memory_calls == 3); // disabled xs1 selects all-ones, not raw XPR zero
   assert(!provider->command(24, 2ull << 25 | 123 | 1ull << 13, 0, packet, 6).ready);

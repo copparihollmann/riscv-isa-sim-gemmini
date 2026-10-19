@@ -52,6 +52,7 @@ def main():
     cases = [
         ("engine", [ROOT / "timing/core/tests/test_engine.cpp"], []),
         ("decode", [ROOT / "timing/tests/test_cpu_decode.cpp"], []),
+        ("counter-taint", [ROOT / "timing/tests/test_counter_taint.cpp"], []),
         (
             "memory",
             [

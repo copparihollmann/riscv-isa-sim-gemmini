@@ -97,19 +97,23 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--build-dir", required=True, type=Path)
     ap.add_argument("--baseline", type=Path)
+    ap.add_argument("--clang", default="clang")
+    ap.add_argument("--linker", default="lld", help="linker name or absolute executable path")
     args = ap.parse_args()
+    compiler = args.clang
+    linker = "--ld-path=" + args.linker if Path(args.linker).is_absolute() else "-fuse-ld=" + args.linker
     build = args.build_dir.absolute()
     elf = build / "native-cpu.elf"
     profile = build / "native-test-model.json"
     output = build / "native-test-report.json"
     run(
         [
-            "clang",
+            compiler,
             "--target=riscv64-unknown-elf",
             "-march=rv64gc",
             "-mabi=lp64d",
             "-nostdlib",
-            "-fuse-ld=lld",
+            linker,
             "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
             ROOT / "timing/tests/elf/cpu.S",
             "-o",
@@ -133,7 +137,8 @@ def main():
         execution = run(
             [
                 build / "spike",
-                *base_args,
+                "--isa=" + changed["cpu"]["isa"],
+                *base_args[1:],
                 "--timing-model=" + str(profile),
                 "--timing-report=" + str(output),
                 "--timing-input-sha256=" + hashlib.sha256(b"").hexdigest(),
@@ -146,6 +151,9 @@ def main():
     annotated, report = observe(model)
     assert baseline.stdout == annotated.stdout, (baseline.stdout, annotated.stdout)
     assert report["functional_status"] == "PASS"
+    assert report["schema"] == "merlin.annotated_spike_report.v2"
+    assert report["feature_observation"]["complete"] is True
+    assert report["feature_observation"]["counted_cpu_instructions"] == report["counter_windows"][0]["instructions"]
     assert report["timing_complete"], report["unresolved"]
     assert report["estimated_cycles"] > 0
     assert report["engine_qualification"] == "not_established"
@@ -158,14 +166,35 @@ def main():
     assert report["aborted_instructions"] == 0
     (build / "native-complete-report.json").write_text(json.dumps(report))
     (build / "native-complete-model.json").write_text(json.dumps(model))
+    bit_source, bit_elf = build / "native-bitmanip.S", build / "native-bitmanip.elf"
+    bit_source.write_text((ROOT / "timing/tests/elf/cpu.S").read_text().replace(
+        "  li t0, 7",
+        "  li t0, 3\n  li t1, 5\n  sh2add t2, t0, t1\n  li t3, 17\n  bne t2, t3, fail\n"
+        "  cpop t2, t2\n  li t3, 2\n  bne t2, t3, fail\n  bseti t2, t2, 4\n"
+        "  li t3, 18\n  bne t2, t3, fail\n  li t0, 7", 1).replace(
+            "rdcycle s0", "csrr s0, mcycle").replace("rdcycle s1", "csrr s1, mcycle"))
+    run([compiler, "--target=riscv64-unknown-elf", "-march=rv64gc_zba_zbb_zbs", "-mabi=lp64d",
+         "-nostdlib", linker, "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"), bit_source, "-o", bit_elf])
+    bit_model = json.loads(json.dumps(model))
+    bit_model["cpu"]["isa"] = "rv64imafdcb_zicsr_zifencei_zihpm_zfh_zba_zbb_zbs"
+    plain = run([args.baseline or build / "spike", "--isa=" + bit_model["cpu"]["isa"], *base_args[1:], bit_elf])
+    execution, observed_bits = observe(bit_model, bit_elf)
+    assert execution.stdout == plain.stdout
+    assert observed_bits["feature_observation"]["complete"] is True, observed_bits["feature_observation"]
+    assert observed_bits["timing_complete"] is True, observed_bits["unresolved"]
+    assert observed_bits["feature_counts"]["cpu.bitmanip"] == 3
+    bit_model["parameters"].pop("cpu.bitmanip.latency_cycles")
+    _, unpriced_bits = observe(bit_model, bit_elf)
+    assert unpriced_bits["feature_observation"]["complete"] is True
+    assert unpriced_bits["timing_complete"] is False
     # Kernels can read counters internally; selected call boundaries must not
     # silently become consecutive internal reads. No guest counter is replaced.
     inner_source = build / "native-inner-counters.S"
     inner_source.write_text((ROOT / "timing/tests/elf/cpu.S").read_text().replace(
         "  li t0, 7", "  rdcycle zero\n  rdcycle zero\n  li t0, 7", 1))
     inner_elf = build / "native-inner-counters.elf"
-    run(["clang", "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
-         "-nostdlib", "-fuse-ld=lld", "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
+    run([compiler, "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
+         "-nostdlib", linker, "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
          inner_source, "-o", inner_elf])
     _, adjacent = observe(model, inner_elf)
     binding = {
@@ -241,15 +270,35 @@ def main():
         _, refusal = observe(changed)
         assert not refusal["timing_complete"] and refusal["estimated_cycles"] is None
         assert any(reason in value for value in refusal["unresolved"]), refusal
+        assert refusal["feature_observation"]["complete"] is (reason == "event timing")
+
+    # A cycle-value spill is safe for count portability until data reaches a
+    # timing-sensitive control/address/device use. Exercise actual store/load
+    # aliasing and overwrites, not just register-to-register propagation.
+    for name, injected, complete in (
+        ("spill", "sd s0, -8(sp)\n  ld t6, -8(sp)", True),
+        ("spill-branch", "sd s0, -8(sp)\n  ld t6, -8(sp)\n  beqz t6, spill_target\nspill_target:", False),
+        ("spill-overwritten", "sd s0, -8(sp)\n  sd zero, -8(sp)\n  ld t6, -8(sp)\n  beqz t6, spill_target\nspill_target:", True),
+        ("spill-partial", "sd s0, -8(sp)\n  sw zero, -8(sp)\n  ld t6, -8(sp)\n  beqz t6, spill_target\nspill_target:", False),
+    ):
+        source, executable = build / (name + ".S"), build / (name + ".elf")
+        source.write_text((ROOT / "timing/tests/elf/cpu.S").read_text().replace("  li t0, 7", "  " + injected + "\n  li t0, 7", 1))
+        run([compiler, "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
+             "-nostdlib", linker, "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"), source, "-o", executable])
+        plain = run([args.baseline or build / "spike", *base_args, executable])
+        execution, observation = observe(model, executable)
+        assert plain.stdout == execution.stdout
+        assert observation["feature_observation"]["complete"] is complete, observation
+        assert observation["timing_complete"] is complete, observation["unresolved"]
     trap_elf = build / "native-trap.elf"
     run(
         [
-            "clang",
+            compiler,
             "--target=riscv64-unknown-elf",
             "-march=rv64gc",
             "-mabi=lp64d",
             "-nostdlib",
-            "-fuse-ld=lld",
+            linker,
             "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
             ROOT / "timing/tests/elf/trap.S",
             "-o",
@@ -268,12 +317,12 @@ def main():
     tainted_elf = build / "native-tainted.elf"
     run(
         [
-            "clang",
+            compiler,
             "--target=riscv64-unknown-elf",
             "-march=rv64gc",
             "-mabi=lp64d",
             "-nostdlib",
-            "-fuse-ld=lld",
+            linker,
             "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
             tainted_source,
             "-o",
@@ -292,12 +341,12 @@ def main():
     mmio_elf = build / "native-mmio.elf"
     run(
         [
-            "clang",
+            compiler,
             "--target=riscv64-unknown-elf",
             "-march=rv64gc",
             "-mabi=lp64d",
             "-nostdlib",
-            "-fuse-ld=lld",
+            linker,
             "-Wl,-T," + str(ROOT / "timing/tests/elf/link.ld"),
             mmio_source,
             "-o",
