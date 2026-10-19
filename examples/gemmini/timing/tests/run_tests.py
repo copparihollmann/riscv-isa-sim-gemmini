@@ -29,6 +29,7 @@ def main():
              "-I", str(root), "-I", str(args.engine_include), "-I", str(args.spike_root)]
     queried_prices = set()
     for name, sources in (("provider_test", [root / "tests/provider_test.cpp"]),
+                          ("staged_test", [root / "tests/staged_test.cpp"]),
                           ("bridge_test", [root / "bridge.cpp", root / "tests/bridge_test.cpp"])):
         output = args.build_dir / name
         subprocess.run([*flags, *(str(source) for source in sources), "-o", str(output)],

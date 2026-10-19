@@ -1,0 +1,75 @@
+#include "staged.hpp"
+#include <cassert>
+
+using namespace merlin_timing;
+using namespace gemmini_annotated_spike;
+
+static StagedConfig config() {
+  return {{2, 4, 2}, {2, 2, 2}, {2, 2}, {0, 1, 2}, {3, 4, 5}, 1, 1};
+}
+static std::vector<ResourceSpec> resources() {
+  return {{0, 1, 0}, {1, 1, 0}, {2, 1, 0}, {3, 1, 0}, {4, 1, 0}, {5, 1, 0}};
+}
+
+int main() {
+  // Isolated PRELOAD survives a fence, then actually schedules with the next
+  // execute command. The old descriptor is not dropped or declared retired.
+  {
+    Engine engine(8, resources()); StagedObserver scheduler(engine, config(), 4);
+    const ValueId descriptor = 5;
+    Event preload{2, {}, {&descriptor, 1}, {}, 7};
+    assert(scheduler.submit("preload", preload, 3, 6, 0, 0).issue == 2);
+    assert(scheduler.pending_preload() && engine.report().events == 0);
+    Event fence{3, {}, {}, {}, 0};
+    assert(scheduler.submit("fence", fence, 0, 127, 0, 0).ready == 3);
+    assert(scheduler.pending_preload() && engine.ready(descriptor) == 0);
+    Event compute{10, {&descriptor, 1}, {}, {}, 20};
+    const auto executed = scheduler.submit("compute_ws", compute, 4, 4, 0, 0);
+    assert(!scheduler.pending_preload() && engine.ready(descriptor) >= 18);
+    assert(executed.ready && *executed.ready >= 39);
+    assert(engine.issue_frontier() == 10); // effects do not stall CPU through completion
+  }
+  // The exception never skips prior unfinished DMA. A later config consumes in
+  // controller FIFO service order but releases its RS entry at controller issue.
+  {
+    Engine engine(8, resources()); StagedObserver scheduler(engine, config(), 4);
+    const ValueId local = 0, load_config = 1, descriptor = 5;
+    Event load{0, {}, {&local, 1}, {}, 50};
+    const auto dma = scheduler.submit("load", load, 10, 2, 0, 0);
+    assert(dma.ready == 51);
+    Event set_config{1, {}, {&load_config, 1}, {}, 1};
+    const auto configured = scheduler.submit("config", set_config, 1, 0, 1, 0);
+    assert(configured.start == 11 && configured.ready == 12);
+    Event preload{2, {}, {&descriptor, 1}, {}, 2};
+    scheduler.submit("preload", preload, 1, 6, 0, 0);
+    Event fence{3, {}, {}, {}, 0};
+    assert(scheduler.submit("fence", fence, 0, 127, 0, 0).ready == 51);
+    assert(scheduler.pending_preload());
+  }
+  // Ordinary entries remain owned until actual effects complete, not until
+  // service starts or the controller queue dequeues.
+  {
+    auto selected = config(); selected.reservations[0] = 1;
+    Engine engine(8, resources()); StagedObserver scheduler(engine, selected, 4);
+    Event first{0, {}, {}, {}, 50}, second{1, {}, {}, {}, 2};
+    assert(scheduler.submit("load", first, 1, 2, 0, 0).ready == 51);
+    assert(scheduler.submit("load", second, 1, 2, 0, 0).issue == 51);
+  }
+  // EX config waits all prior execute completion. ST config uses ST's path.
+  {
+    Engine engine(8, resources()); StagedObserver scheduler(engine, config(), 4);
+    Event compute{0, {}, {}, {}, 40}, set_config{1, {}, {}, {}, 1};
+    assert(scheduler.submit("compute_ws", compute, 2, 4, 0, 0).ready == 41);
+    assert(scheduler.submit("config", set_config, 1, 0, 0, 0).start == 42);
+    const auto store = scheduler.submit("config", set_config, 1, 0, 2, 0);
+    assert(store.start == 2); // independent controller can overlap
+  }
+  // Missing timing never turns into an implicit zero or a released reservation.
+  {
+    Engine engine(8, resources()); auto selected = config(); selected.issue_latency.reset();
+    StagedObserver scheduler(engine, selected, 4);
+    Event load{0, {}, {}, {}, 5};
+    assert(!scheduler.submit("load", load, 1, 2, 0, 0).ready);
+    assert(!engine.report().complete && !engine.barrier());
+  }
+}

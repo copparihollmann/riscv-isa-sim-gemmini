@@ -66,6 +66,9 @@ struct TransferEffects {
   std::optional<Cycle> minimum_latency;
 };
 using TransferHook = std::function<TransferEffects(View<Transfer>)>;
+// Explicit v2 timing-only hook; the v1 functional/count path stays unchanged.
+using SubmitHook = std::function<Result(const std::string &, const Event &,
+    std::optional<Cycle>, std::uint32_t, std::uint64_t, std::uint64_t)>;
 
 struct Counters {
   std::array<std::uint64_t, 128> commands{};
@@ -95,9 +98,9 @@ public:
 
   TargetObserver(Engine &engine, HardwareConfig hardware, Parameters parameters,
                  ResourceBindings resources, ValueId token_base = 0,
-                 TransferHook transfer_hook = {})
+                 TransferHook transfer_hook = {}, SubmitHook submit_hook = {})
       : engine_(engine), h_(hardware), parameters_(std::move(parameters)), resources_(resources),
-        base_(token_base), transfer_hook_(std::move(transfer_hook)),
+        base_(token_base), transfer_hook_(std::move(transfer_hook)), submit_hook_(std::move(submit_hook)),
         accumulator_activation_(h_.reset_accumulator_activation),
         accumulator_not_softmax_(accumulator_activation_ && *accumulator_activation_ != 4) {
     if (required_tokens(h_) - 1 > std::numeric_limits<ValueId>::max() - base_)
@@ -109,6 +112,7 @@ public:
   Result observe_command(std::uint64_t pc, std::uint32_t funct, std::uint64_t rs1,
                          std::uint64_t rs2, Cycle earliest = 0) {
     begin(pc, earliest);
+    funct_ = funct; rs1_ = rs1; rs2_ = rs2;
     add(counters_.commands_total, 1);
     if (funct < counters_.commands.size()) add(counters_.commands[funct], 1);
     if ((funct >= 8 && funct <= 13) || (funct >= 15 && funct <= 21)) {
@@ -182,6 +186,9 @@ private:
   ResourceBindings resources_;
   ValueId base_;
   TransferHook transfer_hook_;
+  SubmitHook submit_hook_;
+  std::uint32_t funct_ = 127;
+  std::uint64_t rs1_ = 0, rs2_ = 0;
   std::array<LoadState, 3> loads_{};
   ExecuteState execute_;
   StoreState store_;
@@ -216,6 +223,7 @@ private:
   }
   void begin(std::uint64_t pc, Cycle earliest) {
     pc_ = pc; earliest_ = earliest;
+    funct_ = 127; rs1_ = rs2_ = 0;
     reads_.clear(); writes_.clear(); demands_.clear(); transfers_.clear();
     event_reads_ = event_writes_ = 0;
     semantic_known_ = legal_ = timing_known_ = true;
@@ -312,7 +320,8 @@ private:
                 std::uint64_t bytes, std::uint64_t macs) {
     add(primitive_classes_[kind], 1);
     auto latency = priced(kind + ".latency", bytes, macs);
-    demand(resource, priced(kind + ".occupancy", bytes, macs));
+    const auto occupancy = priced(kind + ".occupancy", bytes, macs);
+    if (!submit_hook_) demand(resource, occupancy);
     if (!transfers_.empty() && transfer_hook_) {
       auto effects = transfer_hook_({transfers_.data(), transfers_.size()});
       reads_.insert(reads_.end(), effects.reads.begin(), effects.reads.end());
@@ -341,7 +350,7 @@ private:
     Event event{earliest_, {reads_.data(), reads_.size()}, {writes_.data(), writes_.size()},
                 {demands_.data(), demands_.size()}, latency};
     event.hold_reads_until_ready = true;
-    return engine_.submit(event);
+    return submit_hook_ ? submit_hook_(kind, event, occupancy, funct_, rs1_, rs2_) : engine_.submit(event);
   }
   Result configure(std::uint64_t rs1, std::uint64_t rs2) {
     const auto kind = rs1 & 3;
@@ -587,9 +596,11 @@ private:
   }
   Result fence() {
     add(counters_.fences, 1);
-    const auto barrier = engine_.barrier();
-    if (barrier) earliest_ = std::max(earliest_, *barrier);
-    else missing("prior_work_unknown_at_fence");
+    if (!submit_hook_) {
+      const auto barrier = engine_.barrier();
+      if (barrier) earliest_ = std::max(earliest_, *barrier);
+      else missing("prior_work_unknown_at_fence");
+    }
     return submit("fence", resources_.config, 0, 0);
   }
 };

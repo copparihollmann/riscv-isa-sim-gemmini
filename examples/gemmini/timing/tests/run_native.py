@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--timing-provider", type=Path, required=True)
     parser.add_argument("--build-dir", type=Path, required=True)
     parser.add_argument("--clang", default="clang")
+    parser.add_argument("--staged", action="store_true", help="exercise separately selected v2 scheduling with synthetic prices")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     build = args.build_dir.absolute()
@@ -59,6 +60,18 @@ def main():
     for index, name in enumerate(("config", "load", "store", "execute"), start=3):
         model["resources"].append({"id": index, "name": "accelerator." + name,
                                    "capacity": 1, "queue_capacity": 2})
+    if args.staged:
+        model["target"]["scheduling"] = {
+            "version": 2,
+            "reservations": {"load": 2, "execute": 4, "store": 2},
+            "controller_entries": {"load": 2, "execute": 2, "store": 2},
+            "dma_commands": {"load": 2, "store": 2},
+            "issue_latency_cycles": 1, "issue_occupancy_cycles": 1,
+        }
+        for index, name in enumerate(
+                (f"accelerator.{stage}.{group}" for stage in ("issue", "controller")
+                 for group in ("load", "execute", "store")), start=7):
+            model["resources"].append({"id": index, "name": name, "capacity": 1, "queue_capacity": 0})
     extensions = [args.functional_extension.absolute(), args.timing_provider.absolute()]
     model["libraries"] = [digest(library) for library in extensions]
     profile, report_path = build / "synthetic-model.json", build / "report.json"

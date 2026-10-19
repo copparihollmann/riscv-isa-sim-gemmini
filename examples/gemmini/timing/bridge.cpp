@@ -1,6 +1,7 @@
 // Optional adapter to the generic Spike timing plugin ABI. This translation
 // unit can be loaded separately beside the unchanged functional extension.
 #include "provider.hpp"
+#include "staged.hpp"
 #include <timing/provider.hpp>
 
 #include <memory>
@@ -61,6 +62,7 @@ G::Parameters parameters(Services &s) {
 }
 
 G::ResourceBindings resources(Services &s) {
+  if (s.number("target.scheduling.version") == std::optional<double>{2}) return {};
   const auto selected = [&](const std::string &name) -> std::optional<merlin_timing::ResourceId> {
     try { return s.resource("accelerator." + name); }
     catch (const std::exception &) {
@@ -79,12 +81,47 @@ struct Inputs {
   G::ResourceBindings resources;
   merlin_timing::ValueId tokens;
   std::uint32_t opcode, opcode_mask;
+  std::optional<G::StagedConfig> staged;
 };
+
+std::optional<G::StagedConfig> staged_config(Services &services) {
+  const auto version = services.number("target.scheduling.version");
+  if (!version) return {};
+  if (*version != 2) throw std::invalid_argument("unsupported target scheduling version");
+  G::StagedConfig result;
+  const auto count = [&](const std::string &key) {
+    const auto value = services.number("target.scheduling." + key);
+    if (!value || !std::isfinite(*value) || *value < 1 || *value > 65536 || std::floor(*value) != *value)
+      throw std::invalid_argument("missing selected staged capacity: " + key);
+    return static_cast<std::size_t>(*value);
+  };
+  const auto price = [&](const std::string &key) -> std::optional<merlin_timing::Cycle> {
+    const auto value = services.number("target.scheduling." + key);
+    if (!value) { services.unresolved("missing_staged_price:" + key); return {}; }
+    if (!std::isfinite(*value) || *value < 0 || std::floor(*value) != *value || *value >= std::ldexp(1., 64))
+      throw std::invalid_argument("invalid staged price: " + key);
+    return static_cast<merlin_timing::Cycle>(*value);
+  };
+  std::size_t i = 0;
+  for (const auto *name : {"load", "execute", "store"}) {
+    result.reservations[i] = count(std::string("reservations.") + name);
+    result.controller_entries[i] = count(std::string("controller_entries.") + name);
+    result.issue_resources[i] = services.resource(std::string("accelerator.issue.") + name);
+    result.controller_resources[i] = services.resource(std::string("accelerator.controller.") + name);
+    ++i;
+  }
+  result.dma_commands = {count("dma_commands.load"), count("dma_commands.store")};
+  result.issue_latency = price("issue_latency_cycles");
+  result.issue_occupancy = price("issue_occupancy_cycles");
+  return result;
+}
 
 class Provider final : public spike_timing::TargetProvider {
 public:
   Provider(Services services, Inputs inputs)
       : services_(std::move(services)), opcode_(inputs.opcode), opcode_mask_(inputs.opcode_mask),
+        staged_(inputs.staged ? std::make_unique<G::StagedObserver>(services_.engine, *inputs.staged,
+          inputs.tokens + inputs.hardware.scratchpad_rows + inputs.hardware.accumulator_rows + 4) : nullptr),
         observer_(services_.engine, inputs.hardware, std::move(inputs.parameters),
           inputs.resources, inputs.tokens, [this](merlin_timing::View<G::Transfer> transfers) {
             std::vector<spike_timing::MemoryEffect> rows;
@@ -95,7 +132,10 @@ public:
             }
             const auto effects = services_.memory(rows);
             return G::TransferEffects{effects.reads, effects.writes, effects.demands, effects.latency};
-          }) {
+          }, staged_ ? G::SubmitHook{[this](const auto &kind, const auto &event, auto occupancy,
+                                          auto funct, auto rs1, auto rs2) {
+            return staged_->submit(kind, event, occupancy, funct, rs1, rs2);
+          }} : G::SubmitHook{}) {
     for (const auto &counter : counter_features) services_.feature(std::string("target.") + counter.name, 0);
     services_.feature("target.foreign_custom_opcode", 0);
     services_.feature("target.custom_counter_result_unknown", 0);
@@ -146,6 +186,7 @@ public:
 private:
   Services services_; // Own callback closures for the complete provider lifetime.
   std::uint32_t opcode_, opcode_mask_;
+  std::unique_ptr<G::StagedObserver> staged_;
   G::TargetObserver observer_;
   G::Counters previous_{};
   std::map<std::string, std::uint64_t> previous_classes_;
@@ -186,7 +227,8 @@ extern "C" spike_timing::TargetProvider *spike_timing_create_provider_v1(spike_t
     const auto mask = integer(*services, "custom_opcode_mask");
     if (!mask || mask > 127 || (opcode & ~mask)) throw std::invalid_argument("invalid target custom opcode fact");
     Inputs inputs{h, parameters(*services), resources(*services),
-                  services->allocate_tokens(G::TargetObserver::required_tokens(h)), opcode, mask};
+                  services->allocate_tokens(G::TargetObserver::required_tokens(h)), opcode, mask,
+                  staged_config(*services)};
     return new Provider(*services, std::move(inputs));
   } catch (const std::exception &error) {
     services->unresolved(std::string("target_provider_configuration:") + error.what());
