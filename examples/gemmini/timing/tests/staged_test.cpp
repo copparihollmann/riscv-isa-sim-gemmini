@@ -5,7 +5,10 @@ using namespace merlin_timing;
 using namespace gemmini_annotated_spike;
 
 static StagedConfig config() {
-  return {{2, 4, 2}, {2, 2, 2}, {2, 2}, {0, 1, 2}, {3, 4, 5}, 1, 1};
+  StagedConfig result;
+  result.reservations={2,4,2}; result.controller_entries={2,2,2}; result.dma_commands={2,2};
+  result.issue_resources={0,1,2}; result.controller_resources={3,4,5};
+  result.issue_latency=1; result.issue_occupancy=1; return result;
 }
 static std::vector<ResourceSpec> resources() {
   return {{0, 1, 0}, {1, 1, 0}, {2, 1, 0}, {3, 1, 0}, {4, 1, 0}, {5, 1, 0}};
@@ -145,5 +148,52 @@ int main() {
     phases.observe(0, {}, {1});
     phases.observe(1, {1}, {});
     assert(!phases.observe(2, {}, {}));
+  }
+  // The original owner supplies independently established physical resources;
+  // arrival order or distinct row addresses alone never imply independence.
+  {
+    DependencyPhases phases([](auto group, const auto &rows, auto other, const auto &prior) {
+      return (group == 1 || other == 1) && !rows.empty() && !prior.empty() && *rows.begin()/16 != *prior.begin()/16;
+    });
+    phases.observe(0, {}, {0});
+    assert(phases.observe(1, {16}, {32}));
+    assert(!phases.observe(2, {48}, {})); // DMA paths still shared
+  }
+  for (const auto rhs : {16u, 1u}) {
+    auto selected=config(); selected.require_fenced_phases=true; selected.allow_dependency_ordered_phases=true;
+    selected.allow_disjoint_scratchpad_banks=true; selected.scratchpad_bank_rows=16;
+    selected.issue_latency.reset();
+    std::vector<std::string> missing;
+    Engine engine(128, resources());
+    StagedObserver scheduler(engine, selected, 100, [&](const auto &reason) { missing.push_back(reason); },0,64,4,32);
+    Event configured{0, {}, {}, {}, 1};
+    scheduler.submit("config",configured,1,0,1ull<<16,1ull<<48);
+    const ValueId a=0,descriptor=101;
+    Event load{1, {}, {&a,1}, {}, 10};
+    scheduler.submit("load",load,1,2,0,0);
+    Event preload{2, {}, {&descriptor,1}, {}, 4};
+    scheduler.submit("preload",preload,1,6,rhs | 1ull<<32 | 1ull<<48,0x80000000ull | 1ull<<32 | 1ull<<48);
+    assert(missing.empty() == (rhs == 16)); // row-disjoint in one bank is insufficient
+  }
+  // The explicit conservative policy serializes independent rows sharing one
+  // physical SP bank, while preserving overlap in a different physical bank.
+  // Its full-latency holding interval is visible in resource accounting.
+  for (const auto rhs : {16u, 1u}) {
+    auto selected=config(); selected.require_fenced_phases=true; selected.allow_dependency_ordered_phases=true;
+    selected.conservative_local_store_holds=true; selected.scratchpad_bank_rows=16;
+    selected.scratchpad_bank_resources={6,7,8,9}; selected.accumulator_storage_resource=10;
+    auto available=resources();
+    for (unsigned id=6;id<=10;++id) available.push_back({id,1,0});
+    Engine engine(128,available); std::vector<std::string> missing;
+    StagedObserver scheduler(engine,selected,100,[&](const auto &s){missing.push_back(s);},0,64,4,32);
+    const ValueId a=0,b=rhs;
+    Event load{0,{}, {&a,1},{},50};
+    assert(scheduler.submit("load",load,1,2,0,0).ready==51);
+    Event compute{1,{&b,1},{},{},10};
+    const auto result=scheduler.submit("compute_ws",compute,1,4,rhs | 1ull<<32 | 1ull<<48,0xffffffffu);
+    assert(result.start==(rhs==16 ? 2 : 51));
+    assert(missing.empty());
+    const auto stats=engine.report();
+    assert(stats.resources[6].busy_unit_cycles==(rhs==16 ? 50 : 60));
   }
 }

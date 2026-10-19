@@ -41,6 +41,7 @@ class BundleTests(unittest.TestCase):
         second = self.base / "second"
         self.assertEqual(self.receipt, EXPORT.export_bundle(self.document, second))
         self.assertEqual(json.loads((second / "stock_u250.json").read_bytes()), self.document)
+        self.assertEqual((second / "staged.hpp").read_bytes(), (ROOT / "staged.hpp").read_bytes())
         self.assertEqual({path.name for path in second.iterdir()},
                          {*(row["path"] for row in self.receipt["members"]), BUILD.MANIFEST})
         # Exported tooling must work without Merlin installed or importable.
@@ -50,6 +51,12 @@ class BundleTests(unittest.TestCase):
 
     def test_changed_member(self):
         source = self.bundle / "provider.hpp"
+        source.write_bytes(source.read_bytes() + b"\n// mutation\n")
+        with self.assertRaisesRegex(ValueError, "identity differs"):
+            BUILD.verify_bundle(self.bundle)
+
+    def test_changed_staged_member(self):
+        source = self.bundle / "staged.hpp"
         source.write_bytes(source.read_bytes() + b"\n// mutation\n")
         with self.assertRaisesRegex(ValueError, "identity differs"):
             BUILD.verify_bundle(self.bundle)

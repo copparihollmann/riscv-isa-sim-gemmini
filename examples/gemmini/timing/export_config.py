@@ -123,11 +123,11 @@ def export(public_library: Path, rocc_header: Path, profile: str = "stock_u250")
 
 
 def export_bundle(document: dict, destination: Path, profile: str = "stock_u250"):
-    from merlin_timing.provider_bundle import export_bundle as export_sources
+    from merlin_timing.provider_bundle import RUNTIME_HEADERS, export_bundle as export_sources
 
     root = Path(__file__).absolute().parent
     payloads = {}
-    for name in ("README.md", "bridge.cpp", "provider.hpp"):
+    for name in ("README.md", "bridge.cpp", "provider.hpp", "staged.hpp"):
         path = root / name
         if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
             raise ValueError("provider sources must not be symlinks")
@@ -136,7 +136,8 @@ def export_bundle(document: dict, destination: Path, profile: str = "stock_u250"
         with path.open("rb") as stream:
             payloads[name] = stream.read(1024 * 1024 + 1)
     payloads[profile + ".json"] = (json.dumps(document, indent=2, sort_keys=True) + "\n").encode()
-    return export_sources(payloads, destination, entrypoint="bridge.cpp")
+    return export_sources(payloads, destination, entrypoint="bridge.cpp", runtime_headers=(
+        *RUNTIME_HEADERS, "timing/core/include/merlin_timing/reservations.hpp"))
 
 
 def main():

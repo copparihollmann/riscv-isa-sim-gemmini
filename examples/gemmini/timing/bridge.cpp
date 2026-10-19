@@ -115,6 +115,17 @@ std::optional<G::StagedConfig> staged_config(Services &services) {
   result.issue_occupancy = price("issue_occupancy_cycles");
   result.require_fenced_phases = services.number("target.scheduling.require_fenced_phases") == std::optional<double>{1};
   result.allow_dependency_ordered_phases = services.number("target.scheduling.allow_dependency_ordered_phases") == std::optional<double>{1};
+  result.allow_disjoint_scratchpad_banks = services.number("target.scheduling.allow_disjoint_scratchpad_banks") == std::optional<double>{1};
+  result.conservative_local_store_holds = services.number("target.scheduling.conservative_local_store_holds") == std::optional<double>{1};
+  if (result.allow_disjoint_scratchpad_banks || result.conservative_local_store_holds)
+    result.scratchpad_bank_rows = count("scratchpad_bank_rows");
+  if (result.conservative_local_store_holds) {
+    const auto banks = count("scratchpad_bank_count");
+    if (banks > 128) throw std::invalid_argument("local store resource count exceeds bound");
+    for (std::size_t bank = 0; bank < banks; ++bank)
+      result.scratchpad_bank_resources.push_back(services.resource("accelerator.storage.scratchpad." + std::to_string(bank)));
+    result.accumulator_storage_resource = services.resource("accelerator.storage.accumulator.all");
+  }
   return result;
 }
 

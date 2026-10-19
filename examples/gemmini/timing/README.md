@@ -158,6 +158,35 @@ execute-controller drain and output-tag logic. This checked subset still
 refuses independent work sharing unmodeled banks or packet resources. A
 successful ancestry check alone supplies no price or held-out qualification.
 
+`allow_disjoint_scratchpad_banks = 1` can also admit EX/DMA phases using
+separate physical scratchpad banks. The caller must bind the selected
+`scratchpad_bank_rows`. Independent rows within one bank do not qualify. LD/ST
+still share external DMA paths; all accumulator aliases remain one conservative
+conflict class rather than inferred independent ports.
+
+`conservative_local_store_holds = 1` selects a broader explicit reservation
+abstraction. It requires `scratchpad_bank_count`, `scratchpad_bank_rows`, one
+`accelerator.storage.scratchpad.<index>` resource per selected bank and an
+`accelerator.storage.accumulator.all` resource. Actual local read/write tokens,
+including PRELOAD's B feed, reserve each touched store through
+`max(effect_latency, occupancy)`. Unknown terms keep these holds unknown.
+PRELOAD descriptor readiness still does not retire its output tag.
+
+Whole-command holds deliberately serialize port use during some intervals when
+the RTL could overlap work. Accumulator ports/aliases collapse into one
+conservative conflict class; this does not claim the hardware has one port.
+The external-memory model similarly uses an explicitly selected aggregate
+shared resource and approximate cache/coherence policy. Future reservations
+can conservatively postpone independent earlier requests. These are declared
+model approximations, not exact packet or bank arbitration. Unchanged held-out
+error, ordering, family and coverage gates decide their usable timing domain.
+Command payload counts and modeled cache-line traffic remain distinct.
+
+The closed provider bundle includes `staged.hpp`. Its version-2 source manifest
+declares `reservations.hpp` as an additional generic runtime header, and the
+builder pins it alongside the original ABI/engine headers before and after
+compilation. This provides source custody, not timing qualification.
+
 These mechanisms and the synthetic tests do not establish accelerator timing
 qualification. The selected source/fact correspondence, supported semantic
 subset, all prices and held-out timing gates require separate review. Resource

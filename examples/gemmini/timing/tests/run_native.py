@@ -31,7 +31,10 @@ def main():
     parser.add_argument("--clang", default="clang")
     parser.add_argument("--linker", default="lld", help="linker name or absolute executable path")
     parser.add_argument("--staged", action="store_true", help="exercise separately selected v2 scheduling with synthetic prices")
+    parser.add_argument("--conservative-local-holds", action="store_true", help="exercise explicit conservative storage-resource holds")
     args = parser.parse_args()
+    if args.conservative_local_holds and not args.staged:
+        parser.error("--conservative-local-holds requires --staged")
     root = Path(__file__).resolve().parent.parent
     build = args.build_dir.absolute()
     build.mkdir(parents=True, exist_ok=False)
@@ -74,6 +77,15 @@ def main():
                 (f"accelerator.{stage}.{group}" for stage in ("issue", "controller")
                  for group in ("load", "execute", "store")), start=7):
             model["resources"].append({"id": index, "name": name, "capacity": 1, "queue_capacity": 0})
+        if args.conservative_local_holds:
+            model["target"]["scheduling"].update(
+                require_fenced_phases=1, allow_dependency_ordered_phases=1,
+                conservative_local_store_holds=1, scratchpad_bank_count=4,
+                scratchpad_bank_rows=model["target"]["hardware"]["scratchpad_rows"] // 4)
+            for name in [*(f"accelerator.storage.scratchpad.{i}" for i in range(4)),
+                         "accelerator.storage.accumulator.all"]:
+                model["resources"].append({"id": len(model["resources"]), "name": name,
+                                           "capacity": 1, "queue_capacity": 0})
     extensions = [args.functional_extension.absolute(), args.timing_provider.absolute()]
     model["libraries"] = [digest(library) for library in extensions]
     profile, report_path = build / "synthetic-model.json", build / "report.json"

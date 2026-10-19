@@ -15,6 +15,11 @@ struct StagedConfig {
   std::optional<Cycle> issue_latency, issue_occupancy;
   bool require_fenced_phases = false;
   bool allow_dependency_ordered_phases = false;
+  bool allow_disjoint_scratchpad_banks = false;
+  std::uint32_t scratchpad_bank_rows = 0;
+  bool conservative_local_store_holds = false;
+  std::vector<ResourceId> scratchpad_bank_resources;
+  std::optional<ResourceId> accumulator_storage_resource;
 };
 
 // Exact cross-controller RS completion ancestry, independent of event prices.
@@ -24,8 +29,11 @@ class DependencyPhases {
 public:
   using Ids = std::set<std::uint64_t>;
   using Rows = std::set<ValueId>;
+  using Independence = std::function<bool(std::size_t, const Rows &, std::size_t, const Rows &)>;
+  explicit DependencyPhases(Independence independent = {}) : independent_(std::move(independent)) {}
   bool observe(std::size_t group, const Rows &reads, const Rows &writes,
-               bool preload = false, bool compute = false, bool execute_config = false) {
+               bool preload = false, bool compute = false, bool execute_config = false,
+               const Rows *physical = nullptr) {
     if (execute_config) {
       for (const auto &entry : nodes_) if (entry.second.group == 1) execute_drain_.insert(entry.first);
       return true;
@@ -45,10 +53,13 @@ public:
       dependencies.insert(nodes_.at(*last_preload_).parents.begin(), nodes_.at(*last_preload_).parents.end());
     const auto ancestors = closure(dependencies);
     bool ordered = true;
+    Rows local = reads; local.insert(writes.begin(), writes.end());
+    const auto &selected_physical = physical ? *physical : local;
     for (const auto &entry : nodes_)
-      if (entry.second.group != group && !ancestors.count(entry.first)) ordered = false;
+      if (entry.second.group != group && !ancestors.count(entry.first) &&
+          !(independent_ && independent_(group, selected_physical, entry.second.group, entry.second.physical))) ordered = false;
     const auto identity = ++sequence_;
-    nodes_.emplace(identity, Node{group, reads, writes, dependencies});
+    nodes_.emplace(identity, Node{group, reads, writes, selected_physical, dependencies});
     if (compute && last_preload_ && nodes_.count(*last_preload_))
       nodes_.at(*last_preload_).parents.insert(identity);
     if (preload) last_preload_ = identity;
@@ -62,11 +73,12 @@ public:
     else last_preload_.reset();
   }
 private:
-  struct Node { std::size_t group; Rows reads, writes; Ids parents; };
+  struct Node { std::size_t group; Rows reads, writes, physical; Ids parents; };
   std::map<std::uint64_t, Node> nodes_;
   Ids execute_drain_;
   std::uint64_t sequence_ = 0;
   std::optional<std::uint64_t> last_preload_;
+  Independence independent_;
   static bool overlap(const Rows &a, const Rows &b) {
     auto left = a.begin(), right = b.begin();
     while (left != a.end() && right != b.end()) {
@@ -96,7 +108,16 @@ public:
       std::function<void(const std::string &)> unresolved = {},
       ValueId local_base = 0, std::uint32_t scratchpad_rows = 0, std::uint32_t dim = 0, std::uint32_t accumulator_rows = 0)
       : engine_(engine), config_(config), execute_configuration_(execute_configuration),
-        unresolved_(std::move(unresolved)), local_base_(local_base), scratchpad_rows_(scratchpad_rows), dim_(dim), accumulator_rows_(accumulator_rows) {
+        phases_([this](auto group, const auto &rows, auto other, const auto &prior) {
+          return independent_banks(group, rows, other, prior);
+        }), unresolved_(std::move(unresolved)), local_base_(local_base), scratchpad_rows_(scratchpad_rows), dim_(dim), accumulator_rows_(accumulator_rows) {
+    if (config_.allow_disjoint_scratchpad_banks && (!config_.scratchpad_bank_rows ||
+        !scratchpad_rows_ || scratchpad_rows_ % config_.scratchpad_bank_rows))
+      throw std::invalid_argument("selected scratchpad bank geometry is inconsistent");
+    if (config_.conservative_local_store_holds && (!config_.scratchpad_bank_rows ||
+        std::uint64_t(config_.scratchpad_bank_resources.size()) * config_.scratchpad_bank_rows != scratchpad_rows_ ||
+        !config_.accumulator_storage_resource))
+      throw std::invalid_argument("conservative local-store resource mapping is incomplete");
     for (std::size_t i = 0; i < 3; ++i) {
       reservations_[i] = std::make_unique<merlin_timing::ReservationWindow>(config.reservations[i]);
       controllers_[i] = std::make_unique<merlin_timing::ReservationWindow>(config.controller_entries[i]);
@@ -171,8 +192,14 @@ public:
       range(rs1, ((rs1 >> (a_transpose_ ? 32 : 48)) & 31) * a_stride_, rs_reads);
       range(rs2, (rs2 >> 48) & 31, rs_reads);
     }
+    DependencyPhases::Rows physical_rows;
+    for (const auto rows : {source.reads, source.writes})
+      for (std::size_t i = 0; i < rows.size; ++i) if (local(rows[i])) physical_rows.insert(rows[i]);
+    if (funct == 6) { // Includes the retained destination tag conservatively.
+      physical_rows.insert(rs_reads.begin(), rs_reads.end()); physical_rows.insert(rs_writes.begin(), rs_writes.end());
+    }
     const bool dependency_ordered = config ? (subtype != 0 || phases_.observe(group, {}, {}, false, false, true)) :
-        phases_.observe(group, rs_reads, rs_writes, funct == 6, funct == 4 || funct == 5);
+        phases_.observe(group, rs_reads, rs_writes, funct == 6, funct == 4 || funct == 5, false, &physical_rows);
     // Audit actual command order independently of priced Engine progress. An
     // unpriced first event must not hide unsupported later commands.
     if (config_.require_fenced_phases && group == 1) {
@@ -192,7 +219,7 @@ public:
       }
     }
     if (!config && config_.require_fenced_phases && (config_.allow_dependency_ordered_phases || (last_data_group_ && *last_data_group_ != group))) {
-      if (!config_.allow_dependency_ordered_phases || !dependency_ordered) {
+      if (!config_.conservative_local_store_holds && (!config_.allow_dependency_ordered_phases || !dependency_ordered)) {
         missing("staged:cross_controller_phase_without_completion_dependency");
         semantic_scope_known_ = false;
       }
@@ -265,6 +292,26 @@ private:
 
   void missing(const std::string &reason) { if (unresolved_) unresolved_(reason); }
 
+  bool independent_banks(std::size_t group, const DependencyPhases::Rows &rows,
+                         std::size_t other, const DependencyPhases::Rows &prior) const {
+    // DMA directions share external paths even when their SRAM banks differ.
+    // ACC aliases/shared adder structure are not claimed independent: every
+    // accumulator row maps to one conservative physical conflict class.
+    if (!config_.allow_disjoint_scratchpad_banks || (group != 1 && other != 1)) return false;
+    const auto banks = [&](const DependencyPhases::Rows &selected) {
+      std::set<std::uint64_t> result;
+      for (const auto value : selected) {
+        const auto offset = value - local_base_;
+        result.insert(offset < scratchpad_rows_ ? offset / config_.scratchpad_bank_rows :
+                      scratchpad_rows_ / config_.scratchpad_bank_rows);
+      }
+      return result;
+    };
+    const auto left = banks(rows), right = banks(prior);
+    for (const auto bank : left) if (right.count(bank)) return false;
+    return true;
+  }
+
   static bool extend(Cycle &earliest, std::optional<Cycle> value) {
     if (!value) return false;
     earliest = std::max(earliest, *value); return true;
@@ -301,6 +348,25 @@ private:
       if (dma_ticket) consume = std::max(consume, dma_ticket->admitted);
     }
     command.demands.push_back({config_.controller_resources[command.group], 1, command.occupancy});
+    if (config_.conservative_local_store_holds) {
+      // A declared conservative abstraction: hold every touched local store
+      // through the whole effect, including gaps during DMA/mesh service. This
+      // admits less overlap than the RTL and never invents a second SP port.
+      // ACC aliases/ports collapse to one explicit conservative conflict class.
+      std::set<ResourceId> stores;
+      for (const auto *tokens : {&command.reads, &command.writes})
+        for (const auto value : *tokens) {
+          if (value < local_base_) continue;
+          const auto row = value - local_base_;
+          if (row < scratchpad_rows_)
+            stores.insert(config_.scratchpad_bank_resources[row / config_.scratchpad_bank_rows]);
+          else if (row - scratchpad_rows_ < accumulator_rows_)
+            stores.insert(*config_.accumulator_storage_resource);
+        }
+      const auto hold = command.latency && command.occupancy ?
+          std::optional<Cycle>{std::max(*command.latency, *command.occupancy)} : std::nullopt;
+      for (const auto store : stores) command.demands.push_back({store, 1, hold});
+    }
     Event effect{consume, {command.reads.data(), command.reads.size()},
         {command.writes.data(), command.writes.size()}, {command.demands.data(), command.demands.size()},
         known ? command.latency : std::nullopt, true, {command.retained.data(), command.retained.size()}};
