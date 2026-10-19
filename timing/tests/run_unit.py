@@ -51,6 +51,7 @@ def main():
     model_file.write_text(json.dumps(model))
     cases = [
         ("engine", [ROOT / "timing/core/tests/test_engine.cpp"], []),
+        ("reservations", [ROOT / "timing/core/tests/test_reservations.cpp"], []),
         ("decode", [ROOT / "timing/tests/test_cpu_decode.cpp"], []),
         ("counter-taint", [ROOT / "timing/tests/test_counter_taint.cpp"], []),
         (
