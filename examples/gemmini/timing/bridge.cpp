@@ -114,6 +114,7 @@ std::optional<G::StagedConfig> staged_config(Services &services) {
   result.issue_latency = price("issue_latency_cycles");
   result.issue_occupancy = price("issue_occupancy_cycles");
   result.require_fenced_phases = services.number("target.scheduling.require_fenced_phases") == std::optional<double>{1};
+  result.allow_dependency_ordered_phases = services.number("target.scheduling.allow_dependency_ordered_phases") == std::optional<double>{1};
   return result;
 }
 
@@ -123,7 +124,7 @@ public:
       : services_(std::move(services)), opcode_(inputs.opcode), opcode_mask_(inputs.opcode_mask),
         staged_(inputs.staged ? std::make_unique<G::StagedObserver>(services_.engine, *inputs.staged,
           inputs.tokens + inputs.hardware.scratchpad_rows + inputs.hardware.accumulator_rows + 4,
-          services_.unresolved, inputs.tokens, inputs.hardware.scratchpad_rows, inputs.hardware.dim) : nullptr),
+          services_.unresolved, inputs.tokens, inputs.hardware.scratchpad_rows, inputs.hardware.dim, inputs.hardware.accumulator_rows) : nullptr),
         observer_(services_.engine, inputs.hardware, std::move(inputs.parameters),
           inputs.resources, inputs.tokens, [this](merlin_timing::View<G::Transfer> transfers) {
             std::vector<spike_timing::MemoryEffect> rows;

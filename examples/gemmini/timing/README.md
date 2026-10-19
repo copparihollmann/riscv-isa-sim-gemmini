@@ -141,6 +141,23 @@ overlapped mesh/tag semantics. The command-order audit continues when prices are
 unknown, and an observed fence remains ordering evidence even when its cost is
 unknown. These refusals affect native timing, not complete instruction counts.
 
+`allow_dependency_ordered_phases = 1` additionally admits a controller phase
+when the actual selected local-storage hazards prove completion of every prior
+effect from the other controllers. `DependencyPhases` reconstructs the relevant
+selected reservation-station ranges from actual operands and stride state.
+It retains exact event ancestry, rather than treating a later DMA sequence
+number as proof that unrelated earlier DMA completed. Same-LD/EX queue order
+proves issue order only; same-ST dependencies wait completion. PRELOAD source
+feed dependencies and its later compute output/tag retirement remain separate.
+An EX configuration explicitly drains prior EX retirement. Configuration, PE
+and cache tokens do not manufacture cross-controller completion ancestry.
+
+The source authority is the selected `ReservationStation.scala` allocation,
+cross-queue dependency, issue and completion logic, together with the selected
+execute-controller drain and output-tag logic. This checked subset still
+refuses independent work sharing unmodeled banks or packet resources. A
+successful ancestry check alone supplies no price or held-out qualification.
+
 These mechanisms and the synthetic tests do not establish accelerator timing
 qualification. The selected source/fact correspondence, supported semantic
 subset, all prices and held-out timing gates require separate review. Resource

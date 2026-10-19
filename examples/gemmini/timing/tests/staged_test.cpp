@@ -108,6 +108,42 @@ int main() {
     assert(missing.size() == 1);
     assert(missing[0] == "staged:compute_preload_overlap_without_completion_fence");
     scheduler.submit("store", event, 1, 3, 0, 0);
-    assert(missing.back() == "staged:cross_controller_phase_without_completion_fence");
+    assert(missing.back() == "staged:cross_controller_phase_without_completion_dependency");
+  }
+  // Cross-controller storage hazards prove full completion ancestry. An
+  // unrelated earlier DMA cannot disappear merely because a later one is read.
+  {
+    DependencyPhases phases;
+    assert(phases.observe(0, {}, {0}));
+    assert(phases.observe(1, {0}, {1}));
+    assert(phases.observe(2, {1}, {2}));
+    assert(!phases.observe(0, {}, {3}));
+    assert(!phases.observe(1, {0}, {1}));
+    phases.fence(false);
+    assert(phases.observe(1, {0}, {1}));
+  }
+  {
+    DependencyPhases phases;
+    phases.observe(0, {}, {0});
+    phases.observe(0, {}, {1});
+    assert(!phases.observe(1, {1}, {2}));
+  }
+  // PRELOAD feed and result/tag are separate graph edges. ST waits the
+  // PRELOAD destination tag, which retires with its following compute output.
+  {
+    DependencyPhases phases;
+    assert(phases.observe(0, {}, {0}));
+    assert(phases.observe(1, {0}, {2}, true));
+    phases.fence(true);
+    assert(phases.observe(1, {1}, {}, false, true));
+    assert(phases.observe(2, {2}, {}));
+  }
+  // LD/EX same-controller issue ordering never becomes completion ancestry.
+  {
+    DependencyPhases phases;
+    phases.observe(0, {}, {0});
+    phases.observe(0, {}, {1});
+    phases.observe(1, {1}, {});
+    assert(!phases.observe(2, {}, {}));
   }
 }
