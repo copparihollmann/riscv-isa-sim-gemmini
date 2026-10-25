@@ -1,6 +1,7 @@
 // Optional adapter to the generic Spike timing plugin ABI. This translation
 // unit can be loaded separately beside the unchanged functional extension.
 #include "provider.hpp"
+#include "staged.hpp"
 #include <timing/provider.hpp>
 
 #include <memory>
@@ -42,9 +43,44 @@ G::HardwareConfig hardware(Services &s) {
       throw std::invalid_argument("invalid reset activation fact");
     activation = static_cast<std::uint8_t>(*selected);
   }
+  std::optional<bool> normalizations;
+  const auto norms = s.number("target.hardware.normalizations");
+  if (norms) {
+    if (*norms != 0 && *norms != 1) throw std::invalid_argument("invalid normalization capability fact");
+    normalizations = *norms == 1;
+  }
+  std::optional<merlin_timing::Cycle> arrival;
+  const auto strided=s.number("target.scheduling.accumulator_streamed_strided_rows");
+  if(strided && (*strided!=1 ||
+      s.number("target.scheduling.readout_request_stage_split")!=std::optional<double>{1}))
+    throw std::invalid_argument("aligned strided rows require explicit split readout protocol");
+  const auto partial=s.number("target.scheduling.accumulator_streamed_partial_raw_rows");
+  const auto refuse=s.number("target.scheduling.refuse_masked_write_approximation");
+  if ((partial && (*partial!=1 || strided!=std::optional<double>{1} ||
+          s.number("target.scheduling.accumulator_streamed_readout")!=std::optional<double>{1})) ||
+      (refuse && *refuse!=1))
+    throw std::invalid_argument("partial raw rows require explicit streamed split readout");
+  const auto beat=(partial || refuse)?integer(s,"writer_beat_bytes"):0;
+  const auto max_request=(partial || refuse)?integer(s,"writer_max_request_bytes"):0;
+  if ((partial || refuse) && (!beat || (beat&(beat-1)) || max_request<beat ||
+        (max_request&(max_request-1))))
+    throw std::invalid_argument("partial readout requires selected packet geometry");
+  if (const auto enabled = s.number("target.scheduling.accumulator_readout_arrival")) {
+    if (*enabled != 1 || s.number("target.scheduling.version") != std::optional<double>{5} ||
+        normalizations != std::optional<bool>{false})
+      throw std::invalid_argument("ACC readout arrival requires selected non-normalizing staged v5");
+    const auto stages = integer(s, "accumulator_scale_pipeline_stages");
+    if (!stages || stages > 256) throw std::invalid_argument("invalid ACC scale pipeline fact");
+    arrival = stages;
+  }
   return {integer(s, "dim"), integer(s, "scratchpad_rows"), integer(s, "accumulator_rows"),
           integer(s, "element_bytes"), integer(s, "accumulator_bytes"), integer(s, "address_bits"),
-          bool(first), bool(full), activation};
+          bool(first), bool(full), activation, normalizations, arrival,
+          s.number("target.scheduling.accumulator_streamed_readout")==std::optional<double>{1},
+          s.number("target.scheduling.scratchpad_row_loads")==std::optional<double>{1},
+          strided==std::optional<double>{1},partial==std::optional<double>{1},
+          refuse==std::optional<double>{1},beat,max_request,
+          s.number("target.scheduling.scratchpad_partial_row_loads")==std::optional<double>{1}};
 }
 
 G::Parameters parameters(Services &s) {
@@ -57,10 +93,20 @@ G::Parameters parameters(Services &s) {
     }
   for (const auto *field : {"dma.read_bytes_per_cycle", "dma.write_bytes_per_cycle"})
     if (const auto value = s.number(std::string("target.prices.") + field)) result[field] = *value;
+  if (const auto relation = s.number("target.scheduling.pool_relu_shared_scale_pipeline")) {
+    if (*relation != 1 ||
+        s.number("target.hardware.relu_same_accumulator_scale_pipeline") != std::optional<double>{1} ||
+        s.number("target.hardware.normalizations") != std::optional<double>{0})
+      throw std::invalid_argument("pool ReLU service relation requires selected RTL pipeline facts");
+    G::apply_pool_relu_shared_pipeline(result);
+  }
   return result;
 }
 
 G::ResourceBindings resources(Services &s) {
+  const auto staged = s.number("target.scheduling.version");
+  if (staged == std::optional<double>{2} || staged == std::optional<double>{3} ||
+      staged == std::optional<double>{4} || staged == std::optional<double>{5}) return {};
   const auto selected = [&](const std::string &name) -> std::optional<merlin_timing::ResourceId> {
     try { return s.resource("accelerator." + name); }
     catch (const std::exception &) {
@@ -79,12 +125,176 @@ struct Inputs {
   G::ResourceBindings resources;
   merlin_timing::ValueId tokens;
   std::uint32_t opcode, opcode_mask;
+  std::optional<G::StagedConfig> staged;
 };
+
+std::optional<G::StagedConfig> staged_config(Services &services) {
+  const auto version = services.number("target.scheduling.version");
+  if(services.number("target.scheduling.readout_request_stage_split") &&
+      (!version || *version!=5 ||
+       services.number("target.scheduling.accumulator_streamed_readout")!=std::optional<double>{1}))
+    throw std::invalid_argument("readout request split requires staged full-row readout");
+  if (!version) return {};
+  if (*version != 2 && *version != 3 && *version != 4 && *version != 5) throw std::invalid_argument("unsupported target scheduling version");
+  G::StagedConfig result;
+  const auto count = [&](const std::string &key) {
+    const auto value = services.number("target.scheduling." + key);
+    if (!value || !std::isfinite(*value) || *value < 1 || *value > 65536 || std::floor(*value) != *value)
+      throw std::invalid_argument("missing selected staged capacity: " + key);
+    return static_cast<std::size_t>(*value);
+  };
+  const auto price = [&](const std::string &key) -> std::optional<merlin_timing::Cycle> {
+    const auto value = services.number("target.scheduling." + key);
+    if (!value) { services.unresolved("missing_staged_price:" + key); return {}; }
+    if (!std::isfinite(*value) || *value < 0 || std::floor(*value) != *value || *value >= std::ldexp(1., 64))
+      throw std::invalid_argument("invalid staged price: " + key);
+    return static_cast<merlin_timing::Cycle>(*value);
+  };
+  std::size_t i = 0;
+  for (const auto *name : {"load", "execute", "store"}) {
+    result.reservations[i] = count(std::string("reservations.") + name);
+    result.controller_entries[i] = count(std::string("controller_entries.") + name);
+    result.issue_resources[i] = services.resource(std::string("accelerator.issue.") + name);
+    result.controller_resources[i] = services.resource(std::string("accelerator.controller.") + name);
+    ++i;
+  }
+  result.dma_commands = {count("dma_commands.load"), count("dma_commands.store")};
+  result.issue_latency = price("issue_latency_cycles");
+  result.issue_occupancy = price("issue_occupancy_cycles");
+  result.require_fenced_phases = services.number("target.scheduling.require_fenced_phases") == std::optional<double>{1};
+  result.allow_dependency_ordered_phases = services.number("target.scheduling.allow_dependency_ordered_phases") == std::optional<double>{1};
+  result.allow_disjoint_scratchpad_banks = services.number("target.scheduling.allow_disjoint_scratchpad_banks") == std::optional<double>{1};
+  result.conservative_local_store_holds = services.number("target.scheduling.conservative_local_store_holds") == std::optional<double>{1};
+  if (*version == 3 || *version == 4 || *version == 5) {
+    if (services.number("target.scheduling.serialized_execute_epochs") != std::optional<double>{1})
+      throw std::invalid_argument("staged v3 requires explicit serialized execute epoch semantics");
+    result.serialized_execute_epochs = true;
+  } else if (services.number("target.scheduling.serialized_execute_epochs")) {
+    throw std::invalid_argument("execute epoch policy requires staged v3");
+  }
+  if (*version == 4 || *version == 5) {
+    if (services.number("target.scheduling.serialized_output_stationary_epochs") != std::optional<double>{1})
+      throw std::invalid_argument("staged v4 requires explicit OS epoch service semantics");
+    result.serialized_output_stationary_epochs = true;
+  } else if (services.number("target.scheduling.serialized_output_stationary_epochs")) {
+    throw std::invalid_argument("OS epoch policy requires staged v4");
+  }
+  if (*version == 5) {
+    if (services.number("target.scheduling.split_ws_feed_lifetimes") != std::optional<double>{1})
+      throw std::invalid_argument("staged v5 requires explicit WS feed/result lifetime split");
+    result.split_ws_feed_lifetimes = true;
+  } else if (services.number("target.scheduling.split_ws_feed_lifetimes")) {
+    throw std::invalid_argument("WS feed/result lifetime split requires staged v5");
+  }
+  if (const auto split = services.number("target.scheduling.split_ws_accumulate_operands")) {
+    if (*split != 1 || !result.split_ws_feed_lifetimes || !result.conservative_local_store_holds)
+      throw std::invalid_argument("accumulating WS operands require staged v5 and conservative ACC holds");
+    result.split_ws_accumulate_operands = true;
+  }
+  if (const auto release = services.number("target.scheduling.ws_feed_queue_release")) {
+    if (*release != 1 || !result.split_ws_feed_lifetimes ||
+        services.number("target.hardware.execute_completion_pending_register") != std::optional<double>{1})
+      throw std::invalid_argument("WS queue release requires selected registered completion facts and staged v5");
+    result.ws_feed_queue_release = true;
+  }
+  if (const auto paired = services.number("target.scheduling.ws_resident_mul_pre_pairing")) {
+    if (*paired != 1 || !result.ws_feed_queue_release ||
+        services.number("target.hardware.execute_command_lookahead_heads") != std::optional<double>{3})
+      throw std::invalid_argument("WS resident pairing requires selected three-command lookahead and FIFO lifetimes");
+    result.ws_resident_mul_pre_pairing = true;
+  }
+  if(const auto stream=services.number("target.scheduling.accumulator_streamed_readout")) {
+    if(*stream!=1 || !result.conservative_local_store_holds ||
+        services.number("target.scheduling.accumulator_readout_arrival")!=std::optional<double>{1} ||
+        services.number("target.assumptions.accumulator_readout_translation_hits")!=std::optional<double>{1})
+      throw std::invalid_argument("streamed ACC readout requires conservative holds, first-data path and explicit translation-hit assumption");
+    const auto fact=[&](const char *key,std::size_t expected) {
+      if(services.number(std::string("target.hardware.")+key)!=std::optional<double>{double(expected)})
+        throw std::invalid_argument(std::string("unsupported streamed ACC fact: ")+key);
+      return expected;
+    };
+    fact("accumulator_read_response_cycles",1);fact("writer_tlb_queue_entries",1);
+    fact("writer_translation_queue_entries",1);fact("writer_translation_queue_pipe",1);
+    fact("writer_max_request_bytes",64);
+    if(integer(services,"dim")*integer(services,"accumulator_bytes")!=64)
+      throw std::invalid_argument("streamed ACC readout requires one aligned64-byte row transaction");
+    result.readout_stream=G::ReadoutStreamConfig{
+        fact("write_dispatch_queue_entries",2),fact("write_norm_queue_entries",6),
+        fact("normalizer_passthrough_queue_entries",2),fact("write_scale_queue_entries",6),
+        fact("write_issue_queue_entries",5),fact("accumulator_scale_pipeline_stages",8),
+        fact("writer_transaction_entries",16),fact("writer_beat_bytes",16)};
+    if(const auto split=services.number("target.scheduling.readout_request_stage_split")) {
+      if(*split!=1 || services.number("target.assumptions.writer_a_ready_with_transaction_credit")!=std::optional<double>{1} ||
+          services.number("target.assumptions.readout_command_frontend_no_backpressure")!=std::optional<double>{1})
+        throw std::invalid_argument("readout split requires explicit frontend and A-ready/credit assumptions");
+      const auto delay=price("readout_probe_request_cycles");
+      if(!delay || !*delay || *delay>256)
+        throw std::invalid_argument("readout split needs a bounded selected request/probe pipeline");
+      auto &c=*result.readout_stream;
+      c.independent_request_acceptance=true;
+      c.frontend_registered_cycles=fact("readout_extra_command_registered_stages",6);
+      c.probe_request_cycles=*delay;
+      c.private_probe_resource=services.resource("memory.l1d.probe");
+    }
+  }
+  if(const auto selected=services.number("target.scheduling.scratchpad_row_loads")) {
+    if(*selected!=1 || !result.conservative_local_store_holds ||
+        services.number("target.assumptions.scratchpad_load_translation_hits")!=std::optional<double>{1} ||
+        services.number("target.assumptions.scratchpad_load_fifo_responses")!=std::optional<double>{1})
+      throw std::invalid_argument("row loads require explicit translation/FIFO assumptions and storage hazards");
+    const auto fact=[&](const char *key,std::size_t expected) {
+      if(services.number(std::string("target.hardware.")+key)!=std::optional<double>{double(expected)})
+        throw std::invalid_argument(std::string("unsupported scratchpad row-load fact: ")+key);
+      return expected;
+    };
+    fact("dim",16);fact("element_bytes",1);fact("reader_beat_bytes",16);
+    fact("reader_translation_queue_entries",1);fact("reader_tlb_queue_entries",1);
+    fact("reader_beat_merger_stages",1);fact("identity_scale_input_stages",1);
+    fact("identity_scale_output_stages",1);fact("scratchpad_singleported",1);
+    result.scratchpad_load_stream=G::ScratchpadLoadConfig{
+        fact("reader_transaction_entries",16),fact("identity_scale_queue_entries",3),2,
+        3+integer(services,"first_layer_optimizations")};
+  }
+  if(const auto selected=services.number("target.scheduling.scratchpad_request_admission")) {
+    if(*selected!=1 || !result.scratchpad_load_stream ||
+        services.number("target.assumptions.reader_a_ready_with_transaction_credit")!=std::optional<double>{1})
+      throw std::invalid_argument("independent row requests require explicit A-ready credit assumption");
+    result.scratchpad_load_stream->independent_request_admission=true;
+  }
+  if(const auto selected=services.number("target.scheduling.scratchpad_partial_row_loads")) {
+    if(*selected!=1 || !result.scratchpad_load_stream ||
+        !result.scratchpad_load_stream->independent_request_admission ||
+        integer(services,"reader_request_capture_stages")!=1)
+      throw std::invalid_argument("partial rows require the selected one-beat reader request pipeline");
+    result.scratchpad_load_stream->partial_single_beat_rows=true;
+    result.scratchpad_load_stream->partial_request_capture_stages=1;
+  }
+  if(const auto selected=services.number("target.scheduling.scratchpad_load_frontend_arrival")) {
+    if(*selected!=1 || !result.scratchpad_load_stream ||
+        services.number("target.assumptions.load_command_frontend_no_backpressure")!=std::optional<double>{1} ||
+        integer(services,"load_extra_command_registered_stages")!=6)
+      throw std::invalid_argument("row-load frontend requires six selected stages and explicit no-backpressure scope");
+    result.load_frontend_registered_cycles=6;
+  }
+  if (result.allow_disjoint_scratchpad_banks || result.conservative_local_store_holds)
+    result.scratchpad_bank_rows = count("scratchpad_bank_rows");
+  if (result.conservative_local_store_holds) {
+    const auto banks = count("scratchpad_bank_count");
+    if (banks > 128) throw std::invalid_argument("local store resource count exceeds bound");
+    for (std::size_t bank = 0; bank < banks; ++bank)
+      result.scratchpad_bank_resources.push_back(services.resource("accelerator.storage.scratchpad." + std::to_string(bank)));
+    result.accumulator_storage_resource = services.resource("accelerator.storage.accumulator.all");
+  }
+  return result;
+}
 
 class Provider final : public spike_timing::TargetProvider {
 public:
   Provider(Services services, Inputs inputs)
       : services_(std::move(services)), opcode_(inputs.opcode), opcode_mask_(inputs.opcode_mask),
+        staged_(inputs.staged ? std::make_unique<G::StagedObserver>(services_.engine, *inputs.staged,
+          inputs.tokens + inputs.hardware.scratchpad_rows + inputs.hardware.accumulator_rows + 4,
+          services_.unresolved, inputs.tokens, inputs.hardware.scratchpad_rows, inputs.hardware.dim, inputs.hardware.accumulator_rows) : nullptr),
         observer_(services_.engine, inputs.hardware, std::move(inputs.parameters),
           inputs.resources, inputs.tokens, [this](merlin_timing::View<G::Transfer> transfers) {
             std::vector<spike_timing::MemoryEffect> rows;
@@ -95,7 +305,10 @@ public:
             }
             const auto effects = services_.memory(rows);
             return G::TransferEffects{effects.reads, effects.writes, effects.demands, effects.latency};
-          }) {
+          }, staged_ ? G::SubmitHook{[this](const auto &kind, const auto &event, auto occupancy,
+                                          auto funct, auto rs1, auto rs2, const auto &phase) {
+            return staged_->submit(kind, event, occupancy, funct, rs1, rs2, phase);
+          }} : G::SubmitHook{}) {
     for (const auto &counter : counter_features) services_.feature(std::string("target.") + counter.name, 0);
     services_.feature("target.foreign_custom_opcode", 0);
     services_.feature("target.custom_counter_result_unknown", 0);
@@ -106,6 +319,7 @@ public:
   merlin_timing::Result command(std::uint64_t pc, std::uint64_t bits, std::uint64_t rs1,
                                 std::uint64_t rs2, merlin_timing::Cycle earliest) override {
     if ((bits & opcode_mask_) != opcode_) {
+      count_errors_.insert("foreign_custom_opcode");
       services_.unresolved("foreign_custom_opcode");
       services_.feature("target.foreign_custom_opcode", 1);
       merlin_timing::Event unknown;
@@ -119,6 +333,7 @@ public:
     // The functional extension supplies a dummy/random custom counter return.
     // It cannot qualify control/data that depends on a hardware counter result.
     if (((bits >> 25) & 127) == 126 && (bits & (1ull << 14))) {
+      count_errors_.insert("custom_counter_result_not_hardware_equivalent");
       services_.unresolved("custom_counter_result_not_hardware_equivalent");
       services_.feature("target.custom_counter_result_unknown", 1);
       merlin_timing::Event unknown;
@@ -133,14 +348,23 @@ public:
     observer_.observe_fence(earliest);
     features();
   }
+  spike_timing::FeatureObservationStatus feature_status() const {
+    auto reasons = count_errors_;
+    for (const auto &entry : observer_.unknown_semantics()) reasons.insert("target:" + entry.first);
+    if (observer_.counters().accounting_overflow) reasons.insert("target_counter_overflow");
+    if (observer_.counters().illegal_events) reasons.insert("target_illegal_events");
+    return {reasons.empty(), {reasons.begin(), reasons.end()}};
+  }
 
 private:
   Services services_; // Own callback closures for the complete provider lifetime.
   std::uint32_t opcode_, opcode_mask_;
+  std::unique_ptr<G::StagedObserver> staged_;
   G::TargetObserver observer_;
   G::Counters previous_{};
   std::map<std::string, std::uint64_t> previous_classes_;
   std::set<std::string> reported_unknowns_;
+  std::set<std::string> count_errors_;
 
   void features() {
     const auto &now = observer_.counters();
@@ -151,6 +375,7 @@ private:
       feature(counter.name, now.*counter.member, previous_.*counter.member);
     for (const auto &entry : observer_.primitive_classes()) {
       if (!G::registered_primitive_class(entry.first)) {
+        count_errors_.insert("unregistered_target_primitive_class");
         services_.unresolved("unregistered_target_primitive_class");
         continue;
       }
@@ -175,10 +400,18 @@ extern "C" spike_timing::TargetProvider *spike_timing_create_provider_v1(spike_t
     const auto mask = integer(*services, "custom_opcode_mask");
     if (!mask || mask > 127 || (opcode & ~mask)) throw std::invalid_argument("invalid target custom opcode fact");
     Inputs inputs{h, parameters(*services), resources(*services),
-                  services->allocate_tokens(G::TargetObserver::required_tokens(h)), opcode, mask};
+                  services->allocate_tokens(G::TargetObserver::required_tokens(h)), opcode, mask,
+                  staged_config(*services)};
     return new Provider(*services, std::move(inputs));
   } catch (const std::exception &error) {
     services->unresolved(std::string("target_provider_configuration:") + error.what());
     return nullptr;
   }
+}
+
+extern "C" spike_timing::FeatureObservationStatus
+spike_timing_provider_feature_observation_v1(const spike_timing::TargetProvider *provider) {
+  const auto selected = dynamic_cast<const Provider *>(provider);
+  if (!selected) return {false, {"feature observation belongs to a different provider"}};
+  return selected->feature_status();
 }

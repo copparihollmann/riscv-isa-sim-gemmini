@@ -2,7 +2,7 @@
 #define GEMMINI_ANNOTATED_SPIKE_PROVIDER_HPP
 
 // Observation only. Encodings and state transitions follow public libgemmini
-// ea8f7ed7afd68e001fb06ddccad9a023c990961d; no kernel library is included.
+// Receiver source is selected by the target profile; no kernel library is included.
 #include <merlin_timing/engine.hpp>
 
 #include <array>
@@ -26,6 +26,22 @@ using merlin_timing::ValueId;
 using merlin_timing::View;
 using Parameters = std::map<std::string, double>;
 
+// Explicit selected-RTL service relation, never a missing-price fallback.
+// AccumulatorScale's ReLU mux precedes the same elastic scale pipeline used
+// without activation. Pool addresses, transfers and dependencies remain those
+// of the observed pool_store_act1 command. Missing base terms remain UNKNOWN.
+inline void apply_pool_relu_shared_pipeline(Parameters &parameters) {
+  constexpr const char *fields[] = {"latency_cycles", "occupancy_cycles", "latency_per_byte_cycles",
+      "occupancy_per_byte_cycles", "latency_per_mac_cycles", "occupancy_per_mac_cycles"};
+  for (const auto *field : fields)
+    if (parameters.count(std::string("pool_store_act1.") + field))
+      throw std::invalid_argument("pool ReLU shared pipeline conflicts with explicit prices");
+  for (const auto *field : fields) {
+    const auto base = parameters.find(std::string("pool_store.") + field);
+    if (base != parameters.end()) parameters.emplace(std::string("pool_store_act1.") + field, base->second);
+  }
+}
+
 // Canonical observable class vocabulary. Diagnostics deliberately have no
 // hardware price schema; they describe unsupported/unconfigured commands.
 inline constexpr const char *priced_primitive_classes[] = {
@@ -48,6 +64,17 @@ struct HardwareConfig {
   bool first_layer_optimizations;
   bool full_width_accumulator_readout;
   std::optional<std::uint8_t> reset_accumulator_activation;
+  // Absent retains legacy profiles; explicit false forbids CONFIG_NORM.
+  std::optional<bool> normalizations = std::nullopt;
+  // Selected first-data pipeline before full-width ACC StreamWriter requests.
+  std::optional<Cycle> accumulator_readout_arrival = std::nullopt;
+  bool accumulator_streamed_readout = false;
+  bool scratchpad_row_loads = false;
+  bool accumulator_streamed_strided_rows = false;
+  bool accumulator_streamed_partial_raw_rows = false;
+  bool refuse_masked_write_approximation = false;
+  std::uint32_t writer_beat_bytes = 0, writer_max_request_bytes = 0;
+  bool scratchpad_partial_row_loads = false;
 };
 
 // An absent binding is an unknown resource, never an assumed single-lane queue.
@@ -66,6 +93,19 @@ struct TransferEffects {
   std::optional<Cycle> minimum_latency;
 };
 using TransferHook = std::function<TransferEffects(View<Transfer>)>;
+struct TransferPhase {
+  Cycle arrival;
+  std::vector<Demand> demands;
+  std::vector<TransferEffects> rows{};
+  std::uint64_t row_bytes=0;
+  std::vector<Transfer> row_transfers{};
+  TransferHook row_memory{};
+  bool scratchpad_load = false;
+};
+// Explicit v2 timing-only hook; the v1 functional/count path stays unchanged.
+using SubmitHook = std::function<Result(const std::string &, const Event &,
+    std::optional<Cycle>, std::uint32_t, std::uint64_t, std::uint64_t,
+    const std::optional<TransferPhase> &)>;
 
 struct Counters {
   std::array<std::uint64_t, 128> commands{};
@@ -95,9 +135,9 @@ public:
 
   TargetObserver(Engine &engine, HardwareConfig hardware, Parameters parameters,
                  ResourceBindings resources, ValueId token_base = 0,
-                 TransferHook transfer_hook = {})
+                 TransferHook transfer_hook = {}, SubmitHook submit_hook = {})
       : engine_(engine), h_(hardware), parameters_(std::move(parameters)), resources_(resources),
-        base_(token_base), transfer_hook_(std::move(transfer_hook)),
+        base_(token_base), transfer_hook_(std::move(transfer_hook)), submit_hook_(std::move(submit_hook)),
         accumulator_activation_(h_.reset_accumulator_activation),
         accumulator_not_softmax_(accumulator_activation_ && *accumulator_activation_ != 4) {
     if (required_tokens(h_) - 1 > std::numeric_limits<ValueId>::max() - base_)
@@ -109,6 +149,7 @@ public:
   Result observe_command(std::uint64_t pc, std::uint32_t funct, std::uint64_t rs1,
                          std::uint64_t rs2, Cycle earliest = 0) {
     begin(pc, earliest);
+    funct_ = funct; rs1_ = rs1; rs2_ = rs2;
     add(counters_.commands_total, 1);
     if (funct < counters_.commands.size()) add(counters_.commands[funct], 1);
     if ((funct >= 8 && funct <= 13) || (funct >= 15 && funct <= 21)) {
@@ -161,6 +202,7 @@ private:
     std::uint64_t stride = 0;
     std::uint32_t block_stride = 0, pixels = 1;
     bool shrunk = false, valid = false;
+    std::uint32_t scale = 0;
   };
   struct ExecuteState {
     std::uint32_t a_stride = 0, c_stride = 0;
@@ -182,6 +224,9 @@ private:
   ResourceBindings resources_;
   ValueId base_;
   TransferHook transfer_hook_;
+  SubmitHook submit_hook_;
+  std::uint32_t funct_ = 127;
+  std::uint64_t rs1_ = 0, rs2_ = 0;
   std::array<LoadState, 3> loads_{};
   ExecuteState execute_;
   StoreState store_;
@@ -216,6 +261,7 @@ private:
   }
   void begin(std::uint64_t pc, Cycle earliest) {
     pc_ = pc; earliest_ = earliest;
+    funct_ = 127; rs1_ = rs2_ = 0;
     reads_.clear(); writes_.clear(); demands_.clear(); transfers_.clear();
     event_reads_ = event_writes_ = 0;
     semantic_known_ = legal_ = timing_known_ = true;
@@ -309,20 +355,63 @@ private:
     demands_.push_back({*resource, 1, occupancy});
   }
   Result submit(const std::string &kind, std::optional<ResourceId> resource,
-                std::uint64_t bytes, std::uint64_t macs) {
+                std::uint64_t bytes, std::uint64_t macs, Cycle arrival = 0, bool row_load = false) {
     add(primitive_classes_[kind], 1);
     auto latency = priced(kind + ".latency", bytes, macs);
-    demand(resource, priced(kind + ".occupancy", bytes, macs));
+    const auto occupancy = priced(kind + ".occupancy", bytes, macs);
+    std::optional<TransferPhase> phase;
+    if (!submit_hook_) demand(resource, occupancy);
+    if (h_.refuse_masked_write_approximation) for (const auto &t:transfers_) {
+      if (!t.write || !t.rows || !t.row_bytes) continue;
+      // StreamWriter chooses the power-of-two packet covering the most useful
+      // bytes; a partial mask reaches SourceD's read/merge/write path. Do not
+      // substitute full-write prices for that unsupported memory transaction.
+      const auto packet=t.row_bytes>=h_.writer_max_request_bytes ?
+          h_.writer_max_request_bytes:t.row_bytes;
+      const bool full=packet && h_.writer_beat_bytes && packet>=h_.writer_beat_bytes &&
+          !(packet&(packet-1)) && t.row_bytes%packet==0 && t.address%packet==0 &&
+          (t.rows==1 || t.row_stride%packet==0);
+      if(!full) missing("memory:masked_or_nonuniform_write_timing_unmodeled");
+    }
     if (!transfers_.empty() && transfer_hook_) {
-      auto effects = transfer_hook_({transfers_.data(), transfers_.size()});
+      // Preserve per-row transfers rather than dividing aggregate latency.
+      // Observe memory lazily when each row reaches the writer: its dependency
+      // tokens are scheduled before a subsequent row can recycle them.
+      TransferEffects effects;
+      const bool streamed = arrival && submit_hook_ && h_.accumulator_streamed_readout &&
+          transfers_.size()==1 && transfers_[0].row_bytes &&
+          (transfers_[0].row_bytes==std::uint64_t(h_.dim)*h_.accumulator_bytes ||
+           h_.accumulator_streamed_partial_raw_rows) &&
+          transfers_[0].address%transfers_[0].row_bytes==0;
+      if(streamed || row_load) {
+        phase=TransferPhase{arrival,{}};phase->row_bytes=transfers_[0].row_bytes;
+        phase->scratchpad_load=row_load;
+        phase->row_memory=transfer_hook_;
+        for(std::uint64_t r=0;r<transfers_[0].rows;++r) {
+          auto row=transfers_[0];row.address+=r*row.row_stride;row.rows=1;
+          // StreamReader selects a full aligned beat even for fewer useful
+          // bytes. Keep phase.row_bytes/local writes logical; memory observes
+          // each actual Get, including repeated packets for adjacent rows.
+          if(row_load && phase->row_bytes<16) {
+            row.address-=row.address%16;row.row_bytes=16;
+          }
+          phase->row_transfers.push_back(row);
+        }
+        // Local priced service remains a floor. Row memory service is applied
+        // later at its actual streamed arrival, not in this scalar latency.
+        effects.minimum_latency=0;
+      } else effects=transfer_hook_({transfers_.data(), transfers_.size()});
       reads_.insert(reads_.end(), effects.reads.begin(), effects.reads.end());
       writes_.insert(writes_.end(), effects.writes.begin(), effects.writes.end());
+      if (arrival && submit_hook_ && !streamed) phase = TransferPhase{arrival, effects.demands};
       for (const auto &effect : effects.demands) {
         if (effect.units != 1) throw std::invalid_argument("target transfer hook requires unit demands");
-        demand(effect.resource, effect.occupancy);
+        if (!phase) demand(effect.resource, effect.occupancy);
       }
       if (!effects.minimum_latency) missing("external_transfer_latency");
-      else if (latency) latency = std::max(*latency, *effects.minimum_latency);
+      else if (arrival > std::numeric_limits<Cycle>::max() - *effects.minimum_latency)
+        missing("external_transfer_arrival_overflow");
+      else if (latency && !streamed && !row_load) latency = std::max(*latency, *effects.minimum_latency + arrival);
     } else if (!transfers_.empty()) {
       bool write = transfers_.front().write;
       std::uint64_t payload = 0;
@@ -341,7 +430,7 @@ private:
     Event event{earliest_, {reads_.data(), reads_.size()}, {writes_.data(), writes_.size()},
                 {demands_.data(), demands_.size()}, latency};
     event.hold_reads_until_ready = true;
-    return engine_.submit(event);
+    return submit_hook_ ? submit_hook_(kind, event, occupancy, funct_, rs1_, rs2_, phase) : engine_.submit(event);
   }
   Result configure(std::uint64_t rs1, std::uint64_t rs2) {
     const auto kind = rs1 & 3;
@@ -368,7 +457,7 @@ private:
       else {
         auto &load = loads_[id];
         load = {rs2, std::uint32_t((rs1 >> 16) & 65535), std::uint32_t((rs1 >> 8) & 255),
-                bool((rs1 >> 2) & 1), true};
+                bool((rs1 >> 2) & 1), true, std::uint32_t(rs1 >> 32)};
         if (!load.pixels) load.pixels = 1;
         if (!h_.first_layer_optimizations && load.pixels > 1) fail("pixel_extension_unavailable", true);
         writes_.push_back(state(id));
@@ -384,6 +473,12 @@ private:
       else if (accumulator_not_softmax_) accumulator_activation_ = 0;
       writes_.push_back(state(3));
     } else {
+      if (h_.normalizations == std::optional<bool>{false}) {
+        // Selected no-normalization RTL routes this command as a store, not
+        // a harmless configuration. Refuse a valid timing interpretation.
+        fail("normalization_feature_disabled", true);
+        return submit("config", resources_.config, 0, 0);
+      }
       const auto id = std::uint8_t((rs1 >> 8) & 255);
       if (id >= 4) fail("normalization_state_id", true);
       else norm_stat_ = id;
@@ -447,7 +542,20 @@ private:
     }
     if (dram) transfer(dram, p.rows, std::uint64_t(p.cols) * width, load.stride, false);
     else add(counters_.zero_fill_elements, std::uint64_t(p.rows) * p.cols);
-    return submit("load", resources_.load, event_reads_ + event_writes_, 0);
+    bool single_beat_partial=h_.scratchpad_partial_row_loads && p.cols && p.cols<16 &&
+        load.stride>=p.cols && p.rows && p.rows<=16;
+    // Only one-beat row packets are represented here. Crossing rows retain
+    // the original conservative aggregate path; no partial mask is invented.
+    for(std::uint32_t i=0;single_beat_partial && i<p.rows;++i) {
+      if(load.stride && i>(std::numeric_limits<std::uint64_t>::max()-dram)/load.stride)
+        single_beat_partial=false;
+      else if((dram+i*load.stride)%16+p.cols>16)single_beat_partial=false;
+    }
+    const bool row_load = h_.scratchpad_row_loads && submit_hook_ && transfer_hook_ &&
+        dram && !accumulator && !load.shrunk && load.scale==0x3f800000u && load.pixels==1 &&
+        h_.dim==16 && h_.element_bytes==1 && p.rows && p.rows<=16 &&
+        ((p.cols==16 && dram%16==0 && load.stride && load.stride%16==0) || single_beat_partial);
+    return submit("load", resources_.load, event_reads_ + event_writes_, 0, 0, row_load);
   }
   Result store(std::uint64_t dram, std::uint64_t encoded) {
     reads_.push_back(state(3));
@@ -528,7 +636,25 @@ private:
     if (acc && accumulator_activation_ && *accumulator_activation_ &&
         ((!norm && !store_.pool_stride) || (store_.pool_stride && *accumulator_activation_ == 1)))
       kind += "_act" + std::to_string(*accumulator_activation_);
-    return submit(kind, resources_.store, event_reads_ + event_writes_, 0);
+    // Full-width data still traverses AccumulatorScale's selected elastic
+    // pipeline. StreamWriter req.valid requires writeData.valid. Preserve
+    // other readout forms until their separate normalization/pooling paths
+    // have a source-bound arrival contract.
+    const auto full_row_bytes=std::uint64_t(h_.dim)*h_.accumulator_bytes;
+    const auto partial_bytes=std::uint64_t(p.cols)*h_.accumulator_bytes;
+    const bool partial=h_.accumulator_streamed_partial_raw_rows && p.cols<h_.dim &&
+        h_.writer_beat_bytes && partial_bytes>=h_.writer_beat_bytes &&
+        partial_bytes<=h_.writer_max_request_bytes && !(partial_bytes&(partial_bytes-1)) &&
+        partial_bytes%h_.writer_beat_bytes==0 && dram%partial_bytes==0;
+    const auto selected_bytes=p.cols==h_.dim ? full_row_bytes : partial ? partial_bytes : 0;
+    const bool admitted_stride=selected_bytes && (store_.stride==selected_bytes ||
+        (h_.accumulator_streamed_strided_rows && store_.stride>=selected_bytes &&
+         store_.stride%selected_bytes==0));
+    const auto arrival = acc && full && !norm && !store_.pool_stride &&
+        selected_bytes && p.rows && p.rows <= h_.dim &&
+        admitted_stride ?
+        h_.accumulator_readout_arrival.value_or(0) : 0;
+    return submit(kind, resources_.store, event_reads_ + event_writes_, 0, arrival);
   }
   Result compute(std::uint64_t rs1, std::uint64_t rs2, bool preloaded) {
     reads_.push_back(state(4)); reads_.push_back(state(5));
@@ -587,9 +713,11 @@ private:
   }
   Result fence() {
     add(counters_.fences, 1);
-    const auto barrier = engine_.barrier();
-    if (barrier) earliest_ = std::max(earliest_, *barrier);
-    else missing("prior_work_unknown_at_fence");
+    if (!submit_hook_) {
+      const auto barrier = engine_.barrier();
+      if (barrier) earliest_ = std::max(earliest_, *barrier);
+      else missing("prior_work_unknown_at_fence");
+    }
     return submit("fence", resources_.config, 0, 0);
   }
 };

@@ -29,15 +29,21 @@ def main():
     parser.add_argument("--timing-provider", type=Path, required=True)
     parser.add_argument("--build-dir", type=Path, required=True)
     parser.add_argument("--clang", default="clang")
+    parser.add_argument("--linker", default="lld", help="linker name or absolute executable path")
+    parser.add_argument("--staged", action="store_true", help="exercise separately selected v2 scheduling with synthetic prices")
+    parser.add_argument("--conservative-local-holds", action="store_true", help="exercise explicit conservative storage-resource holds")
     args = parser.parse_args()
+    if args.conservative_local_holds and not args.staged:
+        parser.error("--conservative-local-holds requires --staged")
     root = Path(__file__).resolve().parent.parent
     build = args.build_dir.absolute()
     build.mkdir(parents=True, exist_ok=False)
     elf = build / "primitive.elf"
+    linker = "--ld-path=" + args.linker if Path(args.linker).is_absolute() else "-fuse-ld=" + args.linker
     _, compile_seconds = run([args.clang, "--target=riscv64-unknown-elf", "-march=rv64gc", "-mabi=lp64d",
                              "-mcmodel=medany", "-O1", "-Wall", "-Wextra", "-Werror", "-ffreestanding",
                              "-fno-builtin", "-fno-stack-protector", "-msmall-data-limit=0",
-                             "-nostdlib", "-fuse-ld=lld", "-Wl,-T," + str(root / "tests/elf/link.ld"),
+                             "-nostdlib", linker, "-Wl,-T," + str(root / "tests/elf/link.ld"),
                              root / "tests/elf/start.S", root / "tests/elf/primitive.c", "-o", elf])
     spec = importlib.util.spec_from_file_location("spike_native_tests", args.spike_root / "timing/tests/run_native.py")
     module = importlib.util.module_from_spec(spec)
@@ -59,6 +65,27 @@ def main():
     for index, name in enumerate(("config", "load", "store", "execute"), start=3):
         model["resources"].append({"id": index, "name": "accelerator." + name,
                                    "capacity": 1, "queue_capacity": 2})
+    if args.staged:
+        model["target"]["scheduling"] = {
+            "version": 2,
+            "reservations": {"load": 2, "execute": 4, "store": 2},
+            "controller_entries": {"load": 2, "execute": 2, "store": 2},
+            "dma_commands": {"load": 2, "store": 2},
+            "issue_latency_cycles": 1, "issue_occupancy_cycles": 1,
+        }
+        for index, name in enumerate(
+                (f"accelerator.{stage}.{group}" for stage in ("issue", "controller")
+                 for group in ("load", "execute", "store")), start=7):
+            model["resources"].append({"id": index, "name": name, "capacity": 1, "queue_capacity": 0})
+        if args.conservative_local_holds:
+            model["target"]["scheduling"].update(
+                require_fenced_phases=1, allow_dependency_ordered_phases=1,
+                conservative_local_store_holds=1, scratchpad_bank_count=4,
+                scratchpad_bank_rows=model["target"]["hardware"]["scratchpad_rows"] // 4)
+            for name in [*(f"accelerator.storage.scratchpad.{i}" for i in range(4)),
+                         "accelerator.storage.accumulator.all"]:
+                model["resources"].append({"id": len(model["resources"]), "name": name,
+                                           "capacity": 1, "queue_capacity": 0})
     extensions = [args.functional_extension.absolute(), args.timing_provider.absolute()]
     model["libraries"] = [digest(library) for library in extensions]
     profile, report_path = build / "synthetic-model.json", build / "report.json"

@@ -29,6 +29,10 @@ def main():
              "-I", str(root), "-I", str(args.engine_include), "-I", str(args.spike_root)]
     queried_prices = set()
     for name, sources in (("provider_test", [root / "tests/provider_test.cpp"]),
+                          ("staged_test", [root / "tests/staged_test.cpp"]),
+                          ("scratchpad_load_test", [root / "tests/scratchpad_load_test.cpp"]),
+                          ("streamed_readout_test", [root / "tests/streamed_readout_test.cpp"]),
+                          ("execute_service_test", [root / "tests/execute_service_test.cpp"]),
                           ("bridge_test", [root / "bridge.cpp", root / "tests/bridge_test.cpp"])):
         output = args.build_dir / name
         subprocess.run([*flags, *(str(source) for source in sources), "-o", str(output)],
@@ -64,6 +68,7 @@ def main():
         raise AssertionError("changed public parameter source was accepted")
     print("export: reproducible; changed pin refused; no invented prices/queues", flush=True)
     subprocess.run([sys.executable, str(root / "tests/test_bundle.py")], check=True, timeout=15, env=env)
+    subprocess.run([sys.executable, str(root / "tests/test_execute_service_bundle.py")], check=True, timeout=15, env=env)
 
 
 if __name__ == "__main__":

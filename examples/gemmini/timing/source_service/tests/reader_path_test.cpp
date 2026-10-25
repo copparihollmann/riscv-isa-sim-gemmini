@@ -1,0 +1,59 @@
+#include "posted.hpp"
+#include <cassert>
+#include <iostream>
+using namespace gemmini_annotated_spike;
+void check(bool pressure,unsigned columns,bool registered=false,bool missing=false,int lookup_mode=0){
+ std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<17;++i)resources.push_back({i,1,128});
+ Engine engine(18000,resources);merlin_timing::PostedTimeline q({4096,4096,100000});
+ std::vector<std::string>unknown;bool host_updated=false;unsigned post_host_requests=0;
+ const std::map<std::string,double>facts={
+ {"target.scheduling.source_reader_registered_path",1},{"parameters.memory.l2.hit_cycles",1},
+ {"target.hardware.reader_tracker_entries",16},{"target.hardware.reader_tracker_first_free",1},
+ {"target.hardware.reader_translation_queue_stages",2},{"target.hardware.reader_translation_queue_entries",1},{"target.hardware.reader_translation_queue_pipe",1},{"target.hardware.reader_translation_queue_flow",0},
+ {"target.hardware.reader_tl_buffer_stages",3},{"target.hardware.reader_tl_buffer_entries",2},{"target.hardware.reader_tl_buffer_pipe",0},{"target.hardware.reader_tl_buffer_flow",0},
+ {"target.hardware.inclusive_hit_directory_stages",1},{"target.hardware.inclusive_hit_plan_stages",1},{"target.hardware.inclusive_hit_source_d_stages",2}};
+ spike_timing::Services s{engine,[&](const auto&key)->std::optional<double>{if(missing&&key=="target.hardware.reader_tl_buffer_stages")return std::nullopt;auto i=facts.find(key);return registered&&i!=facts.end()?std::optional<double>{i->second}:std::nullopt;},[](const auto&){return 0;},[](auto){return 0;},
+   [&](const auto&){if(host_updated)++post_host_requests;return spike_timing::SharedEffects{{},{},{},Cycle{registered?1u:20u}};},
+   [](const auto&,auto){},[&](auto reason){unknown.push_back(reason);}};
+ HardwareConfig h{16,16384,1024,1,4,32,true,true,std::uint8_t{0},false};
+ h.source_identity_ingress=true;
+ StagedConfig c{};c.source_identity_ingress=true;c.reservations={8,16,4};c.controller_entries={8,10,2};c.dma_commands={2,2};c.issue_resources={6,7,8};c.controller_resources={9,10,11};c.issue_latency=1;c.issue_occupancy=1;
+ c.scratchpad_bank_rows=4096;c.scratchpad_bank_resources={12,13,14,15};c.accumulator_storage_resource=16;c.late_accumulator_write_pipeline=2;
+ PostedSourceObserver target(s,q,h,c,0);
+ merlin_timing::MemoryMilestoneQueryV2 lookup;
+ lookup.opaque=&lookup_mode;lookup.last_observation=[](void*opaque,const merlin_timing::MemoryRequestIdentityV1*r,merlin_timing::MemoryMilestonesV2*out){
+   *out={};out->request=*r;out->memory_observation=r->request;
+   out->lookup=merlin_timing::MemoryLookupSnapshotV1{0,64,true,0};
+   const auto mode=*static_cast<int*>(opaque);
+   if(mode==2)out->lookup->read_hit_without_probe_or_eviction=false;
+   if(mode==3)out->line_pending_at_lookup=true;
+   if(mode==4)++out->request.address;
+   return true;
+ };
+ if(registered&&lookup_mode!=1)target.memory_lookup_query(lookup);
+ // An existing operand consumer owns this port from zero, not a speculative
+ // future booking. Returned rows must backpressure REAL Queue2/ring3/pixel1.
+ Demand busy{14,1,Cycle{80}};Event hold{0,{},{},{&busy,1},Cycle{1}};if(pressure)assert(engine.submit_detached(hold).start==0);
+ std::set<std::string>actor_roles;
+ engine.trace_sink([&](const merlin_timing::Trace&r){if(std::string(r.action)=="submit_detached"){assert(r.event.origin&&r.event.origin->pc==0x80004000&&r.event.origin->bits==0xabcdef);actor_roles.insert(r.event.origin->actor);}});
+ assert(q.post(10,{},[&](auto&,auto){host_updated=true;},merlin_timing::PostedTimeline::Kind::source_arrival));
+ std::vector<ValueId>writes;for(unsigned band=0;band<(columns+15)/16;++band)for(unsigned row=0;row<16;++row)writes.push_back(8192+band*16+row);
+ TransferPhase phase{};phase.scratchpad_load=true;phase.reader_packets=reader_packets(0x81000000,16,columns,columns,16,64,127);phase.reader_destinations=writes;
+ Event load{0,{},{writes.data(),writes.size()},{},Cycle{40}};
+ target.submit("load",load,Cycle{1},2,0,0,phase,{{0x81000000,16,columns,columns,false}},merlin_timing::StageOrigin{0x80004000,0xabcdef,{},"target.load"});
+ target.drain(0);if(lookup_mode){assert(!unknown.empty()&&!target.complete());return;}assert(unknown.empty()&&target.complete());assert(post_host_requests>0);
+ assert(actor_roles.count("target.load.rs_issue")&&actor_roles.count("target.load.memory_get")&&actor_roles.count("target.load.sp_write"));
+ const auto coverage=target.coverage();assert(coverage.peak_q<=2&&coverage.peak_ring<=3&&coverage.peak_reader<=16);
+ if(pressure)assert(coverage.port_blocked>0&&coverage.merger_blocked>0);
+ if(!pressure&&columns==16)assert(*engine.ready(writes[1])==*engine.ready(writes[0])+1); // no invented inter-packet bubble
+ assert(engine.ready(writes.front())<engine.ready(writes.back())); // real row publication survives final completion
+ auto before=engine.ready(writes.front());target.drain(q.now());assert(engine.ready(writes.front())==before);
+ // Unsupported semantic families do not silently inherit raw WS scheduling.
+ target.submit("compute_os",Event{},Cycle{1},4,0,0,{},{});assert(!target.complete()&&!unknown.empty());
+}
+int main(){check(true,32);check(false,16);check(false,17);check(false,80);
+ check(true,32,true);check(false,16,true);check(false,17,true);check(false,80,true);
+ for(int mode=1;mode<=4;++mode)check(false,16,true,false,mode);
+ bool refused=false;try{check(false,16,true,true);}catch(const std::invalid_argument&){refused=true;}assert(refused);
+ std::cout<<"posted native source: delayed host arrival, finite ingress under SP pressure, width32 rows and explicit unsupported refusal PASS\n";
+}
