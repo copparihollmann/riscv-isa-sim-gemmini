@@ -274,8 +274,41 @@ static void invalid_inputs() {
   require(engine.report().events == 0, "refused malformed inputs must not partially mutate event accounting");
 }
 
+static void diagnostic_trace_equivalence() {
+  Engine plain(4, {{1, 1, 1}}), traced(4, {{1, 1, 1}});
+  const ValueId x = 1;
+  const Demand demand{1, 1, 5};
+  std::size_t records = 0;
+  bool raw = false, resource = false, detached = false, drain = false;
+  traced.trace_sink([&](const Trace &t) {
+    ++records;
+    if (std::string(t.action) == "submit" && t.event.reads.size) {
+      raw = t.values.front().writer == 8 && t.result.issue == 8;
+    }
+    if (std::string(t.action) == "submit_detached") {
+      resource = t.resources.front().lanes.front() == 5 && t.result.start == 5;
+      detached = t.frontier_after == t.frontier_before;
+    }
+    if (std::string(t.action) == "barrier") drain = t.frontier_after == t.horizon_before;
+  });
+  auto same = [](Result a, Result b) {
+    require(a.issue == b.issue && a.start == b.start && a.ready == b.ready && a.unknown == b.unknown,
+            "diagnostics must preserve all scheduling results");
+  };
+  same(plain.submit({0, {}, {&x, 1}, {&demand, 1}, 8}), traced.submit({0, {}, {&x, 1}, {&demand, 1}, 8}));
+  same(plain.submit_detached({0, {}, {}, {&demand, 1}, 2}), traced.submit_detached({0, {}, {}, {&demand, 1}, 2}));
+  same(plain.submit({0, {&x, 1}, {}, {}, 2}), traced.submit({0, {&x, 1}, {}, {}, 2}));
+  require(plain.barrier() == traced.barrier(), "diagnostics preserve drains");
+  require(records == 4 && raw && resource && detached && drain, "trace records actual constraints and detached frontier");
+  require(plain.report().modeled_makespan == traced.report().modeled_makespan, "diagnostic horizon unchanged");
+  traced.trace_sink({});
+  traced.submit({0, {}, {}, {}, 1});
+  require(records == 4, "disabled diagnostics invoke no callback");
+}
+
 int main() {
   try {
+    diagnostic_trace_equivalence();
     dependencies_and_overlap();
     mutable_hazards_and_recycling();
     asynchronous_publication();
@@ -287,7 +320,7 @@ int main() {
     cache_slot_identity();
     bounded_streaming();
     invalid_inputs();
-    std::cout << "11 timing core cases passed\n";
+    std::cout << "12 timing core cases passed\n";
   } catch (const std::exception &failure) {
     std::cerr << failure.what() << '\n';
     return 1;

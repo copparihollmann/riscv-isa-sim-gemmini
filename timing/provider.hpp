@@ -43,6 +43,15 @@ public:
 };
 using CreateProvider = TargetProvider *(*)(Services *);
 
+// Optional separate ABI: v1 factories/providers remain binary compatible.
+// Missing timing prices/resources need not invalidate exact feature counts;
+// unsupported effects, illegal commands and accounting gaps do.
+struct FeatureObservationStatus {
+  bool complete = false;
+  std::vector<std::string> unresolved;
+};
+using ObserveProviderFeatures = FeatureObservationStatus (*)(const TargetProvider *);
+
 } // namespace spike_timing
 
 #endif

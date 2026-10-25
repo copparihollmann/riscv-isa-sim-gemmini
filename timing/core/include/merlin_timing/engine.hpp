@@ -5,9 +5,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <functional>
 #include <limits>
 #include <optional>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -33,6 +35,12 @@ struct Demand {
   std::size_t units;
   std::optional<Cycle> occupancy;
 };
+// Optional diagnostic custody belongs to accepted work, never the later CPU site.
+struct StageOrigin {
+  std::uint64_t pc=0, bits=0;
+  std::optional<std::uint64_t> committed_instruction;
+  std::string actor;
+};
 struct Event {
   Cycle earliest = 0;
   View<ValueId> reads;
@@ -41,6 +49,7 @@ struct Event {
   std::optional<Cycle> latency;
   bool hold_reads_until_ready = false;
   View<ValueId> retained_reads{};
+  std::optional<StageOrigin> origin{};
 };
 
 enum class UnknownReason {
@@ -69,6 +78,29 @@ struct Result {
   std::optional<Cycle> start;
   std::optional<Cycle> ready;
   UnknownReason unknown = UnknownReason::none;
+};
+// Diagnostic copies describe scheduling constraints, never hardware observations.
+// Event views remain valid only during the synchronous callback.
+struct TraceValue {
+  ValueId id;
+  std::optional<Cycle> writer, readers;
+};
+struct TraceResource {
+  ResourceId id;
+  std::vector<Cycle> lanes, queued_starts;
+  std::size_t queue_capacity;
+  bool known;
+};
+struct Trace {
+  const char *action = nullptr;
+  Event event{};
+  std::optional<ValueId> token;
+  std::optional<Cycle> requested;
+  std::optional<Cycle> frontier_before, frontier_after;
+  Cycle horizon_before = 0, horizon_after = 0;
+  std::vector<TraceValue> values;
+  std::vector<TraceResource> resources;
+  Result result{};
 };
 struct ResourceReport {
   ResourceId id;
@@ -115,6 +147,10 @@ public:
   Engine(Engine &&) noexcept = default;
   Engine &operator=(Engine &&) noexcept = default;
 
+  // An empty sink adds no diagnostic allocations or state capture. The sink
+  // must not mutate this Engine. Callback failures fail the diagnostic caller.
+  void trace_sink(std::function<void(const Trace &)> sink) { trace_ = std::move(sink); }
+
   std::optional<Cycle> ready(ValueId value) const {
     if (value >= values_.size())
       throw std::out_of_range("value id exceeds scoreboard bound");
@@ -129,11 +165,26 @@ public:
     return std::max(*entry.writer, *entry.readers);
   }
   std::optional<Cycle> issue_frontier() const { return issue_; }
+  // Explicit asynchronous v2 scheduling. A controller event may start in the
+  // future without moving CPU admission to that future dependency. Physical
+  // reservation ownership must be managed separately by the selected adapter.
+  // The original submit/barrier semantics and v1 callers are unchanged.
+  Result submit_detached(const Event &event) {
+    if (trace_) return traced_submit(event, true);
+    return detached(event);
+  }
+  void advance_issue(std::optional<Cycle> admission) {
+    const auto before = issue_;
+    if (!admission || !issue_) issue_.reset();
+    else issue_ = std::max(*issue_, *admission);
+    if (trace_) mutation("advance_issue", before, horizon_, {}, admission);
+  }
   void reset(ValueId value) {
     const auto done = last_use(value);
     if (!issue_ || !done || *done > *issue_)
       throw std::logic_error("cannot recycle a live or unknown scoreboard value");
     values_[static_cast<std::size_t>(value)] = {*issue_, *issue_};
+    if (trace_) mutation("reset", issue_, horizon_, value, issue_);
   }
 
   // Attach an already scheduled asynchronous result to a reusable value token.
@@ -145,14 +196,43 @@ public:
       throw std::logic_error("cannot publish over a live or unknown scoreboard value");
     if (completion && *completion < *issue_)
       throw std::invalid_argument("published result cannot precede the issue frontier");
+    const auto horizon_before = horizon_;
     values_[static_cast<std::size_t>(value)] = {completion, Cycle{0}};
     if (completion)
       horizon_ = std::max(horizon_, *completion);
     else
       count(unknown_events_);
+    if (trace_) mutation("publish", issue_, horizon_before, value, completion);
+  }
+
+  // Pure source-stage readiness query. It neither allocates a resource nor
+  // publishes values, changes queues/frontiers or increments accounting. A
+  // posted actor must recheck at actual dispatch and commit only at that time.
+  // This is not CPU admission or proof that a future input frontier is closed.
+  std::optional<Cycle> earliest_stage_start(const Event &event) {
+    validate(event);
+    if(!event.latency)return {};
+    Cycle at=event.earliest;
+    for(const auto view:{event.reads,event.retained_reads})
+      for(std::size_t i=0;i<view.size;++i){const auto value=ready(view[i]);if(!value)return {};at=std::max(at,*value);}
+    for(std::size_t i=0;i<event.writes.size;++i){const auto value=last_use(event.writes[i]);if(!value)return {};at=std::max(at,*value);}
+    for(std::size_t i=0;i<event.demands.size;++i){
+      const auto &d=event.demands[i];const auto &r=*find(d.resource);
+      if(!r.known||!d.occupancy)return {};
+      at=std::max(at,r.lanes[d.units-1]);
+    }
+    if(!addition(at,*event.latency))return {};
+    for(std::size_t i=0;i<event.demands.size;++i)if(!addition(at,*event.demands[i].occupancy))return {};
+    return at;
   }
 
   Result submit(const Event &event) {
+    if (trace_) return traced_submit(event, false);
+    return submit_impl(event);
+  }
+
+private:
+  Result submit_impl(const Event &event) {
     validate(event);
     count(events_);
     selected_.clear();
@@ -258,16 +338,20 @@ public:
     return {issue, start, completion, completion ? UnknownReason::none : UnknownReason::missing_latency};
   }
 
+public:
   // Drain all modeled work. This has no implicit fence-instruction price.
   // Once prior work has unknown timing, a global drain also has unknown timing.
   std::optional<Cycle> barrier() {
+    const auto before = issue_;
     if (unknown_events_ != 0 || accounting_overflow_) {
       issue_.reset();
+      if (trace_) mutation("barrier", before, horizon_, {}, {});
       return std::nullopt;
     }
     issue_ = std::max(*issue_, horizon_);
     for (auto &resource : resources_)
       resource.retire(*issue_);
+    if (trace_) mutation("barrier", before, horizon_, {}, issue_);
     return issue_;
   }
 
@@ -316,6 +400,50 @@ private:
   std::uint64_t events_ = 0;
   std::uint64_t unknown_events_ = 0;
   bool accounting_overflow_ = false;
+  std::function<void(const Trace &)> trace_;
+
+  Result detached(const Event &event) {
+    const auto saved = issue_;
+    try {
+      const auto result = submit_impl(event);
+      issue_ = saved;
+      return result;
+    } catch (...) { issue_ = saved; throw; }
+  }
+  Result traced_submit(const Event &event, bool is_detached) {
+    validate(event);
+    Trace record{}; record.action = is_detached ? "submit_detached" : "submit";
+    record.event = event;
+    record.frontier_before = issue_;
+    record.horizon_before = horizon_;
+    for (const auto view : {event.reads, event.retained_reads, event.writes})
+      for (std::size_t i = 0; i < view.size; ++i) {
+        const auto &value = values_[static_cast<std::size_t>(view[i])];
+        record.values.push_back({view[i], value.writer, value.readers});
+      }
+    for (std::size_t i = 0; i < event.demands.size; ++i) {
+      const auto &resource = *find(event.demands[i].resource);
+      record.resources.push_back({resource.spec.id, resource.lanes, resource.queue,
+                                 resource.spec.queue_capacity, resource.known});
+    }
+    const auto result = is_detached ? detached(event) : submit_impl(event);
+    record.result = result;
+    record.frontier_after = issue_;
+    record.horizon_after = horizon_;
+    trace_(record);
+    return result;
+  }
+  void mutation(const char *action, std::optional<Cycle> before, Cycle horizon_before,
+                std::optional<ValueId> token, std::optional<Cycle> requested) {
+    Trace record{}; record.action = action;
+    record.token = token;
+    record.requested = requested;
+    record.frontier_before = before;
+    record.frontier_after = issue_;
+    record.horizon_before = horizon_before;
+    record.horizon_after = horizon_;
+    trace_(record);
+  }
 
   static bool addition(Cycle a, Cycle b) { return b <= std::numeric_limits<Cycle>::max() - a; }
   void count(std::uint64_t &value) {
@@ -372,6 +500,39 @@ private:
   }
 };
 
+// A source-configured directory-read-stepped Fibonacci LFSR. The caller must
+// provide real directory lookup events (hits included), not merely misses or
+// distinct addresses. The post-step output selects a victim at the registered
+// directory-result phase. No invalid-way preference is implied.
+struct ReadSteppedLfsrSpec {
+  unsigned width, selection_bits;
+  std::uint64_t feedback_mask, seed;
+};
+class ReadSteppedLfsr {
+ public:
+  explicit ReadSteppedLfsr(ReadSteppedLfsrSpec spec):spec_(spec),state_(spec.seed) {
+    if(!spec.width || spec.width>63 || !spec.selection_bits || spec.selection_bits>spec.width)
+      throw std::invalid_argument("LFSR replacement width unsupported");
+    mask_=(std::uint64_t(1)<<spec.width)-1;
+    selection_mask_=(std::uint64_t(1)<<spec.selection_bits)-1;
+    if(!spec.feedback_mask || (spec.feedback_mask&~mask_) || !spec.seed || (spec.seed&~mask_))
+      throw std::invalid_argument("LFSR replacement taps or seed unsupported");
+  }
+  std::size_t directory_read(std::size_t ways) {
+    if(!ways || (ways&(ways-1)) || ways>selection_mask_+1)
+      throw std::invalid_argument("LFSR replacement needs bounded power-of-two ways");
+    auto selected=state_&spec_.feedback_mask;unsigned parity=0;
+    while(selected){parity^=unsigned(selected&1);selected>>=1;}
+    state_=((state_<<1)&mask_)|parity;
+    unsigned bits=0;for(auto n=ways;n>1;n>>=1)++bits;
+    return std::size_t((state_&selection_mask_)>>(spec_.selection_bits-bits));
+  }
+  void reset(){state_=spec_.seed;}
+  std::uint64_t state()const{return state_;}
+ private:
+  ReadSteppedLfsrSpec spec_;std::uint64_t state_,mask_,selection_mask_;
+};
+
 struct CacheSpec {
   std::size_t sets;
   std::size_t ways;
@@ -401,10 +562,11 @@ struct CacheReport {
 // follows from a tag lookup. The caller supplies memory hierarchy policy.
 class SetAssociativeCache {
 public:
-  explicit SetAssociativeCache(CacheSpec spec) : spec_(spec) {
+  explicit SetAssociativeCache(CacheSpec spec, std::optional<ReadSteppedLfsrSpec> replacement=std::nullopt) : spec_(spec) {
     if (spec.sets == 0 || spec.ways == 0 || spec.line_bytes == 0 ||
         spec.sets > std::numeric_limits<std::size_t>::max() / spec.ways)
       throw std::invalid_argument("cache geometry must be positive and bounded");
+    if(replacement) { replacement_.emplace(*replacement); auto validation=*replacement_; validation.directory_read(spec.ways); }
     lines_.resize(spec.sets * spec.ways);
   }
   CacheProbe probe(std::uint64_t address) const {
@@ -416,6 +578,27 @@ public:
         return {true, slot.dirty, base + i};
     }
     return {false, false, std::nullopt};
+  }
+  // Exact next-lookup classification without stepping the replacement law,
+  // touching ranks, allocating a line or changing diagnostic counters. This is
+  // an admission preview, not a cache access or permission/publication grant.
+  CacheAccess preview_access(std::uint64_t address) const {
+    const auto line=address/spec_.line_bytes;
+    const auto base=static_cast<std::size_t>(line%spec_.sets)*spec_.ways;
+    auto replacement=replacement_;
+    const auto selected=replacement?replacement->directory_read(spec_.ways):spec_.ways;
+    std::size_t victim=spec_.ways;
+    for(std::size_t i=0;i<spec_.ways;++i){
+      const auto &slot=lines_[base+i];
+      if(slot.valid&&slot.line==line)return {true,std::nullopt,false,base+i};
+      if(!slot.valid&&victim==spec_.ways)victim=i;
+    }
+    if(replacement)victim=selected;
+    if(victim==spec_.ways){victim=0;for(std::size_t i=1;i<spec_.ways;++i)
+      if(lines_[base+i].rank>lines_[base+victim].rank)victim=i;}
+    const auto &slot=lines_[base+victim];
+    return {false,slot.valid?std::optional<std::uint64_t>{slot.line}:std::nullopt,
+            slot.valid&&slot.dirty,base+victim};
   }
   CacheProbe invalidate(std::uint64_t address) {
     const auto line = address / spec_.line_bytes;
@@ -442,6 +625,7 @@ public:
     count(accesses_);
     const auto line = address / spec_.line_bytes;
     const auto base = static_cast<std::size_t>(line % spec_.sets) * spec_.ways;
+    const auto selected_victim=replacement_?replacement_->directory_read(spec_.ways):spec_.ways;
     std::size_t victim = spec_.ways;
     for (std::size_t i = 0; i < spec_.ways; ++i) {
       auto &slot = lines_[base + i];
@@ -455,6 +639,7 @@ public:
         victim = i;
     }
     count(misses_);
+    if(replacement_)victim=selected_victim;
     if (victim == spec_.ways) {
       victim = 0;
       for (std::size_t i = 1; i < spec_.ways; ++i)
@@ -471,6 +656,10 @@ public:
     return {false, old, dirty, base + victim};
   }
   CacheReport report() const { return {accesses_, hits_, misses_, entries_, lines_.size(), overflow_}; }
+  std::optional<std::uint64_t> replacement_state() const {
+    if(replacement_)return replacement_->state();
+    return std::nullopt;
+  }
 
 private:
   struct Line {
@@ -480,6 +669,7 @@ private:
     std::size_t rank = 0;
   };
   CacheSpec spec_;
+  std::optional<ReadSteppedLfsr> replacement_;
   std::vector<Line> lines_;
   std::size_t entries_ = 0;
   std::uint64_t accesses_ = 0, hits_ = 0, misses_ = 0;

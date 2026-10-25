@@ -12,15 +12,31 @@ static std::uint64_t csr(unsigned address,unsigned f3,unsigned rd,unsigned rs1) 
 }
 int main() {
   using spike_timing::decode_cpu;
+  for (const auto &encoding : spike_timing::bitmanip_encodings) {
+    const auto bits = encoding.match | (2u << 7) | (3u << 15);
+    const auto decoded = decode_cpu(bits);
+    check(decoded.known && std::string(decoded.kind)=="cpu.bitmanip", "known Zba/Zbb/Zbs encoding needs a distinct price class");
+    check(decoded.read_count>=1 && decoded.reads[0]==3 && decoded.write_count==1 && decoded.writes[0]==2,
+          "bitmanip must retain its actual input and output registers");
+  }
+  const auto unary=decode_cpu(MATCH_CPOP | (2u<<7) | (3u<<15));
+  check(unary.read_count==1,"encoded bitmanip function must not become a spurious input register");
+  const auto binary=decode_cpu(MATCH_SH2ADD | (2u<<7) | (3u<<15) | (4u<<20));
+  check(binary.read_count==2 && binary.reads[1]==4,"binary bitmanip needs both inputs");
+  check(!decode_cpu(MATCH_CLMUL | (2u<<7) | (3u<<15)).known,
+        "an unimplemented extension sharing the integer opcode must refuse");
+  check(!decode_cpu(0xfe00101bu).known,"reserved word-immediate encoding must refuse");
   for(unsigned format: {2u,3u}) {
     auto load=decode_cpu((3u<<15)|(format<<12)|0x07u);
     check(load.known && load.read_count==1 && load.reads[0]==3 && load.write_count==1 && load.writes[0]==32,
           "scalar FLW/FLD must write f0 rather than discard it as x0");
     check(load.fp_width==(format==2 ? 32u : 64u),"scalar load precision must match its width encoding");
     check(load.floating_register_operands,"scalar FP bank must be explicit for execution-domain checks");
+    check(load.memory_address_register==3,"load address must be distinct from loaded data");
     auto store=decode_cpu((4u<<20)|(3u<<15)|(format<<12)|0x27u);
     check(store.fp_width==(format==2 ? 32u : 64u),"scalar store precision must match its width encoding");
     check(store.known && store.read_count==2 && store.reads[1]==36,"scalar FSW/FSD must read FPR input");
+    check(store.memory_address_register==3,"store address must be distinct from stored data");
   }
   for(unsigned format: {0u,1u,4u,5u,6u,7u}) {
     check(!decode_cpu((1u<<25)|(3u<<15)|(format<<12)|0x07u).known,"non-scalar-S/D load must be unknown");
@@ -89,5 +105,10 @@ int main() {
   check(clear.reads_fflags && clear.writes_fflags && !clear.accumulates_fflags,"CSR flag updates are destructive rather than sticky updates");
   check(!decode_cpu(csr(3,4,1,1)).known,"reserved CSR opcode must refuse");
   check(decode_cpu(csr(0xc00,2,1,0)).counter_read,"counter boundary detection must remain compatible");
+  check(decode_cpu((7u<<20)|0x23u).memory_address_register==0,
+        "x0-based store must not use its data register as an address dependency");
+  check(decode_cpu((5u<<15)|0x2fu).memory_address_register==5,"atomic address must be explicit");
+  check(decode_cpu((5u<<13)|(3u<<2)|2u).memory_address_register==2,
+        "compressed stack store must retain the stack address dependency");
   std::cout<<"scalar FP/FCSR decoder controls passed\n";
 }

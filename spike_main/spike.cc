@@ -86,6 +86,7 @@ static void help(int exit_code = 1)
   fprintf(stderr, "  --dm-no-impebreak     Debug module won't support implicit ebreak in program buffer\n");
   fprintf(stderr, "  --blocksz=<size>      Cache block size (B) for CMO operations(powers of 2) [default 64]\n");
   fprintf(stderr, "  --instructions=<n>    Stop after n instructions\n");
+  fprintf(stderr, "  --timing-event-trace=<jsonl> Bounded modeled dependency/resource diagnostic, no physical timing claims\n");
   fprintf(stderr, "  --timing-model=<json> Annotate execution with a pinned approximate timing model\n");
   fprintf(stderr, "  --timing-scope-binding=<json> Exact ELF/input/counter-PC binding for counter_pc_pair policy\n");
   fprintf(stderr, "  --timing-report=<json> Write separate timing observations; guest counters unchanged\n");
@@ -338,7 +339,7 @@ int main(int argc, char** argv)
   bool log_commits = false;
   const char *log_path = nullptr;
   std::vector<std::function<extension_t*()>> extensions;
-  std::string timing_model, timing_report, timing_input_digest, timing_scope_binding;
+  std::string timing_model, timing_report, timing_input_digest, timing_scope_binding, timing_event_trace;
   const char* initrd = NULL;
   const char* dtb_file = NULL;
   uint16_t rbb_port = 0;
@@ -373,6 +374,7 @@ int main(int argc, char** argv)
   };
 
   option_parser_t parser;
+  parser.option(0, "timing-event-trace", 1, [&](const char* value){timing_event_trace = value;});
   parser.option(0, "timing-model", 1, [&](const char* value){timing_model = value;});
   parser.option(0, "timing-report", 1, [&](const char* value){timing_report = value;});
   parser.option(0, "timing-input-sha256", 1, [&](const char* value){timing_input_digest = value;});
@@ -475,6 +477,10 @@ int main(int argc, char** argv)
   if (!*argv1)
     help();
 
+  if (!timing_event_trace.empty() && timing_model.empty()) {
+    fprintf(stderr, "--timing-event-trace requires a timing model and exact counter scope\n");
+    return 1;
+  }
   if (timing_model.empty() != timing_report.empty()) {
     fprintf(stderr, "--timing-model and --timing-report must be selected together\n");
     return 1;
@@ -572,8 +578,8 @@ int main(int argc, char** argv)
       return 1;
     }
     try {
-      timing = std::make_unique<spike_timing::Session>(timing_model, timing_report, htif_args.front(), timing_input_digest, timing_libraries,
-          [&s](std::uint64_t address, std::size_t bytes) { return s.classify_timing_memory(address, bytes); }, timing_scope_binding);
+      timing = std::make_unique<spike_timing::Session>(timing_model, timing_report, s.target_program(), timing_input_digest, timing_libraries,
+          [&s](std::uint64_t address, std::size_t bytes) { return s.classify_timing_memory(address, bytes); }, timing_scope_binding, timing_event_trace);
       s.get_core(0)->get_mmu()->register_memtracer(timing.get());
     } catch (const std::exception& error) {
       fprintf(stderr, "Timing model setup failed: %s\n", error.what());

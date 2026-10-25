@@ -1,4 +1,5 @@
 #include "../timing/model.hpp"
+#include "../timing/integer_divider_timing.hpp"
 #include <boost/property_tree/json_parser.hpp>
 #include <openssl/evp.h>
 #include <array>
@@ -114,6 +115,12 @@ Model::Model(const std::string &path) {
     throw std::invalid_argument("functional counts cannot label a timing profile");
   domain["target_model_sha256"] = digest;
   device = domain.at("device_sha256"); scope = domain.at("scope_sha256");
+  if (const auto selected = document.get_child_optional("cpu.fp_operand_timing")) {
+    if (selected->size() != 1 || selected->get<std::string>("schema", "") !=
+        "merlin.rocket_divsqrt_operand_timing.v1")
+      throw std::invalid_argument("unsupported operand-dependent FP timing protocol");
+    fp_operand_timing = true;
+  }
   const auto limits = document.get_child_optional("limits");
   if (limits) {
     max_values = bounded_integer(*limits, "scoreboard_values", max_values, 1 << 22);
@@ -155,6 +162,7 @@ Model::Model(const std::string &path) {
       prices.emplace(row.first, price);
     }
   }
+  (void)integer_divider_bound(*this);
 }
 void Model::bind_scope(const std::string &path, const std::string &elf, const std::string &input) {
   if (!scope_pc_pair) {

@@ -21,6 +21,9 @@ class htif_t : public chunked_memif_t
   htif_t(const std::vector<std::string>& args);
   virtual ~htif_t();
 
+  // Original primary payload after HTIF host-option parsing, never argv guessing.
+  const std::string& target_program() const { return targs.at(0); }
+
   virtual void start();
   virtual void stop();
 
