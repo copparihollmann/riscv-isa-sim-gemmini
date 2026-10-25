@@ -153,9 +153,14 @@ def verify_sources(sources: Path, manifest: dict, *, built: bool = False) -> Non
                 )
 
 
-def build(package: Path, work: Path, jobs: int) -> dict:
+def build(
+    package: Path, work: Path, jobs: int,
+    *, boost_root: Path | None = None, boost_libdir: Path | None = None,
+) -> dict:
     manifest = verify_package(package)
     profile = json.loads((package / "profile.json").read_text())
+    if profile.get("target_profile", "stock_u250") != manifest.get("target_profile", "stock_u250"):
+        raise ValueError("functional profile differs from the selected source package")
     if not 1 <= jobs <= 2:
         raise ValueError("choose one or two build jobs")
     # A fresh build directory avoids foreign configured source roots or libraries.
@@ -169,6 +174,12 @@ def build(package: Path, work: Path, jobs: int) -> dict:
         unpack(package / entry["archive"], sources / name)
     verify_sources(sources, manifest)
     verify_abi(sources / "libgemmini", profile)
+    if (boost_root is None) != (boost_libdir is None):
+        raise ValueError("select both Boost root and library directory")
+    if boost_root is not None:
+        boost_root, boost_libdir = boost_root.resolve(strict=True), boost_libdir.resolve(strict=True)
+        if not (boost_root / "include/boost/version.hpp").is_file() or not boost_libdir.is_dir():
+            raise ValueError("selected Boost headers or libraries are absent")
     env = dict(
         os.environ,
         TMPDIR=str(temporary),
@@ -176,10 +187,17 @@ def build(package: Path, work: Path, jobs: int) -> dict:
         CXX="g++",
         CFLAGS="-O2 -g0",
         CXXFLAGS="-O2 -g0",
-        LDFLAGS="",
+        LDFLAGS=("-L" + str(boost_libdir)) if boost_libdir is not None else "",
     )
+    if boost_root is not None:
+        env["CPPFLAGS"] = "-I" + str(boost_root / "include")
+        env["BOOST_ROOT"] = str(boost_root)
+        env["LD_LIBRARY_PATH"] = str(boost_libdir) + ":" + env.get("LD_LIBRARY_PATH", "")
+    configure = [str(sources / "spike/configure"), "--prefix=" + str(prefix)]
+    if boost_root is not None:
+        configure += ["--with-boost=" + str(boost_root), "--with-boost-libdir=" + str(boost_libdir)]
     commands = [
-        ([str(sources / "spike/configure"), "--prefix=" + str(prefix)], objects),
+        (configure, objects),
         (
             ["make", "-j" + str(jobs), "spike", "install-hdrs", "install-config-hdrs"],
             objects,
@@ -193,6 +211,19 @@ def build(package: Path, work: Path, jobs: int) -> dict:
     (prefix / "lib").mkdir(exist_ok=True)
     shutil.copy2(objects / "spike", prefix / "bin/spike")
     shutil.copy2(sources / "libgemmini/libgemmini.so", prefix / "lib/libgemmini.so")
+    runtime_members = ["bin/spike", "lib/libgemmini.so"]
+    regex_library_name = None
+    if boost_libdir is not None:
+        regex_libraries = [
+            path for path in boost_libdir.glob("libboost_regex.so.*")
+            if path.is_file() and not path.is_symlink()
+        ]
+        if len(regex_libraries) != 1:
+            raise ValueError("expected one selected Boost regex runtime library")
+        regex_library = regex_libraries[0]
+        regex_library_name = regex_library.name
+        shutil.copy2(regex_library, prefix / "lib" / regex_library.name)
+        runtime_members.append("lib/" + regex_library.name)
     verify_sources(sources, manifest, built=True)
     verify_package(package)
     receipt = {
@@ -213,12 +244,18 @@ def build(package: Path, work: Path, jobs: int) -> dict:
         "build_flags": {
             key: env[key] for key in ("CC", "CXX", "CFLAGS", "CXXFLAGS", "LDFLAGS")
         },
+        "boost_dependency": (
+            {"root": str(boost_root), "libdir": str(boost_libdir),
+             "runtime_library_name": regex_library_name,
+             "version_header_sha256": sha(boost_root / "include/boost/version.hpp")}
+            if boost_root is not None else None
+        ),
         "artifacts": {
             name: {
                 "sha256": sha(prefix / name),
                 "bytes": (prefix / name).stat().st_size,
             }
-            for name in ("bin/spike", "lib/libgemmini.so")
+            for name in runtime_members
         },
     }
     (prefix / "deployment.json").write_text(
@@ -230,14 +267,21 @@ def build(package: Path, work: Path, jobs: int) -> dict:
 
 def prepare_runtime(prefix: Path, runtime: Path, receipt: dict) -> None:
     """Copy only the small runtime endpoints, never source or include roots."""
-    if set(receipt["artifacts"]) != {"bin/spike", "lib/libgemmini.so"}:
+    allowed = {"bin/spike", "lib/libgemmini.so"}
+    boost = receipt.get("boost_dependency")
+    if boost:
+        name = boost.get("runtime_library_name", "")
+        if not name.startswith("libboost_regex.so.") or "/" in name:
+            raise ValueError("selected Boost runtime library has an invalid name")
+        allowed.add("lib/" + name)
+    if set(receipt["artifacts"]) != allowed:
         raise ValueError(
             "runtime requires exactly the baseline executable and functional library"
         )
     runtime.mkdir(exist_ok=False)
     for filename, expected in receipt["artifacts"].items():
         if (
-            filename not in {"bin/spike", "lib/libgemmini.so"}
+            filename not in allowed
             or sha(prefix / filename) != expected["sha256"]
         ):
             raise ValueError("runtime endpoint differs from its exact build receipt")
@@ -253,6 +297,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path)
     parser.add_argument("--jobs", type=int, default=1)
+    parser.add_argument("--boost-root", type=Path, help="explicit staged Boost installation root")
+    parser.add_argument("--boost-libdir", type=Path, help="explicit staged Boost library directory")
     parser.add_argument("--verify-only", action="store_true")
     args = parser.parse_args()
     package = Path(__file__).resolve().parent
@@ -262,7 +308,10 @@ def main() -> None:
     elif args.work_dir is None:
         parser.error("--work-dir is required for a fresh build")
     else:
-        build(package, args.work_dir.absolute(), args.jobs)
+        build(
+            package, args.work_dir.absolute(), args.jobs,
+            boost_root=args.boost_root, boost_libdir=args.boost_libdir,
+        )
 
 
 if __name__ == "__main__":

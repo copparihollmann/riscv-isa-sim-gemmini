@@ -1,0 +1,62 @@
+{
+  "candidate_access": {
+    "header_include_roots": "none; build headers stay outside runtime deployment",
+    "runner": "broker access to runtime/bin/spike and runtime/lib/libgemmini.so only",
+    "source_archives": "trusted operator build inputs; never candidate grants"
+  },
+  "claim": "functional Gemmini software ABI only",
+  "functional_only": true,
+  "hardware_association": {
+    "archive_sha256": "0af6f26e1cbad1c03f9e5873217505a5100bf2d0d068205cfa486522b24fc603",
+    "chipyard_revision": "009e85b05ca817a15fcd6c3fe4eedd86cc2a3617",
+    "embedded_bitstream_sha256": null,
+    "evidence": "operator-verified 30 MHz U250 source handoff and pinned FireSim DTS; original bitstream and driver are not in this package",
+    "functional_receiver_revision": "5b1254a7dc72f757442280e7f28ef30542c78533",
+    "gemmini_revision": "63f0b68a68f185a016a2993f2fb32e1661ea9e6c",
+    "generated_params_sha256": "3758ae967af3a179497660970201093a7fb624be00173990ce33d3f5c38da924",
+    "host_dts_sha256": "c4a2009a405945ea98f731713e0f4e7dc483031ab8cd5156d871e4eb7594f1df",
+    "scope": "functional parameter/header association; matched FPGA execution and physical equivalence unestablished"
+  },
+  "launch": {
+    "additional_extensions": "disabled by default; require independent evidence and an explicit deployment choice",
+    "extension": "gemmini",
+    "harts": 1,
+    "isa": "rv64imafdcb_zicsr_zifencei_zihpm_zfh_zba_zbb_zbs",
+    "isa_status": "explicit executable compatibility selection; not proof of bitstream ISA",
+    "memory_base": 2147483648,
+    "memory_bytes": 17179869184,
+    "memory_mib": 16384,
+    "memory_status": "explicit Spike allocation matching the DTS address span; board capacity still requires execution qualification",
+    "privilege": "m"
+  },
+  "physical_cpu_isa_match": "not_established",
+  "platform": "xilinx_alveo_u250",
+  "policy": "FireSim-selected 5b1254a7 receiver unchanged; no-FSM policy is enforced independently by the compiler grader",
+  "rtl_elaboration_source_lineage": "Chipyard 009e85b05ca817a15fcd6c3fe4eedd86cc2a3617 with Gemmini 63f0b68a68f185a016a2993f2fb32e1661ea9e6c; historical FireSim dirty overlay unproven",
+  "schema": "merlin.functional_spike_profile.v1",
+  "software_abi": {
+    "accumulator_bytes": 4,
+    "accumulator_rows": 1024,
+    "address_bits": 32,
+    "custom_opcode": 123,
+    "custom_opcode_mask": 127,
+    "dim": 16,
+    "element_bytes": 1,
+    "first_layer_optimizations": true,
+    "full_width_accumulator_readout": true,
+    "maximum_software_transfer_bytes": 64,
+    "scratchpad_banks": 4,
+    "scratchpad_rows": 16384,
+    "scratchpad_rows_per_bank": 4096
+  },
+  "target_config": "FireSimGemminiRocketConfig",
+  "target_profile": "fire_aligned_30mhz",
+  "timing_model_included": false,
+  "timing_qualification": "not_established",
+  "unmodeled_physical_behavior": [
+    "Rocket pipeline, physical register and cache timing",
+    "accelerator command queues, latency and overlap",
+    "physical memory mapping, capacity and bandwidth",
+    "interrupt, loader, console and physical board deployment equivalence"
+  ]
+}
