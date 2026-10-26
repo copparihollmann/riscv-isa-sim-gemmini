@@ -843,6 +843,7 @@ private:
     std::optional<Cycle> load_requests_complete;
     if(command.transfer_phase && !command.transfer_phase->reader_packets.empty()) {
       const auto &phase=*command.transfer_phase;
+      if(phase.input_row_repeats){missing("staged:input_row_repeats_require_posted_register_ring");return unknown(effect);}
       if(!packet_load_stream_ || command.group!=0 || command.kind!="load" || !known ||
           !command.latency || !command.occupancy || !phase.row_memory ||
           phase.row_bytes<1 || phase.row_bytes>(phase.individual_row_publication?127:16) || command.writes.empty() ||

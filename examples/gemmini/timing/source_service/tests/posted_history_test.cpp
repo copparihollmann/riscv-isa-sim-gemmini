@@ -4,7 +4,7 @@
 using namespace gemmini_annotated_spike;
 int main(){
  std::vector<merlin_timing::ResourceSpec> resources;for(unsigned i=0;i<17;++i)resources.push_back({i,1,128});
- Engine engine(18000,resources);merlin_timing::PostedTimeline q({4096,500000,1000000});
+ Engine engine(18000,resources);merlin_timing::PostedTimeline q({4096,500000,16});
  std::vector<std::string> unknown;std::uint64_t accepted=0;
  spike_timing::Services s{engine,[](const auto&)->std::optional<double>{return {};},[](const auto&){return 0;},[](auto){return 0;},
    [](const auto&){return spike_timing::SharedEffects{{},{},{},Cycle{0}};},
@@ -15,6 +15,6 @@ int main(){
  // More than the old TOTAL history guard, but only one live command at a time.
  // No token/cycle is reset or completed by pruning the completed drain history.
  for(unsigned i=0;i<66000;++i){Event event;event.earliest=q.now();event.latency=1;target.submit("config",event,Cycle{1},0,1,0,{},{});target.drain(q.now());assert(target.complete());}
- assert(accepted==66000&&unknown.empty());assert(q.now()>=66000);
- std::cout<<"completed command history is reclaimed without changing live queues, token identity or time PASS\n";
+ assert(accepted==66000&&unknown.empty());assert(q.now()>=66000);assert(q.progress().dispatched>16&&q.peak_dispatches_without_source_completion()<=16);
+ std::cout<<"completed command history is reclaimed without changing live queues, token identity or time; actual completion checkpoints bound work between retirements PASS\n";
 }

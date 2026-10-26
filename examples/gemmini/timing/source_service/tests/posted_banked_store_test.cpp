@@ -16,5 +16,5 @@ int main(){
  // assigned a next-edge delay or allowed to preempt a committed request.
  Q late({32,32,64});PostedBankedStore latebank(late,8);
  latebank.offer(P::source_d_write,1,[&](auto t){latebank.offer(P::sink_c,1,[](auto){},t);},0);
- while(late.step(true)){}assert(late.progress().failed&&late.reason()=="late BankedStore request after settled edge");
+ while(late.step(true)){}assert(late.progress().failed&&late.reason().find("late BankedStore request after settled edge")==0);
 }

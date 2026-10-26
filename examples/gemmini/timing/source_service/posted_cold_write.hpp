@@ -6,7 +6,9 @@
 #include <set>
 namespace gemmini_annotated_spike {
 // Selected SourceA/C/E and SinkD ownership, independent of SourceD S4.
-// Whole-fill-before-subline execution remains an explicit conservative bound.
+// Opt-in zero-offset requests execute after the first GrantData notice and
+// read only accepted fill beats. Offset requests retain the source last-beat
+// guard. GrantAck, complete outer data and inner publication remain distinct.
 class PostedColdWrite {
  using Q=merlin_timing::PostedTimeline;using Token=Q::Token;using Cycle=merlin_timing::Cycle;
  public:
@@ -15,12 +17,15 @@ class PostedColdWrite {
  using Lower=std::function<void(Cycle,Cycle,Cycle,Token)>;
  using Bus=std::function<void(Cycle,Token)>;
  using Ready=std::function<void(Cycle)>;
+ struct OwnedServices{CachePort port;Lower lower;Bus bus;};
+ struct Fill {bool first_allowed=false;std::function<void(std::size_t,Cycle)>published;};
  private:
  struct Lease{std::uint64_t set;Token publication;Ready admitted;bool published=false,source_closed=true;};
  struct Miss{spike_timing::WriteMissV5 law;std::shared_ptr<Lease>lease;Ready ready,writeback;Lower lower_write;
-   bool release_ack=false,grant_ack=false,private_closed=true;
-   std::vector<std::vector<Token>>read_dependencies;std::vector<Token>read_accepted,read_reusable;};
- struct D{unsigned kind;std::uint64_t address;std::size_t beats,next=0;bool grant;Ready done,acknowledged;std::optional<Token>upstream;};
+   bool release_ack=false,grant_ack=false,private_closed=true,grant_last=false;
+   std::optional<Fill>fill;
+   std::vector<std::vector<Token>>read_dependencies;std::vector<Token>read_accepted,read_reusable;std::shared_ptr<OwnedServices>services;};
+ struct D{unsigned kind;std::uint64_t address;std::size_t beats,next=0;bool grant;Ready done,acknowledged,first;std::function<void(std::size_t,Cycle)>published;std::optional<Token>upstream;bool early_ack=false;std::shared_ptr<OwnedServices>services;};
  struct C{std::shared_ptr<Miss>miss;std::size_t next=0;};
  struct ABeat{std::shared_ptr<Miss>miss;std::size_t beat;Token consumed;};
  struct ARead{std::shared_ptr<Miss>miss;Token consumed;};
@@ -48,7 +53,7 @@ class PostedColdWrite {
    --live_;wake_later(at+1);
  }
  void close_source(const std::shared_ptr<Miss>&m,Cycle at){
-   if(m->release_ack&&m->grant_ack&&m->private_closed){m->lease->source_closed=true;finish_lease(m->lease,at);}
+   if(m->release_ack&&m->grant_ack&&m->private_closed&&m->grant_last){m->lease->source_closed=true;finish_lease(m->lease,at);}
  }
  void wake(Cycle at){
    if(waiting_.empty())return;
@@ -60,9 +65,13 @@ class PostedColdWrite {
      l->admitted(at);if(!waiting_.empty())wake_later(at+1);break;
    }
  }
- void request_d(unsigned kind,std::uint64_t address,std::size_t beats,bool grant,Ready done,Ready acknowledged,Cycle at,std::optional<Token>upstream={}){
-   if(kind>=d_.size()||!beats||beats>8||d_[kind].size()>=10){q_.fail("cold write D transaction/custody bound");return;}
-   d_[kind].push_back(std::make_shared<D>(D{kind,address,beats,0,grant,std::move(done),std::move(acknowledged),upstream}));kick_d(at);
+ void request_d(unsigned kind,std::uint64_t address,std::size_t beats,bool grant,Ready done,Ready acknowledged,Cycle at,std::optional<Token>upstream={},Ready first={},std::function<void(std::size_t,Cycle)>published={},bool early_ack=false,std::shared_ptr<OwnedServices>services={}){
+   // Each of the ten physical MSHRs can own both a memory GrantData and
+   // a dirty ReleaseAck in class0. These are software records for existing
+   // owners, not extra MSHRs, sinks, TileLink credits or payload storage.
+   const std::size_t custody=kind==0?2*10:10;
+   if(kind>=d_.size()||!beats||beats>8||d_[kind].size()>=custody){q_.fail("cold write D transaction/custody bound");return;}
+   d_[kind].push_back(std::make_shared<D>(D{kind,address,beats,0,grant,std::move(done),std::move(acknowledged),std::move(first),std::move(published),upstream,early_ack,std::move(services)}));kick_d(at);
  }
  void kick_d(Cycle at){
    if(d_scheduled_)return;
@@ -81,15 +90,17 @@ class PostedColdWrite {
    auto offer=[this,d](Cycle at){
      const auto beat=d->next;
      auto entered=sink_d_.push([this,d,beat](Cycle time,Token consumed){
-       auto accepted=token();port_(d->address+beat*8,d->beats==1?Port::sinkd_noop:Port::sinkd_data,time,accepted);
+       auto accepted=token();(d->services?d->services->port:port_)(d->address+beat*8,d->beats==1?Port::sinkd_noop:Port::sinkd_data,time,accepted);
        q_.post(time,{accepted},[this,d,beat,consumed](auto&,auto t){
          q_.complete(consumed);
+         if(d->published)d->published(beat,t);
+         if(!beat&&(d->first||d->early_ack))q_.post(t+1,{},[this,d](auto&,auto now){
+           if(d->first)d->first(now);
+           if(d->early_ack)acknowledge_grant(d,now);
+         },Q::Kind::response_beat);
          if(beat+1==d->beats)q_.post(t+1,{},[this,d](auto&,auto now){
            d->done(now);
-           if(d->grant)source_e_.push([this,d](Cycle t,Token consumed){
-             if(!sinks_){q_.fail("cold write Cork sink underflow");return;}
-             --sinks_;q_.complete(consumed);if(d->acknowledged)d->acknowledged(t);kick_d(t);
-           },now);
+           if(d->grant&&!d->early_ack)acknowledge_grant(d,now);
          },Q::Kind::response_beat);
        },Q::Kind::response_beat);
      },at);
@@ -101,9 +112,15 @@ class PostedColdWrite {
    };
    // Real memory D owns its beat service before SinkD's registered queue.
    // Cork's internally synthesized Grant/ReleaseAck is not a DRAM data beat.
-   if(d->kind==0&&d->beats>1){auto accepted=token();bus_(at,accepted);
+   if(d->kind==0&&d->beats>1){auto accepted=token();(d->services?d->services->bus:bus_)(at,accepted);
      q_.post(at,{accepted},[offer](auto&,auto t){offer(t);},Q::Kind::response_beat);
    }else offer(at);
+ }
+ void acknowledge_grant(const std::shared_ptr<D>&d,Cycle at){
+   source_e_.push([this,d](Cycle t,Token consumed){
+     if(!sinks_){q_.fail("cold write Cork sink underflow");return;}
+     --sinks_;q_.complete(consumed);if(d->acknowledged)d->acknowledged(t);kick_d(t);
+   },at);
  }
  void kick_a(Cycle at){
    if(a_wake_&&*a_wake_<=at)return;
@@ -114,7 +131,7 @@ class PostedColdWrite {
    if(a_inflight_)return;
    if(!a_dirty_.empty()&&(!a_frame_||a_dirty_.front().miss==a_frame_)){
      auto beat=a_dirty_.front();a_dirty_.pop_front();if(!a_frame_)a_frame_=beat.miss;a_inflight_=true;
-     auto accepted=token();bus_(at,accepted);
+     auto accepted=token();(beat.miss->services?beat.miss->services->bus:bus_)(at,accepted);
      q_.post(at,{accepted},[this,beat](auto&,auto t){
        q_.complete(beat.consumed);last_a_=t;a_inflight_=false;kick_c(t+1);
        if(beat.beat==7){
@@ -126,7 +143,7 @@ class PostedColdWrite {
            request_d(0,*m->law.evicted_line*64,1,false,[this,m](Cycle ack){
              if(m->writeback)m->writeback(ack);
              m->release_ack=true;close_source(m,ack);
-           },{},now);
+           },{},now,{}, {},{},false,m->services);
          },Q::Kind::response_beat);
        }
        kick_a(t+1);
@@ -134,11 +151,15 @@ class PostedColdWrite {
    }
    if(a_frame_||a_read_.empty())return;
    auto read=a_read_.front();a_read_.pop_front();q_.complete(read.consumed);last_a_=at;
-   auto returned=token();lower_(read.miss->law.fill_latency,read.miss->law.fill_bus,at,returned);
+   auto returned=token();(read.miss->services?read.miss->services->lower:lower_)(read.miss->law.fill_latency,read.miss->law.fill_bus,at,returned);
    q_.post(at,{returned},[this,m=read.miss](auto&,auto now){grant(m,0,8,now);},Q::Kind::response_beat);kick_a(at+1);
  }
  void grant(const std::shared_ptr<Miss>&m,unsigned kind,std::size_t beats,Cycle at,std::optional<Token>upstream={}){
-   request_d(kind,m->law.line*64,beats,true,m->ready,[this,m](Cycle t){m->grant_ack=true;close_source(m,t);},at,upstream);
+   const bool early=m->fill&&m->fill->first_allowed&&beats>1;
+   request_d(kind,m->law.line*64,beats,true,[this,m,early](Cycle t){
+     m->grant_last=true;if(!early)m->ready(t);close_source(m,t);
+   },[this,m](Cycle t){m->grant_ack=true;close_source(m,t);},at,upstream,
+     early?m->ready:Ready{},m->fill?m->fill->published:std::function<void(std::size_t,Cycle)>{},bool(m->fill),m->services);
  }
  void acquire(const std::shared_ptr<Miss>&m,Cycle at){
    source_a_.push([this,m](Cycle t,Token consumed){
@@ -162,7 +183,7 @@ class PostedColdWrite {
        if(a_dirty_.size()>=12){q_.fail("SourceC payload custody bound");return;}
        a_dirty_.push_back({c->miss,beat,consumed});kick_a(t);
      }else{auto next=cork_cack_.push([this,m=c->miss](Cycle time,Token accepted){
-       request_d(1,*m->law.evicted_line*64,1,false,[this,m](Cycle ack){m->release_ack=true;close_source(m,ack);},{},time,accepted);
+       request_d(1,*m->law.evicted_line*64,1,false,[this,m](Cycle ack){m->release_ack=true;close_source(m,ack);},{},time,accepted,{}, {},false,m->services);
      },t);q_.post(t,{next},[this,consumed](auto&q,auto now){q.complete(consumed);kick_c(now+1);},Q::Kind::source_arrival);}
    },at);
    q_.post(at,{entered},[this](auto&,auto t){kick_c(t+1);},Q::Kind::source_arrival);
@@ -171,7 +192,7 @@ class PostedColdWrite {
    const auto beat=c->next;auto accepted=token();
    const auto dependencies=c->miss->read_dependencies.empty()?std::vector<Token>{}:c->miss->read_dependencies.at(beat);
    q_.post(at,dependencies,[this,c,beat,accepted](auto&,auto t){
-     port_(*c->miss->law.evicted_line*64+beat*8,Port::sourcec_read,t,accepted);
+     (c->miss->services?c->miss->services->port:port_)(*c->miss->law.evicted_line*64+beat*8,Port::sourcec_read,t,accepted);
    },Q::Kind::operand_consume);
    q_.post(at,{accepted},[this,c,beat](auto&,auto t){
      q_.complete(c->miss->read_accepted.at(beat));
@@ -197,17 +218,32 @@ class PostedColdWrite {
    if(!port_||!lower_)throw std::invalid_argument("cold write requires actual port/lower owners");
    if(!bus_)bus_=[this](Cycle,Token done){q_.complete(done);};
  }
+ struct AdmissionStatus{std::size_t live,waiting;bool owns_set;};
+ AdmissionStatus admission_status(std::uint64_t set)const{return {live_,waiting_.size(),leases_.count(set)!=0};}
  void admit(std::uint64_t set,Token publication,Ready admitted,Cycle at){
-   if(!admitted||waiting_.size()>=16){q_.fail("cold write MSHR request custody bound");return;}
-   waiting_.push_back(std::make_shared<Lease>(Lease{set,publication,std::move(admitted)}));wake(at);
+   // A pending record belongs to an already existing upstream transaction:
+   // StreamReader16 + StreamWriter16 + at most two line children of the one
+   // scalar CPU access. This is software custody, not a 34-entry hardware
+   // queue. wake() still admits only the actual ten demand MSHRs, and each
+   // producer retains its original source/payload credit while waiting.
+   constexpr std::size_t upstream_owners=16+16+2;
+   if(!admitted){q_.fail("cold write MSHR request custody bound");return;}
+   // Native CPU requests also enter here outside timeline dispatch. Neither
+   // their admission nor an older waiting device callback may execute on that
+   // host stack. Offer the original request at its causal edge; the callback
+   // still runs on that SAME edge when a real MSHR is available.
+   q_.post(at,{},[this,set,publication,admitted=std::move(admitted)](auto&,auto now)mutable{
+     if(waiting_.size()>=upstream_owners){q_.fail("cold write MSHR request custody bound");return;}
+     waiting_.push_back(std::make_shared<Lease>(Lease{set,publication,std::move(admitted)}));wake(now);
+   },Q::Kind::source_arrival);
  }
- void push(const spike_timing::WriteMissV5&law,Ready ready,Ready writeback,Lower lower_write,Cycle at,std::vector<std::vector<Token>>read_dependencies={},std::optional<Token>last_response={}){
+ void push(const spike_timing::WriteMissV5&law,Ready ready,Ready writeback,Lower lower_write,Cycle at,std::vector<std::vector<Token>>read_dependencies={},std::optional<Token>last_response={},std::optional<Fill>fill={},std::shared_ptr<OwnedServices>services={}){
    const auto lease=leases_.find(law.set);
    if(lease==leases_.end()){q_.fail("cold write source has no admitted MSHR");return;}
    if(law.dirty_eviction&&(!law.evicted_line||law.release_writes.empty()||!writeback||!lower_write)){
      q_.fail("dirty writeback requires distinct original DRAM publication owner");return;
    }
-   auto m=std::make_shared<Miss>(Miss{law,lease->second,std::move(ready),std::move(writeback),std::move(lower_write),!law.evicted_line,false,!last_response,std::move(read_dependencies),{}, {}});
+   auto m=std::make_shared<Miss>(Miss{law,lease->second,std::move(ready),std::move(writeback),std::move(lower_write),!law.evicted_line,false,!last_response,false,std::move(fill),std::move(read_dependencies),{}, {},std::move(services)});
    if(law.dirty_eviction)for(unsigned b=0;b<8;++b){m->read_accepted.push_back(token());m->read_reusable.push_back(token());}
    if(!misses_.emplace(law.line,m).second){q_.fail("duplicate cold target line owner");return;}
    if(last_response)q_.post(at,{*last_response},[this,m](auto&,auto t){m->private_closed=true;close_source(m,t);},Q::Kind::response_beat);

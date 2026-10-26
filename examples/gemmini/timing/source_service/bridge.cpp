@@ -81,7 +81,11 @@ G::HardwareConfig hardware(Services &s) {
           s.number("target.scheduling.wide_scratchpad_row_publication")==std::optional<double>{1}?integer(s,"selected_mvin_cols_bits"):0,
           s.number("target.scheduling.wide_scratchpad_row_publication")==std::optional<double>{1}?integer(s,"selected_mvin_rows_bits"):0,
           s.number("target.scheduling.source_full_accumulator_load")==std::optional<double>{1},
-          s.number("target.scheduling.source_masked_i8_readout")==std::optional<double>{1}};
+          s.number("target.scheduling.source_masked_i8_readout")==std::optional<double>{1},
+          s.number("target.scheduling.source_identity_i8_accumulator_load")==std::optional<double>{1},
+          s.number("target.scheduling.source_ordered_pool_readout")==std::optional<double>{1},
+          s.number("target.scheduling.source_masked_packet_readout")==std::optional<double>{1},
+          s.number("target.scheduling.source_zero_writer")==std::optional<double>{1}};
 }
 
 G::Parameters parameters(Services &s) {
@@ -497,6 +501,7 @@ class PostedProvider final : public spike_timing::TargetProvider {
  Services &services_; Inputs inputs_; G::PostedSourceObserver posted_;
  G::TargetObserver observer_,architectural_; G::Counters previous_{};
  std::unique_ptr<G::PostedCommandIngress> ingress_;
+ bool rocc_router_=false;
  std::optional<merlin_timing::StageOrigin> timing_origin_;
  std::map<std::string,std::uint64_t> classes_;std::set<std::string> reasons_;
  static G::TransferEffects metadata(merlin_timing::View<G::Transfer>){return {{},{},{},merlin_timing::Cycle{0}};}
@@ -543,6 +548,12 @@ class PostedProvider final : public spike_timing::TargetProvider {
          throw std::invalid_argument("raw ingress requires selected non-flow/non-pipe queues");
      if(integer(s,"selected_has_loop_conv")!=1)
        throw std::invalid_argument("raw ingress requires instantiated LoopConv");
+     if(const auto router=s.number("target.scheduling.source_rocc_command_router")){
+       if(*router!=1||integer(s,"rocc_command_router_queue_entries")!=2||
+          integer(s,"rocc_command_router_queue_flow")||integer(s,"rocc_command_router_queue_pipe"))
+         throw std::invalid_argument("RoCC router requires selected original Queue2 and registered non-flow/non-pipe handoff");
+       rocc_router_=true;
+     }
      ingress_=std::make_unique<G::PostedCommandIngress>(q,std::array<std::size_t,4>{2,2,2,2},
        [this](const auto&r,auto at){return ((r.bits>>25)&127)==7 || (group(r)&&posted_.can_allocate(*group(r),at));},
        [this](const auto&r,auto at){
@@ -550,8 +561,10 @@ class PostedProvider final : public spike_timing::TargetProvider {
          else services_.feature("target.posted.raw_to_rs_allocated",1);
          timing_origin_=merlin_timing::StageOrigin{r.pc,r.bits,{},"target.command"};
          observer_.observe_command(r.pc,(r.bits>>25)&127,r.rs1,r.rs2,at);features();
-       });
+       },rocc_router_);
    }
+   if(s.number("target.scheduling.source_rocc_command_router")&&!ingress_)
+     throw std::invalid_argument("RoCC router selection requires actual registered raw ingress");
  }
  void memory_lookup_query(const merlin_timing::MemoryMilestoneQueryV2&query){posted_.memory_lookup_query(query);}
  void write_transactions(const spike_timing::WriteTransactionServiceV1&service){posted_.write_transactions(service);}
@@ -560,8 +573,12 @@ class PostedProvider final : public spike_timing::TargetProvider {
  void cold_writes(const spike_timing::ColdWriteServiceV4&service){posted_.cold_writes(service);}
  void cold_writes(const spike_timing::ColdWriteServiceV5&service){posted_.cold_writes(service);}
  void cold_writes(const spike_timing::ColdWriteServiceV6&service){posted_.cold_writes(service);}
+ void masked_writes(const spike_timing::MaskedWriteServiceV8&s){posted_.masked_writes(s);}
+ void masked_writes(const spike_timing::MaskedWriteServiceV9&s){posted_.masked_writes(s);}
+ void source_actors(const spike_timing::SourceActorSinkV1&s){posted_.source_actors(s);}
  void read_allocations(const spike_timing::ReadAllocationServiceV7&s){posted_.read_allocations(s);}
  bool submit_read_allocations(const spike_timing::ReadAllocationEffectsV7&b,const merlin_timing::StageOrigin&o,merlin_timing::Cycle at,void*cookie,spike_timing::ReadAllocationReadyV7 ready){return posted_.submit_read_allocations(b,o,at,cookie,ready);}
+ bool submit_cpu_read(const spike_timing::CpuReadAdmissionV10&r,const merlin_timing::StageOrigin&o,merlin_timing::Cycle at,void*cookie,spike_timing::ClassifyCpuReadV10 classify,spike_timing::ReadAllocationReadyV7 ready){return posted_.submit_cpu_read(r,o,at,cookie,classify,ready);}
  merlin_timing::Result command(std::uint64_t pc,std::uint64_t bits,std::uint64_t rs1,std::uint64_t rs2,merlin_timing::Cycle earliest)override{
    if((bits&inputs_.opcode_mask)!=inputs_.opcode || (bits&(1ull<<14))){
      reasons_.insert("unsupported_custom_opcode_or_return");services_.unresolved("posted_target:unsupported_custom_opcode_or_return");return {};
@@ -576,7 +593,12 @@ class PostedProvider final : public spike_timing::TargetProvider {
    G::PostedCommandIngress::Request request{pc,bits,rs1,rs2,earliest};
    if(!group(request)&&((bits>>25)&127)!=7){services_.unresolved("posted_target:unsupported_raw_frontend_command");return {};}
    const auto before=ingress_->coverage().source_wait;const auto result=ingress_->push(request);
-   services_.feature("target.posted.raw_accepted",1);
+   // A rejected/failed source attempt is not an accepted hardware command.
+   // Architectural command counts remain independent in features() above.
+   if(result.issue){
+     services_.feature("target.posted.raw_accepted",1);
+     if(rocc_router_)services_.feature("target.posted.rocc_router_accepted",1);
+   }
    services_.feature("target.posted.modeled_raw_source_wait_cycles",ingress_->coverage().source_wait-before);
    services_.engine.advance_issue(result.issue);return result;
  }
@@ -686,6 +708,18 @@ extern "C" void spike_timing_provider_cold_writes_v6(void*opaque,const spike_tim
  if(selected)selected->cold_writes(*service);
 }
 
+extern "C" void spike_timing_provider_masked_writes_v9(void*opaque,const spike_timing::MaskedWriteServiceV9*service){
+ if(!opaque||!service)return;
+ auto selected=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
+ if(selected)selected->masked_writes(*service);
+}
+
+extern "C" void spike_timing_provider_masked_writes_v8(void*opaque,const spike_timing::MaskedWriteServiceV8*service){
+ if(!opaque||!service)return;
+ auto selected=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
+ if(selected)selected->masked_writes(*service);
+}
+
 extern "C" void spike_timing_provider_read_allocations_v7(void*opaque,const spike_timing::ReadAllocationServiceV7*service){
  if(!opaque||!service)return;
  auto selected=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
@@ -696,4 +730,17 @@ extern "C" bool spike_timing_provider_submit_read_allocations_v7(void*opaque,con
  if(!opaque||!batch||!origin||!ready)return false;
  auto selected=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
  return selected&&selected->submit_read_allocations(*batch,*origin,at,cookie,ready);
+}
+extern "C" bool spike_timing_provider_submit_cpu_read_v10(void*opaque,const spike_timing::CpuReadAdmissionV10*request,
+ const merlin_timing::StageOrigin*origin,merlin_timing::Cycle at,void*cookie,spike_timing::ClassifyCpuReadV10 classify,spike_timing::ReadAllocationReadyV7 ready){
+ if(!opaque||!request||!origin||!classify||!ready)return false;
+ auto selected=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
+ return selected&&selected->submit_cpu_read(*request,*origin,at,cookie,classify,ready);
+}
+
+extern "C" bool spike_timing_provider_source_actors_v1(void*opaque,const spike_timing::SourceActorSinkV1*sink){
+ if(!opaque||!sink||sink->version!=1||sink->size!=sizeof(*sink)||!sink->edge||!sink->role)return false;
+ auto provider=dynamic_cast<PostedProvider*>(static_cast<spike_timing::TargetProvider*>(opaque));
+ if(!provider)return false;
+ provider->source_actors(*sink);return true;
 }

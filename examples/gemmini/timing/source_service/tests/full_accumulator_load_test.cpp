@@ -6,7 +6,7 @@ using namespace gemmini_annotated_spike;
 // The normal ISA decoder must produce byte-based ACC packets, rather than
 // reinterpreting sixteen INT32 elements as sixteen scratchpad bytes.
 void decoded(unsigned columns,unsigned align,bool enabled=true,bool accumulate=false,bool shrunk=false,bool repeated=false){
- std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<17;++i)resources.push_back({i,1,128});
+ std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<19;++i)resources.push_back({i,1,128});
  Engine engine(18000,resources);HardwareConfig h{16,16384,1024,1,4,32,true,true,std::uint8_t{0},false};
  h.source_full_accumulator_load=enabled;
  Parameters prices;for(auto kind:{"config","load"}){prices[std::string(kind)+".latency_cycles"]=1;prices[std::string(kind)+".occupancy_cycles"]=1;}
@@ -30,8 +30,8 @@ void decoded(unsigned columns,unsigned align,bool enabled=true,bool accumulate=f
  for(unsigned row=0;row<(repeated?1u:3u);++row)assert(masks[row]==expected&&finals[row]==1);
 }
 
-void consumed(bool enabled,bool pressure=false,bool missing=false,bool repeated=false){
- std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<17;++i)resources.push_back({i,1,128});
+void consumed(bool enabled,bool pressure=false,bool missing=false,bool repeated=false,bool ports=false){
+ std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<19;++i)resources.push_back({i,1,128});
  Engine engine(18000,resources);merlin_timing::PostedTimeline q({65536,65536,1000000});
  std::map<std::string,double>facts={
  {"target.scheduling.source_reader_registered_path",1},{"parameters.memory.l2.hit_cycles",1},
@@ -43,10 +43,11 @@ void consumed(bool enabled,bool pressure=false,bool missing=false,bool repeated=
  {"target.hardware.full_acc_load_separate_scaler",1},{"target.hardware.full_acc_load_scale_args_present",0},
  {"target.hardware.full_acc_load_input_queue_entries",2},{"target.hardware.full_acc_load_input_register_entries",1},
  {"target.hardware.full_acc_load_scale_pipeline_stages",0},{"target.hardware.accumulator_two_port_storage",1}};
+ if(ports){facts["target.scheduling.source_accumulator_row_ports"]=1;facts["target.scheduling.source_banked_accumulator_bounds"]=1;facts["target.hardware.accumulator_bank_count"]=2;facts["target.hardware.accumulator_bank_rows"]=512;facts["target.hardware.accumulator_localaddr_contiguous_banks"]=1;}
  if(enabled)facts["target.scheduling.source_full_accumulator_load"]=1;
  if(missing)facts.erase("target.hardware.full_acc_load_separate_scaler");
  std::vector<std::string>unknown;unsigned fragments=0,gets=0;std::vector<Cycle>publications;
- spike_timing::Services s{engine,[&](const auto&k)->std::optional<double>{auto i=facts.find(k);return i==facts.end()?std::nullopt:std::optional<double>{i->second};},[](const auto&){return 0;},[](auto){return 0;},
+ spike_timing::Services s{engine,[&](const auto&k)->std::optional<double>{auto i=facts.find(k);return i==facts.end()?std::nullopt:std::optional<double>{i->second};},[](const auto&k){return k=="accelerator.storage.accumulator.bank.0"?17:k=="accelerator.storage.accumulator.bank.1"?18:0;},[](auto){return 0;},
  [&](const auto&effects){assert(effects.size()==1&&!effects[0].write&&effects[0].bytes==64);++gets;return spike_timing::SharedEffects{{},{},{},Cycle{4}};},
  [&](const auto&k,auto n){if(k=="target.posted.full_accumulator_load_fragments")fragments+=n;},[&](auto reason){unknown.push_back(reason);}};
  HardwareConfig h{16,16384,1024,1,4,32,true,true,std::uint8_t{0},false};h.source_identity_ingress=true;h.source_full_accumulator_load=enabled;
@@ -74,6 +75,6 @@ int main(){auto full=reader_packets(0x81000000,1,64,64,16,64,64,64);
  for(auto columns:{1u,9u,16u})for(unsigned align=0;align<64;align+=4){decoded(columns,align);decoded(columns,align,true,false,false,true);}
  decoded(16,0,false);decoded(16,0,true,true);decoded(16,0,true,false,true);
  consumed(true);consumed(true,true);consumed(false);
- consumed(true,false,false,true);consumed(true,true,false,true);
+ consumed(true,false,false,true);consumed(true,true,false,true);consumed(true,false,false,false,true);consumed(true,false,false,true,true);
  bool refused=false;try{consumed(true,false,true);}catch(const std::invalid_argument&){refused=true;}assert(refused);
 }

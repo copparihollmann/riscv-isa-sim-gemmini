@@ -11,10 +11,10 @@ from merlin_timing.provider_bundle import RUNTIME_HEADERS, export_bundle
 
 SOURCES = ('README.md', 'bridge.cpp', 'provider.hpp', 'staged.hpp',
            'scratchpad_load.hpp', 'streamed_readout.hpp', 'identity_ingress.hpp',
-           'packet_load.hpp', 'reader_packets.hpp', 'readout_geometry.hpp',
+           'packet_load.hpp', 'reader_packets.hpp', 'pool_requests.hpp', 'readout_geometry.hpp',
            'streamed_packet_readout.hpp', 'writer_packets.hpp',
-           'instruction_context.hpp', 'instruction_suffix.hpp', 'posted.hpp', 'command_ingress.hpp', 'registered_transport.hpp', 'posted_readout_frontend.hpp',
-           'posted_one_beat_writer.hpp','posted_source_d.hpp','posted_full_packet_writer.hpp','posted_cold_write.hpp','posted_banked_store.hpp','posted_victim_probe.hpp','posted_read_allocation.hpp')
+           'instruction_context.hpp', 'instruction_suffix.hpp', 'posted.hpp', 'execute_operand_counters.hpp', 'execute_operand_pipeline.hpp', 'execute_mesh_tags.hpp', 'command_ingress.hpp', 'registered_transport.hpp', 'posted_readout_frontend.hpp',
+           'posted_one_beat_writer.hpp','posted_source_d.hpp','posted_full_packet_writer.hpp','posted_cold_write.hpp','posted_accumulator.hpp','posted_zero_writer.hpp','posted_banked_store.hpp','posted_victim_probe.hpp','posted_read_allocation.hpp')
 
 def export(destination: Path):
     root = Path(__file__).absolute().parent / 'source_service'
@@ -30,7 +30,7 @@ def export(destination: Path):
         *RUNTIME_HEADERS, 'timing/core/include/merlin_timing/reservations.hpp',
         'timing/core/include/merlin_timing/posted_timeline.hpp',
         'timing/core/include/merlin_timing/posted_engine_stage.hpp',
-        'timing/core/include/merlin_timing/memory_milestones.hpp','timing/write_transaction.hpp','timing/read_allocation.hpp'))
+        'timing/core/include/merlin_timing/memory_milestones.hpp','timing/write_transaction.hpp','timing/read_allocation.hpp','timing/source_actor.hpp'))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)

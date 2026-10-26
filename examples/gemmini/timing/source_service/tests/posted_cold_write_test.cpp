@@ -62,4 +62,32 @@ void dirty(bool block){
  assert(*lower_start==outer[7]&&*old_ack>*lower_start&&*new_ready<*old_ack);
  assert(first_s4==2); // only the two matching old8B reads, not all8 or ReleaseAck
 }
-int main(){path(false,false);path(true,false);path(false,true);path(true,true);finite();dirty(false);dirty(true);}
+void software_custody(){
+ Q q({65536,65536,1000000});PostedColdWrite actor(q,[&](auto,auto,auto,auto accepted){q.complete(accepted);},[](auto,auto,auto,auto){assert(false);});
+ unsigned admitted=0;for(unsigned i=0;i<34;++i){auto pub=*q.token();actor.admit(i,pub,[&,pub](Cycle t){++admitted;q.post(t+100,{},[pub](auto&q,auto){q.complete(pub);});},0);}
+ while(q.step(true)){}assert(!q.progress().failed&&!actor.busy()&&admitted==34&&actor.peak_mshrs()==10);
+}
+void native_arrival(){
+ Q q({128,128,1000});
+ PostedColdWrite actor(q,[](auto,auto,auto,auto){assert(false);},[](auto,auto,auto,auto){assert(false);});
+ auto pub=*q.token(),accepted=*q.token();unsigned calls=0;
+ actor.admit(1,pub,[&](Cycle t){++calls;assert(t==7);assert(q.complete(accepted));q.complete(pub);},7);
+ assert(calls==0&&!q.completed(accepted));
+ assert(q.advance(7,true)&&calls==0); // no eager arrival or callback
+ assert(q.advance(8,true)&&calls==1&&q.completed(accepted)==7);
+ while(q.step(true)){}
+ assert(!q.progress().failed&&!actor.busy()&&actor.peak_mshrs()==1);
+}
+void wormhole(bool zero_offset){
+ Q q({65536,65536,1000000});std::vector<Cycle>stored;std::optional<Cycle>ready;
+ PostedColdWrite actor(q,[&](auto,auto,Cycle t,auto accepted){q.complete(accepted);stored.push_back(t);},
+   [&](Cycle latency,Cycle bus,Cycle t,auto response){q.post(t+latency-bus,{},[response](auto&q,auto){q.complete(response);});});
+ auto pub=*q.token();spike_timing::WriteMissV5 law;law.line=16;law.set=16;law.acquire_block=true;law.fill_latency=16;law.fill_bus=4;
+ unsigned beats=0;actor.admit(law.set,pub,[&](Cycle at){
+   actor.push(law,[&](Cycle t){ready=t;q.complete(pub);if(zero_offset)assert(actor.busy());},{},{},at,{},{},
+     PostedColdWrite::Fill{zero_offset,[&](std::size_t beat,Cycle t){assert(beat==beats++);assert(stored.back()==t);}});
+ },0);
+ while(q.step(true)){}assert(!q.progress().failed&&!actor.busy()&&beats==8&&ready);
+ if(zero_offset)assert(*ready<stored.back());else assert(*ready==stored.back()+1);
+}
+int main(){path(false,false);path(true,false);path(false,true);path(true,true);finite();dirty(false);dirty(true);wormhole(false);wormhole(true);software_custody();native_arrival();}

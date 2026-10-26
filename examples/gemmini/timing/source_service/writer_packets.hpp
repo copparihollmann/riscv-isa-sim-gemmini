@@ -57,6 +57,13 @@ inline std::optional<std::vector<std::vector<WriterPacket>>> full_writer_rows(
   }
   return out;
 }
+inline std::optional<std::vector<std::vector<WriterPacket>>> masked_writer_rows(
+    std::uint64_t address,std::uint64_t rows,std::uint64_t width,std::uint64_t stride){
+ if(!rows||rows>16||!width||width>64||!stride||(rows-1&&stride>(UINT64_MAX-address)/(rows-1)))return {};
+ std::vector<std::vector<WriterPacket>>out;
+ for(std::uint64_t row=0;row<rows;++row){auto packets=writer_packets(address+row*stride,width,16,64);if(!packets||packets->size()>4)return {};out.push_back(std::move(*packets));}
+ return out;
+}
 inline std::optional<std::vector<std::vector<WriterPacket>>> one_beat_writer_rows(
     std::uint64_t address,std::uint64_t rows,std::uint64_t width,std::uint64_t stride){
   if(!rows||rows>16||!width||width>16||!stride||

@@ -32,6 +32,22 @@ int main(int argc,char**argv){
   put(104,65537,8);save();denied(); // same-set conflict: no guessed replacement
   const auto full=spike_timing::tsi_elf_bootstrap(path,1024,64,true);
   assert(full.lines.size()==1025 && full.directory_reads.size()>8192);
+  // More than the old million-event history ceiling; exact serialized
+  // directory Get/Put sequence is streamed from a bounded run representation.
+  put(88,0x80000000,8);put(96,0,8);put(104,16*1024*1024,8);save();
+  const auto large=spike_timing::tsi_elf_bootstrap(path,1024,64,true);
+  assert(large.directory_reads.size()==2*1024*1024&&large.directory_reads.stored_runs()==1);
+  assert(large.writes.size()==16384&&large.lines.size()==262144);
+  std::uint64_t index=0;
+  for(const auto&transaction:large.directory_reads){assert(transaction.write&&transaction.bytes==8&&transaction.address==0x80000000+index*8);++index;}
+  assert(index==large.directory_reads.size());
+  // Mixed edge RMW and overlapping same-address writes preserve order and
+  // remain distinct transactions, including accesses to one physical line.
+  assert(p.directory_reads.stored_runs()==3);
+  std::vector<spike_timing::TsiElfBootstrap::Transaction> expanded;
+  for(const auto&transaction:p.directory_reads)expanded.push_back(transaction);
+  assert(expanded.size()==131&&!expanded[0].write&&expanded[1].address==expanded[2].address&&expanded[1].write&&expanded[2].write);
+  put(88,0x80000001,8);put(96,7,8);
   put(104,1031,8);put(16,3,2);save();denied(); // relocated DYN unsupported
   put(16,2,2);put(96,4097,8);save();denied(); // invalid source range
   std::remove(path.c_str());

@@ -82,5 +82,12 @@ class PostedRegisteredTransport {
  }
  std::size_t occupancy(std::size_t index=0)const{return queues_.at(index).items.size();}
 };
+// One selected SourceD owns these registers across ALL opcodes. Keeping the
+// actual S2/S3/S4 credits shared allows S1 to accept the next request after its
+// last input, without creating independent response or writeback pipelines.
+struct PostedSourceDPipeline {
+ PostedRegisteredTransport s2,s3,s4;
+ explicit PostedSourceDPipeline(merlin_timing::PostedTimeline&q):s2(q,{{1,true}}),s3(q,{{1,true}}),s4(q,{{1,true}}){}
+};
 }
 #endif

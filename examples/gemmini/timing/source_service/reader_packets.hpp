@@ -21,7 +21,7 @@ inline std::vector<ReaderPacket> reader_packets(std::uint64_t source,
     std::uint64_t beat,std::uint64_t maximum,std::uint64_t maximum_columns=16,
     std::uint64_t local_row_bytes=16) {
   std::vector<ReaderPacket> out;
-  if(beat!=16 || maximum!=64 || !rows || rows>16 || !columns || columns>maximum_columns || maximum_columns>127 || pitch<columns ||
+  if(beat!=16 || maximum!=64 || !rows || rows>16 || !columns || columns>maximum_columns || maximum_columns>127 || (rows>1 && pitch<columns) ||
      (local_row_bytes!=16 && local_row_bytes!=64))
     return out;
   for(std::size_t row=0;row<rows;++row) {

@@ -384,3 +384,52 @@ this is not exact wormhole/cache-scheduler qualification. Lower-memory startup
 retains the selected uncertain price; actual eight 64-bit response beats replace
 its aggregate byte floor, rather than charging both. This local-source gSIM
 model does not imply the deployed FireSim memory model is identical.
+
+### Optional source actor activity
+
+`diagnostics.source_actor_activity.enabled` enables observation-only lifetime
+capture in a matching observer/provider build. It requires an exact original
+counter-PC scope and the optional `spike_timing_provider_source_actors_v1` ABI.
+`max_pending` bounds open actor identities and pending endpoints (default 65,536).
+The capture tracks prefix actors across scope opening, clips unions to the
+selected counter window, and discards completed histories at committed CPU-start
+watermarks. It adds no timing events, tokens, resource reservations or prices.
+
+`scoped_source_actor_activity` binds every report to the original ELF, model,
+scope and counter-boundary receipt. It separates lane command envelopes,
+combined RS dependency/admission waiting, execute feed service, reader source
+slot residency, StreamWriter packet-state occupancy and writer source slot
+residency. The two writer lifetimes end at different actual source events:
+final client-A enqueue versus client-D acknowledgement. Readout reduction-register
+activity, pure dependency-only wait and deployed DRAM activity are not supplied.
+Unsupported routes, missing ABI, nonmonotonic callbacks or bounded-capture
+exhaustion produce explicit UNKNOWN/null values, never inferred idle cycles.
+These are provisional modeled source lifetimes, not measured hardware occupancy;
+generic one-cycle controller reservations retain their separate dispatch meaning.
+
+
+## Optional row ports, original masked packets and fill publication
+
+`source_accumulator_row_ports=1` selects the two-port, latency2
+AccumulatorMem actor using the existing bank geometry. It models per-row
+RMW/read exclusion and registered write hazards, with Execute priority over
+DMA. The existing mesh result envelope remains selected independently.
+
+`source_masked_packet_readout=1` uses the V8 native packet interface for full,
+partial, raw, i8 and pooled writes through one StreamWriter/SinkA/SourceD owner.
+Every original packet retains its size, beat masks, useful interval and one
+ACK. Partial packets read every original beat at S1; zero-mask beats still
+retain payload/transaction custody. With `source_d_shared_pipeline=1`, S1 ownership ends at final S2 acceptance;
+shared finite S2/S3/S4 stages retain response and publication backpressure.
+Routes without that selection retain their existing conservative admission bounds.
+
+`source_memory_beat_forwarding=1` requires explicit selected MSHR zero-offset
+wormhole and SinkD first/last facts. SourceD may begin zero-offset reads after
+the first GrantData notice, and each SRAM read waits its two actual outer8B
+publications plus the bank exclusion edge. Offset requests wait last grant.
+Cache-line visibility and MSHR retirement still wait all original fill beats;
+the CPU/DMA subline response can precede that visibility. Ordered child request
+admission replaces the prior whole-child completion chain. `source_deferred_read_lookup=1` defers device classification until its original
+MSHR/set lease is admitted. The native V10 intake does the same for supported CPU
+requests. Routes without these interfaces retain their explicit legacy bounds.
+Lower DRAM scheduling and broader cache arbitration remain unqualified.

@@ -6,6 +6,7 @@
 #include <merlin_timing/engine.hpp>
 
 #include "reader_packets.hpp"
+#include "pool_requests.hpp"
 #include "readout_geometry.hpp"
 #include "writer_packets.hpp"
 #include <array>
@@ -82,6 +83,10 @@ struct HardwareConfig {
   std::uint32_t selected_mvin_cols_bits=0,selected_mvin_rows_bits=0;
   bool source_full_accumulator_load=false;
   bool source_masked_i8_readout=false;
+  bool source_identity_i8_accumulator_load=false;
+  bool source_ordered_pool_readout=false;
+  bool source_masked_packet_readout=false;
+  bool source_zero_writer=false;
 };
 
 // An absent binding is an unknown resource, never an assumed single-lane queue.
@@ -100,6 +105,7 @@ struct TransferEffects {
   std::optional<Cycle> minimum_latency;
 };
 using TransferHook = std::function<TransferEffects(View<Transfer>)>;
+struct ZeroFillGeometry {std::uint32_t rows,columns,block_stride;};
 struct TransferPhase {
   Cycle arrival;
   std::vector<Demand> demands;
@@ -113,7 +119,11 @@ struct TransferPhase {
   bool individual_row_publication=false;
   std::vector<std::vector<WriterPacket>> writer_packets{};
   bool full_accumulator_load=false;
+  bool identity_i8_accumulator_load=false;
+  std::vector<PoolReadoutRequest> pool_requests{};
   std::uint32_t full_accumulator_repeats=0;
+  std::uint32_t input_row_repeats=0; // original stride0 input-scaler row tags, not pixel repeats
+  std::optional<ZeroFillGeometry>zero_fill={};
 };
 // Explicit v2 timing-only hook; the v1 functional/count path stays unchanged.
 using SubmitHook = std::function<Result(const std::string &, const Event &,
@@ -375,11 +385,12 @@ private:
     return submit(kind,resources_.load,0,0);
   }
   Result submit(const std::string &kind, std::optional<ResourceId> resource,
-                std::uint64_t bytes, std::uint64_t macs, Cycle arrival = 0, bool row_load = false, bool packet_load = false) {
+                std::uint64_t bytes, std::uint64_t macs, Cycle arrival = 0, bool row_load = false, bool packet_load = false, bool i8_accumulator_load = false, const std::vector<PoolReadoutRequest>&pool_requests = {},std::optional<ZeroFillGeometry>zero_fill={}) {
     add(primitive_classes_[kind], 1);
     auto latency = priced(kind + ".latency", bytes, macs);
     const auto occupancy = priced(kind + ".occupancy", bytes, macs);
     std::optional<TransferPhase> phase;
+    if(zero_fill){phase=TransferPhase{0,{}};phase->zero_fill=zero_fill;phase->reader_destinations=writes_;}
     if (!submit_hook_) demand(resource, occupancy);
     if (!transfers_.empty() && transfer_hook_) {
       // Preserve per-row transfers rather than dividing aggregate latency.
@@ -395,14 +406,18 @@ private:
               transfers_[0].row_bytes,transfers_[0].row_stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)) :
           transfers_[0].row_bytes==std::uint64_t(h_.dim)*h_.accumulator_bytes &&
           transfers_[0].address%transfers_[0].row_bytes==0));
-      if(packet_load) {
+      if(!pool_requests.empty()){
+        phase=TransferPhase{arrival,{}};phase->pool_requests=pool_requests;effects.minimum_latency=0;
+      } else if(packet_load) {
         if(transfers_.size()!=1 || transfers_[0].write)return unknown_transfer(kind);
         phase=TransferPhase{0,{}};phase->row_bytes=transfers_[0].row_bytes;
-        const bool full_accumulator=(std::uint32_t(rs2_)>>31)&1;
-        phase->scratchpad_load=!full_accumulator;phase->full_accumulator_load=full_accumulator;phase->row_memory=transfer_hook_;
+        const bool full_accumulator=((std::uint32_t(rs2_)>>31)&1) && !i8_accumulator_load;
+        phase->scratchpad_load=!full_accumulator&&!i8_accumulator_load;phase->full_accumulator_load=full_accumulator;phase->identity_i8_accumulator_load=i8_accumulator_load;phase->row_memory=transfer_hook_;
         if(full_accumulator && transfers_[0].rows==1)
           phase->full_accumulator_repeats=std::uint32_t((rs2_>>48)&65535)-1;
-        phase->individual_row_publication=full_accumulator || (h_.wide_scratchpad_row_publication && transfers_[0].row_bytes>h_.dim);
+        phase->individual_row_publication=full_accumulator || i8_accumulator_load || (h_.wide_scratchpad_row_publication && transfers_[0].row_bytes>h_.dim);
+        if(phase->scratchpad_load && transfers_[0].rows==1 && transfers_[0].row_stride==0)
+          phase->input_row_repeats=std::uint32_t((rs2_>>48)&65535)-1;
         phase->reader_destinations=writes_; // original block-major physical row mapping, before token sorting
         phase->reader_packets=reader_packets(transfers_[0].address,transfers_[0].rows,
             transfers_[0].row_bytes,full_accumulator && transfers_[0].rows==1 && transfers_[0].row_stride==0 ?
@@ -441,7 +456,7 @@ private:
       } else effects=transfer_hook_({transfers_.data(), transfers_.size()});
       reads_.insert(reads_.end(), effects.reads.begin(), effects.reads.end());
       writes_.insert(writes_.end(), effects.writes.begin(), effects.writes.end());
-      if (arrival && submit_hook_ && !streamed) phase = TransferPhase{arrival, effects.demands};
+      if (arrival && submit_hook_ && !streamed && pool_requests.empty()) phase = TransferPhase{arrival, effects.demands};
       for (const auto &effect : effects.demands) {
         if (effect.units != 1) throw std::invalid_argument("target transfer hook requires unit demands");
         if (!phase) demand(effect.resource, effect.occupancy);
@@ -582,10 +597,16 @@ private:
         dram && accumulator && !accumulate && !load.shrunk && load.pixels==1 &&
         h_.dim==16 && h_.accumulator_bytes==4 && p.cols && p.cols<=16 && p.rows && p.rows<=16 &&
         (load.stride==0 || load.stride>=std::uint64_t(p.cols)*4);
+    const bool input_broadcast_packet=h_.source_identity_ingress && h_.scratchpad_packet_loads &&
+        submit_hook_ && transfer_hook_ && dram && !accumulator && !load.shrunk &&
+        load.scale==0x3f800000u && load.pixels==1 && load.stride==0 &&
+        h_.dim==16 && h_.element_bytes==1 && p.cols &&
+        p.cols<=(h_.wide_scratchpad_row_publication ? (std::uint64_t{1}<<h_.selected_mvin_cols_bits)-1 : 16) &&
+        p.rows && p.rows<=16;
     // LoadController.actual_rows_read is ONE for a nonzero source and stride0.
     // Its scaler input register repeats that fetched row; there are not rows
     // separate DMA requests/cache lookups for this original bias broadcast.
-    if (dram) transfer(dram, full_accumulator_packet&&load.stride==0 ? 1 : p.rows,
+    if (dram) transfer(dram, (full_accumulator_packet&&load.stride==0)||input_broadcast_packet ? 1 : p.rows,
         std::uint64_t(p.cols) * width, load.stride, false);
     else add(counters_.zero_fill_elements, std::uint64_t(p.rows) * p.cols);
     const bool row_load = !h_.source_identity_ingress && h_.scratchpad_row_loads && submit_hook_ && transfer_hook_ &&
@@ -597,12 +618,19 @@ private:
     if(h_.wide_scratchpad_row_publication && dram && !accumulator && !load.shrunk &&
         load.scale==0x3f800000u && load.pixels==1 &&
         (p.cols>packet_max_columns || p.rows>h_.dim))return unknown_transfer("load");
-    const bool packet_load=full_accumulator_packet || (!row_load && h_.scratchpad_packet_loads && submit_hook_ && transfer_hook_ &&
+    const bool i8_accumulator_packet=h_.source_identity_i8_accumulator_load && submit_hook_ && transfer_hook_ &&
+        dram && accumulator && load.shrunk && load.scale==0x3f800000u && load.pixels==1 &&
+        h_.dim==16 && h_.element_bytes==1 && h_.accumulator_bytes==4 &&
+        p.cols && p.cols<=16 && p.rows && p.rows<=16 && load.stride>=p.cols;
+    const bool packet_load=full_accumulator_packet || i8_accumulator_packet || (!row_load && h_.scratchpad_packet_loads && submit_hook_ && transfer_hook_ &&
         dram && !accumulator && !load.shrunk && load.scale==0x3f800000u && load.pixels==1 &&
         h_.dim==16 && h_.element_bytes==1 && p.cols && p.cols<=packet_max_columns && p.rows && p.rows<=16 &&
-        load.stride>=p.cols);
-    if(!packet_load)add(row_load ? counters_.load_row_stream_publication : counters_.load_aggregate_publication,1);
-    return submit("load", resources_.load, event_reads_ + event_writes_, 0, 0,row_load,packet_load);
+        (p.rows==1 || load.stride>=p.cols || input_broadcast_packet));
+    const bool zero_fill=!dram&&h_.source_zero_writer&&submit_hook_&&!accumulator&&load.pixels==1&&
+      h_.dim==16&&h_.element_bytes==1&&p.cols&&p.cols<=64&&p.rows&&p.rows<=16;
+    if(!packet_load&&!zero_fill)add(row_load ? counters_.load_row_stream_publication : counters_.load_aggregate_publication,1);
+    return submit("load", resources_.load, event_reads_ + event_writes_, 0, 0,row_load,packet_load,i8_accumulator_packet,{},
+      zero_fill?std::optional<ZeroFillGeometry>{{p.rows,p.cols,load.block_stride}}:std::nullopt);
   }
   Result store(std::uint64_t dram, std::uint64_t encoded) {
     reads_.push_back(state(3));
@@ -691,7 +719,7 @@ private:
     if(h_.accumulator_readout_packet_geometry && h_.accumulator_streamed_readout &&
        acc && !norm && !store_.pool_stride) {
       const auto width=std::uint64_t(p.cols)*(full?h_.accumulator_bytes:h_.element_bytes);
-      if(p.cols<=h_.dim && p.rows<=h_.dim && ((h_.source_masked_i8_readout && !full &&
+      if(p.cols<=h_.dim && p.rows<=h_.dim && ((h_.source_masked_packet_readout&&bool(masked_writer_rows(dram,p.rows,width,store_.stride))) || (h_.source_masked_i8_readout && !full &&
           bool(one_beat_writer_rows(dram,p.rows,width,store_.stride))) || (h_.accumulator_readout_full_packets ?
           bool(full_writer_rows(dram,p.rows,width,store_.stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)) :
           single_full_row_transactions(dram,p.rows,width,store_.stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)))) {
@@ -702,7 +730,18 @@ private:
         p.cols==h_.dim && p.rows && p.rows<=h_.dim &&
         store_.stride==std::uint64_t(h_.dim)*h_.accumulator_bytes ?
         h_.accumulator_readout_arrival.value_or(0):0;
-    return submit(kind, resources_.store, event_reads_ + event_writes_, 0, arrival);
+    std::vector<PoolReadoutRequest>ordered_pool;
+    if(h_.source_ordered_pool_readout&&submit_hook_&&transfer_hook_&&pooled&&acc&&!full&&!norm&&
+       accumulator_activation_&&*accumulator_activation_<=1){
+      const auto requests=pool_readout_requests(base,store_.orows,store_.ocols,store_.porows,store_.pocols,
+        store_.pool_size,store_.pool_stride,store_.upad,store_.lpad,store_.out_dim,dram,store_.stride,p.cols);
+      if(!requests){missing("unsupported_ordered_pool_request_geometry");}
+      else{
+        ordered_pool=*requests;
+        for(auto&r:ordered_pool)if(r.local_row)*r.local_row+=base_+h_.scratchpad_rows;
+      }
+    }
+    return submit(kind, resources_.store, event_reads_ + event_writes_, 0, arrival,false,false,false,ordered_pool);
   }
   Result compute(std::uint64_t rs1, std::uint64_t rs2, bool preloaded) {
     reads_.push_back(state(4)); reads_.push_back(state(5));
