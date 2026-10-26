@@ -111,3 +111,26 @@ python3 examples/gemmini/functional_baseline/export.py \
   --libgemmini-repo /path/to/public/libgemmini \
   --output /path/to/new/task-temporary-package
 ```
+
+## Explicit nearest-even correction
+
+The pinned receiver's `ROUND_NEAR_EVEN` computes its adjacent integer using a
+floating addition. Near a binade boundary this can skip an integer. The optional
+`rne_repair.py` changes that successor to integer `i +/- 1`, preserving the FP32
+product, ties-to-even decision and saturation. It prepares a new receiver identity
+and records its original archive, exact header delta and selected build headers.
+
+```sh
+python3 examples/gemmini/functional_baseline/rne_repair.py \
+  --libgemmini-repo /path/to/public/libgemmini \
+  --baseline-runtime /path/to/original/runtime \
+  --spike-prefix /path/to/original/spike/install \
+  --output /path/to/new/task-repaired-runtime
+```
+
+Select the resulting `runtime/` explicitly. The original profiles continue to
+describe the pristine receiver. The correction covers finite FP32 products with
+representable signed64 integer intermediates; nonfinite and out-of-range
+conversion behavior is not qualified by these checks. Run
+`tests/check_rne_repair.py --prepared ... --spike-prefix ... --output ...` to check
+the actual upstream counterexample, repaired arithmetic and source custody.
