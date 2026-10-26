@@ -1,5 +1,6 @@
 #include "../timing/model.hpp"
 #include "../timing/integer_divider_timing.hpp"
+#include "../timing/bitmanip_alu_timing.hpp"
 #include <boost/property_tree/json_parser.hpp>
 #include <openssl/evp.h>
 #include <array>
@@ -163,6 +164,7 @@ Model::Model(const std::string &path) {
     }
   }
   (void)integer_divider_bound(*this);
+  (void)bitmanip_alu_service(*this);
 }
 void Model::bind_scope(const std::string &path, const std::string &elf, const std::string &input) {
   if (!scope_pc_pair) {

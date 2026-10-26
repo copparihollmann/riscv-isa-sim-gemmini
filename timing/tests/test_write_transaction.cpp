@@ -3,21 +3,59 @@
 #include <map>
 #include <iostream>
 using namespace spike_timing;
+void parent_phase_checks(const Model&base){
+ auto model=base;
+ // Synthetic set count, same selected8-way source replacement law. Every
+ // address maps to one set; this needs only115 original scalar stores.
+ model.document.put("memory.caches.l1d.ways",8);model.document.put("memory.caches.l2.ways",8);
+ model.document.put("memory.caches.l2.replacement.schema","merlin.read_stepped_lfsr_replacement.v1");
+ model.document.put("memory.caches.l2.replacement.width",16);model.document.put("memory.caches.l2.replacement.feedback_mask",46080);
+ model.document.put("memory.caches.l2.replacement.seed",1);model.document.put("memory.caches.l2.replacement.selection_bits",10);
+ model.document.put("memory.caches.l2.replacement.source_receipt_sha256",std::string(64,'0'));
+ merlin_timing::Engine engine(model.max_values,model.resources);std::uint64_t next=0;unsigned prefixes=0,reused=0;
+ MemorySystem memory(model,engine,[&](std::size_t n){auto v=next;next+=n;return v;},[](auto,auto){},[](auto why){std::cerr<<why<<"\n";assert(false);});
+ for(unsigned i=0;i<115;++i){
+  const auto address=0x89000000ULL+i*65536ULL;assert(memory.access({{address,8,true}},"cpu_data").latency);
+  ReadAllocationEffectsV7 batch;if(memory.take_read_allocations(batch)){
+   assert(batch.snapshot_revision==5&&batch.unavailable.empty());
+   for(const auto&phase:batch.parent_writebacks){++prefixes;assert(phase.bytes==64&&phase.address%64==0&&phase.before_child==0&&!phase.writes.empty());
+    for(auto value:phase.writes){assert(std::find(batch.source_request.writes.begin(),batch.source_request.writes.end(),value)==batch.source_request.writes.end());
+     for(const auto&child:batch.allocations)if(std::find(child.source_request.writes.begin(),child.source_request.writes.end(),value)!=child.source_request.writes.end())++reused;
+    }
+   }
+   for(const auto&child:batch.allocations){
+    for(auto value:child.source_request.writes)assert(std::find(batch.source_request.writes.begin(),batch.source_request.writes.end(),value)==batch.source_request.writes.end());
+    if(child.victim)assert(memory.victim_client_released(*child.victim,(i+1)*1000));
+   }
+  }
+  memory.cpu_data_completed((i+1)*1000,false);memory.source_full_fence((i+1)*1000);
+ }
+ assert(prefixes&&reused==1);
+ std::cout<<"original dirty private writeback/child LLC-slot reuse retains separate prefix and late publications PASS\n";
+}
 void source_read_checks(const Model&model){
  merlin_timing::Engine engine(model.max_values,model.resources);std::uint64_t next=0;
  std::map<std::string,std::uint64_t>f;
  MemorySystem m(model,engine,[&](std::size_t n){auto v=next;next+=n;return v;},[&](const auto&k,auto n){f[k]+=n;},[](auto why){std::cerr<<why<<"\n";assert(false);});
  const std::uint64_t a=0x89000000;ReadAllocationEffectsV7 r;
+ const auto before_preview=f;const auto preview_values=next;
+ assert(m.cpu_read_admission_lines({{a,8,true}},"cpu_data")==std::vector<std::uint64_t>{a});
+ assert(m.cpu_read_admission_lines({{a+60,8,false}},"cpu_fetch")==std::vector<std::uint64_t>({a,a+64}));
+ assert(m.cpu_read_admission_lines({{a,4,false},{a+2,2,false}},"cpu_fetch")==std::vector<std::uint64_t>{a});
+ assert(!m.cpu_read_admission_lines({{a,32,false}},"cpu_data"));
+ assert(!m.cpu_read_admission_lines({{a,4,false},{a+128,4,false}},"cpu_data"));
+ assert(f==before_preview&&next==preview_values); // no tags, replacement RNG, traffic or value IDs are consumed
  const auto first=m.access({{a,64,true}},"cpu_data");
- assert(first.latency==4&&m.take_read_allocations(r)&&r.allocations.size()==1);
- assert(r.allocations[0].inner_acquire&&r.allocations[0].inner_address==a&&r.allocations[0].inner_bytes==64);
+ assert(first.latency==2&&m.take_read_allocations(r)&&r.allocations.size()==1);
+ assert(!r.allocations[0].device_resident_no_probe&&r.allocations[0].inner_acquire&&r.allocations[0].inner_address==a&&r.allocations[0].inner_bytes==64);
  assert(!r.allocations[0].victim&&r.allocations[0].miss.acquire_block&&r.response_stages==2);
  assert(!m.take_read_allocations(r));m.cpu_data_completed(30,false);
- assert(m.access({{a+1024,16,false}},"device").latency==2&&m.take_read_allocations(r));
+ assert(m.cpu_read_admission_lines({{a,8,false}},"cpu_data")->empty());
+ assert(m.access({{a+1024,16,false}},"device").latency==0&&m.take_read_allocations(r));
  assert(!r.allocations[0].inner_acquire&&r.allocations[0].inner_address==a+1024&&r.allocations[0].inner_bytes==16);
  const auto misses=f["modeled.cache.l2.misses"],bytes=f["modeled.dram_request_bytes"];
  const auto effects=m.access({{a+2048,32,false}},"device");
- assert(effects.latency==2&&m.take_read_allocations(r)&&r.allocations.size()==1);
+ assert(effects.latency==0&&m.take_read_allocations(r)&&r.allocations.size()==1);
  const auto&v=r.allocations[0];assert(v.victim&&v.victim->line==a/64&&v.victim->private_dirty&&!v.victim->llc_dirty);
  assert(v.victim->client_ready==38&&v.miss.dirty_eviction&&!v.miss.release_writes.empty());
  assert(v.miss.release_latency>0&&v.miss.fill_latency>0&&r.source_request.demands.empty());
@@ -30,10 +68,21 @@ void source_read_checks(const Model&model){
  // An instruction miss whose actual lower LLC line is resident must keep
  // the native L1 miss and source-owned lower lookup exactly once. The old
  // optional fetch-refill approximation must not suppress the latter price.
- assert(m.access({{a+2048,2,false}},"cpu_fetch").latency==4&&m.take_read_allocations(r));
- assert(r.allocations.size()==1&&r.allocations[0].resident&&!r.allocations[0].inner_acquire);
+ assert(m.access({{a+2048,2,false}},"cpu_fetch").latency==2&&m.take_read_allocations(r));
+ assert(r.allocations.size()==1&&r.allocations[0].resident&&!r.allocations[0].inner_acquire&&!r.allocations[0].device_resident_no_probe);
  assert(r.allocations[0].inner_address==a+2048&&r.allocations[0].inner_bytes==64);
  assert(f["modeled.fetch_refill.applied"]==0);
+ // Two distinct lower allocations from one architectural request retain
+ // independent lookup/dependency custody; the parent is not cloned twice.
+ const auto multi=m.access({{a+4096,128,false}},"device");
+ assert(multi.latency==0&&m.take_read_allocations(r)&&r.snapshot_revision==5&&r.allocations.size()==2);
+ assert(r.source_request.latency==0&&r.source_request.writes.empty());
+ for(unsigned i=0;i<2;++i){const auto&child=r.allocations[i];
+   assert(child.inner_address==a+4096+i*64&&child.inner_bytes==64);
+   assert(child.source_request.latency==2&&child.source_request.writes.size()==1);
+   assert(std::find(child.source_request.reads.begin(),child.source_request.reads.end(),r.allocations[1-i].source_request.writes[0])==child.source_request.reads.end());
+ }
+ assert(r.allocations[0].source_request.writes!=r.allocations[1].source_request.writes);
  // A resident no-probe read inside a typed write epoch now has a real source
  // actor. A later target-coherence probe still fails that exact old guard.
  merlin_timing::Engine e(model.max_values,model.resources);std::uint64_t n=0;std::vector<std::string>unknown;
@@ -42,14 +91,41 @@ void source_read_checks(const Model&model){
  FullWritePacketV3 p;p.address=a;p.transaction_bytes=64;p.beat_bytes=16;WriteTransactionEffectsV6 output;
  assert(resident.write_packet(p,output));
  assert(resident.access({{a+16,16,false}},"device").latency&&resident.take_read_allocations(r));
- assert(r.allocations.size()==1&&r.allocations[0].resident&&!r.allocations[0].victim&&r.allocations[0].miss.fill_latency==0&&unknown.empty());
+ assert(r.allocations.size()==1&&r.allocations[0].resident&&r.allocations[0].device_resident_no_probe&&!r.allocations[0].victim&&r.allocations[0].miss.fill_latency==0&&unknown.empty());
  assert(resident.access({{a,1,false}},"cpu_data").latency&&resident.take_read_allocations(r));
  resident.access({{a,16,false}},"device");
  assert(std::find(unknown.begin(),unknown.end(),"typed masked-write source epoch intersects unsupported external shared-cache service before full fence")!=unknown.end());
 }
+void masked_packet_checks(const Model&model){
+ merlin_timing::Engine engine(model.max_values,model.resources);std::uint64_t next=0;std::map<std::string,std::uint64_t>f;
+ MemorySystem memory(model,engine,[&](std::size_t n){auto v=next;next+=n;return v;},[&](const auto&k,auto n){f[k]+=n;},[](auto x){std::cerr<<x<<"\n";assert(false);});
+ MaskedWritePacketV8 p;p.address=0x89000000;p.transaction_bytes=64;p.masks={0,0xff00,0xffff,0x1f};
+ MaskedWriteEffectsV9 observed;assert(memory.write_packet(p,observed)&&!observed.resident_dirty_no_probe);
+ WriteTransactionEffectsV6 out=std::move(observed.original);assert(out.miss&&out.miss->acquire_block&&out.resident.base.sram_read_required);
+ assert(f["device.requested_write_bytes"]==29&&f["modeled.dram_request_bytes"]==64&&f["modeled.typed_write.client_transaction_bytes"]==64);
+ // Same packet owner interface can follow with full and partial requests.
+ p.masks={0xffff,0xffff,0xffff,0xffff};assert(memory.write_packet(p,observed)&&observed.resident_dirty_no_probe);
+ out=std::move(observed.original);assert(!out.miss&&!out.resident.base.sram_read_required);
+ assert(f["device.requested_write_bytes"]==93&&f["modeled.dram_request_bytes"]==64);
+ p.address+=64;p.transaction_bytes=32;p.masks={0x8000,0x7fff};
+ assert(memory.write_packet(p,out)&&out.miss&&out.miss->acquire_block);
+ assert(f["device.requested_write_bytes"]==109&&f["modeled.dram_request_bytes"]==128&&f["modeled.typed_write.client_transaction_bytes"]==160);
+ const auto before=f;p.masks={0xff00,0x7fff};p.masks[0]|=1;
+ assert(!memory.write_packet(p,out)&&f==before); // reject before any tag/traffic mutation
+ // A clean resident hit still needs a Directory dirty-bit update. It must
+ // not inherit the early-retirement premise from mere absence of a miss.
+ merlin_timing::Engine clean_engine(model.max_values,model.resources);std::uint64_t clean_next=0;
+ MemorySystem clean(model,clean_engine,[&](std::size_t n){auto v=clean_next;clean_next+=n;return v;},[](const auto&,auto){},[](auto){assert(false);});
+ p.address=0x8a000000;p.transaction_bytes=64;p.masks={0xffff,0xffff,0xffff,0xffff};
+ assert(clean.access({{p.address,64,false}},"device").latency);
+ assert(clean.write_packet(p,observed)&&!observed.original.miss&&!observed.resident_dirty_no_probe);
+ assert(clean.write_packet(p,observed)&&observed.resident_dirty_no_probe);
+
+}
 int main(int argc,char**argv){
  assert(argc==2);Model model(argv[1]);
- if(model.document.get_child_optional("memory.source_read_allocations")){source_read_checks(model);return 0;}merlin_timing::Engine engine(model.max_values,model.resources);
+ if(model.number("target.scheduling.source_masked_packet_readout")==std::optional<double>{1}){masked_packet_checks(model);return 0;}
+ if(model.document.get_child_optional("memory.source_read_allocations")){source_read_checks(model);parent_phase_checks(model);return 0;}merlin_timing::Engine engine(model.max_values,model.resources);
  std::uint64_t next=0;std::map<std::string,std::uint64_t>features;unsigned unknown=0;
  MemorySystem memory(model,engine,[&](std::size_t n){auto v=next;next+=n;return v;},[&](const auto&name,auto n){features[name]+=n;},[&](const auto&){++unknown;});
  WriteTransactionV1 request;request.address=0x81000000;request.beat_bytes=16;request.transaction_bytes=16;request.mask=8;

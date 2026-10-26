@@ -318,6 +318,7 @@ void MemorySystem::bootstrap_primary_elf(const std::string &elf) {
     const auto replacement_state=caches_.at("l2")->replacement_state();
     bootstrap_report_="{\"status\":\"applied\",\"execution_domain\":\"selected_gsim_tsi_no_loadmem\",\"scope\":\"before_guest_timing\",\"replacement_scope\":"+json_string(s.get<std::string>("replacement_scope"))+",\"source_receipt_sha256\":"+json_string(s.get<std::string>("source_receipt_sha256"))+",\"lines\":"+std::to_string(plan.lines.size())+",\"write_chunks\":"+std::to_string(plan.writes.size())+",\"written_bytes\":"+std::to_string(plan.bytes)+",\"resident_lines\":"+std::to_string(caches_.at("l2")->report().entries)+",\"directory_reads\":"+std::to_string(source_directory?plan.directory_reads.size():0)+",\"replacement_state\":"+(replacement_state?std::to_string(*replacement_state):"null")+"}";
     feature_("modeled.loader_bootstrap.directory_reads",source_directory?plan.directory_reads.size():0);
+    feature_("modeled.loader_bootstrap.stored_directory_runs",plan.directory_reads.stored_runs());
     feature_("modeled.loader_bootstrap.applied",1);
     feature_("modeled.loader_bootstrap.lines",plan.lines.size());
     feature_("modeled.loader_bootstrap.write_chunks",plan.writes.size());
@@ -383,6 +384,40 @@ void MemorySystem::cache_access(std::uint64_t address, std::uint64_t bytes, bool
   }
   const auto &name = path[level];
   const auto line_bytes = lines_.at(name);
+  if(read_allocations_selected_&&!walk.source_partition&&!write&&
+      name==read_allocation_cache_&&!typed_write_request_&&!walk.coherence_transaction&&!walk.coherence_probe){
+    const auto last_line=(address+bytes-1)/line_bytes;
+    for(auto line=address/line_bytes;;++line){
+      const auto first=std::max(address,line*line_bytes);
+      const auto count=std::min(address+bytes,(line+1)*line_bytes)-first;
+      Walk local;local.source_partition=true;local.device=walk.device;local.cpu_fetch=walk.cpu_fetch;
+      local.suppress_cache_price=walk.suppress_cache_price;
+      local.visited=walk.visited;local.byte_coverage=walk.byte_coverage;
+      // A resident hit has no lower recursion to discover its original DRAM
+      // coherence-granule reader. Retain that owner explicitly in its child.
+      if(const auto id=token(line*line_bytes/granule_))local.reads.insert(*id);
+      else local.complete=false;
+      cache_access(first,count,false,path,level,local);
+      finish_walk(local);
+      walk.visited=std::move(local.visited);walk.byte_coverage=std::move(local.byte_coverage);
+      walk.shared_lookup|=local.shared_lookup;walk.complete&=local.complete;
+      walk.device_lookups.insert(walk.device_lookups.end(),local.device_lookups.begin(),local.device_lookups.end());
+      if(local.read_allocations.size()==1){
+        auto allocation=std::move(local.read_allocations.front());
+        allocation.source_request=std::move(local.effects);
+        walk.read_allocations.push_back(std::move(allocation));
+        feature_("modeled.read_allocations.partitioned",1);
+      }else if(local.read_allocations.empty()){
+        // Repeated original lookup or unsupported coherent path: retain its
+        // effects once in the residual request, rather than discarding it.
+        walk.reads.insert(local.reads.begin(),local.reads.end());walk.writes.insert(local.writes.begin(),local.writes.end());
+        if(!add(walk.latency,local.latency))walk.complete=false;
+        walk.effects.demands.insert(walk.effects.demands.end(),local.effects.demands.begin(),local.effects.demands.end());
+      }else{unresolved_("read allocation child contains multiple original source owners");walk.complete=false;}
+      if(line==last_line)break;
+    }
+    return;
+  }
   const auto last = (address + bytes - 1) / line_bytes;
   for (auto line = address / line_bytes;; ++line) {
     const auto key = std::make_tuple(name, line, walk.coherence_transaction);
@@ -426,7 +461,9 @@ void MemorySystem::cache_access(std::uint64_t address, std::uint64_t bytes, bool
       if(read_allocations_selected_&&!write&&name==read_allocation_cache_&&!typed_write_request_&&!walk.coherence_transaction){
         const auto preview=caches_.at(name)->preview_access(line*line_bytes);
         if(!preview.hit||!walk.coherence_probe){
-          allocation.emplace();allocation->resident=preview.hit;auto&m=allocation->miss;m.line=line;m.slot=preview.slot;
+          allocation.emplace();allocation->resident=preview.hit;
+          allocation->device_resident_no_probe=walk.device&&preview.hit&&!walk.coherence_probe;
+          auto&m=allocation->miss;m.line=line;m.slot=preview.slot;
           m.set=line%model_.document.get<std::uint64_t>("memory.caches."+name+".sets");
           m.generation=cache_generations_.at(name).at(preview.slot)+(preview.hit?0:1);m.evicted_line=preview.evicted_line;
           m.dirty_eviction=preview.dirty_eviction;m.acquire_block=!preview.hit;
@@ -483,7 +520,11 @@ void MemorySystem::cache_access(std::uint64_t address, std::uint64_t bytes, bool
       if (refill_candidate && !replace)
         feature_(result.dirty_eviction ? "modeled.fetch_refill.legacy_dirty_eviction" :
                  "modeled.fetch_refill.legacy_lower_miss",1);
-      if (!replace && !walk.suppress_cache_price) {
+      // The selected native I$ controller owns this original private miss
+      // lookup. Suppress it here, before recursive lower-service joins.
+      const bool source_icache_miss=walk.cpu_fetch&&level==0&&!write&&!result.hit&&
+        bool(model_.document.get_child_optional("cpu.instruction_miss_service"));
+      if (!replace && !walk.suppress_cache_price && !source_icache_miss) {
         charge(walk, "memory." + name + (result.hit ? ".hit_cycles" : ".miss_cycles"));
         if(device_read_pipeline_ && walk.device && !write && !walk.coherence_transaction &&
            level==0 && name==device_read_pipeline_->cache) {
@@ -505,7 +546,29 @@ void MemorySystem::cache_access(std::uint64_t address, std::uint64_t bytes, bool
         feature_("modeled.writeback_bytes", line_bytes);
         const auto latency=walk.latency,bus=walk.bus;
         const auto previous_writes=(typed_release_writes_||allocation)?walk.writes:std::set<merlin_timing::ValueId>{};
-        cache_access(*result.evicted_line * line_bytes, line_bytes, true, path, level + 1, walk);
+        if(read_allocations_selected_&&level==0&&!walk.device&&!walk.source_partition&&
+           !walk.coherence_transaction&&name==victim_private_cache_){
+          // This original dirty private victim is written back BEFORE the
+          // incoming lower read. Keep its writes separate from the later
+          // private fill/CPU-store destination instead of merging generations.
+          Walk release;release.source_partition=true;release.visited=walk.visited;
+          release.byte_coverage=walk.byte_coverage;
+          cache_access(*result.evicted_line*line_bytes,line_bytes,true,path,level+1,release);
+          walk.visited=std::move(release.visited);walk.byte_coverage=std::move(release.byte_coverage);
+          walk.complete&=release.complete;walk.shared_lookup|=release.shared_lookup;
+          walk.reads.insert(release.reads.begin(),release.reads.end());
+          if(!add(walk.latency,release.latency)||!add(walk.bus,release.bus))walk.complete=false;
+          for(const auto&entry:release.boundary_bytes)walk.boundary_bytes[entry.first]+=entry.second;
+          walk.effects.demands.insert(walk.effects.demands.end(),release.effects.demands.begin(),release.effects.demands.end());
+          if(!release.probe_cycles.empty()||!release.probe_responses.empty()||!release.read_allocations.empty()){
+            unresolved_("private writeback prefix contains an unpartitioned coherent child");walk.complete=false;
+          }
+          ReadParentWritebackV11 publication;publication.address=*result.evicted_line*line_bytes;
+          publication.bytes=line_bytes;publication.before_child=walk.read_allocations.size();
+          publication.writes.assign(release.writes.begin(),release.writes.end());
+          walk.parent_writebacks.push_back(std::move(publication));
+          feature_("modeled.read_allocations.parent_writeback_prefixes",1);
+        }else cache_access(*result.evicted_line * line_bytes, line_bytes, true, path, level + 1, walk);
         if(typed_cold_miss_&&level==0){typed_cold_miss_->release_latency=walk.latency-latency;typed_cold_miss_->release_bus=walk.bus-bus;}
         if(allocation){
           allocation->miss.release_latency=walk.latency-latency;allocation->miss.release_bus=walk.bus-bus;
@@ -708,6 +771,29 @@ bool MemorySystem::write_packet(const FullWritePacketV3&r,WriteTransactionEffect
   const auto ok=write_source_owned(request,{r.address,r.transaction_bytes},out.resident.base,&out.resident.probe,true,&miss,&writes,&out.victim);
   if(miss){out.miss.emplace();static_cast<WriteMissV4&>(*out.miss)=*miss;out.miss->release_writes=std::move(writes);}if(ok)typed_full_packet_epoch_=true;return ok;
 }
+bool MemorySystem::write_packet(const MaskedWritePacketV8&r,WriteTransactionEffectsV6&out){
+ out={};const auto useful=masked_write_packet_useful(r);
+ if(!useful||model_.number("target.scheduling.source_masked_packet_readout")!=std::optional<double>{1}){
+   out.resident.base.unavailable="original masked packet requires selected shared SourceD route";return false;
+ }
+ WriteTransactionV1 request;request.address=r.address;request.transaction_bytes=r.transaction_bytes;
+ request.beat_bytes=16;request.mask=useful->bytes==r.transaction_bytes?0xffff:0;request.accepted=r.accepted;
+ std::optional<WriteMissV4>miss;std::vector<merlin_timing::ValueId>writes;
+ const auto ok=write_source_owned(request,*useful,out.resident.base,&out.resident.probe,
+   useful->bytes==r.transaction_bytes,&miss,&writes,&out.victim);
+ if(miss){out.miss.emplace();static_cast<WriteMissV4&>(*out.miss)=*miss;out.miss->release_writes=std::move(writes);}
+ return ok;
+}
+bool MemorySystem::write_packet(const MaskedWritePacketV8&r,MaskedWriteEffectsV9&out){
+ out={};bool dirty=false;
+ if(device_write_request_pipeline_&&masked_write_packet_useful(r)){
+   const auto prior=caches_.at(device_write_request_pipeline_->cache)->probe(r.address);
+   dirty=prior.hit&&prior.dirty;
+ }
+ const auto admitted=write_packet(r,out.original);
+ if(admitted)out.resident_dirty_no_probe=dirty&&!out.original.miss&&!out.original.resident.probe&&!out.original.victim;
+ return admitted;
+}
 bool MemorySystem::write_source_owned(const WriteTransactionV1&r,const WriteUsefulBytes&useful,WriteTransactionEffectsV1&out,std::optional<WriteProbeV2>*probe,bool full_packet,std::optional<WriteMissV4>*miss,std::vector<merlin_timing::ValueId>*release_writes,std::optional<VictimProbeV6>*victim){
   out={};
   const auto deny=[&](const char*why){out.unavailable=why;return false;};
@@ -818,6 +904,59 @@ bool MemorySystem::write_source_owned(const WriteTransactionV1&r,const WriteUsef
   return true;
 }
 
+void MemorySystem::finish_walk(Walk&walk) {
+  walk.effects.reads.assign(walk.reads.begin(), walk.reads.end());
+  walk.effects.writes.assign(walk.writes.begin(), walk.writes.end());
+  for (const auto &entry : walk.boundary_bytes) {
+    const auto price = "memory." + entry.first + ".per_byte_cycles";
+    const auto cost = model_.cycles(price, entry.second);
+    const auto resource = model_.resource(model_.document.get<std::string>(
+        "memory.caches." + entry.first + ".byte_service.resource"));
+    if (!cost || !resource || !add(walk.latency, *cost)) walk.complete = false;
+    else walk.effects.demands.push_back({*resource, 1, *cost});
+    feature_("modeled.cache." + entry.first + ".boundary_bytes", entry.second);
+  }
+  for (const auto &entry : walk.probe_cycles) {
+    const auto &service = probe_service_.at(entry.first);
+    walk.effects.demands.push_back({service.resource, 1, entry.second});
+    // Scalar cache/snoop costs already account for some control work. Retain
+    // them and enforce this independent protocol floor instead of adding the
+    // same stages twice. Per-line cache/DMA overlap remains approximate.
+    walk.latency = std::max(walk.latency, entry.second);
+  }
+  // Completion and controller release are different milestones. SharedEffects
+  // already supports latency independent of occupancy; preserve its ABI and
+  // existing hazards, without charging this pipeline as serialized probe work.
+  for (const auto &entry:walk.probe_responses)
+    walk.latency=std::max(walk.latency,entry.second);
+  if (walk.bus) {
+    const auto resource = model_.resource("memory.shared");
+    if (resource) walk.effects.demands.push_back({*resource, 1, walk.bus});
+    else walk.complete = false;
+  }
+  if (walk.complete) walk.effects.latency = walk.latency;
+  else unresolved_("memory timing has unresolved prices, resources or semantics");
+}
+
+std::optional<std::vector<std::uint64_t>>MemorySystem::cpu_read_admission_lines(const std::vector<MemoryEffect>&effects,const std::string&path)const{
+  const auto p=paths_.find(path);
+  if(!read_allocations_selected_||p==paths_.end()||p->second.size()!=2||p->second.back()!=read_allocation_cache_||
+      (path!="cpu_data"&&path!="cpu_fetch")||lines_.at(p->second.front())!=64||lines_.at(read_allocation_cache_)!=64)return {};
+  std::set<std::uint64_t>lines;
+  for(const auto&e:effects){
+    if(!e.bytes||e.immutable)continue;
+    // Selected scalar accesses and fetches touch at most two adjacent lines.
+    // Preserve UNKNOWN for a different CPU/request domain.
+    if(e.bytes>16||e.bytes-1>UINT64_MAX-e.address)return {};
+    const auto last=(e.address+e.bytes-1)/64;
+    for(auto line=e.address/64;;++line){
+      if(!caches_.at(p->second.front())->probe(line*64).hit)lines.insert(line*64);
+      if(line==last)break;
+    }
+  }
+  if(lines.size()>2||(lines.size()==2&&*lines.rbegin()!=*lines.begin()+64))return {};
+  return std::vector<std::uint64_t>(lines.begin(),lines.end());
+}
 SharedEffects MemorySystem::access(const std::vector<MemoryEffect> &effects, const std::string &path) {
   building_.clear();last_read_allocations_={};
   if(observation_sequence_==UINT64_MAX)throw std::overflow_error("memory observation identity overflow");
@@ -889,37 +1028,12 @@ SharedEffects MemorySystem::access(const std::vector<MemoryEffect> &effects, con
       cache_access(effect.address, effect.bytes, effect.write, selected->second, 0, walk);
     }
   }
-  walk.effects.reads.assign(walk.reads.begin(), walk.reads.end());
-  walk.effects.writes.assign(walk.writes.begin(), walk.writes.end());
-  for (const auto &entry : walk.boundary_bytes) {
-    const auto price = "memory." + entry.first + ".per_byte_cycles";
-    const auto cost = model_.cycles(price, entry.second);
-    const auto resource = model_.resource(model_.document.get<std::string>(
-        "memory.caches." + entry.first + ".byte_service.resource"));
-    if (!cost || !resource || !add(walk.latency, *cost)) walk.complete = false;
-    else walk.effects.demands.push_back({*resource, 1, *cost});
-    feature_("modeled.cache." + entry.first + ".boundary_bytes", entry.second);
-  }
-  for (const auto &entry : walk.probe_cycles) {
-    const auto &service = probe_service_.at(entry.first);
-    walk.effects.demands.push_back({service.resource, 1, entry.second});
-    // Scalar cache/snoop costs already account for some control work. Retain
-    // them and enforce this independent protocol floor instead of adding the
-    // same stages twice. Per-line cache/DMA overlap remains approximate.
-    walk.latency = std::max(walk.latency, entry.second);
-  }
-  // Completion and controller release are different milestones. SharedEffects
-  // already supports latency independent of occupancy; preserve its ABI and
-  // existing hazards, without charging this pipeline as serialized probe work.
-  for (const auto &entry:walk.probe_responses)
-    walk.latency=std::max(walk.latency,entry.second);
-  if (walk.bus) {
-    const auto resource = model_.resource("memory.shared");
-    if (resource) walk.effects.demands.push_back({*resource, 1, walk.bus});
-    else walk.complete = false;
-  }
-  if (walk.complete) walk.effects.latency = walk.latency;
-  else unresolved_("memory timing has unresolved prices, resources or semantics");
+  // A compound CPU effect may already have visited the incoming lower line.
+  // Without a captured allocation there is no phase consumer: retain the
+  // original aggregate publication instead of dropping the writeback writes.
+  if(walk.read_allocations.empty())for(const auto&phase:walk.parent_writebacks)
+    walk.writes.insert(phase.writes.begin(),phase.writes.end());
+  finish_walk(walk);
   if(walk.device && effects.size()==1 && !effects.front().write &&
       !effects.front().immutable && effects.front().bytes && walk.complete &&
       walk.device_lookups.size()==1) {
@@ -946,6 +1060,9 @@ SharedEffects MemorySystem::access(const std::vector<MemoryEffect> &effects, con
   if(!walk.read_allocations.empty()){
     last_read_allocations_.allocations=std::move(walk.read_allocations);
     last_read_allocations_.source_request=walk.effects;
+    last_read_allocations_.parent_writebacks=std::move(walk.parent_writebacks);
+    if(!last_read_allocations_.parent_writebacks.empty()&&last_read_allocations_.allocations.size()!=1)
+      last_read_allocations_.unavailable="private writeback phases require one original CPU allocation";
     if(!walk.complete)last_read_allocations_.unavailable="captured read allocation has incomplete native source ownership";
   }
   return walk.effects;

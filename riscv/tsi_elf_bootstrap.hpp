@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <fstream>
 #include <limits>
+#include <iterator>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -21,8 +22,48 @@ namespace spike_timing {
 struct TsiElfBootstrap {
   struct Chunk { std::uint64_t address,bytes; };
   struct Transaction { std::uint64_t address,bytes; bool write; };
+  // Count consecutive TSI beats without retaining one history object per
+  // beat. Iteration still visits every original Get/Put in the original order;
+  // this is software storage compression, never one aggregate cache request.
+  class DirectoryTransactions {
+    struct Run {Transaction first;std::uint64_t count;};
+    std::vector<Run>runs_;std::uint64_t count_=0;
+   public:
+    void push_back(Transaction event){
+      if(count_==UINT64_MAX)throw std::invalid_argument("loader directory count overflow");
+      if(!runs_.empty()){
+        auto&last=runs_.back();
+        if(last.first.write==event.write&&last.first.bytes==event.bytes&&
+           last.count<=(UINT64_MAX-last.first.address)/8&&last.first.address+last.count*8==event.address){
+          ++last.count;++count_;return;
+        }
+      }
+      // At most one ordered discontinuity per memif chunk/edge. A malicious
+      // ELF cannot grow the representation beyond the existing chunk bound.
+      if(runs_.size()>=(1<<20))throw std::invalid_argument("loader bootstrap directory-run bound exceeded");
+      runs_.push_back({event,1});++count_;
+    }
+    std::uint64_t size()const{return count_;}
+    std::size_t stored_runs()const{return runs_.size();}
+    Transaction operator[](std::uint64_t index)const{
+      for(const auto&run:runs_){if(index<run.count)return {run.first.address+index*8,run.first.bytes,run.first.write};index-=run.count;}
+      throw std::out_of_range("loader directory transaction index");
+    }
+    class Iterator {
+      const DirectoryTransactions*owner_;std::size_t run_;std::uint64_t offset_;
+     public:
+      using iterator_category=std::input_iterator_tag;
+      using value_type=Transaction;using difference_type=std::ptrdiff_t;using pointer=void;using reference=Transaction;
+      Iterator(const DirectoryTransactions*owner,std::size_t run,std::uint64_t offset=0):owner_(owner),run_(run),offset_(offset){}
+      Transaction operator*()const{const auto&r=owner_->runs_.at(run_);return {r.first.address+offset_*8,r.first.bytes,r.first.write};}
+      Iterator&operator++(){if(++offset_==owner_->runs_.at(run_).count){++run_;offset_=0;}return *this;}
+      bool operator==(const Iterator&other)const{return owner_==other.owner_&&run_==other.run_&&offset_==other.offset_;}
+      bool operator!=(const Iterator&other)const{return !(*this==other);}
+    };
+    Iterator begin()const{return {this,0};}Iterator end()const{return {this,runs_.size()};}
+  };
   std::vector<Chunk> writes;
-  std::vector<Transaction> directory_reads;
+  DirectoryTransactions directory_reads;
   std::vector<std::uint64_t> lines;
   std::uint64_t bytes=0;
 };
@@ -57,7 +98,6 @@ inline TsiElfBootstrap tsi_elf_bootstrap(const std::string &path,
     // request under the separately reviewed serialized-loader contract.
     while(bytes){
       const auto n=std::min(bytes,8-(address&7));
-      if(out.directory_reads.size()>=(1<<20))throw std::invalid_argument("loader bootstrap directory-event bound exceeded");
       out.directory_reads.push_back({write?address&~7ULL:address,write?std::uint64_t(8):n,write});
       address+=n;bytes-=n;
     }

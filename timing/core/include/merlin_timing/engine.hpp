@@ -404,6 +404,10 @@ private:
 
   Result detached(const Event &event) {
     const auto saved = issue_;
+    // Asynchronous owners have their own admission edge. The CPU frontier
+    // may already have advanced beyond it while this posted actor was pending.
+    // Match earliest_stage_start and retain all value/resource constraints.
+    if (issue_) issue_ = Cycle{0};
     try {
       const auto result = submit_impl(event);
       issue_ = saved;

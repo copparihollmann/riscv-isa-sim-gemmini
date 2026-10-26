@@ -23,7 +23,8 @@ selection = dict(schema='merlin.rocket_integer_divider_service_bound.v1', xlen=6
     div_unroll=1, early_out=True, early_out_granularity=1,
     response_ready='assumed_immediate', rtl_sha256='a'*64, source_sha256='b'*64)
 selected=copy.deepcopy(model); selected.setdefault('cpu', {})['integer_divider_service']=selection
-cases=[('legacy',model,'legacy'),('selected',selected,'selected')]
+operand=copy.deepcopy(selected);operand['cpu']['integer_divider_service']['schema']='merlin.rocket_integer_divider_operand_service.v2'
+cases=[('legacy',model,'legacy'),('selected',selected,'selected'),('operand',operand,'selected')]
 for name,key,value in [('unroll','div_unroll',2),('xlen','xlen',32),('earlyout','early_out',False),
     ('granularity','early_out_granularity',2),('backpressure','response_ready','unbounded'),
     ('pin','rtl_sha256','bad'),('unknown','extra',1)]:
@@ -41,3 +42,8 @@ for name,doc,mode in cases:
     path=a.build_dir/(name+'.json');path.write_text(json.dumps(doc))
     subprocess.run([str(exe),str(path),mode],check=True,timeout=10)
 print(f'{len(cases)} selection cases and eight divide/remainder decodings passed')
+
+service=a.build_dir/'test-divider-service'
+subprocess.run([*flags,str(ROOT/'timing/tests/test_integer_divider_service.cpp'),'-o',str(service)],check=True,timeout=120)
+subprocess.run([str(service)],check=True,timeout=30)
+print('8264 operand cases match selected RTL register interpreter and architectural results')

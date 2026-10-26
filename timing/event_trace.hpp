@@ -1,6 +1,7 @@
 #ifndef SPIKE_TIMING_EVENT_TRACE_HPP
 #define SPIKE_TIMING_EVENT_TRACE_HPP
 #include "model.hpp"
+#include "integer_divider_timing.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -10,8 +11,11 @@ namespace spike_timing {
 // bounds stop collection without modifying scheduling or silently dropping rows.
 class EventTrace {
 public:
-  static constexpr std::size_t max_events = 32768, max_bytes = 16 * 1024 * 1024;
-  explicit EventTrace(const std::string &path) : out_(path, std::ios::out | std::ios::trunc) {
+  static constexpr std::size_t default_max_events = 32768, default_max_bytes = 16 * 1024 * 1024;
+  explicit EventTrace(const std::string &path,std::size_t events=default_max_events,std::size_t bytes=default_max_bytes)
+      : out_(path, std::ios::out | std::ios::trunc),max_events(events),max_bytes(bytes) {
+    if(!events||events>1048576||bytes<1024||bytes>1024ull*1024*1024)
+      throw std::invalid_argument("event trace diagnostic work bound");
     if (!out_) throw std::runtime_error("cannot open timing event trace");
   }
   void header(const std::string &model, const std::string &elf, const std::string &scope) {
@@ -52,6 +56,15 @@ public:
     s << "]}";
     if (append(s.str())) ++events_;
   }
+  void divider(std::uint64_t pc,std::uint64_t bits,std::uint64_t instruction,const IntegerDividerService&service){
+    if(truncated_)return;
+    if(events_>=max_events){truncated_=true;return;}
+    std::ostringstream s;s<<"{\"kind\":\"integer_divider_operands\",\"pc\":"<<pc
+      <<",\"instruction_bits\":"<<bits<<",\"instruction_index\":"<<instruction
+      <<",\"lhs\":"<<service.lhs<<",\"rhs\":"<<service.rhs
+      <<",\"request_to_valid_cycles\":"<<service.latency<<",\"response_ready\":\"assumed_immediate\"}";
+    if(append(s.str()))++events_;
+  }
   void finish(bool completed) {
     // Reserve 256 bytes in append for this explicit completion/truncation row.
     out_ << "{\"summary\":true,\"events\":" << events_ << ",\"truncated\":" << (truncated_ ? "true" : "false")
@@ -61,6 +74,7 @@ public:
   }
 private:
   std::ofstream out_;
+  const std::size_t max_events,max_bytes;
   std::size_t events_ = 0, bytes_ = 0;
   bool truncated_ = false;
   static std::string number(std::optional<std::uint64_t> n) { return n ? std::to_string(*n) : "null"; }

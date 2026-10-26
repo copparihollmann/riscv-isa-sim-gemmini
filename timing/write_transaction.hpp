@@ -136,5 +136,48 @@ struct ColdWriteServiceV6 {
  bool(*client_released)(void*,const VictimProbeV6*,merlin_timing::Cycle)=nullptr;
 };
 using InstallColdWriteServiceV6=void(*)(void*,const ColdWriteServiceV6*);
+// Original PutPartial/PutFull packet. One owner/ACK covers all client beats;
+// useful bytes are independently validated against every original byte mask.
+struct MaskedWritePacketV8 {
+ std::uint32_t size=sizeof(MaskedWritePacketV8),version=8;
+ std::uint64_t address=0,transaction_bytes=0,beat_bytes=16;
+ std::vector<std::uint64_t>masks;
+ merlin_timing::Cycle accepted=0;
+};
+inline std::optional<WriteUsefulBytes> masked_write_packet_useful(const MaskedWritePacketV8&r){
+ if(r.version!=8||r.size!=sizeof(r)||r.beat_bytes!=16||r.transaction_bytes<16||r.transaction_bytes>64||
+    (r.transaction_bytes&(r.transaction_bytes-1))||r.address%r.transaction_bytes||
+    r.address>UINT64_MAX-(r.transaction_bytes-1)||r.masks.size()!=r.transaction_bytes/16)return {};
+ std::uint64_t first=r.transaction_bytes,last=0,count=0;
+ for(std::size_t b=0;b<r.masks.size();++b){
+   if(r.masks[b]>>16)return {};
+   for(unsigned bit=0;bit<16;++bit)if(r.masks[b]&(1ull<<bit)){
+     const auto offset=b*16+bit;first=std::min(first,std::uint64_t(offset));last=offset;++count;
+   }
+ }
+ if(!count||last-first+1!=count)return {};
+ return WriteUsefulBytes{r.address+first,count};
+}
+struct MaskedWriteServiceV8 {
+ std::uint32_t size=sizeof(MaskedWriteServiceV8),version=8;
+ void*opaque=nullptr;
+ bool(*packet)(void*,const MaskedWritePacketV8*,WriteTransactionEffectsV6*)=nullptr;
+};
+using InstallMaskedWriteServiceV8=void(*)(void*,const MaskedWriteServiceV8*);
+// Exact pre-mutation native Directory premise. A dirty resident Put without
+// private probes needs no metadata write/acquire/GrantAck. Older effects never
+// imply this fact merely because an outer miss was absent.
+struct MaskedWriteEffectsV9 {
+ WriteTransactionEffectsV6 original;
+ bool resident_dirty_no_probe=false;
+};
+struct MaskedWriteServiceV9 {
+ std::uint32_t size=sizeof(MaskedWriteServiceV9),version=9;
+ void*opaque=nullptr;
+ bool(*packet)(void*,const MaskedWritePacketV8*,MaskedWriteEffectsV9*)=nullptr;
+};
+using InstallMaskedWriteServiceV9=void(*)(void*,const MaskedWriteServiceV9*);
+
+
 }
 #endif

@@ -28,7 +28,10 @@ public:
   bool write_packet(const FullWritePacketV3 &, WriteTransactionEffectsV5 &);
   bool write_transaction(const WriteTransactionV1 &,WriteTransactionEffectsV6 &);
   bool write_packet(const FullWritePacketV3 &,WriteTransactionEffectsV6 &);
+  bool write_packet(const MaskedWritePacketV8 &,WriteTransactionEffectsV6 &);
+  bool write_packet(const MaskedWritePacketV8 &,MaskedWriteEffectsV9 &);
   bool take_read_allocations(ReadAllocationEffectsV7&);
+  std::optional<std::vector<std::uint64_t>>cpu_read_admission_lines(const std::vector<MemoryEffect>&,const std::string&)const;
   bool source_read_allocations_selected()const{return read_allocations_selected_;}
   void cpu_data_completed(std::optional<merlin_timing::Cycle>,bool atomic);
   bool private_client_busy()const{return !victim_clients_.empty();}
@@ -126,18 +129,20 @@ private:
   struct Walk {
     SharedEffects effects;
     std::vector<ReadAllocationV7>read_allocations;
+    std::vector<ReadParentWritebackV11>parent_writebacks;
     std::set<merlin_timing::ValueId> reads, writes;
     using TransactionLine = std::tuple<std::string, std::uint64_t, bool>;
     std::map<TransactionLine, bool> visited;
     std::map<TransactionLine, std::map<std::uint64_t, std::uint64_t>> byte_coverage;
     bool coherence_transaction = false;
-    bool cpu_fetch = false, suppress_cache_price = false, device=false, shared_lookup=false,coherence_probe=false;
+    bool cpu_fetch = false, suppress_cache_price = false, device=false, shared_lookup=false,coherence_probe=false,source_partition=false;
     std::vector<Lookup> device_lookups;
     std::map<std::string, std::uint64_t> boundary_bytes;
     std::map<std::string, merlin_timing::Cycle> probe_cycles, probe_responses;
     merlin_timing::Cycle latency = 0, bus = 0;
     bool complete = true;
   };
+  void finish_walk(Walk&);
   void cache_access(std::uint64_t, std::uint64_t, bool,
                     const std::vector<std::string> &, std::size_t, Walk &);
   void coherent_access(std::uint64_t, bool, Walk &);

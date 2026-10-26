@@ -7,6 +7,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--build-dir', type=Path, required=True)
     p.add_argument('--boost-include', type=Path)
+    p.add_argument('--masked-packets', action='store_true')
     p.add_argument('--cold', action='store_true', help='exercise opt-in source-owned cold allocation')
     p.add_argument('--source-read', action='store_true', help='exercise source-owned ordinary LLC replacement')
     p.add_argument('--victim', action='store_true', help='exercise source-closed private victim snapshot')
@@ -49,6 +50,7 @@ def main():
             line_visible_after_last_cycles=1,lookup_response_cycles=2,
             request_accept_cycles=2)
         model['memory']['source_read_allocations']=dict(schema='merlin.selected_source_read_allocations.v1',enabled=1,cache='l2',directory_stages=1,mshr_plan_stages=1,source_d_stages=2,source_receipt_sha256='0'*64)
+    if args.masked_packets: model.setdefault('target',{}).setdefault('scheduling',{})['source_masked_packet_readout']=1
     path = build/'model.json'; path.write_text(json.dumps(model))
     flags = ['g++','-std=c++20','-O1','-g0','-I'+str(ROOT/'timing'),'-I'+str(ROOT/'timing/core/include')]
     if args.boost_include: flags += ['-I'+str(args.boost_include)]

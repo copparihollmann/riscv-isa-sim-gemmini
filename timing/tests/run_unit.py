@@ -53,6 +53,9 @@ def main():
     cases = [
         ("engine", [ROOT / "timing/core/tests/test_engine.cpp"], []),
         ("reservations", [ROOT / "timing/core/tests/test_reservations.cpp"], []),
+        ("fetch-miss-controller", [ROOT / "timing/tests/test_fetch_miss_controller.cpp"], []),
+        ("fetch-parcels", [ROOT / "timing/tests/test_fetch_parcel_buffer.cpp"], []),
+        ("rocket-writeback", [ROOT / "timing/tests/test_rocket_writeback.cpp"], []),
         ("decode", [ROOT / "timing/tests/test_cpu_decode.cpp"], []),
         ("fp-operands", [ROOT / "timing/tests/test_fp_operand_timing.cpp"], []),
         ("fp-operand-model", [ROOT / "timing/tests/test_fp_operand_model.cpp",

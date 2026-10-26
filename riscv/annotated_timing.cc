@@ -1,3 +1,5 @@
+#include "timing/fetch_parcel_buffer.hpp"
+#include "timing/fetch_miss_controller.hpp"
 #include "../timing/observer.hpp"
 #include "cpu_decode.hpp"
 #include "immutable_elf_suffix.hpp"
@@ -7,8 +9,10 @@
 #include "counter_taint.hpp"
 #include "event_trace.hpp"
 #include "scoped_resources.hpp"
+#include "source_actor_activity.hpp"
 #include "fp_operand_timing.hpp"
 #include "../timing/integer_divider_timing.hpp"
+#include "../timing/bitmanip_alu_timing.hpp"
 #include "processor.h"
 #include <dlfcn.h>
 #include <array>
@@ -69,6 +73,8 @@ public:
   merlin_timing::Engine engine;
   std::unique_ptr<EventTrace> event_trace;
   std::unique_ptr<ScopedResources> scoped_resources;
+  std::unique_ptr<SourceActorActivity> source_actors;
+  SourceActorSinkV1 source_actor_sink;
   std::string report_path, elf_digest, input_digest;
   std::map<std::string, std::uint64_t> features;
   std::set<std::string> unresolved;
@@ -84,8 +90,11 @@ public:
   ColdWriteServiceV4 cold_write_service_v4;
   ColdWriteServiceV5 cold_write_service_v5;
   ColdWriteServiceV6 cold_write_service_v6;
+  MaskedWriteServiceV8 masked_write_service_v8;
+  MaskedWriteServiceV9 masked_write_service_v9;
   ReadAllocationServiceV7 read_allocation_service_v7;
   SubmitReadAllocationsV7 submit_read_allocations_v7=nullptr;
+  SubmitCpuReadV10 submit_cpu_read_v10=nullptr;
   std::unique_ptr<Services> services;
   std::unique_ptr<TargetProvider> target;
   std::unique_ptr<merlin_timing::PostedTimeline> posted_timeline;
@@ -94,6 +103,9 @@ public:
   merlin_timing::ObserveImmutableInstructionSuffixV1 target_suffix = nullptr;
   std::unique_ptr<ImmutableElfSuffix> primary_instructions;
   ValueId next_token = 67;
+  FetchParcelBuffer fetch_parcels;
+  bool fetch_parcels_enabled=false;
+  std::unique_ptr<FetchMissController>fetch_miss_controller;
   std::optional<Cycle> pending_flags = Cycle{0};
   std::array<bool,64> time_dependent{};
   bool temporal_rounding = false, temporal_flags = false;
@@ -103,6 +115,7 @@ public:
   bool in_instruction = false, finished = false, counter_pending = false;
   bool access_overflow = false, command_pending = false, trapped = false;
   bool fp_special = false;
+  std::optional<IntegerDividerService>divider_service;
   std::array<std::uint64_t, 4> command{};
   std::vector<MemoryEffect> accesses;
   std::function<unsigned(std::uint64_t, std::size_t)> memory_kind;
@@ -127,7 +140,9 @@ public:
       throw std::invalid_argument("stopping accounting requires an exact selected counter-PC scope");
     if (!event_trace_path.empty()) {
       if (!model.scope_pc_pair) throw std::invalid_argument("event trace requires an exact counter PC scope");
-      event_trace = std::make_unique<EventTrace>(event_trace_path);
+      event_trace = std::make_unique<EventTrace>(event_trace_path,
+          model.document.get<std::size_t>("diagnostics.event_trace.max_events",EventTrace::default_max_events),
+          model.document.get<std::size_t>("diagnostics.event_trace.max_bytes",EventTrace::default_max_bytes));
       event_trace->header(model.digest, elf_digest, model.scope_binding_digest);
     }
     if (model.document.get<bool>("diagnostics.scoped_resources.enabled", false)) {
@@ -135,6 +150,10 @@ public:
       scoped_resources=std::make_unique<ScopedResources>(model.resources);
       if (const auto pairs=model.document.get_child_optional("diagnostics.scoped_resources.pairs"))
         for (const auto& entry:*pairs) scoped_resources->pair(entry.second.get<uint32_t>("left"),entry.second.get<uint32_t>("right"));
+    }
+    if(model.document.get<bool>("diagnostics.source_actor_activity.enabled",false)){
+      if(!model.scope_pc_pair)throw std::invalid_argument("source actor activity requires exact selected counter-PC scope");
+      source_actors=std::make_unique<SourceActorActivity>(model.document.get<std::size_t>("diagnostics.source_actor_activity.max_pending",65536));
     }
     for (const auto *name : cpu_feature_classes) {
       add_feature(name, 0);
@@ -149,6 +168,15 @@ public:
         for (const auto width : {32, 64})
           for (const auto *path : {".normal", ".special"})
             add_feature(std::string(name) + ".f" + std::to_string(width) + path, 0);
+    if(const auto selected=model.document.get_child_optional("cpu.fetch_parcel_buffer")){
+      if(selected->get<std::string>("schema","")!="merlin.rocket_ibuf_retained_parcel.v1"||
+         selected->get<unsigned>("fetch_bytes",0)!=4||selected->get<unsigned>("parcel_bytes",0)!=2||
+         selected->get<unsigned>("retained_parcels",0)!=1||selected->get<unsigned>("decode_width",0)!=1||
+         !is_digest(selected->get<std::string>("source_sha256",""))||
+         !is_digest(selected->get<std::string>("rtl_sha256","")))
+        throw std::invalid_argument("instruction parcel buffer differs from selected IBuf source geometry");
+      fetch_parcels_enabled=true;add_feature("cpu.fetch.retained_parcel_instructions",0);add_feature("cpu.fetch.partial_parcel_instructions",0);
+    }
     issue_resource = model.resource("cpu.issue");
     issue_cost = model.cycles("cpu.issue_cycles");
     branch_taken = model.cycles("cpu.branch.taken_penalty_cycles");
@@ -208,7 +236,7 @@ public:
         if(!value||value>maximum)throw std::invalid_argument("invalid posted software guard");return value;
       };
       posted_timeline=std::make_unique<merlin_timing::PostedTimeline>(merlin_timing::PostedTimeline::Spec{
-        65536,static_cast<std::size_t>(guard("completion_token_budget",1048576,16777216)),
+        65536,static_cast<std::size_t>(guard("completion_token_budget",1048576,67108864)),
         guard("dispatch_budget",8000000,64000000)});
     }
     const auto factory = reinterpret_cast<CreateProvider>(dlsym(RTLD_DEFAULT, "spike_timing_create_provider_v1"));
@@ -370,10 +398,62 @@ public:
         };
         install_cold_v6(target.get(),&cold_write_service_v6);
       }
+      const auto install_masked_v8=reinterpret_cast<InstallMaskedWriteServiceV8>(
+          dlsym(RTLD_DEFAULT,"spike_timing_provider_masked_writes_v8"));
+      if(install_masked_v8){
+        masked_write_service_v8.opaque=this;
+        masked_write_service_v8.packet=[](void*opaque,const MaskedWritePacketV8*request,WriteTransactionEffectsV6*out){
+          if(!opaque||!request||!out)return false;
+          auto self=static_cast<Impl*>(opaque);const auto useful=masked_write_packet_useful(*request);
+          if(!useful||self->memory_kind(request->address,request->transaction_bytes)!=1){out->resident.base.unavailable="masked packet outside stable RAM or invalid original masks";return false;}
+          const auto admitted=self->memory->write_packet(*request,*out);
+          if(admitted)self->counter_memory.write(useful->address,useful->bytes,false);
+          return admitted;
+        };
+        install_masked_v8(target.get(),&masked_write_service_v8);
+      }
+      const auto install_masked_v9=reinterpret_cast<InstallMaskedWriteServiceV9>(dlsym(RTLD_DEFAULT,"spike_timing_provider_masked_writes_v9"));
+      if(model.number("target.scheduling.source_resident_dirty_put_request_retirement")==std::optional<double>{1}&&!install_masked_v9)
+        throw std::invalid_argument("resident dirty Put retirement requires exact native V9 Directory observation");
+      if(install_masked_v9){
+        masked_write_service_v9.opaque=this;
+        masked_write_service_v9.packet=[](void*opaque,const MaskedWritePacketV8*request,MaskedWriteEffectsV9*out){
+          if(!opaque||!request||!out)return false;
+          auto self=static_cast<Impl*>(opaque);const auto useful=masked_write_packet_useful(*request);
+          if(!useful||self->memory_kind(request->address,request->transaction_bytes)!=1){out->original.resident.base.unavailable="V9 original masked packet outside stable RAM or invalid masks";return false;}
+          const auto admitted=self->memory->write_packet(*request,*out);
+          if(admitted)self->counter_memory.write(useful->address,useful->bytes,false);
+          return admitted;
+        };
+        install_masked_v9(target.get(),&masked_write_service_v9);
+      }
       const auto install_read_allocations=reinterpret_cast<InstallReadAllocationServiceV7>(
           dlsym(RTLD_DEFAULT,"spike_timing_provider_read_allocations_v7"));
       submit_read_allocations_v7=reinterpret_cast<SubmitReadAllocationsV7>(
           dlsym(RTLD_DEFAULT,"spike_timing_provider_submit_read_allocations_v7"));
+      if(const auto deferred=model.number("target.scheduling.source_deferred_cpu_read_lookup")){
+        submit_cpu_read_v10=reinterpret_cast<SubmitCpuReadV10>(dlsym(RTLD_DEFAULT,"spike_timing_provider_submit_cpu_read_v10"));
+        if(*deferred!=1||!memory->source_read_allocations_selected()||!posted_timeline||!submit_cpu_read_v10||
+            model.number("target.scheduling.source_deferred_read_lookup")!=std::optional<double>{1})
+          throw std::invalid_argument("deferred CPU lookup requires selected native V10 finite read intake");
+      }
+      if(const auto selected=model.document.get_child_optional("cpu.instruction_miss_service")){
+        if(selected->get<std::string>("schema","")!="merlin.rocket_demand_icache_controller.v1"||
+           selected->get<std::string>("scope","")!="one_demand_no_itim_always_ready_refill"||
+           selected->get<unsigned>("line_bytes",0)!=64||selected->get<unsigned>("beat_bytes",0)!=16||
+           selected->get<unsigned>("tile_a_queue_entries",0)!=2||selected->get<unsigned>("tile_d_queue_entries",0)!=2||
+           selected->get<unsigned>("queue_flow",1)!=0||selected->get<unsigned>("queue_pipe",1)!=0||
+           !is_digest(selected->get<std::string>("icache_source_sha256",""))||
+           !is_digest(selected->get<std::string>("frontend_source_sha256",""))||
+           !is_digest(selected->get<std::string>("rtl_sha256",""))||!fetch_parcels_enabled||!submit_cpu_read_v10||
+           model.document.get_child_optional("memory.fetch_refill_timeline"))
+          throw std::invalid_argument("I$ miss controller requires selected one-demand V10 source path and exact local geometry");
+        fetch_miss_controller=std::make_unique<FetchMissController>(*posted_timeline,FetchMissController::Spec{
+          selected->get<Cycle>("lookup_stages",0),selected->get<Cycle>("tile_a_queue_stages",0),
+          selected->get<Cycle>("tile_d_queue_stages",0),selected->get<Cycle>("line_valid_stages",0),
+          selected->get<Cycle>("replay_lookup_stages",0)});
+        add_feature("cpu.fetch.source_demand_refills",0);
+      }
       if(memory->source_read_allocations_selected()&&(!posted_timeline||!install_read_allocations||!submit_read_allocations_v7))
         throw std::invalid_argument("source read allocation selection lacks ordinary posted provider intake");
       if(install_read_allocations){
@@ -394,6 +474,15 @@ public:
           return opaque && epoch && static_cast<MemorySystem *>(opaque)->admit_response_epoch(*epoch);
         };
         install_epochs(target.get(),&memory_response_epoch_service);
+      }
+      if(source_actors){
+        source_actor_sink.opaque=source_actors.get();
+        source_actor_sink.role=[](void*opaque,SourceActorRoleV1 role,std::uint64_t capacity){static_cast<SourceActorActivity*>(opaque)->role(role,capacity);};
+        source_actor_sink.edge=[](void*opaque,SourceActorRoleV1 role,std::uint64_t id,std::uint64_t at,bool begin){
+          static_cast<SourceActorActivity*>(opaque)->edge(role,id,at,begin);
+        };
+        const auto install=reinterpret_cast<InstallSourceActorSinkV1>(dlsym(RTLD_DEFAULT,"spike_timing_provider_source_actors_v1"));
+        if(!install||!install(target.get(),&source_actor_sink))source_actors->unavailable("selected provider lacks source-actor ABI v1");
       }
       target_features = reinterpret_cast<ObserveProviderFeatures>(
           dlsym(RTLD_DEFAULT, "spike_timing_provider_feature_observation_v1"));
@@ -430,6 +519,9 @@ public:
     if (kind == "cpu.divide" && integer_divider_bound(model)) {
       cost.latency = IntegerDividerBound::latency;
       cost.occupancy = IntegerDividerBound::occupancy;
+    }
+    if(kind=="cpu.bitmanip"&&bitmanip_alu_service(model)){
+      cost.latency=BitmanipAluService::latency;cost.occupancy=BitmanipAluService::occupancy;
     }
     const auto resources = model.document.get_child_optional("cpu_execution_resources");
     if (resources) {
@@ -496,6 +588,11 @@ public:
     }
     accesses.clear(); access_overflow = false; command_pending = false;
     const auto decoded = decode_cpu(bits);
+    divider_service.reset();
+    if(std::string(decoded.kind)=="cpu.divide")if(const auto service=integer_divider_bound(model);service&&service->operand_sensitive){
+      const auto*state=processor->get_state();
+      divider_service=integer_divider_service(bits,state->XPR[(bits>>15)&31],state->XPR[(bits>>20)&31]);
+    }
     fp_special = false;
     if (model.fp_operand_timing && decoded.known &&
         (std::string(decoded.kind) == "cpu.fp_divide" || std::string(decoded.kind) == "cpu.fp_sqrt")) {
@@ -584,14 +681,20 @@ public:
       const auto c=instruction_context(merlin_timing::InstructionPhase::aborted);
       target_context(target.get(),&c);
     }catch(...){trapped=true;}
+    fetch_parcels.reset();
     in_instruction = false; accelerator_depth = 0; command_pending = false; accesses.clear();
   }
   // Actual in-order source admission. While this instruction is pending no
   // later CPU request can arrive. Device callbacks may run, but a future bank
   // or memory effect is never committed before those chronological arrivals.
-  merlin_timing::Result submit_cpu_stage(const Event &event,const char *actor,const std::vector<ValueId>&memory_writes={}) {
+  merlin_timing::Result submit_cpu_stage(const Event &event,const char *actor,const std::vector<ValueId>&memory_writes={},bool original_instruction=false) {
     if(!posted_timeline)return engine.submit(event);
     auto&q=*posted_timeline;auto done=q.token();if(!done){unknown(q.reason());return {};}
+    // The guard bounds work without actual ORIGINAL source completion, not
+    // total initialization length before the first accelerator command.
+    // Only the committed scalar execution/result stage is a checkpoint.
+    // Fetch fragments, request admission, polls and elapsed time are not.
+    if(original_instruction&&!q.track_source_completion(*done)){unknown(q.reason());return {};}
     merlin_timing::OwnedStage owned;owned.earliest=std::max(q.now(),engine.issue_frontier().value_or(0));
     owned.earliest=std::max(owned.earliest,event.earliest);owned.latency=event.latency;
     owned.reads.assign(event.reads.data,event.reads.data+event.reads.size);
@@ -623,6 +726,61 @@ public:
         if(!q.step(true)){q.fail("private victim controller completion deadlock");break;}
       if(q.progress().failed){unknown("posted_timeline:"+q.reason());return {};}
       engine.advance_issue(q.now());
+    }
+    if(submit_cpu_read_v10){
+      const auto lines=memory->cpu_read_admission_lines(effects,path);
+      if(!lines){unknown("deferred CPU lookup lacks selected private scalar request preview");return {};}
+      if(path=="cpu_fetch"&&fetch_miss_controller&&lines->size()==2){
+        // A redirected 32-bit instruction at the final halfword can need two
+        // cold fetch blocks. ICache issues two ORIGINAL line Gets serially;
+        // it has one refill controller, never two simultaneous miss credits.
+        if(effects.size()!=1||effects[0].write||effects[0].immutable||
+           effects[0].address/64!=lines->front()/64||
+           (effects[0].address+effects[0].bytes-1)/64!=lines->back()/64){
+          unknown("I$ split fetch lacks original adjacent block interval");return {};
+        }
+        const auto boundary=lines->back();const auto&e=effects[0];
+        for(const auto&part:std::array<MemoryEffect,2>{{
+          {e.address,boundary-e.address,false,false},
+          {boundary,e.address+e.bytes-boundary,false,false}}}){
+          const auto response=accepted_memory({part},path);
+          if(response.latency!=std::optional<Cycle>{0}){
+            unknown("I$ original split line refill did not retain its source owner");return {};
+          }
+        }
+        add_feature("cpu.fetch.source_serial_split_instructions",1);
+        return SharedEffects{{},{},{},Cycle{0}};
+      }
+      if(!lines->empty()){
+        struct PendingCpuRead {Impl*self;const std::vector<MemoryEffect>*effects;const std::string*path;std::optional<Cycle>ready;std::optional<merlin_timing::PostedTimeline::Token>fetch_owner;};
+        PendingCpuRead pending{this,&effects,&path,{},{}};
+        CpuReadAdmissionV10 request;request.line_addresses=*lines;
+        const merlin_timing::StageOrigin origin{pc,bits,instructions,path};
+        auto issue=[&](Cycle source_at){
+          if(!submit_cpu_read_v10(target.get(),&request,&origin,source_at,&pending,
+            [](void*opaque,Cycle,ReadAllocationEffectsV7*out){
+              auto&p=*static_cast<PendingCpuRead*>(opaque);
+              if(*p.path=="cpu_data"&&p.self->memory->private_client_busy())return CpuReadLookupStatusV10::retry;
+              const auto result=p.self->memory->access(*p.effects,*p.path);
+              if(!result.latency||!p.self->memory->take_read_allocations(*out)||!out->unavailable.empty())return CpuReadLookupStatusV10::refused;
+              return CpuReadLookupStatusV10::accepted;
+            },[](void*opaque,Cycle at){auto&p=*static_cast<PendingCpuRead*>(opaque);if(p.fetch_owner)p.self->fetch_miss_controller->response(*p.fetch_owner,at,[pending=&p](Cycle received){pending->ready=received;});else p.ready=at;})){
+          unknown("deferred CPU memory source intake refused");q.fail("CPU source intake refused after I$ lookup");return;
+        }
+        };
+        if(path=="cpu_fetch"&&fetch_miss_controller){
+          if(lines->size()!=1){unknown("I$ demand refill requires one original aligned fetch line");return {};}
+          pending.fetch_owner=fetch_miss_controller->begin(at,std::move(issue));
+          if(!pending.fetch_owner){unknown("I$ controller request refused");return {};}
+          add_feature("cpu.fetch.source_demand_refills",1);
+        }else issue(std::max(q.now(),engine.issue_frontier().value_or(0)));
+
+        while(!pending.ready&&!q.progress().failed)if(!q.step(true)){q.fail("CPU deferred lookup source dependency deadlock");break;}
+        if(!pending.ready||q.progress().failed){unknown("posted_timeline:"+q.reason());return {};}
+        // Original memory effects were consumed once by their admitted source
+        // owners. The caller still owns the scalar instruction/register result.
+        engine.advance_issue(*pending.ready);return SharedEffects{{},{},{},Cycle{0}};
+      }
     }
     auto result=memory->access(effects,path);
     ReadAllocationEffectsV7 allocation;
@@ -697,6 +855,7 @@ public:
     if (temporal && model.fp_operand_timing &&
         (std::string(decoded.kind) == "cpu.fp_divide" || std::string(decoded.kind) == "cpu.fp_sqrt"))
       unsafe("counter-derived FP timing class is outside the timing trace contract");
+    if(temporal&&divider_service)unsafe("counter-derived integer divide timing operands outside timing contract");
     // A harness may spill its opening cycle value for subtraction after the
     // window. Track those actual bytes instead of rejecting every such spill.
     // Loads propagate labels; control, address, device input and state uses
@@ -711,6 +870,7 @@ public:
     }
     accelerator_depth = 0;
     if (decoded.fence) {
+      fetch_parcels.reset();
       if (target) target->fence(engine.issue_frontier().value_or(0));
       engine.barrier();
       // Timing's conservative barrier does not manufacture an architectural
@@ -721,14 +881,22 @@ public:
     }
     const auto instruction_bytes = (bits & 3) == 3 ? 4u : 2u;
     const auto instruction_space = memory_kind(pc, instruction_bytes);
-    SharedEffects fetch;
+    const auto parcel_plan=fetch_parcels_enabled?fetch_parcels.plan(pc,instruction_bytes):FetchParcelBuffer::Plan{pc,instruction_bytes,false};
+    SharedEffects fetch{{},{},{},Cycle{0}};
     if (!instruction_space) unsafe("instruction fetch outside stable memory is unsupported");
-    else fetch = accepted_memory({MemoryEffect{pc, instruction_bytes, false, instruction_space == 2}}, "cpu_fetch");
+    else if(parcel_plan.bytes){
+      if(memory_kind(parcel_plan.address,parcel_plan.bytes)!=instruction_space)unsafe("fetch block crosses stable memory ownership");
+      fetch=accepted_memory({MemoryEffect{parcel_plan.address,parcel_plan.bytes,false,instruction_space==2}},"cpu_fetch");
+    }
+    if(fetch_parcels_enabled&&parcel_plan.retained)add_feature(parcel_plan.bytes?"cpu.fetch.partial_parcel_instructions":"cpu.fetch.retained_parcel_instructions",1);
     const ValueId fetch_token = 64;
     const auto fetch_memory_writes=fetch.writes;
     fetch.writes.push_back(fetch_token);
     Event fetch_event{0, view(fetch.reads), view(fetch.writes), view(fetch.demands), fetch.latency, true};
-    submit_cpu_stage(fetch_event,"cpu_fetch",fetch_memory_writes);
+    if(parcel_plan.bytes)submit_cpu_stage(fetch_event,"cpu_fetch",fetch_memory_writes);
+    // A retained halfword is the data already accepted by IBuf. Its original
+    // fetch token remains ready even if a later request replaces its I$ line.
+    fetch_parcels.commit(pc,instruction_bytes,next_pc,decoded.branch||decoded.fence,parcel_plan);
 
     if(posted_timeline && !accesses.empty()){
       auto at=std::max(posted_timeline->now(),engine.issue_frontier().value_or(0));
@@ -757,7 +925,12 @@ public:
     retained_reads.insert(retained_reads.end(), data.reads.begin(), data.reads.end());
     writes.insert(writes.end(), data.writes.begin(), data.writes.end());
     std::vector<Demand> demands = std::move(data.demands);
-    const auto cost = cpu_cost(priced_class, decoded.kind);
+    auto cost = cpu_cost(priced_class, decoded.kind);
+    if(divider_service){cost.latency=divider_service->latency;cost.occupancy=divider_service->occupancy;
+      add_feature("cpu.divide.source_service_cycles",divider_service->latency);
+      if(event_trace&&windows.size()==model.scope_window&&(counter_pending||pc==model.scope_begin_pc))
+        event_trace->divider(pc,bits,instructions,*divider_service);
+    }
     auto latency = cost.latency;
     if (issue_resource) demands.push_back({*issue_resource, 1, issue_cost});
     else { unknown("CPU issue resource is unspecified"); latency.reset(); }
@@ -775,7 +948,7 @@ public:
       else latency.reset();
     }
     Event event{earliest, view(reads), view(writes), view(demands), latency, false, view(retained_reads)};
-    const auto cpu = submit_cpu_stage(event,decoded.kind,data.writes);
+    const auto cpu = submit_cpu_stage(event,decoded.kind,data.writes,true);
     if(!accesses.empty())memory->cpu_data_completed(cpu.ready,std::string(decoded.kind)==CpuKinds::atomic);
     if (decoded.accumulates_fflags)
       pending_flags = pending_flags && cpu.ready ?
@@ -802,6 +975,7 @@ public:
         first_counter_pc = pc; first_counter_instruction = instructions;
         first_counter_features = features;
         if (scoped_resources && windows.size()==model.scope_window) scoped_resources->begin(cpu.start);
+        if (source_actors && windows.size()==model.scope_window) source_actors->begin(cpu.start);
       } else {
         if (!counter_pending) { unsafe("counter scope closed without its opening boundary"); return; }
         if (windows.size() >= model.max_counter_windows)
@@ -817,6 +991,7 @@ public:
           scoped.emplace(feature.first, delta);
         }
         if (scoped_resources && selected) scoped_resources->end(cpu.start);
+        if (source_actors && selected) source_actors->end(cpu.start);
         windows.push_back({first_counter_pc, pc, instructions - first_counter_instruction, elapsed, std::move(scoped),
                            selected ? unresolved : std::set<std::string>{}, engine.report().complete && !trapped,
                            selected ? feature_reasons() : std::set<std::string>{}});
@@ -827,6 +1002,7 @@ public:
         }
       }
     }
+    if(source_actors&&cpu.start)source_actors->advance(*cpu.start);
   }
   std::string cold_write_report()const{
     const bool dirty=bool(model.document.get_child_optional("memory.device_write_miss_pipeline.dirty_victim"));
@@ -904,32 +1080,60 @@ public:
         << ",\"engine_qualification\":\"not_established\""
         << ",\"uncertainty\":{\"status\":\"unqualified\",\"interval_cycles\":null}"
         << ",\"memory_initial_state\":" << memory->bootstrap_report()
+        << ",\"instruction_fetch_service\":{\"mode\":\"" << (fetch_parcels_enabled?"selected_IBuf_one_retained_halfword":"per_instruction_fetch")
+        << "\",\"limitations\":\"Fetch pipeline/FQ and prediction/redirect overlap remain unmodeled\"}"
+        << ",\"instruction_miss_service\":\"" << (fetch_miss_controller?"selected_one_demand_ICache_lookup_refill_valid_replay":"legacy_private_cache_lookup") << "\""
         << ",\"integer_divider_service\":" << (integer_divider_bound(model) ?
-          "{\"mode\":\"provisional_component_service_bound\",\"latency_cycles\":67,"
-          "\"occupancy_cycles\":68,\"response_ready\":\"assumed_immediate\","
+          (std::string("{\"mode\":")+json_string(integer_divider_bound(model)->operand_sensitive?
+            "selected_operand_count_sign_service":"provisional_component_service_bound")+
+          ",\"maximum_request_to_valid_cycles\":67,\"response_ready\":\"assumed_immediate\","
           "\"scope\":\"MulDiv request acceptance to response availability and ready-state release\","
-          "\"limitations\":\"No core writeback/arbitration or backpressure bound; whole-SoC estimate is not an upper bound\"}" : "null")
+          "\"limitations\":\"No core writeback/arbitration or backpressure bound; whole-SoC estimate is not an upper bound\"}") : "null")
+        << ",\"bitmanip_alu_service\":" << (bitmanip_alu_service(model)?
+          "{\"mode\":\"selected_source_ALU_pipeline\",\"latency_cycles\":1,\"occupancy_cycles\":1,\"qualification\":\"not_established\"}":"null")
         << ",\"posted_source_timeline\":" << (posted_timeline ?
           (std::string("{\"enabled\":true,\"causal_dispatches\":")+std::to_string(posted_timeline->progress().dispatched)+
           ",\"pending\":"+std::to_string(posted_timeline->progress().pending)+
+          ",\"failure_reason\":"+json_string(posted_timeline->reason())+
           ",\"software_token_budget\":"+std::to_string(posted_timeline->specification().tokens)+
+          ",\"software_token_budget_scope\":\"live_unresolved_or_referenced_completion_records\""+
+          ",\"software_live_tokens\":"+std::to_string(posted_timeline->summary().live_tokens)+
+          ",\"software_peak_live_tokens\":"+std::to_string(posted_timeline->summary().peak_live_tokens)+
           ",\"software_dispatch_budget\":"+std::to_string(posted_timeline->specification().dispatched)+
+          ",\"software_dispatch_budget_scope\":\"consecutive_callbacks_without_original_source_completion\""+
+          ",\"software_dispatches_since_source_completion\":"+std::to_string(posted_timeline->dispatches_since_source_completion())+
+          ",\"software_peak_dispatches_without_source_completion\":"+std::to_string(posted_timeline->peak_dispatches_without_source_completion())+
           ",\"memory_service\":"+json_string(model.number("target.scheduling.source_reader_memory_owned_cache_pipeline")==std::optional<double>{1}?
             "native_cache_stage_composition_with_aggregate_packet_ready_bound":"aggregate_packet_completion_bound")+
           ",\"read_allocation_service\":"+json_string(memory->source_read_allocations_selected()?
-            "optional_V7_single_lookup_rprobe_release_acquire_source_response_with_native_CPU_ownership":"legacy_aggregate_read_allocation")+
+            "optional_V7_partitioned_lookup_rprobe_release_acquire_source_response_with_native_CPU_ownership":"legacy_aggregate_read_allocation")+
           ",\"read_allocation_bounds\":"+(memory->source_read_allocations_selected()?
-            std::string("[\"native_read_lookup_precedes_finite_pool_admission\",\"whole_fill_before_SourceD_read\",\"inner_D_external_backpressure_not_source_closed\",\"shared_SourceD_controller_conservatively_held_through_last_response_or_S4\"]"):std::string("[]"))+
+            std::string("[")+json_string(submit_cpu_read_v10?"native_CPU_LLC_lookup_after_finite_admission_private_prefix_bound":"native_CPU_read_lookup_precedes_finite_pool_admission")+","+json_string(model.number("target.scheduling.source_memory_beat_forwarding")==std::optional<double>{1}?
+              "zero_offset_first_grant_and_per_beat_SRAM_publication":"whole_fill_before_SourceD_read")+
+            ","+json_string(model.number("target.scheduling.source_memory_beat_forwarding")==std::optional<double>{1}?
+              "ordered_request_admission_with_independent_children":"multi_allocation_native_order_bound")+
+            ",\"inner_D_external_backpressure_not_source_closed\",\"resident_device_Get_MSHR_" + std::string(model.number("target.scheduling.source_resident_get_request_retirement")==std::optional<double>{1}?"request_capture_with_no_probe_snapshot":"conservatively_held_to_data_publication") + "\",\"shared_SourceD_controller_" + std::string(model.number("target.scheduling.source_d_read_input_retirement")==std::optional<double>{1}?"read_last_input_with_finite_s2_s3_store_S4_bound":"conservatively_held_through_last_response_or_S4") + "\"]":std::string("[]"))+
           ",\"response_order\":\"provisional_ready_fifo\",\"reader_transport\":"+json_string(
             model.number("target.scheduling.source_reader_registered_path")==std::optional<double>{1}?
             "selected_registered_tlb_client_shared_buffers":"legacy_response_transport")+
-          ",\"readout_service\":"+json_string(model.number("target.scheduling.source_full_raw_packet_readout")==std::optional<double>{1}?
+          ",\"readout_service\":"+json_string(model.number("target.scheduling.source_masked_packet_readout")==std::optional<double>{1}?
+            "shared_original_full_partial_raw_i8_pool_packets_one_ack_per_packet":
+            model.number("target.scheduling.source_ordered_pool_readout")==std::optional<double>{1}?
+            "ordered_pool_repeated_ACC_reads_garbage_metadata_bypass_finite_reduction_register_onebeat_final_writer":
+            model.number("target.scheduling.source_full_raw_packet_readout")==std::optional<double>{1}?
             "source_i8_and_full_raw_finite_writer_conditional_source_d":
             model.number("target.scheduling.source_masked_i8_readout")==std::optional<double>{1}?
             "source_i8_frontend_finite_writer_conditional_masked_source_d_raw_fallback_bound":
             model.number("target.scheduling.source_aligned_i8_readout")==std::optional<double>{1}?
             "source_i8_frontend_finite_writer_raw_fallback_bound":"raw_aggregate_writer_bound")+
-          ",\"accumulator_load_service\":"+json_string(model.number("target.scheduling.source_full_accumulator_load")==std::optional<double>{1}?
+          ",\"accumulator_storage_service\":"+json_string(
+            model.number("target.scheduling.source_accumulator_row_ports")==std::optional<double>{1}?
+              "selected_two_port_per_row_RMW_read_write_and_registered_hazards":
+            model.number("target.scheduling.source_banked_accumulator_bounds")==std::optional<double>{1}?
+              "selected_LocalAddr_banks_with_conservative_combined_port_occupancy":"aggregate_accumulator_storage_bound")+
+          ",\"accumulator_load_service\":"+json_string(model.number("target.scheduling.source_identity_i8_accumulator_load")==std::optional<double>{1}?
+            "shared_input_identity_queue_register_ring_pixel_to_ACC_write2_overwrite_RMW_plus_full_width_identity_route":
+            model.number("target.scheduling.source_full_accumulator_load")==std::optional<double>{1}?
             "source_queue_register_overwrite_and_stride_zero_broadcast":"legacy_or_unsupported")+
           ",\"cold_write_service\":"+(model.number("target.scheduling.source_cold_write_misses")==std::optional<double>{1}?
             cold_write_report():std::string("null"))+
@@ -1019,6 +1223,32 @@ public:
             << ",\"active_cycles\":" << pair.active << '}';
       }
       out << "],\"meaning\":\"capacity reservations and generic start queues, not physical utilization or stalls\"}";
+    }
+    if(source_actors){
+      const bool available=complete&&source_actors->complete();
+      out<<",\"scoped_source_actor_activity\":{\"schema\":\"merlin.scoped_source_actor_activity.v1\",\"source_kind\":\"modeled_source_actor\",\"unit\":\"model_cycles\",\"complete\":"<<(available?"true":"false")
+         <<",\"model_sha256\":"<<json_string(model.digest)<<",\"elf_sha256\":"<<json_string(elf_digest)
+         <<",\"scope_sha256\":"<<json_string(model.scope)<<",\"scope_binding_sha256\":"<<json_string(model.scope_binding_digest)
+         <<",\"begin_cycle\":"<<cycle_json(source_actors->first())<<",\"end_cycle\":"<<cycle_json(source_actors->last())
+         <<",\"unavailable_reason\":"<<(available?"null":json_string(source_actors->reason().empty()?"timing or original source ROI incomplete":source_actors->reason()))
+         <<",\"actors\":[";first=true;
+      for(const auto&r:source_actors->rows()){
+        const bool row_available=available&&r.covered;
+        if(!first)out<<',';first=false;
+        out<<"{\"name\":"<<json_string(r.name)<<",\"meaning\":"<<json_string(r.meaning)<<",\"availability\":"<<json_string(row_available?"modeled":"UNKNOWN")
+           <<",\"capacity\":"<<(r.covered&&r.capacity?std::to_string(r.capacity):"null")
+           <<",\"active_cycles\":"<<(row_available?std::to_string(r.active):"null")
+           <<",\"resident_unit_cycles\":"<<(row_available?std::to_string(r.units):"null")
+           <<",\"peak_units\":"<<(row_available?std::to_string(r.peak):"null")
+           <<",\"starts_in_scope\":"<<(row_available?std::to_string(r.starts):"null")<<'}';
+      }
+      out<<"],\"overlaps\":[";first=true;
+      for(const auto&p:source_actors->pairs()){
+        if(!first)out<<',';first=false;
+        out<<"{\"left\":"<<json_string(source_actors->rows()[p.left].name)<<",\"right\":"<<json_string(source_actors->rows()[p.right].name)
+           <<",\"active_cycles\":"<<(available&&source_actors->rows()[p.left].covered&&source_actors->rows()[p.right].covered?std::to_string(p.active):"null")<<'}';
+      }
+      out<<"],\"not_available\":[\"physical_PE_occupancy\",\"deployed_DRAM_activity\",\"separate_pure_dependency_and_controller_wait\"],\"qualification\":\"source service, command envelopes and finite-credit residency are separate; provisional timing, not measured hardware utilization\"}";
     }
     if (model.scope_pc_pair)
       out << ",\"scope_binding_sha256\":" << json_string(model.scope_binding_digest)
