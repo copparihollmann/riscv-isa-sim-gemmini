@@ -2,6 +2,7 @@
 #define GEMMINI_EXECUTE_OPERAND_COUNTERS_HPP
 #include <array>
 #include <cstdint>
+#include <limits>
 #include <stdexcept>
 namespace gemmini_annotated_spike {
 // ExecuteController.scala310-409, selected non-transposed WS/SP domain.
@@ -24,10 +25,18 @@ class ExecuteOperandCounters {
  bool complete_=false;
  unsigned next(unsigned x)const{return x+1==total_?0:x+1;}
  public:
+ static bool valid_bank_geometry(unsigned bank_rows,unsigned bank_count){
+   // LocalAddr selects contiguous banks from high SP address bits. Each
+   // selected singleported SRAM retains its own original finite response
+   // queues; changing bank geometry must not change those queue capacities.
+   return bank_rows>=16&&!(bank_rows&(bank_rows-1))&&bank_count&&bank_count<=128&&
+     !(bank_count&(bank_count-1))&&
+     std::uint64_t(bank_rows)*bank_count<=std::numeric_limits<std::uint32_t>::max();
+ }
  ExecuteOperandCounters(std::array<Operand,3>operands,unsigned total,unsigned dim,
                         unsigned bank_rows,unsigned bank_count)
  :operands_(operands),total_(total),dim_(dim),bank_rows_(bank_rows),bank_count_(bank_count){
-   if(dim!=16||total<4||total>dim||!bank_rows||!bank_count)
+   if(dim!=16||total<4||total>dim||!valid_bank_geometry(bank_rows,bank_count))
      throw std::invalid_argument("operand counters require selected WS geometry and floor4");
    for(unsigned i=0;i<operands_.size();++i){const auto&o=operands_[i];
      if(o.rows>dim||!o.stride||o.stride>65535||(i!=0&&o.stride!=1)||
@@ -39,6 +48,8 @@ class ExecuteOperandCounters {
  const auto&counters()const{return counter_;}
  const auto&started()const{return started_;}
  unsigned total_rows()const{return total_;}
+ unsigned bank_rows()const{return bank_rows_;}
+ unsigned bank_count()const{return bank_count_;}
  bool complete()const{return complete_;}
  Signals signals(std::array<bool,3>ready,bool control_ready)const{
    if(complete_)throw std::logic_error("operand source already consumed");

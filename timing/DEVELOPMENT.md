@@ -91,3 +91,9 @@ input digest and timing scope. A newer release source revision does not
 replace those recorded inputs. Native tests establish implementation behavior,
 not cycle accuracy or qualification against a hardware configuration.
 
+The finite weight-stationary operand pipeline admits selected power-of-two
+scratchpad bank geometries. Its two/four/eight-bank tests exercise arbitration,
+response ownership, buffer bounds and stalled handshakes. They keep the
+sixteen-element array dimension fixed and do not establish timing accuracy
+for another RTL configuration. Unsupported configurations remain explicit
+errors or unknown timing rather than receiving inferred parameters.

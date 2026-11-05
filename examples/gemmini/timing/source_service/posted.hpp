@@ -360,7 +360,7 @@ class PostedSourceObserver {
    q_.post_settled(at,{},[this,ready=mesh_edge.request_ready](auto&,auto t){ws_input_tick(t,ready);},Q::Kind::operand_consume);
  }
  void ws_input_tick(Cycle at,bool request_ready){
-   std::array<bool,4>ports{true,true,true,true};
+   std::vector<bool>ports(config_.scratchpad_bank_resources.size(),true);
    if(!ws_feed_->source_consumed()){
      const auto offered=ws_feed_->offered();
      for(unsigned operand=0;operand<3;++operand)if(offered.physical[operand]){
@@ -419,8 +419,9 @@ class PostedSourceObserver {
       std::uint64_t(operands[0].address)+(total-1)*std::uint64_t(c->a_stride)>=h_.scratchpad_rows){
      fail("nonunit A padded counter wrap is not source established");return;
    }
-   C counters(operands,total,16,config_.scratchpad_bank_rows,4);
-   if(!ws_feed_)ws_feed_=std::make_unique<ExecuteOperandPipeline>(std::move(counters),4);
+   const auto banks=config_.scratchpad_bank_resources.size();
+   C counters(operands,total,16,config_.scratchpad_bank_rows,banks);
+   if(!ws_feed_)ws_feed_=std::make_unique<ExecuteOperandPipeline>(std::move(counters),banks);
    else ws_feed_->begin(std::move(counters),c->done.id);
    // The first stream starts with the component's owner0; all later source
    // ids are the original command's token, never a later CPU instruction.
@@ -1942,8 +1943,12 @@ class PostedSourceObserver {
      ws_garbage_preload_rows_=true;
    }
    if(const auto selected=s_.number("target.scheduling.source_ws_operand_pipeline")){
-     if(*selected!=1||!ws_garbage_preload_rows_||!accumulator_ports_||config_.scratchpad_bank_resources.size()!=4||
-        config_.scratchpad_bank_rows!=4096||config_.late_accumulator_write_pipeline!=std::optional<Cycle>{2})
+     const auto banks=config_.scratchpad_bank_resources.size();
+     if(*selected!=1||!ws_garbage_preload_rows_||!accumulator_ports_||
+        !ExecuteOperandCounters::valid_bank_geometry(config_.scratchpad_bank_rows,banks)||
+        std::uint64_t(config_.scratchpad_bank_rows)*banks!=h_.scratchpad_rows||
+        std::set<ResourceId>(config_.scratchpad_bank_resources.begin(),config_.scratchpad_bank_resources.end()).size()!=banks||
+        config_.late_accumulator_write_pipeline!=std::optional<Cycle>{2})
        throw std::invalid_argument("finite WS operands require selected source storage and output pipeline");
      for(const auto&fact:std::array<std::pair<const char*,double>,8>{{{"execute_control_queue_entries",5},{"execute_sp_response_queue_entries",4},{"execute_sram_response_queue_entries",1},{"execute_mesh_tag_queue_entries",6},{"execute_mesh_matmul_ids",5},{"execute_mesh_tile_latency",0},{"execute_mesh_output_delay",1},{"execute_mesh_shifter_banks",1}}})
        if(s_.number(std::string("target.hardware.")+fact.first)!=std::optional<double>{fact.second})

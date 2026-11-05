@@ -31,18 +31,24 @@ class ExecuteOperandPipeline {
  std::uint64_t serial_=0,owner_=0;Coverage coverage_;
  static bool same(const Response&a,const Response&b){return a.serial==b.serial&&a.owner==b.owner&&a.operand==b.operand&&a.bank==b.bank&&a.row==b.row;}
  public:
- ExecuteOperandPipeline(C counters,unsigned banks):counters_(std::move(counters)),banks_(banks){if(banks!=4)throw std::invalid_argument("selected execute response pipeline needs four SP banks");}
+ ExecuteOperandPipeline(C counters,unsigned banks):counters_(std::move(counters)){
+   if(banks!=counters_.bank_count())throw std::invalid_argument("execute response banks differ from selected operand geometry");
+   banks_.resize(banks);
+ }
  const Coverage&coverage()const{return coverage_;}
  std::uint64_t source_owner()const{return owner_;}
  C::Signals offered()const{return counters_.signals({true,true,true},true);}
  bool source_consumed()const{return counters_.complete();}
  void begin(C counters,std::uint64_t owner){
    if(!source_consumed())throw std::logic_error("execute source command has not consumed its final row");
+   if(counters.bank_count()!=counters_.bank_count()||counters.bank_rows()!=counters_.bank_rows())
+     throw std::invalid_argument("execute source geometry changed while original responses may remain live");
    counters_=std::move(counters);owner_=owner;
  }
  bool empty()const{if(!control_.empty())return false;for(const auto&b:banks_)if(b.pending||b.queued||!b.execute.empty())return false;return true;}
- Edge step(std::array<bool,4>port_ready,Mesh mesh){
-   Edge edge;std::array<bool,4>dequeue{};
+ Edge step(const std::vector<bool>&port_ready,Mesh mesh){
+   if(port_ready.size()!=banks_.size())throw std::invalid_argument("execute port readiness differs from selected bank count");
+   Edge edge;std::vector<bool>dequeue(banks_.size(),false);
    if(!control_.empty()){
      const auto&c=control_.front();edge.control_pop=!c.first||mesh.request_ready;
      edge.request_rows=c.rows;edge.request_owner=c.owner;
@@ -62,7 +68,7 @@ class ExecuteOperandPipeline {
    }
    // The pipeline's non-flow queues observe old contents. SRAM Queue1 may
    // flow its arriving synchronous response directly into the execute FIFO.
-   std::array<bool,4>read_ready{};
+   std::vector<bool>read_ready(banks_.size(),false);
    for(unsigned i=0;i<banks_.size();++i){
      auto&b=banks_[i];const bool execute_ready=b.execute.size()<4||dequeue[i];
      if(dequeue[i]){b.execute.pop_front();++coverage_.responses;}

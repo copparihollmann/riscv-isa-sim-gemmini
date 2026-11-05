@@ -26,6 +26,16 @@ actual subsequent commits. A future PRELOAD can require MUL_PRE D input; without
 closed context the conservative full-row feed remains. Source trace evidence is
 not hardware cycle qualification.
 
+The selected finite WS operand pipeline derives its physical SRAM ports from
+`target.scheduling.scratchpad_bank_count` and `scratchpad_bank_rows`. Contiguous
+power-of-two bank geometry must cover exactly the selected scratchpad rows,
+and bank resources must be distinct. Per-bank Queue4/Queue1 response capacity,
+Queue5 control capacity, source arbitration and original command/response
+custody remain unchanged. Synthetic two/four/eight-bank regressions cover
+fixed-capacity rebanking, merged/repaired operand placement and backpressure;
+they do not grant qualification for a new RTL configuration. The original
+four-bank selected configuration retains its source edge equations.
+
 ### Wide source-row publication
 
 Opt-in `wide_scratchpad_row_publication` requires selected mvin column/row field

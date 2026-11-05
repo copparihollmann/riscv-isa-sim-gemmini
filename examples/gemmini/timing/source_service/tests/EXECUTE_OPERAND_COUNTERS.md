@@ -56,3 +56,25 @@ The new posted fixture exercises both legacy controls and the selected real
 same-bank MUL_PRE path for rows1/2/3/4/5/15/16. Unsupported transpose, ACC
 operands, SP result storage and LOOP_WS retain their existing qualification
 limits; this selection supplies no CPU frontend or divider writeback model.
+
+The selected scratchpad bank count and per-bank row depth now parameterize
+counter arbitration, original response owners and physical-port readiness.
+Bank depths are powers of two with at least one DIM16 tile; bank counts are
+powers of two bounded to128. The posted observer also requires their product
+to equal the selected total scratchpad rows and distinct resource identities
+for every physical bank. Readiness vectors must match the count, and a chained
+command cannot change geometry while prior responses remain in custody.
+The Queue5 control, per-bank Queue4 execute and per-bank SRAM Queue1 capacities,
+handshake equations, original serial/owner identities and mesh/register law
+are unchanged.
+
+`execute_operand_rebank_test.cpp` and `posted_ws_rebank_test.cpp` exercise2/4/8
+singleported banks at a fixed16,384 total rows. Regions0/4096 are disjoint with
+four or eight banks but share a bank with two. Relocating the second region to
+8192 restores separation. Tests check exact request/response custody under
+port/tag backpressure, chained outstanding commands, finite queue occupancy,
+invalid geometry refusal, original four-bank edge counts, ACC publication and
+full-fence drain. These synthetic source-component and observer tests are not
+qualification against a newly elaborated RTL implementation or physical
+performance measurements. Each selected hardware variant still needs its own
+source/fact binding and hardware/model qualification.
