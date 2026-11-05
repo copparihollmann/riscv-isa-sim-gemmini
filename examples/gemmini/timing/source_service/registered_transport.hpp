@@ -4,6 +4,25 @@
 #include <deque>
 #include <memory>
 namespace gemmini_annotated_spike {
+// TileLink D arbitration owns an ORIGINAL message, not independently
+// arbitrated beats. This is an ordering obligation, not another hardware
+// queue/credit or a latency. The owner releases it on its actual last D.fire;
+// missing/stalled beats therefore keep later packets backpressured.
+// Selected source: tilelink/Arbiter.scala beatsLeft/muxState; DMA.scala
+// StreamReader binds XactTracker.peek through BeatMerger until last D.fire.
+class PostedPacketLock {
+ using Q=merlin_timing::PostedTimeline;using Cycle=merlin_timing::Cycle;using Token=Q::Token;
+ Q&q_;std::optional<Token>last_;
+ Token token(){auto t=q_.token();if(!t)throw std::runtime_error("packet ownership token bound");return *t;}
+ public:
+ struct Packet{Token admitted,released;};
+ explicit PostedPacketLock(Q&q):q_(q){}
+ Packet acquire(Cycle at){
+   Packet p{token(),token()};std::vector<Token>deps;if(last_)deps.push_back(*last_);last_=p.released;
+   q_.post(at,std::move(deps),[admitted=p.admitted](auto&q,auto){q.complete(admitted);},Q::Kind::response_beat);
+   return p;
+ }
+};
 // Finite non-flow registered queues. A pipe queue may reuse a dequeue credit
 // on that edge; a non-pipe FULL queue can reuse it only on the next edge.
 // Consumers own their completion token until the actual downstream handshake.

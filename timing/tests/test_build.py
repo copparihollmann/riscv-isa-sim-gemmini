@@ -1,6 +1,7 @@
 """Source-custody regressions without configuring or compiling a simulator."""
 
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
@@ -70,6 +71,20 @@ class BuildCustody(unittest.TestCase):
         identity = module.source_identity()
         members = {row["path"]: row for row in identity["members"]}
         core = json.loads((ROOT / "timing/core/source-manifest.json").read_text())
+        directory = ROOT / "timing/core"
+        observed = []
+        for path in sorted(directory.rglob("*")):
+            if not path.is_file() or path.name == "source-manifest.json":
+                continue
+            self.assertFalse(path.is_symlink())
+            data = path.read_bytes()
+            observed.append({
+                "path": path.relative_to(directory).as_posix(),
+                "bytes": len(data),
+                "sha256": hashlib.sha256(data).hexdigest(),
+            })
+        self.assertEqual(core["schema"], "spike.timing_core.source_manifest.v1")
+        self.assertEqual(core["members"], observed)
         for row in core["members"]:
             if "timing/core/" + row["path"] in members:
                 self.assertEqual(

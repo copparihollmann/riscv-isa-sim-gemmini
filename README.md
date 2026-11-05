@@ -4,6 +4,11 @@ Spike RISC-V ISA Simulator
 About
 -------------
 
+This fork adds an optional timing observer and Gemmini provider. See the
+[timing model documentation](timing/README.md) for build and runtime options,
+and [development checks](timing/DEVELOPMENT.md) for source verification and
+native tests. These additions preserve functional instruction execution.
+
 Spike, the RISC-V ISA Simulator, implements a functional model of one or more
 RISC-V harts.  It is named after the golden spike used to celebrate the
 completion of the US transcontinental railway.

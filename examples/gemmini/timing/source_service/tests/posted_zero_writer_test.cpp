@@ -12,5 +12,15 @@ int main(){
   assert(accepted.size()==2&&accepted[0]==0&&accepted[1]==(stall?10:2));
   assert(writes==std::vector<Cycle>({stall?10u:2u,stall?11u:3u,stall?12u:4u}));assert(masks==std::vector<std::uint64_t>({65535,7,31}));
  }
+ // A local ACC port can retain the pixel for multiple edges. No replacement
+ // or upstream request acceptance may use that register before write.fire.
+ Q held({4096,8192,100000});std::vector<Cycle>fires,inputs;
+ PostedZeroWriter asynchronous(held,[](const auto&,Cycle){return true;},
+   [&](const auto&,Cycle at,PostedZeroWriter::Accepted accepted){
+     held.post(at+7,{},[&,accepted](auto&,Cycle t){fires.push_back(t);accepted(t);},Q::Kind::local_publish);
+   });
+ asynchronous.push({{0,0xffff,{}},{16,3,{}}},[&](Cycle t){inputs.push_back(t);asynchronous.push({{1,1,{}}},[&](Cycle t){inputs.push_back(t);},t+1);},0);
+ while(held.step(true)){}assert(!held.progress().failed&&!asynchronous.busy());
+ assert(asynchronous.peak_registers()==2&&inputs==std::vector<Cycle>({0,9})&&fires==std::vector<Cycle>({9,17,25}));
  std::cout<<"ZeroWriter request1/pixel1 same-edge replacement, retained masks and stalled ownership PASS\n";
 }

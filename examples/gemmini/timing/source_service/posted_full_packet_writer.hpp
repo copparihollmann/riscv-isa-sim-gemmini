@@ -10,17 +10,39 @@ class PostedFullPacketWriter {
  using Q=merlin_timing::PostedTimeline;using Token=Q::Token;using Cycle=merlin_timing::Cycle;
  public:
  using Memory=std::function<void(Cycle,Token,Token,const std::vector<Token>&,const std::vector<Token>&)>;
+ // Original StreamWriter data_blocks register writes, in StoreController's
+ // row-major block order. Only the last block has store_en and starts TL work.
+ struct Block{std::uint64_t owner;std::size_t index,count;};
  private:
  std::optional<spike_timing::SourceActorSinkV1>actor_sink_;
  void actor(spike_timing::SourceActorRoleV1 role,std::uint64_t id,Cycle at,bool begin){if(actor_sink_)actor_sink_->edge(actor_sink_->opaque,role,id,at,begin);}
- struct Packet{Memory memory;Token captured,done,d_accepted;std::vector<Token>data,popped;std::size_t beats;std::shared_ptr<Packet>next;std::uint64_t row_actor=0;std::function<void(Cycle)>idle{};};
+ struct Packet{Memory memory;Token captured,done,d_accepted;std::vector<Token>data,popped;std::size_t beats;std::shared_ptr<Packet>next;std::uint64_t row_actor=0;std::function<void(Cycle)>idle{};std::optional<Block>block{};};
  Q&q_;PostedRegisteredTransport&shared_a_,&shared_d_;PostedRegisteredTransport local_a_,local_d_;
  std::size_t live_=0,peak_=0,payload_live_=0,payload_peak_=0,payload_capacity_;
  bool busy_=false;std::deque<std::shared_ptr<Packet>>waiting_;std::shared_ptr<Packet>credit_wait_;
+ std::optional<Block>collecting_;
  std::deque<std::function<void(Cycle)>>payload_wait_;
  Token token(){auto t=q_.token();if(!t)throw std::runtime_error("full writer token budget");return *t;}
  void next(Cycle at){if(!busy_&&!waiting_.empty()){auto p=waiting_.front();waiting_.pop_front();capture(p,at);}}
- void capture(std::shared_ptr<Packet>p,Cycle at){busy_=true;for(auto x=p;x;x=x->next)x->row_actor=p->captured.id;actor(spike_timing::SourceActorRoleV1::writer_state,p->captured.id,at,true);q_.complete(p->captured);q_.post(at+1,{},[this,p](auto&,auto t){issue(p,0,t);},Q::Kind::source_arrival);}
+ void capture(std::shared_ptr<Packet>p,Cycle at){
+   if(p->block){
+     const auto b=*p->block;
+     if((!collecting_&&b.index!=0)||(collecting_&&
+         (collecting_->owner!=b.owner||collecting_->count!=b.count||collecting_->index!=b.index))){q_.fail("StreamWriter block register owner/order mismatch");return;}
+     if(b.index+1<b.count){
+       if(p->beats){q_.fail("intermediate block must not own a memory packet");return;}
+       collecting_=Block{b.owner,b.index+1,b.count};q_.complete(p->captured);
+       // store_en=false leaves the RTL idle. A second req.fire is possible
+       // on the next edge; no TL source, packet or acknowledgement is created.
+       busy_=true;q_.post(at+1,{},[this](auto&,auto t){busy_=false;next(t);},Q::Kind::source_arrival);return;
+     }
+     collecting_.reset();
+   }else if(collecting_){q_.fail("StreamWriter row interrupted its block register owner");return;}
+   busy_=true;for(auto x=p;x;x=x->next)x->row_actor=p->captured.id;actor(spike_timing::SourceActorRoleV1::writer_state,p->captured.id,at,true);q_.complete(p->captured);q_.post(at+1,{},[this,p](auto&,auto t){issue(p,0,t);},Q::Kind::source_arrival);
+ }
+ void enqueue(std::shared_ptr<Packet>p,Cycle at){
+   q_.post(std::max(at,q_.now()),{},[this,p](auto&,auto t){if(busy_){if(waiting_.size()>=16){q_.fail("full writer request custody bound");return;}waiting_.push_back(p);}else capture(p,t);},Q::Kind::source_arrival);
+ }
  void acknowledge(std::shared_ptr<Packet>p,Cycle at){
    if(!live_){q_.fail("full writer xactBusy underflow");return;}--live_;actor(spike_timing::SourceActorRoleV1::writer_slot,p->captured.id,at,false);q_.complete(p->done);
    if(credit_wait_){auto pending=std::move(credit_wait_);credit_wait_.reset();q_.post(at+1,{},[this,pending](auto&,auto t){issue(pending,0,t);},Q::Kind::source_arrival);}
@@ -68,7 +90,12 @@ class PostedFullPacketWriter {
  Token push(std::size_t beats,Memory memory,Cycle at,Token done){
    return push_row({beats},{std::move(memory)},at,{done});
  }
- Token push_row(std::vector<std::size_t>beats,std::vector<Memory>memory,Cycle at,std::vector<Token>done,std::function<void(Cycle)>idle={}){
+ Token push_block(Block block,Cycle at){
+   if(!block.owner||block.count<2||block.count>4||block.index+1>=block.count)throw std::invalid_argument("intermediate writer block geometry");
+   auto p=std::make_shared<Packet>(Packet{{},token(),{},{},{},{},0,{}});p->block=block;enqueue(p,at);return p->captured;
+ }
+ Token push_row(std::vector<std::size_t>beats,std::vector<Memory>memory,Cycle at,std::vector<Token>done,std::function<void(Cycle)>idle={},std::optional<Block>block={}){
+   if(block&&(!block->owner||block->count<2||block->count>4||block->index+1!=block->count))throw std::invalid_argument("final writer block geometry");
    if(beats.empty()||beats.size()>4||beats.size()!=memory.size()||beats.size()!=done.size())throw std::invalid_argument("full writer requires original bounded row packet sequence");
    std::shared_ptr<Packet>p,prior;
    for(std::size_t packet=0;packet<beats.size();++packet){
@@ -78,14 +105,15 @@ class PostedFullPacketWriter {
      if(prior)prior->next=current;else p=current;prior=current;
    }
    prior->idle=std::move(idle);
+   p->block=block;
    // StreamWriter holds the captured row while bytesSent advances between
    // original packets; only the first packet incurs io.req capture.
-   q_.post(std::max(at,q_.now()),{},[this,p](auto&,auto t){if(busy_){if(waiting_.size()>=16){q_.fail("full writer request custody bound");return;}waiting_.push_back(p);}else capture(p,t);},Q::Kind::source_arrival);
+   enqueue(p,at);
    return p->captured;
  }
  std::size_t peak_transactions()const{return peak_;}
  std::size_t peak_payload_beats()const{return payload_peak_;}
- bool busy()const{return busy_||live_||payload_live_||credit_wait_||!waiting_.empty()||!payload_wait_.empty()||local_a_.busy()||local_d_.busy();}
+ bool busy()const{return busy_||collecting_||live_||payload_live_||credit_wait_||!waiting_.empty()||!payload_wait_.empty()||local_a_.busy()||local_d_.busy();}
 };
 // SourceD's full-write subset: S1 reforms the original request, S2 holds data
 // from SinkA, S3 emits ACK only on the first internal beat, S4 publishes each

@@ -51,6 +51,29 @@ int main(){
  auto captured=split.push_row({2,2},{memory,memory},0,acks2);
  while(row.step(true)){}assert(!row.progress().failed&&!split.busy()&&row.completed(captured)==0);
  assert(starts==std::vector<Cycle>({6,8}));for(auto token:acks2)assert(row.completed(token));
+ // Intermediate scaled blocks only update the original data_blocks registers.
+ // Final store_en owns one packet/ACK, and the next row must wait for the
+ // existing writer state to finish its last A beat (not its later D ACK).
+ Q blocks({4096,4096,100000});PostedRegisteredTransport ba(blocks,{{2,false},{2,false}}),bd(blocks,{{2,false},{2,false}});
+ PostedFullPacketWriter grouped(blocks,ba,bd,40);unsigned original_packets=0;
+ PostedFullPacketWriter::Memory bm=[&](Cycle t,auto ready,auto,const auto&data,const auto&popped){
+   ++original_packets;blocks.post(t+50,{},[ready](auto&q,auto){q.complete(ready);},Q::Kind::response_beat);
+   for(std::size_t i=0;i<data.size();++i)blocks.post(t,{data[i]},[pop=popped[i]](auto&q,auto){q.complete(pop);},Q::Kind::operand_consume);
+ };
+ std::vector<Q::Token>partial;
+ for(unsigned b=0;b<3;++b)partial.push_back(grouped.push_block({1,b,4},b));
+ blocks.advance(30,true);assert(original_packets==0&&grouped.peak_transactions()==0&&grouped.busy());
+ for(unsigned b=0;b<3;++b)assert(blocks.completed(partial[b])==b);
+ auto ack1=*blocks.token(),ack2=*blocks.token();
+ auto final1=grouped.push_row({4},{bm},30,{ack1},{},PostedFullPacketWriter::Block{1,3,4});
+ auto next=grouped.push_block({2,0,2},31);
+ auto final2=grouped.push_row({2},{bm},32,{ack2},{},PostedFullPacketWriter::Block{2,1,2});
+ while(blocks.step(true)){}
+ assert(!blocks.progress().failed&&!grouped.busy()&&original_packets==2);
+ assert(blocks.completed(final1)==30&&blocks.completed(next)>=34&&blocks.completed(final2)>blocks.completed(next));
+ assert(blocks.completed(next)<blocks.completed(ack1)&&blocks.completed(ack1)&&blocks.completed(ack2));
+ Q wrong({4096,4096,100000});PostedRegisteredTransport wa(wrong,{{2,false}}),wd(wrong,{{2,false}});PostedFullPacketWriter invalid(wrong,wa,wd,40);
+ invalid.push_block({9,1,3},0);while(wrong.step(true)){}assert(wrong.progress().failed&&invalid.peak_transactions()==0);
  spike_timing::FullWritePacketV3 packet;packet.address=0x81000000;packet.transaction_bytes=64;packet.beat_bytes=16;
  assert(spike_timing::full_write_packet_valid(packet));packet.transaction_bytes=48;assert(!spike_timing::full_write_packet_valid(packet));
 }

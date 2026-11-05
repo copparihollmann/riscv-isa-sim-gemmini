@@ -8,6 +8,25 @@ C source(unsigned a_rows,unsigned d_rows,bool same){
  return C({C::Operand{0,a_rows,false,true},C::Operand{},C::Operand{same?16u:4096u,d_rows,false,true}},16,16,4096,4);
 }
 int main(){
+ for(unsigned stride:{2u,3u}){
+   C sampled({C::Operand{4090,16,false,true,stride},C::Operand{},C::Operand{4096,16,false,true}},16,16,4096,4);
+   std::vector<unsigned>addresses;unsigned clocks=0;
+   while(!sampled.complete()){
+     const auto saved=sampled.counters();auto held=sampled.step({true,true,true},false);
+     (void)held;assert(sampled.counters()==saved);
+     auto s=sampled.step({true,true,true},true);
+     if(s.physical[0]&&s.fire[0])addresses.push_back(s.request[0].bank*4096+s.request[0].row);
+     assert(++clocks<=48);
+   }
+   assert(addresses.size()==16);
+   for(unsigned i=0;i<16;++i)assert(addresses[i]==4090+i*stride);
+ }
+ for(unsigned mode=0;mode<3;++mode){
+   bool refused=false;
+   try{C invalid({C::Operand{mode==2?16380u:0u,16,false,true,mode==0?0u:3u},
+                  C::Operand{0,16,false,true,mode==1?2u:1u},C::Operand{}},16,16,4096,4);}
+   catch(const std::invalid_argument&){refused=true;}assert(refused);
+ }
  for(bool same:{false,true})for(unsigned rows:{1,4,16}){
    auto c=source(rows,rows,same);unsigned cycle=0,a=0,d=0;std::vector<unsigned>ar,dr;
    while(!c.complete()){

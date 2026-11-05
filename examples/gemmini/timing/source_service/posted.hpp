@@ -32,10 +32,11 @@ namespace gemmini_annotated_spike {
 class PostedSourceObserver {
  using Q=merlin_timing::PostedTimeline;using Token=Q::Token;
  using Stage=merlin_timing::OwnedStage;
- struct Row {std::optional<Token> writer;std::vector<Token> readers;};
+ struct Row {std::optional<Token> writer,writer_command_done;std::vector<Token> readers;};
  struct Command {
    std::string kind;Stage original;std::optional<Cycle> occupancy;
    std::uint32_t funct;std::uint64_t rs1,rs2;std::optional<TransferPhase> phase;
+   unsigned a_stride=1;
    std::vector<Transfer> transfers;std::size_t group;
    Token start,consume,done;std::vector<Token> dependencies,output_dependencies;
    std::vector<ValueId> sp_reads,acc_reads,outputs;std::map<ValueId,Token> row_ready;
@@ -56,8 +57,9 @@ class PostedSourceObserver {
  std::array<std::vector<std::shared_ptr<Command>>,3> active_;
  std::array<std::optional<Token>,3> last_issue_;
  std::array<std::vector<std::shared_ptr<Command>>,3> controller_wait_;
- std::array<std::size_t,2>dma_active_{};bool ws_unit_=false;
+ std::array<std::size_t,2>dma_active_{};bool ws_unit_=false,ws_layout_=false;unsigned ws_a_stride_=1;
  std::unique_ptr<PostedRegisteredTransport>reader_request_path_,reader_response_path_,shared_a_path_,shared_d_path_;
+ PostedPacketLock reader_d_packets_;
  std::unique_ptr<PostedReadoutFrontend>readout_frontend_;
  std::unique_ptr<PostedOneBeatWriter>one_beat_writer_;
  std::unique_ptr<PostedRegisteredTransport>full_acc_load_path_;
@@ -70,7 +72,7 @@ class PostedSourceObserver {
  std::optional<spike_timing::FullWritePacketServiceV3>full_packet_service_;
  std::optional<spike_timing::MaskedWriteServiceV8>masked_packet_service_;
  std::optional<spike_timing::MaskedWriteServiceV9>masked_packet_service_v9_;bool resident_dirty_put_retirement_=false;
- bool masked_packets_=false,ordered_dirty_puts_=false,store_request_release_=false,store_local_completion_=false;
+ bool masked_packets_=false,ordered_dirty_puts_=false,store_request_release_=false,store_local_completion_=false,multiblock_i8_readout_=false;
  std::map<std::uint64_t,Token>pending_store_obligations_;
  std::optional<Cycle>last_store_completion_at_;
  struct PendingOrderedWrite{std::uint64_t line;Token published,consumed;};
@@ -165,7 +167,33 @@ class PostedSourceObserver {
  bool ready(const std::vector<Token>&deps)const{for(auto t:deps)if(!q_.completed(t))return false;return true;}
  void once(Token t){if(!q_.completed(t))q_.complete(t);actor_done(t,q_.now());}
  void prune(std::size_t g){auto &v=active_[g];v.erase(std::remove_if(v.begin(),v.end(),[this](auto&c){return c->finished||q_.completed(c->done).has_value()||(c->kind=="compute_ws"&&q_.completed(c->consume).has_value());}),v.end());}
- void await(Token t){while(!q_.completed(t)&&!q_.progress().failed)if(!q_.step(true)){fail("blocked source dependency without a producer");break;}}
+ std::string blocked_dependency_description(Token awaited)const{
+   std::string text="blocked source dependency without a producer; awaited="+std::to_string(awaited.id);
+   std::size_t count=0;
+   for(const auto&c:commands_)if(!c->finished&&!q_.completed(c->done)){
+     if(count++==16){text+="; command detail truncated";break;}
+     text+="; "+c->kind+"[done="+std::to_string(c->done.id)+",start="+std::to_string(c->start.id)+
+       ",consume="+std::to_string(c->consume.id)+",started="+std::to_string(c->started)+
+       ",rs1="+std::to_string(c->rs1)+",rs2="+std::to_string(c->rs2)+",pending=";
+     std::size_t deps=0;
+     for(auto dep:c->dependencies)if(!q_.completed(dep)&&deps++<32)text+=std::to_string(dep.id)+",";
+     text+="; output_pending=";
+     for(auto dep:c->output_dependencies)if(!q_.completed(dep)&&deps++<64)text+=std::to_string(dep.id)+",";
+     for(const auto&row:c->row_dependencies)for(auto dep:row.second)if(!q_.completed(dep)&&deps++<96)
+       text+="row"+std::to_string(row.first)+":"+std::to_string(dep.id)+",";
+     text+="; unpublished=";
+     for(const auto&row:c->row_ready)if(!q_.completed(row.second))text+=std::to_string(row.first)+":"+std::to_string(row.second.id)+",";
+     text+="]";
+   }
+   text+="; reader_inflight="+std::to_string(reader_inflight_)+",response_queue="+std::to_string(responses_.size());
+   if(merging_response_){const auto&r=merging_response_;
+     text+=",merger_addr="+std::to_string(r->packet.address)+",merger_next="+std::to_string(r->next)+",beats=";
+     for(auto beat:r->beats)text+=std::to_string(beat.id)+":"+std::to_string(bool(q_.completed(beat)))+",";
+   }
+   if(source_d_free_)text+=";source_d_free="+std::to_string(source_d_free_->id)+":"+std::to_string(bool(q_.completed(*source_d_free_)));
+   return text;
+ }
+ void await(Token t){while(!q_.completed(t)&&!q_.progress().failed)if(!q_.step(true)){fail(blocked_dependency_description(t));break;}}
  void bank(Stage&stage,const std::vector<ValueId>&rows,Cycle duration){
    std::set<std::size_t> banks,acc_banks;bool accumulator=false;
    for(auto row:rows){if(sp(row))banks.insert((row-base_)/config_.scratchpad_bank_rows);else if(acc(row)){
@@ -188,21 +216,27 @@ class PostedSourceObserver {
  }
  // A real scheduled stage, posted at source acceptance. The event's views are
  // copied and no Engine or cache state is touched until its callback dispatch.
- void stage(Stage work,std::vector<Token>deps,Token complete,std::function<void(const Result&)>accepted={}){
+ void stage(Stage work,std::vector<Token>deps,Token complete,std::function<void(const Result&)>accepted={},bool zero=false){
    const bool feed=work.origin&&work.origin->actor.size()>=5&&work.origin->actor.substr(work.origin->actor.size()-5)==".feed";
    if(accumulator_ports_&&((work.writes.size()==1&&acc(work.writes[0]))||(work.writes.empty()&&work.reads.size()==1&&acc(work.reads[0])) )){
      const bool write=!work.writes.empty();const auto row=write?work.writes[0]:work.reads[0];
      const bool rmw=write&&contains(work.reads,row);
      auto owned=std::make_shared<Stage>(std::move(work));const auto at=now(owned->earliest);
-     q_.post(at,std::move(deps),[this,owned,row,write,rmw,complete,accepted=std::move(accepted)](auto&,auto t)mutable{
+     q_.post(at,std::move(deps),[this,owned,row,write,rmw,complete,zero,accepted=std::move(accepted)](auto&,auto t)mutable{
        accumulator_ports_->offer(row-base_-h_.scratchpad_rows,write,rmw,
-         [this,owned](Cycle at){auto start=s_.engine.earliest_stage_start(owned->event(at));if(!start){fail("ACC row readiness unknown");return false;}return *start<=at;},
+         [this,owned,zero](Cycle at){
+           if(zero&&
+              (last_mvin_response_at_==std::optional<Cycle>{at}||!full_acc_last_pending_.empty()||
+               (identity_pixel_&&identity_pixel_->last_packet_output)))return false;
+           auto start=s_.engine.earliest_stage_start(owned->event(at));if(!start){fail("ACC row readiness unknown");return false;}return *start<=at;
+         },
          [this,owned,complete,accepted=std::move(accepted)](Cycle at)mutable{
            const auto result=s_.engine.submit_detached(owned->event(at));
            if(result.start!=std::optional<Cycle>{at}||!result.ready){fail("ACC row admission changed");return;}
            if(accepted)accepted(result);
            q_.post(*result.ready,{},[this,complete](auto&,auto){once(complete);},Q::Kind::local_publish);
-         },t,owned->origin&&owned->origin->actor.find(".acc_result_row")!=std::string::npos);
+         },t,owned->origin&&owned->origin->actor.find(".acc_result_row")!=std::string::npos,
+         zero);
      },Q::Kind::operand_consume);return;
    }
    work.earliest=now(work.earliest);merlin_timing::PostedEngineStage::post(q_,s_.engine,std::move(work),std::move(deps),complete,
@@ -379,7 +413,12 @@ class PostedSourceObserver {
    unsigned total;
    if(c->kind=="preload"){operands[2]=operand(c->rs1,true);total=operands[2].garbage?4:16;}
    else{operands[0]=operand(c->rs1,true);operands[1]=operand(c->rs2,true);operands[2]=paired?operand(paired->rs1,true):C::Operand{};
+     operands[0].stride=c->a_stride;
      total=paired&&!operands[2].garbage?16:std::max({operands[0].garbage?1u:operands[0].rows,operands[1].garbage?1u:operands[1].rows,4u});}
+   if(c->a_stride!=1&&c->kind=="compute_ws"&&
+      std::uint64_t(operands[0].address)+(total-1)*std::uint64_t(c->a_stride)>=h_.scratchpad_rows){
+     fail("nonunit A padded counter wrap is not source established");return;
+   }
    C counters(operands,total,16,config_.scratchpad_bank_rows,4);
    if(!ws_feed_)ws_feed_=std::make_unique<ExecuteOperandPipeline>(std::move(counters),4);
    else ws_feed_->begin(std::move(counters),c->done.id);
@@ -578,6 +617,10 @@ class PostedSourceObserver {
    }
    const auto row=fragment->repeat_rows.empty()?fragment->row:fragment->repeat_rows.at(repeat);
    Stage write;write.origin=fragment->origin;write.earliest=at;write.writes={row};
+   // Scratchpad forwards mvin_scale_acc.tag.accumulate to AccumulatorMem.
+   // This consumes the bank's read port at the write handshake and must wait
+   // for the previous value, including any in-flight same-row publication.
+   if(fragment->accumulate){write.reads={row};write.hold_reads_until_ready=true;}
    write.latency=2;bank(write,write.writes,1);
    if(accumulator_ports_){
      const bool last=fragment->repeat_rows.empty()||repeat+1==fragment->repeat_rows.size();auto complete=token();
@@ -609,19 +652,26 @@ class PostedSourceObserver {
    },Q::Kind::local_publish);
  }
  void full_acc_offer(std::shared_ptr<Fragment>fragment,Cycle at){
-   if(!full_acc_load_path_){fail("full ACC overwrite ingress source law absent");return;}
+   if(!full_acc_load_path_){fail("full ACC ingress source law absent");return;}
    auto entered=full_acc_load_path_->push([this,fragment](Cycle t,Token consumed){full_acc_write(fragment,consumed,t);},at);
    q_.post(at,{entered},[this,fragment](auto&,auto){once(fragment->accepted);},Q::Kind::response_beat);
  }
  struct Response{std::shared_ptr<Command>command;ReaderPacket packet;std::vector<Token>fragments;
    std::function<void(Cycle)>returned;std::function<void()>done;Cycle begin=0;std::size_t next=0;
-   std::vector<Token>beats;std::optional<Token>merged;std::shared_ptr<ReaderLease>lease;};
+   std::vector<Token>beats;std::optional<Token>merged;std::shared_ptr<ReaderLease>lease;
+   std::optional<PostedPacketLock::Packet>d_packet;};
  std::deque<std::shared_ptr<Response>> responses_;bool response_busy_=false;
  bool response_source_busy_=false;std::shared_ptr<Response>merging_response_;
  std::size_t reader_inflight_=0;Cycle reader_request_next_=0;
  std::deque<std::function<void(Cycle)>>reader_wait_;
  Token source_response_beat(const std::shared_ptr<Response>&response,std::size_t beat,Cycle at,bool source_driven=false){
-   auto accepted=reader_response([this,response,beat](Cycle t,Token consumed){
+   if(!response->d_packet)response->d_packet=reader_d_packets_.acquire(at);
+   const auto accepted=token();
+   // Reserve the whole original D message BEFORE entering the shared
+   // registered transport. Waiting inside its head on another packet's
+   // merger would strand that packet's later beats behind this one.
+   q_.post(at,{response->d_packet->admitted},[this,response,beat,accepted](auto&,auto time){
+   auto entered=reader_response([this,response,beat](Cycle t,Token consumed){
      std::vector<Token>deps;
      if(merging_response_&&merging_response_!=response)deps.push_back(*merging_response_->merged);
      q_.post(t,std::move(deps),[this,response,beat,consumed](auto&,auto time){
@@ -636,7 +686,16 @@ class PostedSourceObserver {
          if(!reader_wait_.empty()){auto continuation=std::move(reader_wait_.front());reader_wait_.pop_front();continuation(time);}
        }
      },Q::Kind::response_beat);
-   },at);
+   },time);
+   q_.post(time,{entered},[this,response,beat,accepted](auto&q,auto){
+     q.complete(accepted);
+     // The upstream arbiter releases message ownership on its last D.fire
+     // INTO the registered transport. Holding it through the client queues
+     // would serialize independent packets by the whole pipeline depth.
+     // Reader credits still release separately at the actual client D.fire.
+     if(beat+1==response->beats.size())once(response->d_packet->released);
+   },Q::Kind::response_beat);
+   },Q::Kind::response_beat);
    q_.post(at,{accepted},[this,response,beat,source_driven](auto&,auto t){
      if(source_driven)return;
      if(beat+1<response->beats.size())source_response_beat(response,beat+1,t+1);
@@ -680,7 +739,8 @@ class PostedSourceObserver {
    auto item=std::make_shared<Fragment>(Fragment{row,accepted,complete,[this,c,row]{
      if(!--load_remaining_.at(c.get()).at(row))once(c->row_ready.at(row));
    },tag(c,(c->phase->full_accumulator_load||c->phase->identity_i8_accumulator_load)?"acc_load_write":"sp_write"),response->next==response->packet.outputs.size()});
-   item->i8_accumulator=c->phase->identity_i8_accumulator_load;item->accumulate=item->i8_accumulator&&bool((c->rs2>>30)&1);
+   item->i8_accumulator=c->phase->identity_i8_accumulator_load;
+   item->accumulate=(item->i8_accumulator||c->phase->full_accumulator_load)&&bool((c->rs2>>30)&1);
    if(c->phase->input_row_repeats){
      const auto count=c->phase->input_row_repeats+1;
      if(!c->phase->scratchpad_load || item->i8_accumulator || c->phase->full_accumulator_load ||
@@ -715,6 +775,7 @@ class PostedSourceObserver {
    },Q::Kind::response_beat);
  }
  std::map<Command*,std::map<ValueId,std::size_t>>load_remaining_;
+ std::map<std::uint64_t,Token>pending_zero_rows_;
  // One original LoadController row request, followed by its original local
  // column fragments. ZeroWriter never allocates a memory transaction.
  void zero_load(const std::shared_ptr<Command>&c,Cycle at){
@@ -722,19 +783,26 @@ class PostedSourceObserver {
    const auto geometry=*c->phase->zero_fill;const auto bands=(geometry.columns+15)/16;
    if(!geometry.rows||geometry.rows>16||!geometry.columns||geometry.columns>64||
       c->phase->reader_destinations.size()!=geometry.rows*bands){fail("zero writer local destination geometry");return;}
-   std::vector<Token>published;
-   for(auto row:c->phase->reader_destinations){if(!sp(row)){fail("zero writer non-SP destination");return;}published.push_back(c->row_ready.at(row));}
-   q_.post(at,published,[this,c](auto&,auto end){once(c->consume);once(c->done);c->finished=true;--dma_active_[0];schedule_next(0,end);},Q::Kind::command_retire);
+   for(auto row:c->phase->reader_destinations){
+     if(!sp(row)&&!acc(row)){fail("zero writer local destination outside selected memories");return;}
+     auto published=c->row_ready.at(row);pending_zero_rows_.emplace(published.id,published);
+   }
    auto issue=std::make_shared<std::function<void(std::size_t,Cycle)>>();
    *issue=[this,c,geometry,bands,issue](std::size_t index,Cycle time){
      std::vector<PostedZeroWriter::Row>rows;
      for(std::uint32_t band=0;band<bands;++band){
        const auto row=c->phase->reader_destinations.at(band*geometry.rows+index);
        const auto columns=std::min(16u,geometry.columns-band*16);
-       rows.push_back({row,(std::uint64_t{1}<<columns)-1,[this,c,row,columns](Cycle t){
-         s_.feature("target.posted.zero_local_writes",1);s_.feature("target.posted.zero_useful_bytes",columns);
+       const bool last=index+1==geometry.rows&&band+1==bands;
+       rows.push_back({row,(std::uint64_t{1}<<columns)-1,[this,c,row,columns,last](Cycle t){
+         s_.feature("target.posted.zero_local_writes",1);s_.feature("target.posted.zero_useful_bytes",columns*(acc(row)?h_.accumulator_bytes:h_.element_bytes));
+         if(acc(row))s_.feature("target.posted.zero_accumulator_local_writes",1);
          if(columns!=16)s_.feature("target.posted.zero_masked_local_writes",1);
-         q_.post(t+1,{},[this,c,row](auto&,auto){once(c->row_ready.at(row));},Q::Kind::local_publish);
+         q_.post(t+(acc(row)?2:1),{},[this,c,row](auto&,auto){auto published=c->row_ready.at(row);once(published);pending_zero_rows_.erase(published.id);},Q::Kind::local_publish);
+         // Last local fire returns the original row response. The command
+         // tracker's registered bytes_left reaches zero on the next edge;
+         // ACC array publication remains an independent +2 obligation.
+         if(last)q_.post(t+1,{},[this,c](auto&,auto end){once(c->consume);once(c->done);c->finished=true;--dma_active_[0];schedule_next(0,end);},Q::Kind::command_retire);
        },tag(c,"zero_write")});
      }
      zero_writer_->push(std::move(rows),[this,c,geometry,index,issue](Cycle t){
@@ -752,6 +820,9 @@ class PostedSourceObserver {
    }
    if(c->phase->identity_i8_accumulator_load&&!identity_i8_accumulator_load_){fail("identity i8 ACC load law not selected");return;}
    if(c->phase->full_accumulator_load&&!full_acc_load_path_){fail("posted full ACC load law not selected");return;}
+   if(c->phase->full_accumulator_load&&((c->rs2>>30)&1)&&!accumulator_ports_){
+     fail("full ACC accumulating load requires source bank RMW arbitration");return;
+   }
    struct State{std::size_t next=0,returned=0,merged=0;std::vector<Token>fragments;};
    auto state=std::make_shared<State>();
    for(const auto&p:c->phase->reader_packets)for(const auto&f:p.outputs){
@@ -767,7 +838,11 @@ class PostedSourceObserver {
      }else ++load_remaining_[c.get()][c->phase->reader_destinations[f.destination]];
    }
    auto issue=std::make_shared<std::function<void(Cycle)>>();
-   *issue=[this,c,state,issue](Cycle time){
+   std::weak_ptr<std::function<void(Cycle)>> weak_issue=issue;
+   *issue=[this,c,state,weak_issue](Cycle time){
+     // Scheduled continuations retain the issuer while live. The issuer
+     // must not retain itself when an unsupported lookup aborts the command.
+     const auto issue=weak_issue.lock();if(!issue)return;
      const auto &packets=c->phase->reader_packets;
      if(state->next>=packets.size())return;
      if(reader_inflight_>=16){
@@ -1376,34 +1451,68 @@ class PostedSourceObserver {
    if((!full_packet_service_&&!masked_packet_service_)||!c->phase||c->transfers.size()!=1||!config_.readout_stream||
       !(std::uint32_t(c->rs2)&(1u<<31))||(!masked_packets_&&!(std::uint32_t(c->rs2)&(1u<<29)))){fail("full packet writer requires original raw ACC readout");return;}
    const auto transfer=c->transfers[0];auto rows=masked_packets_?masked_writer_rows(transfer.address,transfer.rows,transfer.row_bytes,transfer.row_stride):full_writer_rows(transfer.address,transfer.rows,transfer.row_bytes,transfer.row_stride,16,64);
-   if(!rows||rows->size()!=c->acc_reads.size()||rows->size()>16){fail("full packet raw row mapping unsupported");return;}
+   const auto blocks=c->phase->accumulator_readout_blocks;
+   if(!rows||!blocks||rows->size()*blocks!=c->acc_reads.size()||rows->size()>16){fail("full packet ACC row mapping unsupported");return;}
+   if(blocks>1){
+     const auto columns=(c->rs2>>32)&65535;
+     if(!multiblock_i8_readout_||blocks>4||(std::uint32_t(c->rs2)&(1u<<29))||
+        columns<=16||columns>64||blocks!=(columns+15)/16||transfer.row_bytes!=columns){
+       fail("multiblock ACC readout lacks original narrow row geometry");return;
+     }
+     const auto base=base_+h_.scratchpad_rows+(std::uint32_t(c->rs2)&0x3ffffffu);
+     for(std::size_t block=0;block<blocks;++block)for(std::size_t row=0;row<rows->size();++row)
+       if(c->acc_reads[block*rows->size()+row]!=base+block*16+row){fail("multiblock ACC readout physical row order");return;}
+   }
    for(const auto&row:*rows)if(row.empty()||row.size()>4){fail("full packet raw row packet bound");return;}
-   begin_local_store(c,rows->size());
+   begin_local_store(c,rows->size()*blocks);
    std::vector<Token>done,requests;
-   auto unread=std::make_shared<std::size_t>(rows->size());
+   std::optional<Token>previous_block_request;
+   auto unread=std::make_shared<std::size_t>(rows->size()*blocks);
    for(std::size_t row=0;row<rows->size();++row){
      auto completed=token();done.push_back(completed);auto packets=rows->at(row);
-     auto request=readout_frontend_->push([this,c,row,unread](Cycle time,Token accepted,Token ready){
+     for(std::size_t block=0;block<blocks;++block){
+     auto read_port=[this,c,row,block,blocks,unread](Cycle time,Token accepted,Token ready){
        if(store_request_release_)q_.post(time,{ready},[this,c,unread](auto&,auto){
          if(!*unread){fail("store local row consumption ownership");return;}
          if(!--*unread){once(c->consume);s_.feature("target.posted.store_local_row_consumptions",1);}
        },Q::Kind::operand_consume);
-       Stage read;read.origin=tag(c,"acc_read");read.earliest=time;read.reads={c->acc_reads[row]};read.latency=1;
+       Stage read;read.origin=tag(c,"acc_read");read.earliest=time;read.reads={c->acc_reads[block*(c->acc_reads.size()/blocks)+row]};read.latency=1;
        read.hold_reads_until_ready=true;bank(read,read.reads,1);read.kind=Q::Kind::operand_consume;
        stage(std::move(read),{},ready,[this,c,accepted](const auto&r){q_.post(*r.start,{},[this,c,accepted](auto&q,auto t){q.complete(accepted);store_local_response(c,t);},Q::Kind::operand_consume);});
-     },[this,c,packets=std::move(packets),completed](Cycle time,Token captured){
+     };
+     auto output=[this,c,packets,completed,block,blocks](Cycle time,Token captured){
+       const auto owner=PostedFullPacketWriter::Block{completed.id,block,blocks};
+       if(block+1<blocks){
+         auto accepted=full_packet_writer_->push_block(owner,time);
+         q_.post(time,{accepted},[this,captured](auto&q,auto){q.complete(captured);s_.feature("target.posted.multiblock_i8_register_captures",1);},Q::Kind::source_arrival);return;
+       }
        std::vector<Token>packet_done;std::vector<std::size_t>beats;std::vector<PostedFullPacketWriter::Memory>memory;
        for(const auto&packet:packets){
          auto ack_done=token(),published=token();packet_done.push_back(ack_done);packet_done.push_back(published);beats.push_back(packet.bytes/16);
          memory.push_back([this,c,packet,published](Cycle at,Token d_ready,Token d_accepted,const auto&data,const auto&popped){full_packet_request(c,packet,published,at,d_ready,d_accepted,data,popped);});
        }
        std::vector<Token>acks;for(std::size_t i=0;i<packet_done.size();i+=2)acks.push_back(packet_done[i]);
-       auto accepted=full_packet_writer_->push_row(std::move(beats),std::move(memory),time,std::move(acks));
+       auto accepted=full_packet_writer_->push_row(std::move(beats),std::move(memory),time,std::move(acks),{},
+         blocks>1?std::optional<PostedFullPacketWriter::Block>{owner}:std::nullopt);
        q_.post(time,{accepted},[captured](auto&q,auto){q.complete(captured);},Q::Kind::source_arrival);
        q_.post(time,std::move(packet_done),[completed](auto&q,auto){q.complete(completed);},Q::Kind::command_retire);
-     },at+1);requests.push_back(request);
+     };
+     Token request;
+     if(blocks>1){
+       request=token();std::vector<Token>prior;if(previous_block_request)prior.push_back(*previous_block_request);
+       // One StoreController request remains valid until dispatch admission.
+       // Stream the original row/block cursor; never pre-enqueue rows*blocks
+       // requests into a fictitious enlarged hardware input queue.
+       q_.post(at+1,std::move(prior),[this,request,read_port=std::move(read_port),output=std::move(output)](auto&,auto t)mutable{
+         const auto entered=readout_frontend_->push_ordered(std::move(read_port),std::move(output),t);
+         q_.post(t,{entered},[request](auto&q,auto){q.complete(request);},Q::Kind::source_arrival);
+       },Q::Kind::source_arrival);
+       previous_block_request=request;
+     }else request=readout_frontend_->push(std::move(read_port),std::move(output),at+1);
+     requests.push_back(request);
+     }
    }
-   if(store_request_release_)q_.post(at,requests,[this,c,count=rows->size()](auto&,auto accepted){
+   if(store_request_release_)q_.post(at,requests,[this,c,count=rows->size()*blocks](auto&,auto accepted){
      // StoreController releases its FIFO on final DMA req.fire. A singleton
      // visits sending_rows on the next edge before recognizing wrapped0.
      q_.post(accepted+(count==1?2:1),{},[this,c](auto&,auto t){s_.feature("target.posted.store_controller_request_releases",1);pop(c,t);},Q::Kind::source_arrival);
@@ -1741,23 +1850,33 @@ class PostedSourceObserver {
    if(query.version!=2||query.size!=sizeof(query)||!query.opaque||!query.last_observation){fail("invalid native lookup query");return;}
    lookup_query_=query;
  }
- PostedSourceObserver(spike_timing::Services&s,Q&q,HardwareConfig h,StagedConfig config,ValueId base):s_(s),q_(q),h_(h),config_(std::move(config)),base_(base){
+ PostedSourceObserver(spike_timing::Services&s,Q&q,HardwareConfig h,StagedConfig config,ValueId base):s_(s),q_(q),h_(h),config_(std::move(config)),base_(base),reader_d_packets_(q){
    if(h_.source_zero_writer){
      if(!h_.first_layer_optimizations||h_.dim!=16||h_.element_bytes!=1||
         s_.number("target.hardware.zero_writer_request_register_entries")!=std::optional<double>{1}||
         s_.number("target.hardware.zero_writer_pixel_register_entries")!=std::optional<double>{1}||
         s_.number("target.hardware.zero_writer_max_columns")!=std::optional<double>{64})
-       throw std::invalid_argument("zero writer requires selected request1/pixel1 SP geometry");
+       throw std::invalid_argument("zero writer requires selected request1/pixel1 local geometry");
      zero_writer_=std::make_unique<PostedZeroWriter>(q_,[this](const auto&row,Cycle at){
        if(last_mvin_response_at_==std::optional<Cycle>{at}||!full_acc_last_pending_.empty()||
           (identity_pixel_&&identity_pixel_->last_packet_output))return false;
+       // ACC's physical arbitration owns readiness after this held pixel is
+       // offered. The register remains occupied until its actual write.fire.
+       if(acc(row.address))return true;
        Stage write;write.origin=row.origin;write.earliest=at;write.writes={row.address};write.latency=1;bank(write,write.writes,1);
        const auto ready=s_.engine.earliest_stage_start(write.event(at));if(!ready){fail("zero writer SP readiness unknown");return false;}return *ready==at;
-     },[this](const auto&row,Cycle at){
+     },[this](const auto&row,Cycle at,PostedZeroWriter::Accepted accepted){
+       if(acc(row.address)){
+         Stage write;write.origin=row.origin;write.earliest=at;write.writes={row.address};write.latency=2;bank(write,write.writes,1);
+         auto complete=token();
+         stage(std::move(write),{},complete,[row,accepted=std::move(accepted)](const auto&r){row.published(*r.start);accepted(*r.start);},true);
+         return;
+       }
        Stage write;write.origin=row.origin;write.earliest=at;write.writes={row.address};write.latency=1;bank(write,write.writes,1);
        const auto result=s_.engine.submit_detached(write.event(at));
        if(result.start!=at||result.ready!=at+1){fail("zero writer local publication changed at admission");return;}
        row.published(at);
+       accepted(at);
      });
    }
    if(const auto banked=s_.number("target.scheduling.source_banked_accumulator_bounds")){
@@ -1961,6 +2080,15 @@ class PostedSourceObserver {
        throw std::invalid_argument("masked packets require original shared writer/SourceD/BankedStore owners");
      masked_packets_=true;
    }
+   if(const auto selected=s_.number("target.scheduling.source_multiblock_i8_readout")){
+     if(*selected!=1||!h.source_multiblock_i8_readout||!masked_packets_||!full_packet_writer_||!readout_frontend_||
+        h.writer_max_request_bytes!=64||h.writer_beat_bytes!=16||
+        s_.number("target.hardware.stream_writer_block_registers")!=std::optional<double>{4}||
+        s_.number("target.hardware.store_block_stride_rows")!=std::optional<double>{16}||
+        s_.number("target.hardware.store_block_last_only")!=std::optional<double>{1})
+       throw std::invalid_argument("multiblock narrow readout requires selected4block registers, row stride16 and final-block store_en");
+     multiblock_i8_readout_=true;s_.feature("target.posted.multiblock_i8_register_captures",0);
+   }
    if(const auto resident=s_.number("target.scheduling.source_resident_dirty_put_request_retirement")){
      if(*resident!=1||!source_d_pipeline_||!masked_packets_||
         s_.number("target.scheduling.source_cold_write_misses")!=std::optional<double>{1}||
@@ -2033,10 +2161,11 @@ class PostedSourceObserver {
      fail("unsupported committed primitive "+kind);return {};
    }
    if(kind=="config"&&(rs1&3)==0){
-     if(!(rs1&128))ws_unit_=bool(rs1&4)&&!(rs1&(3ull<<8));
-     ws_unit_=ws_unit_&&((rs1>>16)&65535)==1&&((rs2>>48)&65535)==1;
+     if(!(rs1&128))ws_layout_=bool(rs1&4)&&!(rs1&(3ull<<8));
+     ws_a_stride_=(rs1>>16)&65535;
+     ws_unit_=ws_layout_&&ws_a_stride_>0&&((rs2>>48)&65535)==1;
    }
-   if((kind=="preload"||kind=="compute_ws")&&!ws_unit_){fail("posted compute needs non-transposed unit-stride WS");return {};}
+   if((kind=="preload"||kind=="compute_ws")&&(!ws_unit_||(ws_a_stride_!=1&&!ws_operand_pipeline_))){fail("posted compute needs non-transposed WS with source finite A-row sampling and unit C stride");return {};}
    const auto group=kind=="load"?0:store_kind(kind)?2:kind=="config"&&((rs1&3)==1)?0:kind=="config"&&((rs1&3)==2||(rs1&3)==3)?2:1;
    const auto before_rs=now(e.earliest);
    prune(group);while(active_[group].size()>=config_.reservations[group]&&!q_.progress().failed){
@@ -2045,6 +2174,7 @@ class PostedSourceObserver {
    if(q_.progress().failed)return {};
    if(now(e.earliest)>before_rs)s_.feature("target.posted.modeled_cpu_rs_wait_cycles",now(e.earliest)-before_rs);
    auto c=std::make_shared<Command>();c->kind=kind;c->funct=funct;c->rs1=rs1;c->rs2=rs2;c->phase=phase;c->transfers=transfers;c->group=group;c->occupancy=occupancy;
+   c->a_stride=ws_a_stride_;
    c->start=token();c->consume=token();c->done=token();q_.track_source_completion(c->done);c->original.origin=std::move(origin);c->original.earliest=now(e.earliest);c->original.latency=e.latency;
    if(actor_sink_){const auto role=group==0?ActorRole::load_command:group==2?ActorRole::store_command:ActorRole::execute_command;
      actor(role,c->done.id,q_.now(),true);actor_done_[c->done.id]=role;
@@ -2061,13 +2191,30 @@ class PostedSourceObserver {
      reads.insert(reads.end(),c->sp_reads.begin(),c->sp_reads.end());
    }
    else if(kind=="compute_ws"){
-     for(auto packet:{rs1,rs2})if(std::uint32_t(packet)!=0xffffffffu)
-       for(std::uint64_t row=0;row<std::min<std::uint64_t>(h_.dim,packet>>48);++row)c->sp_reads.push_back(base_+std::uint32_t(packet)+row);
+     unsigned operand=0;
+     for(auto packet:{rs1,rs2}){const auto stride=operand++==0?c->a_stride:1;
+       if(std::uint32_t(packet)!=0xffffffffu)
+         for(std::uint64_t row=0;row<std::min<std::uint64_t>(h_.dim,packet>>48);++row)c->sp_reads.push_back(base_+std::uint32_t(packet)+row*stride);
+     }
      reads.erase(std::remove_if(reads.begin(),reads.end(),[&](auto row){return sp(row)&&!contains(c->sp_reads,row);}),reads.end());
    }
    for(auto row:reads)if(acc(row))c->acc_reads.push_back(row);
    for(auto row:c->original.writes)if(physical(row))c->outputs.push_back(row);
    if(accumulator_ports_&&kind=="compute_ws")for(auto row:c->outputs)c->row_ready.emplace(row,token());
+   if(kind=="compute_ws"&&c->a_stride!=1){
+     // ReservationStation tracks the conservative contiguous rows*a_stride
+     // interval, including holes that never become SRAM requests. RAW waits
+     // the original writer command, and those RS-only readers release on
+     // ISSUE. Actual sampled rows retain their later consume obligations.
+     const auto address=std::uint32_t(rs1);
+     const auto span=std::min<std::uint64_t>(h_.dim,rs1>>48)*c->a_stride;
+     if(address==0xffffffffu||address+span>h_.scratchpad_rows){fail("nonunit A RS interval crosses selected scratchpad");return {};}
+     for(std::uint64_t offset=0;offset<span;++offset){auto&state=rows_[base_+address+offset];
+       state.readers.erase(std::remove_if(state.readers.begin(),state.readers.end(),[this](auto t){return q_.completed(t).has_value();}),state.readers.end());
+       if(state.writer_command_done)c->dependencies.push_back(*state.writer_command_done);
+       state.readers.push_back(c->start);
+     }
+   }
    // Explicit pending row generations bind commands not yet published in
    // Engine; default ready(row)==0 can NEVER satisfy an outstanding LOAD.
    for(auto row:reads){
@@ -2079,6 +2226,7 @@ class PostedSourceObserver {
      state.readers.push_back(late?(accumulator_ports_?c->row_ready.at(row):c->done):physical(row)?c->consume:c->start);
    }
    for(auto row:c->original.writes){auto &state=rows_[row];
+     if(physical(row))state.writer_command_done=c->done;
      // ReservationStation same-EX deps clear on ISSUE (scala463-476).
      // COMPUTE's old ACC value / WAW belongs to its late output actor. Keep
      // exact generations and all old readers there; never erase the hazard.
@@ -2110,6 +2258,7 @@ class PostedSourceObserver {
      const auto obligation=pending_store_obligations_.begin()->second;await(obligation);
    }
    while(!ws_pending_rows_.empty()&&!q_.progress().failed){const auto pending=ws_pending_rows_.begin()->second;await(pending);ws_pending_rows_.erase(pending.id);}
+   while(!pending_zero_rows_.empty()&&!q_.progress().failed){const auto pending=pending_zero_rows_.begin()->second;await(pending);}
    if(q_.progress().failed)s_.unresolved("posted_source:"+q_.reason());
    if(now(at)>before)s_.feature("target.posted.modeled_target_fence_wait_cycles",now(at)-before);
    s_.engine.advance_issue(now(at));

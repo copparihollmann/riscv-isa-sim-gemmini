@@ -57,8 +57,12 @@ public:
       throw std::invalid_argument("row service requires selected fenced single-MUL conservative resource semantics");
   }
 
+  // Retained bridges pass six arguments. Current bridges also carry the
+  // transfer phase, which must reach the underlying staged observer unchanged.
+  template <typename... Phase>
   Result submit(const std::string &kind, const Event &source, std::optional<Cycle> occupancy,
-                std::uint32_t funct, std::uint64_t rs1, std::uint64_t rs2) {
+                std::uint32_t funct, std::uint64_t rs1, std::uint64_t rs2,
+                const Phase &...phase) {
     if (funct == 0 && (rs1 & 3) == 0 && !(rs1 & 128)) {
       ws_ = (rs1 >> 2) & 1;
       a_transpose_ = (rs1 >> 8) & 1;
@@ -98,7 +102,7 @@ public:
         }
       }
     }
-    return staged_.submit(kind, selected, occupancy, funct, rs1, rs2);
+    return staged_.submit(kind, selected, occupancy, funct, rs1, rs2, phase...);
   }
 
   bool pending_preload() const { return staged_.pending_preload(); }

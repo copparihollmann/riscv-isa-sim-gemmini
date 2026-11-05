@@ -85,7 +85,8 @@ G::HardwareConfig hardware(Services &s) {
           s.number("target.scheduling.source_identity_i8_accumulator_load")==std::optional<double>{1},
           s.number("target.scheduling.source_ordered_pool_readout")==std::optional<double>{1},
           s.number("target.scheduling.source_masked_packet_readout")==std::optional<double>{1},
-          s.number("target.scheduling.source_zero_writer")==std::optional<double>{1}};
+          s.number("target.scheduling.source_zero_writer")==std::optional<double>{1},
+          s.number("target.scheduling.source_multiblock_i8_readout")==std::optional<double>{1}};
 }
 
 G::Parameters parameters(Services &s) {

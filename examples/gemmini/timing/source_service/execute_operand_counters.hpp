@@ -9,7 +9,7 @@ namespace gemmini_annotated_spike {
 // control pipelines. This component supplies no independent latency or credit.
 class ExecuteOperandCounters {
  public:
- struct Operand {std::uint32_t address=0;unsigned rows=0;bool garbage=true,active=false;};
+ struct Operand {std::uint32_t address=0;unsigned rows=0;bool garbage=true,active=false;unsigned stride=1;};
  struct Request {unsigned operand,bank,row;};
  struct Signals {
    std::array<bool,3>valid{},fire{},physical{};
@@ -29,8 +29,12 @@ class ExecuteOperandCounters {
  :operands_(operands),total_(total),dim_(dim),bank_rows_(bank_rows),bank_count_(bank_count){
    if(dim!=16||total<4||total>dim||!bank_rows||!bank_count)
      throw std::invalid_argument("operand counters require selected WS geometry and floor4");
-   for(const auto&o:operands_)if(o.rows>dim||(!o.garbage&&o.address>=std::uint64_t(bank_rows)*bank_count))
-     throw std::invalid_argument("operand counters require source-bound SP row addresses");
+   for(unsigned i=0;i<operands_.size();++i){const auto&o=operands_[i];
+     if(o.rows>dim||!o.stride||o.stride>65535||(i!=0&&o.stride!=1)||
+        (!o.garbage&&(o.address>=std::uint64_t(bank_rows)*bank_count||
+         (i==0&&o.stride!=1&&std::uint64_t(o.address)+(total_-1)*std::uint64_t(o.stride)>=std::uint64_t(bank_rows)*bank_count))))
+       throw std::invalid_argument("operand counters require source-bound nonwrapping SP row addresses");
+   }
  }
  const auto&counters()const{return counter_;}
  const auto&started()const{return started_;}
@@ -41,7 +45,10 @@ class ExecuteOperandCounters {
    Signals s;
    std::array<unsigned,3>address{};
    for(unsigned i=0;i<3;++i){
-     address[i]=operands_[i].address+(i==2?dim_-1-counter_[i]:counter_[i]);
+     // ExecuteController's a_addr_offset advances only on the same A.fire /
+     // cntl_ready as its counter, and resets on the original total_rows wrap.
+     // B remains ascending unit stride; D remains reverse unit stride.
+     address[i]=operands_[i].address+(i==2?dim_-1-counter_[i]:counter_[i]*operands_[i].stride);
      s.request[i]={i,address[i]/bank_rows_,address[i]%bank_rows_};
    }
    for(unsigned i=0;i<3;++i){

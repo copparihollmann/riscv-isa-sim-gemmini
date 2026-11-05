@@ -16,10 +16,11 @@ class PostedZeroWriter {
  using Ready=std::function<bool(const Row&,Cycle)>;
  using Write=std::function<void(const Row&,Cycle)>;
  using Accepted=std::function<void(Cycle)>;
+ using PortWrite=std::function<void(const Row&,Cycle,Accepted)>;
  private:
  struct Request{std::vector<Row>rows;std::size_t next=0;Cycle visible=0;Accepted accepted;};
  struct Pixel{Row row;Cycle visible;};
- Q&q_;Ready ready_;Write write_;std::shared_ptr<Request>request_,waiting_;std::optional<Pixel>pixel_;
+ Q&q_;Ready ready_;PortWrite write_;std::shared_ptr<Request>request_,waiting_;std::optional<Pixel>pixel_;bool port_pending_=false;
  std::optional<Cycle>scheduled_,settled_;std::size_t peak_=0;
  void kick(Cycle at){
    if(settled_==std::optional<Cycle>{at})++at;
@@ -28,7 +29,16 @@ class PostedZeroWriter {
  }
  void tick(Cycle at){
    settled_=at;
-   if(pixel_&&pixel_->visible<=at&&ready_(pixel_->row,at)){auto p=*pixel_;pixel_.reset();write_(p.row,at);}
+   if(pixel_&&!port_pending_&&pixel_->visible<=at&&ready_(pixel_->row,at)){
+     port_pending_=true;
+     write_(pixel_->row,at,[this](Cycle accepted){
+       if(!pixel_||!port_pending_){q_.fail("zero writer lost held local port owner");return;}
+       pixel_.reset();port_pending_=false;advance(accepted);
+     });return;
+   }
+   advance(at);
+ }
+ void advance(Cycle at){
    if(!pixel_&&request_&&request_->visible<=at){
      pixel_=Pixel{request_->rows.at(request_->next++),at+1};
      if(request_->next==request_->rows.size())request_.reset();
@@ -40,9 +50,10 @@ class PostedZeroWriter {
    if(request_||pixel_||waiting_)kick(at+1);
  }
  public:
- PostedZeroWriter(Q&q,Ready ready,Write write):q_(q),ready_(std::move(ready)),write_(std::move(write)){
+ PostedZeroWriter(Q&q,Ready ready,PortWrite write):q_(q),ready_(std::move(ready)),write_(std::move(write)){
    if(!ready_||!write_)throw std::invalid_argument("zero writer requires original local port owners");
  }
+ PostedZeroWriter(Q&q,Ready ready,Write write):PostedZeroWriter(q,std::move(ready),[write=std::move(write)](const Row&r,Cycle at,Accepted accepted){write(r,at);accepted(at);}){}
  void push(std::vector<Row>rows,Accepted accepted,Cycle at){
    if(rows.empty()||rows.size()>4||!accepted){q_.fail("zero writer original row geometry unavailable");return;}
    for(auto r:rows)if(!r.mask||(r.mask&~0xffffull)){q_.fail("zero writer invalid original column mask");return;}

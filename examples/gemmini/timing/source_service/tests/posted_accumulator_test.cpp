@@ -23,4 +23,10 @@ int main(){
  priority.offer(0,true,false,[](auto){return true;},[&](auto t){order[0]=t;},0);
  priority.offer(1,true,false,[](auto){return true;},[&](auto t){order[1]=t;},0,true);
  while(p.step(true)){}assert(!p.progress().failed&&order[1]==0&&order[0]==1);
+ // ZeroWriter is below BOTH DMA and Execute, independent of offer order.
+ Q z({128,128,1000});PostedAccumulator mux(z,1,512);std::map<unsigned,unsigned>zero;
+ mux.offer(0,true,false,[](auto){return true;},[&](auto t){zero[0]=t;},0,false,true);
+ mux.offer(1,true,false,[](auto){return true;},[&](auto t){zero[1]=t;},0);
+ mux.offer(2,true,false,[](auto){return true;},[&](auto t){zero[2]=t;},0,true);
+ while(z.step(true)){}assert(!z.progress().failed&&zero[2]==0&&zero[1]==1&&zero[0]==2);
 }

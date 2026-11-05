@@ -87,6 +87,7 @@ struct HardwareConfig {
   bool source_ordered_pool_readout=false;
   bool source_masked_packet_readout=false;
   bool source_zero_writer=false;
+  bool source_multiblock_i8_readout=false;
 };
 
 // An absent binding is an unknown resource, never an assumed single-lane queue.
@@ -124,6 +125,7 @@ struct TransferPhase {
   std::uint32_t full_accumulator_repeats=0;
   std::uint32_t input_row_repeats=0; // original stride0 input-scaler row tags, not pixel repeats
   std::optional<ZeroFillGeometry>zero_fill={};
+  std::uint32_t accumulator_readout_blocks=1;
 };
 // Explicit v2 timing-only hook; the v1 functional/count path stays unchanged.
 using SubmitHook = std::function<Result(const std::string &, const Event &,
@@ -398,7 +400,8 @@ private:
       // tokens are scheduled before a subsequent row can recycle them.
       TransferEffects effects;
       const bool streamed = arrival && submit_hook_ && h_.accumulator_streamed_readout &&
-          transfers_.size()==1 && ((h_.source_masked_i8_readout && bool(one_beat_writer_rows(
+          transfers_.size()==1 && ((h_.source_multiblock_i8_readout && ((rs2_>>32)&65535)>h_.dim && h_.source_masked_packet_readout &&
+          bool(masked_writer_rows(transfers_[0].address,transfers_[0].rows,transfers_[0].row_bytes,transfers_[0].row_stride))) || (h_.source_masked_i8_readout && bool(one_beat_writer_rows(
           transfers_[0].address,transfers_[0].rows,transfers_[0].row_bytes,transfers_[0].row_stride))) || (h_.accumulator_readout_packet_geometry ?
           (h_.accumulator_readout_full_packets ? bool(full_writer_rows(transfers_[0].address,transfers_[0].rows,
               transfers_[0].row_bytes,transfers_[0].row_stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)) :
@@ -432,9 +435,15 @@ private:
         effects.minimum_latency=0;
       } else if(streamed || row_load) {
         phase=TransferPhase{arrival,{}};phase->row_bytes=transfers_[0].row_bytes;
+        if(streamed && h_.source_multiblock_i8_readout && (std::uint32_t(rs2_)&(1u<<31)) &&
+           !(std::uint32_t(rs2_)&(1u<<29)))
+          phase->accumulator_readout_blocks=std::uint32_t((((rs2_>>32)&65535)+h_.dim-1)/h_.dim);
         phase->scratchpad_load=row_load;
         phase->row_memory=transfer_hook_;
-        if(streamed && h_.source_masked_i8_readout && one_beat_writer_rows(
+        if(streamed && phase->accumulator_readout_blocks>1){
+          phase->writer_packets=*masked_writer_rows(transfers_[0].address,transfers_[0].rows,
+              transfers_[0].row_bytes,transfers_[0].row_stride);
+        }else if(streamed && h_.source_masked_i8_readout && one_beat_writer_rows(
             transfers_[0].address,transfers_[0].rows,transfers_[0].row_bytes,transfers_[0].row_stride)){
           phase->writer_packets=*one_beat_writer_rows(transfers_[0].address,transfers_[0].rows,
               transfers_[0].row_bytes,transfers_[0].row_stride);
@@ -594,7 +603,7 @@ private:
       }
     }
     const bool full_accumulator_packet=h_.source_full_accumulator_load && submit_hook_ && transfer_hook_ &&
-        dram && accumulator && !accumulate && !load.shrunk && load.pixels==1 &&
+        dram && accumulator && !load.shrunk && load.pixels==1 &&
         h_.dim==16 && h_.accumulator_bytes==4 && p.cols && p.cols<=16 && p.rows && p.rows<=16 &&
         (load.stride==0 || load.stride>=std::uint64_t(p.cols)*4);
     const bool input_broadcast_packet=h_.source_identity_ingress && h_.scratchpad_packet_loads &&
@@ -625,8 +634,12 @@ private:
     const bool packet_load=full_accumulator_packet || i8_accumulator_packet || (!row_load && h_.scratchpad_packet_loads && submit_hook_ && transfer_hook_ &&
         dram && !accumulator && !load.shrunk && load.scale==0x3f800000u && load.pixels==1 &&
         h_.dim==16 && h_.element_bytes==1 && p.cols && p.cols<=packet_max_columns && p.rows && p.rows<=16 &&
-        (p.rows==1 || load.stride>=p.cols || input_broadcast_packet));
-    const bool zero_fill=!dram&&h_.source_zero_writer&&submit_hook_&&!accumulator&&load.pixels==1&&
+        (p.rows==1 || load.stride>0 || input_broadcast_packet));
+    // Scratchpad routes ZeroWriter's registered zero data to either memory.
+    // ACC overwrites bypass both scalers too; accumulating zero writes need
+    // the separately observed RMW identity and remain outside this mapping.
+    const bool zero_fill=!dram&&h_.source_zero_writer&&submit_hook_&&
+      (!accumulator||(!accumulate&&!load.shrunk&&h_.accumulator_bytes==4))&&load.pixels==1&&
       h_.dim==16&&h_.element_bytes==1&&p.cols&&p.cols<=64&&p.rows&&p.rows<=16;
     if(!packet_load&&!zero_fill)add(row_load ? counters_.load_row_stream_publication : counters_.load_aggregate_publication,1);
     return submit("load", resources_.load, event_reads_ + event_writes_, 0, 0,row_load,packet_load,i8_accumulator_packet,{},
@@ -719,7 +732,10 @@ private:
     if(h_.accumulator_readout_packet_geometry && h_.accumulator_streamed_readout &&
        acc && !norm && !store_.pool_stride) {
       const auto width=std::uint64_t(p.cols)*(full?h_.accumulator_bytes:h_.element_bytes);
-      if(p.cols<=h_.dim && p.rows<=h_.dim && ((h_.source_masked_packet_readout&&bool(masked_writer_rows(dram,p.rows,width,store_.stride))) || (h_.source_masked_i8_readout && !full &&
+      const bool local_geometry=p.cols<=h_.dim ||
+          (h_.source_multiblock_i8_readout&&!full&&store_.pool_size==0&&accumulator_activation_&&*accumulator_activation_<=1&&h_.dim==16&&h_.element_bytes==1&&
+           p.cols<=h_.writer_max_request_bytes&&h_.writer_max_request_bytes==64);
+      if(local_geometry && p.rows && p.rows<=h_.dim && ((h_.source_masked_packet_readout&&bool(masked_writer_rows(dram,p.rows,width,store_.stride))) || (h_.source_masked_i8_readout && !full &&
           bool(one_beat_writer_rows(dram,p.rows,width,store_.stride))) || (h_.accumulator_readout_full_packets ?
           bool(full_writer_rows(dram,p.rows,width,store_.stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)) :
           single_full_row_transactions(dram,p.rows,width,store_.stride,h_.writer_beat_bytes,h_.writer_max_request_bytes)))) {

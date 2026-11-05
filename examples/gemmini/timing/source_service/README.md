@@ -277,12 +277,15 @@ new accuracy qualification. Full-width raw readout retains its prior route.
 ### Optional full-width accumulator MOVIN
 
 `target.scheduling.source_full_accumulator_load=1` adds a separate source-bound
-overwrite route for nonzero-memory INT32 accumulator loads, up to16 rows and
+route for nonzero-memory INT32 accumulator loads, up to16 rows and
 16 elements per row. It requires explicit selected facts: separate accumulator
 scaler, absent scale arguments, Queue2 input, one replaceable input register,
 zero scaler pipeline stages, two-port accumulator storage and two write stages.
-Shrunk input, accumulation, zero filling and pixel repeats do not inherit this
-route. A nonzero-memory stride-zero load uses the original
+Shrunk input, zero filling and pixel repeats do not inherit this route.
+Accumulating loads additionally require selected physical accumulator-bank
+read/modify/write arbitration. They retain the old row value as an input and
+wait for its publication before the write handshake. Without that selection,
+accumulation remains unsupported. A nonzero-memory stride-zero load uses the original
 `LoadController.scala:76,105` rule: fetch one input row and retain it for the
 declared number of output rows. The scaler register decrements `repeats`, emits
 rows in descending order and cannot release/replace its input until the last
@@ -365,6 +368,15 @@ full fence before another typed-writer route or external shared-memory
 consumer. Masked packets, cold/evicted lines, unselected
 probes, retries and broader cache/MSHR arbitration remain unsupported.
 Without this opt-in the previous raw writer remains unchanged.
+
+`source_multiblock_i8_readout=1` additionally admits unpooled narrow readouts
+of 17–64 columns, with up to sixteen output rows. It requires the selected
+masked-packet path, four StreamWriter block registers, a sixteen-row local
+block stride and final-block-only `store_en`. Intermediate blocks fill the
+original row registers without creating memory transactions. The final block
+starts the bounded original packet sequence. StoreController requests remain
+ordered and wait for admission, rather than using an enlarged synthetic queue.
+Full-width multiblock readout and widths above64 columns remain unsupported.
 
 ### Opt-in cold output writes
 

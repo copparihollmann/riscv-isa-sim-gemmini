@@ -5,7 +5,7 @@
 using namespace gemmini_annotated_spike;
 std::uint64_t pack(unsigned rows,unsigned cols){return 8192|(std::uint64_t(rows)<<48)|(std::uint64_t(cols)<<32);}
 Parameters prices(){Parameters p;for(auto k:{"config","load"})for(auto f:{"latency_cycles","occupancy_cycles","latency_per_byte_cycles","occupancy_per_byte_cycles","latency_per_mac_cycles","occupancy_per_mac_cycles"})p[std::string(k)+"."+f]=(std::string(f)=="latency_cycles"||std::string(f)=="occupancy_cycles")?1:0;return p;}
-void check(unsigned rows,unsigned cols,unsigned align,bool pressure=false){
+void check(unsigned rows,unsigned cols,unsigned align,bool pressure=false,std::uint64_t pitch=0){
  std::vector<merlin_timing::ResourceSpec>resources;for(unsigned i=0;i<17;++i)resources.push_back({i,1,128});
  Engine engine(18000,resources);merlin_timing::PostedTimeline q({65536,65536,1000000});std::vector<std::string>unknown;
  unsigned gets=0,emitted=0,writes=0;std::vector<ValueId>order;std::vector<Cycle>times;
@@ -18,16 +18,17 @@ void check(unsigned rows,unsigned cols,unsigned align,bool pressure=false){
  TargetObserver decoder(engine,h,prices(),{},0,[](View<Transfer>){return TransferEffects{{},{},{},Cycle{0}};},[&](const auto&kind,const auto&e,auto occupancy,auto funct,auto rs1,auto rs2,const auto&p){if(kind=="load")phase=p;return target.submit(kind,e,occupancy,funct,rs1,rs2,p,{},merlin_timing::StageOrigin{4,0xabcdef,{},"target."+kind});});
  if(pressure){Demand hold{14,1,Cycle{100}};assert(engine.submit_detached(Event{0,{},{},{&hold,1},Cycle{1}}).start==0);}
  engine.trace_sink([&](const merlin_timing::Trace&t){if(t.event.origin&&t.event.origin->actor=="target.load.sp_write"&&std::string(t.action)=="submit_detached"){++writes;assert(t.event.writes.size==1);order.push_back(t.event.writes[0]);times.push_back(*t.result.ready);}});
- decoder.observe_command(0,0,(0x3f800000ull<<32)|(16ull<<16)|(1ull<<8)|1,0);
+ decoder.observe_command(0,0,(0x3f800000ull<<32)|(16ull<<16)|(1ull<<8)|1,pitch);
  decoder.observe_command(4,2,0x81000000+align,pack(rows,cols));target.drain(0);
- assert(unknown.empty()&&target.complete()&&phase&&phase->scratchpad_load&&phase->input_row_repeats==rows-1);
- assert(decoder.counters().requested_read_bytes==cols&&decoder.counters().local_write_bytes==rows*cols);
- const auto packets=reader_packets(0x81000000+align,1,cols,0,16,64,127);assert(!packets.empty()&&gets==packets.size());
+ const auto source_rows=pitch?rows:1u;
+ assert(unknown.empty()&&target.complete()&&phase&&phase->scratchpad_load&&phase->input_row_repeats==(pitch?0:rows-1));
+ assert(decoder.counters().requested_read_bytes==source_rows*cols&&decoder.counters().local_write_bytes==rows*cols);
+ const auto packets=reader_packets(0x81000000+align,source_rows,cols,pitch,16,64,127);assert(!packets.empty()&&gets==packets.size());
  unsigned fragments=0;for(const auto&p:packets)fragments+=p.outputs.size();
- assert(writes==fragments*rows&&emitted==(rows>1?fragments*rows:0));
+ assert(writes==fragments*(pitch?1:rows)&&emitted==(!pitch&&rows>1?fragments*rows:0));
  std::map<ValueId,unsigned>counts;for(auto row:order)++counts[row];
  for(unsigned band=0;band<(cols+15)/16;++band)for(unsigned row=0;row<rows;++row)assert(counts[8192+band*16+row]&&engine.ready(8192+band*16+row));
- if(rows>1){for(unsigned r=0;r<rows;++r)assert(order[r]==8192+rows-1-r);for(unsigned r=1;r<rows;++r)assert(times[r]==times[r-1]+1);}
+ if(rows>1&&!pitch){for(unsigned r=0;r<rows;++r)assert(order[r]==8192+rows-1-r);for(unsigned r=1;r<rows;++r)assert(times[r]==times[r-1]+1);}
  const auto coverage=target.coverage();assert(coverage.peak_q<=2&&coverage.peak_ring<=3&&coverage.peak_reader<=16);
  if(pressure){assert(times.front()>=101&&coverage.port_blocked>0);}
 }
@@ -41,6 +42,7 @@ int main(){
  assert(reader_packets(0x81000000,2,16,0,16,64).empty());
  for(auto rows:{1u,3u,16u})for(auto cols:{1u,3u,16u,32u,127u})for(auto align:{0u,7u,15u})check(rows,cols,align);
  check(16,16,0,true);check(16,32,7,true);
- refused(false,false,true,16,16,0);refused(true,true,true,16,3,0);refused(true,false,false,16,16,0);refused(true,false,true,17,16,0);refused(true,false,true,16,128,0);refused(true,false,true,16,16,1);
+ check(3,17,7,false,5);check(3,17,7,true,5);check(5,31,15,true,2);
+ refused(false,false,true,16,16,0);refused(true,true,true,16,3,0);refused(true,false,false,16,16,0);refused(true,false,true,17,16,0);refused(true,false,true,16,128,0);
  std::cout<<"stride0 one original Get stream; finite input-register/ring3 descending repeats; masked bands/pressure and unsupported guards PASS\n";
 }

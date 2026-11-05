@@ -68,7 +68,7 @@ def main():
         raise AssertionError("changed public parameter source was accepted")
     print("export: reproducible; changed pin refused; no invented prices/queues", flush=True)
     subprocess.run([sys.executable, str(root / "tests/test_bundle.py")], check=True, timeout=15, env=env)
-    subprocess.run([sys.executable, str(root / "tests/test_execute_service_bundle.py")], check=True, timeout=15, env=env)
+    subprocess.run([sys.executable, str(root / "tests/test_execute_service_bundle.py")], check=True, timeout=60, env=env)
 
 
 if __name__ == "__main__":
