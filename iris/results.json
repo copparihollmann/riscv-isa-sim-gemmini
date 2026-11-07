@@ -1,0 +1,195 @@
+{
+  "schema": "iris.public_capability_results.v1",
+  "as_of_utc_date": "2026-11-07",
+  "timing_result_native_sha256": "35a804964d7882f36a8892d7672dcfbbc7becc89c87e2d830c149820c1291388",
+  "new_build_accuracy_qualification_transferred": false,
+  "error_formula": "100 * (model_cycles - FPGA_cycles) / FPGA_cycles",
+  "percentile": "nearest-rank-ceil",
+  "timing_2percent_certified": false,
+  "reference_source_image_association_verified": false,
+  "normal_end_to_end_timing_or_speed_claim": false,
+  "references": {
+    "isolated_compute": {
+      "external_path": "build/rvv-compute-heldout2-C12-source-VADD-root-validation-v1/report.json",
+      "sha256": "bd7c177fdb0eb235f5e86e713a4b401c86c65bc29f54da24557bb546ffc51c88",
+      "report_schema": "iris.protected2_ASM_all1320_validation.v1",
+      "total_cycle_groups": {
+        "all": {
+          "count": 1320,
+          "median_signed_percent": 0.06476683937823834,
+          "median_absolute_percent": 0.15479876160990713,
+          "p90_absolute_percent": 6.522420821574161,
+          "maximum_absolute_percent": 150.58674278464954,
+          "within2": 1110,
+          "quantile": "nearest-rank-ceil"
+        },
+        "hart:0": {
+          "count": 660,
+          "median_signed_percent": 0.05655035318094953,
+          "median_absolute_percent": 0.129366106080207,
+          "p90_absolute_percent": 6.522420821574161,
+          "maximum_absolute_percent": 149.24290220820188,
+          "within2": 560,
+          "quantile": "nearest-rank-ceil"
+        },
+        "hart:1": {
+          "count": 660,
+          "median_signed_percent": 0.06476683937823834,
+          "median_absolute_percent": 0.15479876160990713,
+          "p90_absolute_percent": 6.505613878642941,
+          "maximum_absolute_percent": 150.58674278464954,
+          "within2": 550,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:integer": {
+          "count": 576,
+          "median_signed_percent": 0.032467532467532464,
+          "median_absolute_percent": 0.12853470437017994,
+          "p90_absolute_percent": 0.5076142131979695,
+          "maximum_absolute_percent": 2.3696682464454977,
+          "within2": 573,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:fp": {
+          "count": 432,
+          "median_signed_percent": 0.048677592081778354,
+          "median_absolute_percent": 0.10393987955785694,
+          "p90_absolute_percent": 0.6048387096774194,
+          "maximum_absolute_percent": 1.1435832274459974,
+          "within2": 432,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:matrix_int": {
+          "count": 48,
+          "median_signed_percent": 0.19342359767891681,
+          "median_absolute_percent": 0.19342359767891681,
+          "p90_absolute_percent": 0.7518796992481203,
+          "maximum_absolute_percent": 11.11111111111111,
+          "within2": 47,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:matrix_fp8": {
+          "count": 48,
+          "median_signed_percent": 0.056815109403870356,
+          "median_absolute_percent": 0.09718172983479106,
+          "p90_absolute_percent": 0.3831417624521073,
+          "maximum_absolute_percent": 0.8431703204047217,
+          "within2": 48,
+          "quantile": "nearest-rank-ceil"
+        }
+      }
+    },
+    "zephyr": {
+      "external_path": "build/zephyr-hart2-pow2-35a-OS-root-validation-v2/report.json",
+      "sha256": "da6e43471b2f67cea0eb617c38859d5111441aedf98c3fa42bb026a35ef8bfeb",
+      "report_schema": "iris.zephyr_pow2_35a_OS_postfreeze_validation.v1",
+      "total_cycle_groups": {
+        "all": {
+          "count": 648,
+          "defined_relative_errors": 648,
+          "zero_reference_count": 0,
+          "median_signed_percent": -3.5714285714285716,
+          "median_absolute_percent": 4.705882352941177,
+          "p90_absolute_percent": 27.751196172248804,
+          "maximum_absolute_percent": 96.763883339992,
+          "within2": 159,
+          "quantile": "nearest-rank-ceil"
+        },
+        "mask:1": {
+          "count": 162,
+          "defined_relative_errors": 162,
+          "zero_reference_count": 0,
+          "median_signed_percent": -3.5714285714285716,
+          "median_absolute_percent": 3.9215686274509802,
+          "p90_absolute_percent": 27.751196172248804,
+          "maximum_absolute_percent": 62.365591397849464,
+          "within2": 42,
+          "quantile": "nearest-rank-ceil"
+        },
+        "mask:2": {
+          "count": 162,
+          "defined_relative_errors": 162,
+          "zero_reference_count": 0,
+          "median_signed_percent": -3.5714285714285716,
+          "median_absolute_percent": 3.9215686274509802,
+          "p90_absolute_percent": 27.751196172248804,
+          "maximum_absolute_percent": 62.365591397849464,
+          "within2": 42,
+          "quantile": "nearest-rank-ceil"
+        },
+        "mask:3": {
+          "count": 324,
+          "defined_relative_errors": 324,
+          "zero_reference_count": 0,
+          "median_signed_percent": -3.9215686274509802,
+          "median_absolute_percent": 4.705882352941177,
+          "p90_absolute_percent": 27.751196172248804,
+          "maximum_absolute_percent": 96.763883339992,
+          "within2": 75,
+          "quantile": "nearest-rank-ceil"
+        },
+        "split:protected_validation": {
+          "count": 192,
+          "defined_relative_errors": 192,
+          "zero_reference_count": 0,
+          "median_signed_percent": -24.615384615384617,
+          "median_absolute_percent": 24.615384615384617,
+          "p90_absolute_percent": 28.94736842105263,
+          "maximum_absolute_percent": 90.48903272204242,
+          "within2": 32,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:rvv": {
+          "count": 288,
+          "defined_relative_errors": 288,
+          "zero_reference_count": 0,
+          "median_signed_percent": -2.7681660899653977,
+          "median_absolute_percent": 2.7681660899653977,
+          "p90_absolute_percent": 5.228758169934641,
+          "maximum_absolute_percent": 96.763883339992,
+          "within2": 102,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:matrix_int8": {
+          "count": 72,
+          "defined_relative_errors": 72,
+          "zero_reference_count": 0,
+          "median_signed_percent": 28.94736842105263,
+          "median_absolute_percent": 28.94736842105263,
+          "p90_absolute_percent": 55.670103092783506,
+          "maximum_absolute_percent": 69.66292134831461,
+          "within2": 9,
+          "quantile": "nearest-rank-ceil"
+        },
+        "kind:matrix_fp8": {
+          "count": 288,
+          "defined_relative_errors": 288,
+          "zero_reference_count": 0,
+          "median_signed_percent": -24.615384615384617,
+          "median_absolute_percent": 24.615384615384617,
+          "p90_absolute_percent": 27.751196172248804,
+          "maximum_absolute_percent": 27.751196172248804,
+          "within2": 48,
+          "quantile": "nearest-rank-ceil"
+        }
+      }
+    },
+    "FPGA_functional": {
+      "external_path": "build/zephyr-hart2-pow2-FPGA-sealed-analysis-v1/report.json",
+      "sha256": "35d713fbc927c8dda0a05e94fe4c3528efafede40f27884f409fdb2849a9f407"
+    },
+    "Zephyr_example_parity": {
+      "external_path": "build/zephyr-firstuse-f5d-model-FPGA-functional-parity-v1/report.json",
+      "sha256": "493725e7398cd20f468cd1d334337b593e7d063c3fffcf45486911a410518521"
+    }
+  },
+  "functional_results": {
+    "FPGA_regions": 648,
+    "FPGA_independently_checked_active_values": 181440,
+    "FPGA_guards_checked": true,
+    "FPGA_all_regions_passed": true,
+    "normal_Zephyr_example_checksums": 9,
+    "normal_Zephyr_example_passed_on_model_and_FPGA": true,
+    "full_ISA_special_value_and_context_migration_certification": false
+  }
+}
