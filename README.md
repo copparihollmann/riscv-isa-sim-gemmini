@@ -21,6 +21,19 @@ profile smoke admitted three regions and produced JSON/Perfetto output.
 These migration checks do not establish new timing accuracy; the timing tables
 below identify the separate, historically measured binary.
 
+**Compiler-kernel fetch fix:** native build
+`12e51b98964125d6b18e7172efc92f7bdc0ad95ee4259f33aed98856a5764cad`
+passes Merlin's 45 quick `vme_gemm_2x2_bias` cases, all 32 existing functional
+guests with exact reference stdout, and the normal three-hart Zephyr smoke with
+all nine independently checked region checksums and byte-identical stdout.
+Speculative lookahead now stops at undefined instruction bytes beyond a return;
+an actual jump into those bytes still fails closed. Four directed guests check
+both unknown first parcels and missing second parcels against the old and fixed
+builds (eight expected outcomes).
+[Validation receipts](iris/provenance/speculative-fetch-validation.json) bind the
+new build and raw results. These functional checks establish no new timing
+accuracy and do not transfer the historical accuracy tables to this build.
+
 ## Current capabilities
 
 | Physical hart | Core / vector unit | VLEN / DLEN | Supported model role |

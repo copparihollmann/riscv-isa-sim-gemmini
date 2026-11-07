@@ -1,0 +1,88 @@
+{
+  "schema": "iris.speculative_fetch_validation.v1",
+  "pass": true,
+  "created_utc": "2026-11-07T20:25:11.609999+00:00",
+  "source_base_commit": "f510cee1dede08bc0747f50f6933809304a30cb5",
+  "native_binary_sha256": "12e51b98964125d6b18e7172efc92f7bdc0ad95ee4259f33aed98856a5764cad",
+  "UART_sha256": "bd39be45bb8c280fd34e8eff777b0403d2e7022f7b6513b5b43eb2ca5c6e6e44",
+  "clean_build_receipt": {
+    "external_path": "/scratch/copparihollmann/merlin/out/build/iris-speculative-fetch-fixed-v1/build.json",
+    "sha256": "61a2e02ca3fb4b8d39a283022fb7a0352857bf594b72323ae576fc5a90db514d"
+  },
+  "source_sha256": {
+    "riscv/processor.cc": "62fdfac46a04ef2567ff1814c67eb0c2ee577a71e9c8b1bf3a862dcec19145a8",
+    "iris/tests/speculative_fetch.S": "20f0be5f3b99bc1ceb39dd5d2c58352f1fb664a22459c5cf2234bbe831774572",
+    "iris/tests/speculative_fetch.ld": "9e69fcd8027dee970bf47ad1724421c66d64e0f66b1e1ad784e926ce28fc6b5d",
+    "iris/tests/speculative_fetch.py": "d1b21ecbd70beca1f376742fcc1c19cfb72f7cd212c4a683866523674d759040"
+  },
+  "fix_scope": "Speculative sequential fetch stops at unknown first or second instruction parcel; architectural demand-fetch undefined-state checks are unchanged.",
+  "directed_fetch": {
+    "guest_programs": 4,
+    "physical_harts": 3,
+    "parked_harts": [
+      1,
+      2
+    ],
+    "expected_outcomes": 8,
+    "old_build_positive_failures_reproduced": true,
+    "actual_undefined_execution_still_refuses": true,
+    "receipt": {
+      "external_path": "/scratch/copparihollmann/merlin/out/artifacts/probes/iris-speculative-fetch-regression-v1/report.json",
+      "sha256": "abe4c5674f52d09b09a1d9025b359f72c6f2d946f93134b2902920ff36fdf264"
+    }
+  },
+  "compiler_kernel": {
+    "name": "vme_gemm_2x2_bias",
+    "quick_cases": 45,
+    "physical_harts": 3,
+    "parked_harts": [
+      1,
+      2
+    ],
+    "profile": "source_os",
+    "all_cases_pass_existing_Merlin_judge": true,
+    "ELF_sha256": "5ec4c7d06a500cee7a99547035300df19d3254b736d5ebe84d263a20be8445c4",
+    "receipt": {
+      "external_path": "/scratch/copparihollmann/merlin/out/artifacts/probes/iris-native-kernel-fetch-fixed-v1/validation.json",
+      "sha256": "910562fb222adc24ae802b3a762b58c8e962039e81e8181b3abf259b64e6e052"
+    }
+  },
+  "functional32": {
+    "count": 32,
+    "all_expected_exits_and_exact_frozen_stdout": true,
+    "required_diagnostics_matched": true,
+    "environment_overrides_preserved": true,
+    "dtc_PATH": "/scratch/eygao/iris-cy/.conda-env/bin",
+    "receipt": {
+      "external_path": "/scratch/copparihollmann/merlin/out/artifacts/probes/iris-speculative-fetch-functional32-v1/results.json",
+      "sha256": "a0d6135173229c78d8bb843faad526d323282982f60822aa5505b23f933f5fe2"
+    }
+  },
+  "zephyr": {
+    "profile": "source_os",
+    "physical_harts": 3,
+    "compute_harts": [
+      0,
+      1
+    ],
+    "scalar_control_hart": 2,
+    "regions": 9,
+    "independent_region_checksums": true,
+    "normal_exit_zero": true,
+    "stdout_byte_identical_to_frozen_reference": true,
+    "ELF_sha256": "f5d722c41d53517416cb0314191851f30227fa63e25c93408d73361494bd33dd",
+    "receipt": {
+      "external_path": "/scratch/copparihollmann/merlin/out/artifacts/probes/iris-speculative-fetch-zephyr-f5d-v1/validation.json",
+      "sha256": "031722d54338152d010bb809c6749fd7ec940e1c34baa138fed84c8e1a54bc0c"
+    }
+  },
+  "timing_accuracy_certified": false,
+  "historical_timing_validation_transferred": false,
+  "hardware_contacted": false,
+  "limitations": [
+    "No new FPGA run or timing calibration performed.",
+    "The compiler-kernel suite uses hart 0; harts 1/2 park.",
+    "The Zephyr smoke does not certify full vector/tile context migration.",
+    "Existing accuracy tables refer to frozen binary 35a804964d7882f36a8892d7672dcfbbc7becc89c87e2d830c149820c1291388."
+  ]
+}

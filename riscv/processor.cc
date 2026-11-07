@@ -91,6 +91,16 @@ bool processor_t::iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed, bo
   auto* low=sim->addr_to_mem(pc);auto* high=sim->addr_to_mem(pc+1);
   if (!low || !high) return false;
   if (!allow_split_pages && reinterpret_cast<uintptr_t>(high)!=reinterpret_cast<uintptr_t>(low)+1) return false;
+  // This probe is speculative. Unknown instruction bytes are a boundary for
+  // lookahead, not an architectural observation: an unresolved return/branch
+  // can make them unreachable. Demand fetch retains the strict MMU check.
+  auto parcel_known = [this](reg_t address) {
+    if (!cfg->iris_vme) return true;
+    std::array<uint8_t,2> masks;
+    sim->iris_memory_definedness.read_into(iris_board::storage_address(id,address),masks);
+    return masks[0]==0xff && masks[1]==0xff;
+  };
+  if (!parcel_known(pc)) return false;
   // mem_t uses separately allocated host pages. Guest RAM at a page boundary
   // need not have contiguous host pointers. Read only the required mapped
   // bytes here; the ordinary MMU fetch retains its architectural access checks.
@@ -99,6 +109,7 @@ bool processor_t::iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed, bo
   if (length==2) return allow_compressed && extension_enabled(EXT_ZCA);
   return length==4 && pc<=std::numeric_limits<reg_t>::max()-3 &&
       sim->addr_to_mem(pc+2) && sim->addr_to_mem(pc+3) &&
+      parcel_known(pc+2) &&
       (allow_split_pages || reinterpret_cast<uintptr_t>(sim->addr_to_mem(pc+3))==reinterpret_cast<uintptr_t>(low)+3);
 }
 
