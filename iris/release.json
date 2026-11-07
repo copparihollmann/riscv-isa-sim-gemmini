@@ -1,0 +1,68 @@
+{
+  "schema": "iris.vendored_native_release.v1",
+  "source_pins": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+    "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+    "hardfloat": "0ecaef097ce2accbd16a61613699450ed5533f29",
+    "spike": "72958551566a30f19444bd7e354552824e4d0a98"
+  },
+  "historical_native_binary_sha256": "35a804964d7882f36a8892d7672dcfbbc7becc89c87e2d830c149820c1291388",
+  "profiles": {
+    "source_compute": {
+      "calibration_identity": "iris-C12-source-VADD-fixed-costs-v1",
+      "fixture_sha256": "b1c752150d7c6b2427772076bf20e852a7d2142fdcc8b74c4dd380bf369eb328",
+      "profile_scope": {
+        "source_VADD": true,
+        "source_FADD": true,
+        "source_OPU": true,
+        "specialized_OPU_FENCE": true,
+        "normal_Zephyr_qualification_claimed": false,
+        "compute_timing_qualification_transferred": false
+      },
+      "per_hart_isa": {
+        "0": "rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+        "1": "rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+        "2": "rv64gcv_zfh_zvfh_zvl256b_zvbb"
+      }
+    },
+    "source_os": {
+      "calibration_identity": "iris-C12-source-composite-fixed-costs-OPU-OFF-v1",
+      "fixture_sha256": "97ef45bb2cfb7144a1798e594df8065a55989980c8b406d0fe1e221597ef1bcb",
+      "profile_scope": {
+        "source_VADD": false,
+        "source_FADD": true,
+        "source_OPU": false,
+        "specialized_OPU_FENCE": false,
+        "normal_Zephyr_qualification_claimed": true,
+        "compute_timing_qualification_transferred": false
+      },
+      "per_hart_isa": {
+        "0": "rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+        "1": "rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+        "2": "rv64gcv_zfh_zvfh_zvl256b_zvbb"
+      }
+    }
+  },
+  "qualification": {
+    "accuracy_2percent_certified": false,
+    "whole_model_certified": false,
+    "source_image_association_verified": false,
+    "new_build_inherits_historical_binary_validation": false
+  },
+  "memory_regions": [
+    [
+      1879048192,
+      262144
+    ],
+    [
+      2147483648,
+      4294967296
+    ],
+    [
+      23622320128,
+      131072
+    ]
+  ]
+}

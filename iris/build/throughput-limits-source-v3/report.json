@@ -1,0 +1,2079 @@
+{
+  "schema": "iris.source_throughput_limits.v1",
+  "pass": true,
+  "generated_source": {
+    "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/design/FireSim-generated.sv",
+    "sha256": "c0f972d2a63be8170f7c84a38633fbede855f00d3022e81141fa0bb274397b64",
+    "bytes": 67737449,
+    "association": "Co-located archived image-build generated SV; full source/implementation/loaded-image attestation remains false",
+    "association_receipt": "/scratch/copparihollmann/iris-model/build/firesim-observability-archived-driver-v3/report.json",
+    "association_receipt_sha256": "e0cefa3a9fc03e40755eea4b89cd9970ad75690f361bf400a5f9887fea68d712"
+  },
+  "repository_pins": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+    "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+    "testchipip": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+    "spike_chipyard_pin": "9c190a07c6838f6392bafa4ad83acea462c7f759",
+    "firesim": "69b17767e0b227e31ea341c50899e49f02d6f5ea"
+  },
+  "source_image_association_verified": false,
+  "loaded_image_verified": false,
+  "timing_accuracy_certified": false,
+  "hardware_contacted": false,
+  "runtime_model_changed": false,
+  "geometry": {
+    "compute_harts": [
+      0,
+      1
+    ],
+    "rocket_hart": 2,
+    "opu_clusters_per_hart": 16,
+    "opu_cells_per_cluster": 16,
+    "opu_macs_per_accepted_array_edge": 256,
+    "integer_byte_slices_by_class": [
+      16,
+      32
+    ],
+    "compute_segmented_fp_blocks64": 2,
+    "rocket_shared_fp_element_requests_per_edge": 1,
+    "scalar_fadd_latency_by_hart": [
+      4,
+      4,
+      3
+    ],
+    "atl_data_bits_by_hart": [
+      256,
+      256,
+      64
+    ]
+  },
+  "vector_geometry": {
+    "VLEN": 256,
+    "DLEN_by_hart": [
+      128,
+      128,
+      256
+    ],
+    "MLEN_by_hart": [
+      128,
+      128,
+      256
+    ],
+    "matrix_tile_edge": 32,
+    "matrix_element_width": 32,
+    "LMUL": "changes group length only; not physical lane count"
+  },
+  "nominal_clock_conversion": {
+    "core_hz_by_hart": [
+      500000000,
+      500000000,
+      500000000
+    ],
+    "scope": "Source requested/clock-summary frequency only. Multiply per-edge ceilings by500e6 only while that clock is running; not achieved frequency/workload performance or loaded-image attestation.",
+    "evidence": "clock_summary"
+  },
+  "capacity_records": [
+    {
+      "family": "scalar.integer.alu",
+      "hart": 0,
+      "value": 2,
+      "units": "integer_ALU_instructions/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "Shuttle pairing legality and data hazards may reduce two-ALU issue"
+      ],
+      "evidence": [
+        "ShuttleCore"
+      ]
+    },
+    {
+      "family": "scalar.fadd",
+      "hart": 0,
+      "value": 1,
+      "units": "scalar_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one scalar issue input; H/S/D physical pipes are format alternatives, not additive capacities",
+        "Rocket CP vector requests share the scalar FPU input"
+      ],
+      "evidence": [
+        "ShuttleFPPipe"
+      ],
+      "physical_result_latency_edges": 4,
+      "dependent_chain_min_accept_gap_edges": 5,
+      "dependent_chain_upper_adds_per_edge": 0.2,
+      "phase_proof_sha256": "5500e47eeb308c3edf8950617b35b54e82695621f41a3864d032e793f8d809da"
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 0,
+      "value": 16,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 8
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 0,
+      "value": 8,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 0,
+      "value": 4,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 0,
+      "value": 2,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 0,
+      "value": 8,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 0,
+      "value": 8,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 16,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 0,
+      "value": 4,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 0,
+      "value": 4,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 32,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 0,
+      "value": 2,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 0,
+      "value": 2,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 64,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "vector.ATL.A.data",
+      "hart": 0,
+      "value": 32,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one A ready&&valid beat",
+        "payload applies to Put data; Get control does not transport logical read bytes here",
+        "partial strobes and control reduce useful payload"
+      ],
+      "evidence": [
+        "SaturnShuttleUnit"
+      ],
+      "achieved_bytes_per_second": null
+    },
+    {
+      "family": "vector.ATL.D.data",
+      "hart": 0,
+      "value": 32,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one D ready&&valid beat",
+        "AccessAckData only; acknowledgments/control do not count as full payload"
+      ],
+      "evidence": [
+        "SaturnShuttleUnit"
+      ],
+      "achieved_bytes_per_second": null
+    },
+    {
+      "family": "vme.int8",
+      "hart": 0,
+      "value": 256,
+      "units": "cell_MACs/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "all16x16 cells enabled for the selected subtile",
+        "INT8 writes same physical edge; FP8 completes2 edges later",
+        "FP8 same MRF entry cannot be reissued within the two history entries; minimum issue gap3; distinct entries can pipeline",
+        "whole instruction rate must account for TM/TN shape and TK plus VRF hazards"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence",
+        "OuterProductUnit",
+        "OuterProductCluster",
+        "OuterProductCell"
+      ],
+      "arithmetic_ops_per_mac": 2
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 0,
+      "value": 256,
+      "units": "cell_MACs/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "all16x16 cells enabled for the selected subtile",
+        "INT8 writes same physical edge; FP8 completes2 edges later",
+        "FP8 same MRF entry cannot be reissued within the two history entries; minimum issue gap3; distinct entries can pipeline",
+        "whole instruction rate must account for TM/TN shape and TK plus VRF hazards"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence",
+        "OuterProductUnit",
+        "OuterProductCluster",
+        "OuterProductCell"
+      ],
+      "arithmetic_ops_per_mac": 2
+    },
+    {
+      "family": "vme.zero",
+      "hart": 0,
+      "value": 256,
+      "units": "MRF_elements_zeroed/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "only active shape subtile cells; zero is not MAC/FLOP work"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence"
+      ]
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 0,
+      "value": 4,
+      "units": "32bit_elements/microissue_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "source xDim4 output/input words per iteration",
+        "row readout path latency5-cluster_position plus backend capture stages; column readout is not configured"
+      ],
+      "evidence": [
+        "opu_sequence",
+        "OuterProductUnit"
+      ]
+    },
+    {
+      "family": "rvv.fp8.fma",
+      "hart": 0,
+      "value": 16,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "selected format only; segmented datapaths overlap with H/S/D alternatives",
+        "format/definedness not certified by a width count"
+      ],
+      "evidence": [
+        "fp_scala",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 8
+    },
+    {
+      "family": "rvv.bf16.fma",
+      "hart": 0,
+      "value": 8,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "selected format only; segmented datapaths overlap with H/S/D alternatives",
+        "format/definedness not certified by a width count"
+      ],
+      "evidence": [
+        "fp_scala",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "scalar.integer.alu",
+      "hart": 1,
+      "value": 2,
+      "units": "integer_ALU_instructions/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "Shuttle pairing legality and data hazards may reduce two-ALU issue"
+      ],
+      "evidence": [
+        "ShuttleCore"
+      ]
+    },
+    {
+      "family": "scalar.fadd",
+      "hart": 1,
+      "value": 1,
+      "units": "scalar_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one scalar issue input; H/S/D physical pipes are format alternatives, not additive capacities",
+        "Rocket CP vector requests share the scalar FPU input"
+      ],
+      "evidence": [
+        "ShuttleFPPipe"
+      ],
+      "physical_result_latency_edges": 4,
+      "dependent_chain_min_accept_gap_edges": 5,
+      "dependent_chain_upper_adds_per_edge": 0.2,
+      "phase_proof_sha256": "5500e47eeb308c3edf8950617b35b54e82695621f41a3864d032e793f8d809da"
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 1,
+      "value": 16,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 8
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 1,
+      "value": 8,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 1,
+      "value": 4,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 1,
+      "value": 2,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 1,
+      "value": 8,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 1,
+      "value": 8,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 16,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 1,
+      "value": 4,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 1,
+      "value": 4,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 32,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 1,
+      "value": 2,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one selected-format 128-bit SIMD group per edge through two explicit 64-bit segmented FMA blocks"
+      ],
+      "evidence": [
+        "fp_scala",
+        "FPFMAPipe",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 1,
+      "value": 2,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 64,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "vector.ATL.A.data",
+      "hart": 1,
+      "value": 32,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one A ready&&valid beat",
+        "payload applies to Put data; Get control does not transport logical read bytes here",
+        "partial strobes and control reduce useful payload"
+      ],
+      "evidence": [
+        "SaturnShuttleUnit"
+      ],
+      "achieved_bytes_per_second": null
+    },
+    {
+      "family": "vector.ATL.D.data",
+      "hart": 1,
+      "value": 32,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one D ready&&valid beat",
+        "AccessAckData only; acknowledgments/control do not count as full payload"
+      ],
+      "evidence": [
+        "SaturnShuttleUnit"
+      ],
+      "achieved_bytes_per_second": null
+    },
+    {
+      "family": "vme.int8",
+      "hart": 1,
+      "value": 256,
+      "units": "cell_MACs/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "all16x16 cells enabled for the selected subtile",
+        "INT8 writes same physical edge; FP8 completes2 edges later",
+        "FP8 same MRF entry cannot be reissued within the two history entries; minimum issue gap3; distinct entries can pipeline",
+        "whole instruction rate must account for TM/TN shape and TK plus VRF hazards"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence",
+        "OuterProductUnit",
+        "OuterProductCluster",
+        "OuterProductCell"
+      ],
+      "arithmetic_ops_per_mac": 2
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 1,
+      "value": 256,
+      "units": "cell_MACs/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "all16x16 cells enabled for the selected subtile",
+        "INT8 writes same physical edge; FP8 completes2 edges later",
+        "FP8 same MRF entry cannot be reissued within the two history entries; minimum issue gap3; distinct entries can pipeline",
+        "whole instruction rate must account for TM/TN shape and TK plus VRF hazards"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence",
+        "OuterProductUnit",
+        "OuterProductCluster",
+        "OuterProductCell"
+      ],
+      "arithmetic_ops_per_mac": 2
+    },
+    {
+      "family": "vme.zero",
+      "hart": 1,
+      "value": 256,
+      "units": "MRF_elements_zeroed/accepted_array_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "only active shape subtile cells; zero is not MAC/FLOP work"
+      ],
+      "evidence": [
+        "opu_scala",
+        "opu_sequence"
+      ]
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 1,
+      "value": 4,
+      "units": "32bit_elements/microissue_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "source xDim4 output/input words per iteration",
+        "row readout path latency5-cluster_position plus backend capture stages; column readout is not configured"
+      ],
+      "evidence": [
+        "opu_sequence",
+        "OuterProductUnit"
+      ]
+    },
+    {
+      "family": "rvv.fp8.fma",
+      "hart": 1,
+      "value": 16,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "selected format only; segmented datapaths overlap with H/S/D alternatives",
+        "format/definedness not certified by a width count"
+      ],
+      "evidence": [
+        "fp_scala",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 8
+    },
+    {
+      "family": "rvv.bf16.fma",
+      "hart": 1,
+      "value": 8,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "selected format only; segmented datapaths overlap with H/S/D alternatives",
+        "format/definedness not certified by a width count"
+      ],
+      "evidence": [
+        "fp_scala",
+        "SegmentedFMAPipe"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "scalar.integer.alu",
+      "hart": 2,
+      "value": 1,
+      "units": "integer_ALU_instructions/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "Shuttle pairing legality and data hazards may reduce two-ALU issue"
+      ],
+      "evidence": [
+        "Rocket"
+      ]
+    },
+    {
+      "family": "scalar.fadd",
+      "hart": 2,
+      "value": 1,
+      "units": "scalar_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one scalar issue input; H/S/D physical pipes are format alternatives, not additive capacities",
+        "Rocket CP vector requests share the scalar FPU input"
+      ],
+      "evidence": [
+        "FPU"
+      ],
+      "physical_result_latency_edges": 3,
+      "dependent_chain_min_accept_gap_edges": 4,
+      "dependent_chain_upper_adds_per_edge": 0.25,
+      "phase_proof_sha256": "5500e47eeb308c3edf8950617b35b54e82695621f41a3864d032e793f8d809da"
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 2,
+      "value": 32,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray_6"
+      ],
+      "sew": 8
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 2,
+      "value": 16,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray_6"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 2,
+      "value": 8,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray_6"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.integer.vadd",
+      "hart": 2,
+      "value": 4,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "one VADD micro-op per issue path per edge",
+        "LMUL extends iterations; it does not replicate adders",
+        "non-widening and non-reduction VADD only"
+      ],
+      "evidence": [
+        "integer_scala",
+        "execution_scala",
+        "AdderArray_6"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 2,
+      "value": 1,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "ONE elementwise scalar FP request per edge regardless of SEW/DLEN; shared scalar FPU ready required"
+      ],
+      "evidence": [
+        "shared_fp_scala",
+        "SharedScalarElementwiseFPFMA",
+        "FPU"
+      ],
+      "sew": 16
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 2,
+      "value": 1,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 16,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 2,
+      "value": 1,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "ONE elementwise scalar FP request per edge regardless of SEW/DLEN; shared scalar FPU ready required"
+      ],
+      "evidence": [
+        "shared_fp_scala",
+        "SharedScalarElementwiseFPFMA",
+        "FPU"
+      ],
+      "sew": 32
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 2,
+      "value": 1,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 32,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "rvv.fp.fadd",
+      "hart": 2,
+      "value": 1,
+      "units": "element_adds/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "ONE elementwise scalar FP request per edge regardless of SEW/DLEN; shared scalar FPU ready required"
+      ],
+      "evidence": [
+        "shared_fp_scala",
+        "SharedScalarElementwiseFPFMA",
+        "FPU"
+      ],
+      "sew": 64
+    },
+    {
+      "family": "rvv.fp.fma",
+      "hart": 2,
+      "value": 1,
+      "units": "element_FMAs/core_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "2 FLOPs/FMA convention; FADD is 1 FLOP, not 2",
+        "same format resources as vector FADD; capacities cannot be summed"
+      ],
+      "evidence": [
+        "fp_scala",
+        "shared_fp_scala"
+      ],
+      "sew": 64,
+      "flops_per_fma": 2
+    },
+    {
+      "family": "vector.ATL.A.data",
+      "hart": 2,
+      "value": 8,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one A ready&&valid beat",
+        "payload applies to Put data; Get control does not transport logical read bytes here",
+        "partial strobes and control reduce useful payload"
+      ],
+      "evidence": [
+        "SaturnRocketUnit"
+      ],
+      "achieved_bytes_per_second": null
+    },
+    {
+      "family": "vector.ATL.D.data",
+      "hart": 2,
+      "value": 8,
+      "units": "wire_data_bytes/source_edge",
+      "kind": "conditional_source_capacity_upper_bound",
+      "conditions": [
+        "clocked source edge",
+        "legal supported opcode/configuration",
+        "active operands already available and defined",
+        "ready/valid accepted without competing ports or writeback conflicts",
+        "excludes setup, dependencies, masks/tails, frontend, memory and drain overhead",
+        "at most one D ready&&valid beat",
+        "AccessAckData only; acknowledgments/control do not count as full payload"
+      ],
+      "evidence": [
+        "SaturnRocketUnit"
+      ],
+      "achieved_bytes_per_second": null
+    }
+  ],
+  "shape_counterexamples": {
+    "int8_full32_K4": {
+      "macs": 4096,
+      "microissues": 16,
+      "earliest_issue_edges": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "per_edge_cell_macs": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "issue_span_edges": 16,
+      "last_result_edge": 15,
+      "scope": "Earliest source sequencer/array schedule assuming all operands/ports ready; excludes frontend/dispatch/readout and does not establish achieved utilization."
+    },
+    "fp8_full32_K4": {
+      "macs": 4096,
+      "microissues": 16,
+      "earliest_issue_edges": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "per_edge_cell_macs": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "issue_span_edges": 16,
+      "last_result_edge": 17,
+      "scope": "Earliest source sequencer/array schedule assuming all operands/ports ready; excludes frontend/dispatch/readout and does not establish achieved utilization."
+    },
+    "fp8_single_subtile_K4": {
+      "macs": 1024,
+      "microissues": 4,
+      "earliest_issue_edges": [
+        0,
+        3,
+        6,
+        9
+      ],
+      "per_edge_cell_macs": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "issue_span_edges": 10,
+      "last_result_edge": 11,
+      "scope": "Earliest source sequencer/array schedule assuming all operands/ports ready; excludes frontend/dispatch/readout and does not establish achieved utilization."
+    },
+    "fp8_partial17_K4": {
+      "macs": 1156,
+      "microissues": 16,
+      "earliest_issue_edges": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "per_edge_cell_macs": [
+        256,
+        16,
+        16,
+        1,
+        256,
+        16,
+        16,
+        1,
+        256,
+        16,
+        16,
+        1,
+        256,
+        16,
+        16,
+        1
+      ],
+      "issue_span_edges": 16,
+      "last_result_edge": 17,
+      "scope": "Earliest source sequencer/array schedule assuming all operands/ports ready; excludes frontend/dispatch/readout and does not establish achieved utilization."
+    },
+    "empty_M": {
+      "macs": 0,
+      "microissues": 0,
+      "earliest_issue_edges": [],
+      "per_edge_cell_macs": [],
+      "issue_span_edges": 0,
+      "last_result_edge": null
+    }
+  },
+  "ordinary_vector_counterexamples": {
+    "Rocket_FP16_VL32_LMUL2": {
+      "element_operations": 32,
+      "conditional_min_service_edges": 32,
+      "elements_per_accepted_edge_upper": 1,
+      "setup_edges": null,
+      "dependent_II": null,
+      "LMUL_replication_factor": 1
+    },
+    "compute_FP16_VL32_LMUL2": {
+      "element_operations": 32,
+      "conditional_min_service_edges": 4,
+      "elements_per_accepted_edge_upper": 8,
+      "setup_edges": null,
+      "dependent_II": null,
+      "LMUL_replication_factor": 1
+    },
+    "compute_e8_VL256_LMUL8": {
+      "element_operations": 256,
+      "conditional_min_service_edges": 16,
+      "elements_per_accepted_edge_upper": 16,
+      "setup_edges": null,
+      "dependent_II": null,
+      "LMUL_replication_factor": 1
+    }
+  },
+  "unknown_or_unqualified_capacities": {
+    "achieved_DRAM_bytes_per_second": null,
+    "NoC_end_to_end_bytes_per_second": null,
+    "cache_miss_service_latency": null,
+    "arbitrary_RVV_opcode_peak": null,
+    "scalar_divide_peak": null,
+    "combined_machine_peak": null,
+    "FP8_or_BF16_Rocket_arithmetic": null
+  },
+  "non_additivity": [
+    "Different FP format ceilings share physical arithmetic",
+    "Rocket vector FP and scalar FP share input/FMA service",
+    "Unit peak sums ignore frontend/VRF/NoC/clock sharing and are not workload roofs",
+    "Intent bytes are not physical traffic; only accepted data beats qualify wire utilization"
+  ],
+  "source_conflict_note": "Use hardware/evidence/outer-product-unit.scala be2f... actual ungated OPU source. The third_party copy daf... contains a clock-gate difference and is not silently substituted.",
+  "source_expressions": {
+    "opu_scala": {
+      "path": "/scratch/copparihollmann/iris-model/hardware/evidence/outer-product-unit.scala",
+      "sha256": "be2f6842fc72538ef7b458e22e0f3a3668a58ae3038d03a5deea47f629adf3ff",
+      "expressions": [
+        {
+          "expression": "def fp8MaccLatency = 2",
+          "lines": [
+            46
+          ]
+        },
+        {
+          "expression": "val int_macc = io.macc && !is_fp8",
+          "lines": [
+            74
+          ]
+        },
+        {
+          "expression": "val cells = Seq.fill(clusterYdim, clusterXdim)",
+          "lines": [
+            171
+          ]
+        },
+        {
+          "expression": "val clusters = Seq.fill(yDim, xDim)",
+          "lines": [
+            271
+          ]
+        },
+        {
+          "expression": "val gated_clock = clock",
+          "lines": [
+            266
+          ]
+        },
+        {
+          "expression": "val en = io.row_en(i) && io.col_en(j)",
+          "lines": [
+            190
+          ]
+        }
+      ]
+    },
+    "opu_sequence": {
+      "path": "/scratch/copparihollmann/iris-model/hardware/evidence/outer-product-sequencer.scala",
+      "sha256": "59dd5e0c462272ab0aca03516ab5516af62c1609029c0fdf8ebad8f04bff3580",
+      "expressions": [
+        {
+          "expression": "val S = subTileEdge",
+          "lines": [
+            50
+          ]
+        },
+        {
+          "expression": "val d_empty = Mux",
+          "lines": [
+            123
+          ]
+        },
+        {
+          "expression": "val fp8_hist_valid = RegInit",
+          "lines": [
+            207
+          ]
+        },
+        {
+          "expression": "val do_mm = fire && mm && !nop",
+          "lines": [
+            250
+          ]
+        },
+        {
+          "expression": "io.iss.bits.row_en(i)(j) :=",
+          "lines": [
+            281
+          ]
+        },
+        {
+          "expression": "io.iss.bits.col_en(i)(j) :=",
+          "lines": [
+            286
+          ]
+        },
+        {
+          "expression": "val move_latency = ((yDim+1).U - move_cluster)",
+          "lines": [
+            219
+          ]
+        }
+      ]
+    },
+    "integer_scala": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/int/IntegerPipe.scala",
+      "sha256": "4f8c24673fac6b181f145f00f4c0f3f339d57837377d303a52ebe9da659a344e",
+      "expressions": [
+        {
+          "expression": "class AdderArray(dLenB: Int)",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "expression": "Fill(dLenB >> eew",
+          "lines": [
+            31
+          ]
+        },
+        {
+          "expression": "def insns = (baseInsns ++ wideningInsns).map(_.pipelined(1))",
+          "lines": [
+            210
+          ]
+        },
+        {
+          "expression": "io.stall := false.B",
+          "lines": [
+            231
+          ]
+        }
+      ]
+    },
+    "execution_scala": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/ExecutionUnit.scala",
+      "sha256": "7549d2bb2f8a9f6680d012486fdce7bed11b09b26f7c5e65c52345d8427db935",
+      "expressions": [
+        {
+          "expression": "assert(PopCount(io.iss.bits.fu_sel) <= 1.U)",
+          "lines": [
+            74
+          ]
+        },
+        {
+          "expression": "io.iss.ready := !Mux1H",
+          "lines": [
+            75
+          ]
+        },
+        {
+          "expression": "val pipe_iss = io.iss.fire",
+          "lines": [
+            102
+          ]
+        }
+      ]
+    },
+    "fp_scala": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/fp/FPFMAPipe.scala",
+      "sha256": "34a4e41f68861c4dc7b4803c49fd6d0b393964b633e9892a68310b5fcf0afaff",
+      "expressions": [
+        {
+          "expression": "val nTandemFMA = dLenB / 8",
+          "lines": [
+            437
+          ]
+        },
+        {
+          "expression": "FType.D -> Wire(Vec(1, UInt(64.W)))",
+          "lines": [
+            270
+          ]
+        },
+        {
+          "expression": "FType.S -> Wire(Vec(2, UInt(32.W)))",
+          "lines": [
+            271
+          ]
+        },
+        {
+          "expression": "FType.H -> Wire(Vec(4, UInt(16.W)))",
+          "lines": [
+            272
+          ]
+        },
+        {
+          "expression": "MXFType.BF16 -> Wire(Vec(4, UInt(16.W)))",
+          "lines": [
+            273
+          ]
+        },
+        {
+          "expression": "MXFType.E5M3 -> Wire(Vec(8, UInt(8.W)))",
+          "lines": [
+            274
+          ]
+        },
+        {
+          "expression": "fma_types.foldLeft",
+          "lines": [
+            292
+          ]
+        },
+        {
+          "expression": "io.stall := false.B",
+          "lines": [
+            423
+          ]
+        }
+      ]
+    },
+    "shared_fp_scala": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/fp/SharedFPFMA.scala",
+      "sha256": "65c440405300c4df7295d7349c54c5709d33ae27cc02e836c6f3f71d18a871be",
+      "expressions": [
+        {
+          "expression": "base_insns.map(_.elementWise)",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "expression": "io.stall := !io_fp_req.ready",
+          "lines": [
+            42
+          ]
+        },
+        {
+          "expression": "io_fp_req.valid := io.pipe(0).valid",
+          "lines": [
+            148
+          ]
+        }
+      ]
+    },
+    "vector_params": {
+      "path": "/scratch/copparihollmann/iris-model/hardware/evidence/saturn-parameters.scala",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "expressions": [
+        {
+          "expression": "def opuMxParams",
+          "lines": [
+            71
+          ]
+        },
+        {
+          "expression": "def dmaParams",
+          "lines": [
+            99
+          ]
+        },
+        {
+          "expression": "case object Split",
+          "lines": [
+            237
+          ]
+        },
+        {
+          "expression": "case object Unified",
+          "lines": [
+            203
+          ]
+        },
+        {
+          "expression": "def opuTE(vLen: Int)",
+          "lines": [
+            408
+          ]
+        }
+      ]
+    },
+    "iris_config": {
+      "path": "/scratch/copparihollmann/iris-model/hardware/evidence/iris-config.scala",
+      "sha256": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
+      "expressions": [
+        {
+          "expression": "WithRocketVectorUnit(256, 256, VectorParams.dmaParams)",
+          "lines": [
+            278
+          ]
+        },
+        {
+          "expression": "WithTileFrequency(500.0)",
+          "lines": [
+            284
+          ]
+        },
+        {
+          "expression": "VectorParams.opuMxParams",
+          "lines": [
+            289
+          ]
+        }
+      ]
+    },
+    "shuttle_vector_config": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/shuttle/Configs.scala",
+      "sha256": "74850fbda13a0ad1ed5a215cbfc28485a9dc4e782ecace3dccc336981a61abf8",
+      "expressions": [
+        {
+          "expression": "mLen=mLen.getOrElse(dLen)",
+          "lines": [
+            26
+          ]
+        }
+      ]
+    },
+    "rocket_vector_config": {
+      "path": "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/rocket/Configs.scala",
+      "sha256": "f8185e622376b661c8af071b0b40e051f5b1099acc8f5b3c7101bfd6b5a4c21e",
+      "expressions": [
+        {
+          "expression": "mLen=mLen.getOrElse(dLen)",
+          "lines": [
+            27
+          ]
+        }
+      ]
+    },
+    "clock_summary": {
+      "path": "/scratch/copparihollmann/iris-model/hardware/evidence/firesim-clocks.freq-summary",
+      "sha256": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+      "expressions": [
+        {
+          "expression": "clock_500.0MHz, requested: 500.0 MHz, actual: 500.0 MHz",
+          "lines": [
+            5
+          ]
+        }
+      ]
+    }
+  },
+  "associated_modules": {
+    "DigitalTop": {
+      "start_line": 614175,
+      "end_line": 626529,
+      "sha256": "fc98f5d69748cbc719e1ef6147741ea9bda45f0c44965780e24edf0450d8bf1f",
+      "artifact": "modules/DigitalTop.sv"
+    },
+    "TilePRCIDomain": {
+      "start_line": 433807,
+      "end_line": 434545,
+      "sha256": "8f7f92fe24331b9292184fbbee3470c92679c2349bc48f7aa78e94f08d8c6efc",
+      "artifact": "modules/TilePRCIDomain.sv"
+    },
+    "TilePRCIDomain_2": {
+      "start_line": 598550,
+      "end_line": 599858,
+      "sha256": "c000164d07bfbe0592025c8ac170005f9c4f9eeb019ec79d68e5c2c9c34ced2f",
+      "artifact": "modules/TilePRCIDomain_2.sv"
+    },
+    "ShuttleTile": {
+      "start_line": 427747,
+      "end_line": 432809,
+      "sha256": "14d39511519be92e69beab71460b3ca820f9b281d3338cd8ed351188e9acf433",
+      "artifact": "modules/ShuttleTile.sv"
+    },
+    "RocketTile": {
+      "start_line": 590959,
+      "end_line": 594811,
+      "sha256": "f0a50e5e05d11d7b0ab3da7f6881006b97c0d8ff4b4ff32780773f902b7ea865",
+      "artifact": "modules/RocketTile.sv"
+    },
+    "ShuttleCore": {
+      "start_line": 412673,
+      "end_line": 426617,
+      "sha256": "25b648dee518c702e3d6f9abf5209415fa396906a232082c811c40d65d4df9c0",
+      "artifact": "modules/ShuttleCore.sv"
+    },
+    "Rocket": {
+      "start_line": 585617,
+      "end_line": 590958,
+      "sha256": "803c42a4e0f600cfce08fc9adc21d1c32560df4ceac5de94cfdbc5bc9a0487ae",
+      "artifact": "modules/Rocket.sv"
+    },
+    "ShuttleFPPipe": {
+      "start_line": 404278,
+      "end_line": 404851,
+      "sha256": "263d4ca14e8784796954870404e02d563aa7243d3c4c43208f0c0dbfe480b739",
+      "artifact": "modules/ShuttleFPPipe.sv"
+    },
+    "FPU": {
+      "start_line": 575644,
+      "end_line": 577244,
+      "sha256": "d6cce406e2021f160f2f75a073378b40aaa236b61b553c41984153723f16cf83",
+      "artifact": "modules/FPU.sv"
+    },
+    "FPUFMAPipe_l4_f16": {
+      "start_line": 402960,
+      "end_line": 403132,
+      "sha256": "1e51dad23e40411affabc9dbe93288033af1b4b56c2a1a5dba6ddb61a85d615c",
+      "artifact": "modules/FPUFMAPipe_l4_f16.sv"
+    },
+    "FPUFMAPipe_l4_f32": {
+      "start_line": 402179,
+      "end_line": 402354,
+      "sha256": "a9d5b6902ca2f049a39391ef9a72b02ea697164fb7ceea59d3385bacefea1683",
+      "artifact": "modules/FPUFMAPipe_l4_f32.sv"
+    },
+    "FPUFMAPipe_l4_f64": {
+      "start_line": 401377,
+      "end_line": 401554,
+      "sha256": "58f6a6c50a1cc4d82afc1e42e300d886f7ce51f601072659270652883acee0d3",
+      "artifact": "modules/FPUFMAPipe_l4_f64.sv"
+    },
+    "FPUFMAPipe_l3_f16": {
+      "start_line": 575500,
+      "end_line": 575643,
+      "sha256": "2d80071ba1f0fb63cf37aa4c51802597117770e5252e297d79c2b91033733928",
+      "artifact": "modules/FPUFMAPipe_l3_f16.sv"
+    },
+    "FPUFMAPipe_l3_f32": {
+      "start_line": 573275,
+      "end_line": 573421,
+      "sha256": "8d65053ae90138299186c3c8ea21c5a5d5745a5e6a7b3734015eac224fb387cf",
+      "artifact": "modules/FPUFMAPipe_l3_f32.sv"
+    },
+    "FPUFMAPipe_l3_f64": {
+      "start_line": 574934,
+      "end_line": 575079,
+      "sha256": "b27c11a37f35305d70618ac076e11f5ef27e4a27d045f7463b2b0cc2cdb10bd6",
+      "artifact": "modules/FPUFMAPipe_l3_f64.sv"
+    },
+    "VectorBackend": {
+      "start_line": 347389,
+      "end_line": 355331,
+      "sha256": "f9a8876344904d9856deefb56b6cdd19ea2598769f50035f3bae32cb9afa3492",
+      "artifact": "modules/VectorBackend.sv"
+    },
+    "VectorBackend_2": {
+      "start_line": 528513,
+      "end_line": 533108,
+      "sha256": "06760972243a5e877531b5349f1f1a77ccfaf899cad4d0159d2d383cd6fffa46",
+      "artifact": "modules/VectorBackend_2.sv"
+    },
+    "SaturnShuttleUnit": {
+      "start_line": 376065,
+      "end_line": 377365,
+      "sha256": "2e2b7e460abe1cd3138a77bdd53e476ec94b515d0c756221b8375fc152b9d4ec",
+      "artifact": "modules/SaturnShuttleUnit.sv"
+    },
+    "SaturnRocketUnit": {
+      "start_line": 569706,
+      "end_line": 571218,
+      "sha256": "bd1901bba428461a6de7af7042fbd6aa61aa3829d56de7a61d913705bd48f29a",
+      "artifact": "modules/SaturnRocketUnit.sv"
+    },
+    "OuterProductUnit": {
+      "start_line": 320920,
+      "end_line": 322759,
+      "sha256": "979b5a0bbd1dfc7299efc13447310eca1fe19ad1d5a5e30ab09d1c18374e5696",
+      "artifact": "modules/OuterProductUnit.sv"
+    },
+    "OuterProductCluster": {
+      "start_line": 318987,
+      "end_line": 319951,
+      "sha256": "ffd8e633009da9c306207b09e6a00a50ac268be8310025e9a92527b5110e8a54",
+      "artifact": "modules/OuterProductCluster.sv"
+    },
+    "OuterProductCluster_4": {
+      "start_line": 319952,
+      "end_line": 320919,
+      "sha256": "2115840a6c7d97bc6537a6133ebcef828f8ab1f8f1355f9c4d84853a7794e1e0",
+      "artifact": "modules/OuterProductCluster_4.sv"
+    },
+    "OuterProductCell": {
+      "start_line": 318413,
+      "end_line": 318986,
+      "sha256": "aa3f5cfc1fb54f2b177fd05ce9496a01d264fd8d5c162f6c4695aca90317b69b",
+      "artifact": "modules/OuterProductCell.sv"
+    },
+    "OuterProductSequencer": {
+      "start_line": 327052,
+      "end_line": 328462,
+      "sha256": "b4a10b7e758fb4cfde61cb0e0ad42931356e772826bdafbdecd338ecf150dd78",
+      "artifact": "modules/OuterProductSequencer.sv"
+    },
+    "FPFMAPipe": {
+      "start_line": 300246,
+      "end_line": 301212,
+      "sha256": "7baa6ed6446ea24500a3128c220dcb0985b6376bd2f79497d10cbcd09f827b74",
+      "artifact": "modules/FPFMAPipe.sv"
+    },
+    "SegmentedFMAPipe": {
+      "start_line": 294485,
+      "end_line": 300245,
+      "sha256": "baeb8b2e4095b33916ed1e07821b5ed11dba3e31b4d8af09c4a8600f49dd18ca",
+      "artifact": "modules/SegmentedFMAPipe.sv"
+    },
+    "SharedScalarElementwiseFPFMA": {
+      "start_line": 481928,
+      "end_line": 482865,
+      "sha256": "96e312a8673e473bea650f93d8ca543a6c0b3d79aa595e05058631e9e2d5fd05",
+      "artifact": "modules/SharedScalarElementwiseFPFMA.sv"
+    },
+    "ExecutionUnitint": {
+      "start_line": 286829,
+      "end_line": 287923,
+      "sha256": "094e3588890b8ca4a533d8160bfcb38a29d6b1eec1c93a059dbde0a4992674d7",
+      "artifact": "modules/ExecutionUnitint.sv"
+    },
+    "ExecutionUnitfp": {
+      "start_line": 316711,
+      "end_line": 317836,
+      "sha256": "c0b727f62f8c453ab09fbe4e410450428a0bcf3bcbf9668ff040f7ed063f03c9",
+      "artifact": "modules/ExecutionUnitfp.sv"
+    },
+    "ExecutionUnitfp_int": {
+      "start_line": 491781,
+      "end_line": 493496,
+      "sha256": "43fc4ac209759bdfaf7f753e6b8cf8399ea42fd6193c9806c269ae408458428e",
+      "artifact": "modules/ExecutionUnitfp_int.sv"
+    },
+    "IntegerPipe": {
+      "start_line": 278550,
+      "end_line": 280600,
+      "sha256": "7c240198713a1e791aae7582c215987375237ea261407655a3271f9606a14cfd",
+      "artifact": "modules/IntegerPipe.sv"
+    },
+    "IntegerPipe_2": {
+      "start_line": 468753,
+      "end_line": 472223,
+      "sha256": "f989f98f31340fc328ff1e78a4da318f81812191d73d5bd513996370c2267ce0",
+      "artifact": "modules/IntegerPipe_2.sv"
+    },
+    "AdderArray": {
+      "start_line": 277300,
+      "end_line": 277983,
+      "sha256": "eaf68317a3989c5b115da93616078a06c01a9b378932c54c0a35c257c1b8e621",
+      "artifact": "modules/AdderArray.sv"
+    },
+    "AdderArray_6": {
+      "start_line": 466322,
+      "end_line": 467683,
+      "sha256": "e725269fa0d64742a8bd03ea40be900fb5f19af33055bec6b387e454f72b5de7",
+      "artifact": "modules/AdderArray_6.sv"
+    },
+    "ExecuteSequencer": {
+      "start_line": 323666,
+      "end_line": 325543,
+      "sha256": "98c6042e040c86e363dfef9ae56022b159c8a64e96d63b907176f0059fb01bdb",
+      "artifact": "modules/ExecuteSequencer.sv"
+    },
+    "ExecuteSequencer_1": {
+      "start_line": 325544,
+      "end_line": 327051,
+      "sha256": "2807f8bab9aa55a9063158c8bb07c24b97f29f264f161a287c13e77a49d10d15",
+      "artifact": "modules/ExecuteSequencer_1.sv"
+    },
+    "ExecuteSequencer_4": {
+      "start_line": 494326,
+      "end_line": 496547,
+      "sha256": "1b7b2162d983ab654b9133db5221d8c2e3feb7319ae306664ed9f6b9bd304853",
+      "artifact": "modules/ExecuteSequencer_4.sv"
+    },
+    "VectorMemUnit": {
+      "start_line": 369612,
+      "end_line": 375934,
+      "sha256": "b5e79e0217694ab5875dfc9b29ebeacf58bc70da5b1d17c3be1ad8941736c182",
+      "artifact": "modules/VectorMemUnit.sv"
+    },
+    "VectorMemUnit_2": {
+      "start_line": 562725,
+      "end_line": 567704,
+      "sha256": "9eec24427e89524802501146e8453ddd0a9d3ac069dd3684fd2441fdda2e4a0b",
+      "artifact": "modules/VectorMemUnit_2.sv"
+    },
+    "RegisterAccess": {
+      "start_line": 341351,
+      "end_line": 341930,
+      "sha256": "cba6e5c644f3541d55658914cffc834850dda070616a7aec59fce6697606dd69",
+      "artifact": "modules/RegisterAccess.sv"
+    },
+    "RegisterAccess_2": {
+      "start_line": 514292,
+      "end_line": 514647,
+      "sha256": "5d802efaf887eeb8d4b5cf063adc23f69e949c6e34a45b98e9dc9040e0213877",
+      "artifact": "modules/RegisterAccess_2.sv"
+    },
+    "RegisterFile": {
+      "start_line": 339748,
+      "end_line": 341350,
+      "sha256": "9eaba9a2b946b130e98aedd34df03ecaf0be5b0795803295061a003404694748",
+      "artifact": "modules/RegisterFile.sv"
+    },
+    "RegisterFile_2": {
+      "start_line": 513838,
+      "end_line": 514291,
+      "sha256": "b01f033665fea46ee2ed9a4839e60243b9905337477cf17a21421ef932b97230",
+      "artifact": "modules/RegisterFile_2.sv"
+    },
+    "TLSplitInterface": {
+      "start_line": 263890,
+      "end_line": 264107,
+      "sha256": "87432557dafe790b7934c426e52d67e6ac7a6670912abbc3c162340ce19375a0",
+      "artifact": "modules/TLSplitInterface.sv"
+    },
+    "TLSplitInterface_2": {
+      "start_line": 461066,
+      "end_line": 461283,
+      "sha256": "61025553ea8ee7f347142f77946e035b5f0063b72948858b461f09b0c44864ea",
+      "artifact": "modules/TLSplitInterface_2.sv"
+    }
+  },
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/firesim-observability-archived-driver-v3/report.json": "e0cefa3a9fc03e40755eea4b89cd9970ad75690f361bf400a5f9887fea68d712",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/design/FireSim-generated.sv": "c0f972d2a63be8170f7c84a38633fbede855f00d3022e81141fa0bb274397b64",
+    "/scratch/copparihollmann/iris-model/build/scalar-fadd-whole-RTL-proof-v2/report.json": "5500e47eeb308c3edf8950617b35b54e82695621f41a3864d032e793f8d809da",
+    "/scratch/copparihollmann/iris-model/hardware/manifest.json": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+    "/scratch/copparihollmann/iris-model/hardware/evidence/outer-product-unit.scala": "be2f6842fc72538ef7b458e22e0f3a3668a58ae3038d03a5deea47f629adf3ff",
+    "/scratch/copparihollmann/iris-model/hardware/evidence/outer-product-sequencer.scala": "59dd5e0c462272ab0aca03516ab5516af62c1609029c0fdf8ebad8f04bff3580",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/int/IntegerPipe.scala": "4f8c24673fac6b181f145f00f4c0f3f339d57837377d303a52ebe9da659a344e",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/ExecutionUnit.scala": "7549d2bb2f8a9f6680d012486fdce7bed11b09b26f7c5e65c52345d8427db935",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/fp/FPFMAPipe.scala": "34a4e41f68861c4dc7b4803c49fd6d0b393964b633e9892a68310b5fcf0afaff",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/fp/SharedFPFMA.scala": "65c440405300c4df7295d7349c54c5709d33ae27cc02e836c6f3f71d18a871be",
+    "/scratch/copparihollmann/iris-model/hardware/evidence/saturn-parameters.scala": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+    "/scratch/copparihollmann/iris-model/hardware/evidence/iris-config.scala": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/shuttle/Configs.scala": "74850fbda13a0ad1ed5a215cbfc28485a9dc4e782ecace3dccc336981a61abf8",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/rocket/Configs.scala": "f8185e622376b661c8af071b0b40e051f5b1099acc8f5b3c7101bfd6b5a4c21e",
+    "/scratch/copparihollmann/iris-model/hardware/evidence/firesim-clocks.freq-summary": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+    "/scratch/copparihollmann/iris-model/third_party/shuttle/src/main/scala/exu/Core.scala": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+    "/scratch/copparihollmann/iris-model/third_party/shuttle/src/main/scala/exu/FPU.scala": "cf5caed71f33e566efbaa0ee01b8a5c0244552249ea964ebc677e822f369b0c1",
+    "/scratch/copparihollmann/iris-model/third_party/rocket-chip/src/main/scala/tile/FPU.scala": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+    "/scratch/copparihollmann/iris-model/third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/exu/FunctionalUnit.scala": "4d93110b4be070268af271b58a2047a64b4b0ad1eafc475f58d7ac8099200d03",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/backend/ExecuteSequencer.scala": "1ffdbb4198a5166963b5596ef90bd8fbeb582268e902eb04449d61b698c90c3e",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/backend/Backend.scala": "d4a4df872b47f50bcca1b845890845084deaf884daf0ce4e1c7aa11b8a6b8c96",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/backend/RegisterFile.scala": "4f21a5f2b8a849571d1c26e6921f76a846d8c460e3cd56b940fbe16361886d4d",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/backend/RegisterAccess.scala": "52630e5b354248c7370fd77fb73e6167e22e564e74f607b32a864bd19f591d4b",
+    "/scratch/copparihollmann/iris-model/hardware/opu_cell/check.py": "0e5cda4a7296e30812363fdf5632674c72a4fe1df4a044711065e27992bc59b0",
+    "/scratch/copparihollmann/iris-model/hardware/opu_array/check.py": "4f100e228353ae714aa715b1a19a13bff3762c50505a830fa4c6ac7dafc3599e",
+    "/scratch/copparihollmann/iris-model/build/opu-array-rtl-proof-v2-pipelined/results.json": "22ec3934f91f9d931c9f562b32de5b065ce1abbfece8f539021a50c3d047ba07",
+    "/scratch/copparihollmann/iris-model/build/opu-cell-rtl-proof-v2/results.json": "ae76215dfc93d25c09efb305b397cadf3ce9bc3feb5e4d67eb7f93c71e4c0ba8",
+    "/scratch/copparihollmann/iris-model/build/opu-sequencer-component-v2-final/report.json": "389c3b0660c161f0a753ca8e27dc586ab8c8eae7010b5434689eec17e6c866ca",
+    "/scratch/copparihollmann/iris-model/hardware/throughput_limits/derive.py": "6b6d1ca03261782d6a28df61f427eb20da7eabb2dbb3d04618d03a105ef99113"
+  },
+  "input_count": 30
+}

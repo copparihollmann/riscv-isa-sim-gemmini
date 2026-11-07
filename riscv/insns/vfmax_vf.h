@@ -1,3 +1,6 @@
+if(P.VU.iris_mode){
+#include "iris_fpcomp_body.h"
+}else{
 // vfmax
 
 require_zvfbfa
@@ -12,3 +15,5 @@ VI_VFP_VF_LOOP
 {
   vd = f64_max(vs2, rs1);
 })
+
+}

@@ -1,0 +1,4 @@
+# Keep the historical patch text byte-identical to the measured source capsule.
+iris/provenance/*.patch -whitespace
+# Retain the frozen source's existing whitespace-only line during this import.
+riscv/iris_timing_adapter.cc whitespace=-blank-at-eol

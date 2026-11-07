@@ -1,0 +1,75 @@
+{
+  "schema": "iris.fork_import_validation.v1",
+  "pass": true,
+  "native_binary_sha256": "cc9767615437f72ce7200d75df2aea39d6769a77b9a953c9c5c9bfc0d097c9ea",
+  "UART_sha256": "ab188412d6e1abf2648681c6605d6ada424a7c4d87cef192b8649092e882f516",
+  "clean_build_receipt": {
+    "external_path": "build/fork-iris-native-v2/build.json",
+    "sha256": "d7630d7c9ba962eaaa66ac4e4bd5a9159f274b855548434d8598c0b85be20a25"
+  },
+  "native_frozen_source_files_compared": 2140,
+  "documentation_files_excluded": [
+    "README.md",
+    ".gitignore"
+  ],
+  "native_files_changed_only_for_include_relocations": [
+    "riscv/clint.cc",
+    "riscv/iris_event_graph.cc",
+    "riscv/iris_fast_cache_control.cc",
+    "riscv/iris_fast_cache_tags.cc",
+    "riscv/iris_fast_frontend.cc",
+    "riscv/iris_fast_icache.cc",
+    "riscv/iris_fast_predictor.cc",
+    "riscv/iris_memory_adapter.cc",
+    "riscv/iris_rocket_fabric.cc",
+    "riscv/iris_rocket_frontend.cc",
+    "riscv/iris_rocket_packets.cc",
+    "riscv/iris_rocket_serial.cc",
+    "riscv/iris_saturn_live.h",
+    "riscv/iris_shuttle_issue.cc",
+    "riscv/iris_timing_adapter.h",
+    "riscv/mmu.h",
+    "riscv/plic.cc",
+    "riscv/sim.cc"
+  ],
+  "functional32": {
+    "count": 32,
+    "all_expected_exits_and_exact_frozen_stdout": true,
+    "external_path": "build/iris-fork-functional32-v3/report.json",
+    "sha256": "bc13ae9bef4549b41f855dd9fcd2cf41aabc61fab878065a29e5e2128f68b803"
+  },
+  "smokes": {
+    "compute": {
+      "external_receipt": "build/iris-fork-clean-rebuild-QA-v2/compute/run.json",
+      "sha256": "867475c9ae0f1eebfe983a64eb76a363b6398505796d27d63e83c15e63c38ba6",
+      "stdout_byte_identical_to_frozen_reference": true,
+      "stdout_sha256": "b8234024beedfd569229e5b8ea9ec85f32cc8a7e758b55139b078b50de4dd858"
+    },
+    "zephyr": {
+      "external_receipt": "build/iris-fork-clean-rebuild-QA-v2/zephyr/run.json",
+      "sha256": "05848878d7c8445c3c3a41f9a2ca1f34cf45f10bf346902b6b8bf2a6ee731c2d",
+      "stdout_byte_identical_to_frozen_reference": true,
+      "stdout_sha256": "926e90cff41e988f8e826993bc99302abc93535cac59376497359bff6f32d69c"
+    },
+    "profile": {
+      "external_receipt": "build/iris-fork-clean-rebuild-QA-v2/profile/run.json",
+      "sha256": "a57b11f2e4e2abb383c1eddecbb792ea5d7b65c55bff5e2c77ac518eef4e3d92",
+      "stdout_byte_identical_to_frozen_reference": true,
+      "stdout_sha256": "0f8fd7c8ae4814ec5a57c17db4b102d1630cca787ac294f859cf7952c9c8e06a"
+    }
+  },
+  "profile_regions": 3,
+  "historical_timing_validation_transferred": false,
+  "accuracy_2percent_certified": false,
+  "hardware_contacted": false,
+  "source_fork": "https://github.com/copparihollmann/riscv-isa-sim-gemmini",
+  "source_branch": "iris-model",
+  "prior_failures_preserved": [
+    "build/iris-fork-clean-rebuild-QA-v1/profile/run.json",
+    "build/iris-fork-functional32-v2/report.json"
+  ],
+  "prior_failure_causes": [
+    "Missing packaged source capacity report, then archived byte-identical report added",
+    "Raw canonical harness lacked dtc in PATH, then supplied matching tool; no native semantic fix"
+  ]
+}

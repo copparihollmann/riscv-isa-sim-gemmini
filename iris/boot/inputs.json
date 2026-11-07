@@ -1,0 +1,19 @@
+{
+  "schema": "iris.board_boot_inputs.v1",
+  "inputs": {
+    "bootrom": {
+      "hex": "bootrom.hex",
+      "bytes": 192,
+      "sha256": "5f6ae520d6612da2b31c2ee70bc872b743a77bbde0abba87bf96aa5fc249a216",
+      "original_input": "board/evidence/bootrom.rv64.img"
+    },
+    "dtb": {
+      "hex": "dtb.hex",
+      "bytes": 5724,
+      "sha256": "622c099a1dbcc87473d0760b1ec5b366c296d964aec834722d3c5ba0e4a95c78",
+      "original_input": "board/build/iris.dtb"
+    }
+  },
+  "chipyard_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+  "loaded_image_source_association_verified": false
+}

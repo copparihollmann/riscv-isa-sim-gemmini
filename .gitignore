@@ -8,3 +8,6 @@ autom4te.cache/
 .#*
 *~
 config.log
+/iris/.build/
+__pycache__/
+*.pyc

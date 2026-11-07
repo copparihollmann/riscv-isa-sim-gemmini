@@ -1,0 +1,264 @@
+{
+  "schema": "iris.upstream_source_import.v1",
+  "upstream": "https://github.com/riscv-software-src/riscv-isa-sim.git",
+  "upstream_commit": "72958551566a30f19444bd7e354552824e4d0a98",
+  "frozen_model_sha256": "35a804964d7882f36a8892d7672dcfbbc7becc89c87e2d830c149820c1291388",
+  "only_native_code_changes_since_frozen_source": "External include paths relocated into this repository iris/ subtree; no timing or instruction semantics intentionally changed. New binary requires separate checks.",
+  "include_relocations": [
+    {
+      "file": "riscv/iris_fast_predictor.cc",
+      "old": "../../../pipeline/fast_shuttle_predictor.cpp",
+      "new": "../iris/pipeline/fast_shuttle_predictor.cpp"
+    },
+    {
+      "file": "riscv/iris_fast_icache.cc",
+      "old": "../../../pipeline/fast_source_icache.cpp",
+      "new": "../iris/pipeline/fast_source_icache.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_serial.cc",
+      "old": "../../../pipeline/rocket_serial_peer.cpp",
+      "new": "../iris/pipeline/rocket_serial_peer.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_frontend.cc",
+      "old": "../../../pipeline/rocket_frontend_rtl_peer.cpp",
+      "new": "../iris/pipeline/rocket_frontend_rtl_peer.cpp"
+    },
+    {
+      "file": "riscv/sim.cc",
+      "old": "../../../board/iris_boot.hpp",
+      "new": "../iris/board/iris_boot.hpp"
+    },
+    {
+      "file": "riscv/sim.cc",
+      "old": "../../../board/physical_map.hpp",
+      "new": "../iris/board/physical_map.hpp"
+    },
+    {
+      "file": "riscv/iris_memory_adapter.cc",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_memory_path.cpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_memory_path.cpp"
+    },
+    {
+      "file": "riscv/iris_memory_adapter.cc",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_scalar_memory.cpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_scalar_memory.cpp"
+    },
+    {
+      "file": "riscv/iris_memory_adapter.cc",
+      "old": "../../../timing/empirical_cache.cpp",
+      "new": "../iris/timing/empirical_cache.cpp"
+    },
+    {
+      "file": "riscv/iris_memory_adapter.cc",
+      "old": "../../../timing/empirical_cache_v9.cpp",
+      "new": "../iris/timing/empirical_cache_v9.cpp"
+    },
+    {
+      "file": "riscv/iris_fast_cache_tags.cc",
+      "old": "../../../pipeline/frontend_cache.cpp",
+      "new": "../iris/pipeline/frontend_cache.cpp"
+    },
+    {
+      "file": "riscv/iris_fast_cache_control.cc",
+      "old": "../../../pipeline/frontend_cache_pipeline.cpp",
+      "new": "../iris/pipeline/frontend_cache_pipeline.cpp"
+    },
+    {
+      "file": "riscv/iris_fast_frontend.cc",
+      "old": "../../../pipeline/fast_source_frontend.cpp",
+      "new": "../iris/pipeline/fast_source_frontend.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_fabric.cc",
+      "old": "../../../pipeline/rocket_fabric_peer.cpp",
+      "new": "../iris/pipeline/rocket_fabric_peer.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_fabric.cc",
+      "old": "../../../pipeline/rocket_fabric_fixture.cpp",
+      "new": "../iris/pipeline/rocket_fabric_fixture.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_fabric.cc",
+      "old": "../../../pipeline/rocket_dcache_arbiter.cpp",
+      "new": "../iris/pipeline/rocket_dcache_arbiter.cpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/rvv_fadd_eg_source_v1.hpp",
+      "new": "../iris/timing/rvv_fadd_eg_source_v1.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/rvv_integer_eg_source_v1.hpp",
+      "new": "../iris/timing/rvv_integer_eg_source_v1.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/overlap_completion_entry_schedule.hpp",
+      "new": "../iris/timing/overlap_completion_entry_schedule.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/overlap_completion_command_queues_tk.hpp",
+      "new": "../iris/timing/overlap_completion_command_queues_tk.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/rocket_fabric_peer.hpp",
+      "new": "../iris/pipeline/rocket_fabric_peer.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/rocket_serial_peer.hpp",
+      "new": "../iris/pipeline/rocket_serial_peer.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/axi_functional_fixture.hpp",
+      "new": "../iris/pipeline/axi_functional_fixture.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/cbus_functional_fixture.hpp",
+      "new": "../iris/pipeline/cbus_functional_fixture.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/rocket_fabric_fixture.hpp",
+      "new": "../iris/pipeline/rocket_fabric_fixture.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/fabric_backing.hpp",
+      "new": "../iris/pipeline/fabric_backing.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/serial_backing.hpp",
+      "new": "../iris/pipeline/serial_backing.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/frontend_rtl_peer.hpp",
+      "new": "../iris/pipeline/frontend_rtl_peer.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/fast_source_frontend.hpp",
+      "new": "../iris/pipeline/fast_source_frontend.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/fast_rocket_packets.hpp",
+      "new": "../iris/pipeline/fast_rocket_packets.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/rocket_frontend_rtl_peer.hpp",
+      "new": "../iris/pipeline/rocket_frontend_rtl_peer.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/rocket_branch.hpp",
+      "new": "../iris/pipeline/rocket_branch.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/empirical_counter_clock.hpp",
+      "new": "../iris/pipeline/empirical_counter_clock.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/frontend_branch.hpp",
+      "new": "../iris/pipeline/frontend_branch.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_engine.hpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_engine.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_scalar_memory.hpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_scalar_memory.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/empirical_cache_v9.hpp",
+      "new": "../iris/timing/empirical_cache_v9.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/scalar_l2_hit_service.hpp",
+      "new": "../iris/pipeline/scalar_l2_hit_service.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../pipeline/scalar_outer_response_service_v2.hpp",
+      "new": "../iris/pipeline/scalar_outer_response_service_v2.hpp"
+    },
+    {
+      "file": "riscv/iris_timing_adapter.h",
+      "old": "../../../timing/shuttle_issue.hpp",
+      "new": "../iris/timing/shuttle_issue.hpp"
+    },
+    {
+      "file": "riscv/plic.cc",
+      "old": "../../../board/iris_plic.hpp",
+      "new": "../iris/board/iris_plic.hpp"
+    },
+    {
+      "file": "riscv/iris_rocket_packets.cc",
+      "old": "../../../pipeline/fast_rocket_ibuf.cpp",
+      "new": "../iris/pipeline/fast_rocket_ibuf.cpp"
+    },
+    {
+      "file": "riscv/iris_rocket_packets.cc",
+      "old": "../../../pipeline/fast_rocket_packets_checked.cpp",
+      "new": "../iris/pipeline/fast_rocket_packets_checked.cpp"
+    },
+    {
+      "file": "riscv/iris_event_graph.cc",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_engine.cpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_engine.cpp"
+    },
+    {
+      "file": "riscv/clint.cc",
+      "old": "../../../board/iris_clint.hpp",
+      "new": "../iris/board/iris_clint.hpp"
+    },
+    {
+      "file": "riscv/iris_shuttle_issue.cc",
+      "old": "../../../timing/shuttle_issue.cpp",
+      "new": "../iris/timing/shuttle_issue.cpp"
+    },
+    {
+      "file": "riscv/iris_shuttle_issue.cc",
+      "old": "../../../pipeline/empirical_hazards.hpp",
+      "new": "../iris/pipeline/empirical_hazards.hpp"
+    },
+    {
+      "file": "riscv/iris_shuttle_issue.cc",
+      "old": "../../../pipeline/fast_source_rvc_table.hpp",
+      "new": "../iris/pipeline/fast_source_rvc_table.hpp"
+    },
+    {
+      "file": "riscv/mmu.h",
+      "old": "../../../board/physical_map.hpp",
+      "new": "../iris/board/physical_map.hpp"
+    },
+    {
+      "file": "riscv/mmu.h",
+      "old": "../../../board/addressing.hpp",
+      "new": "../iris/board/addressing.hpp"
+    },
+    {
+      "file": "riscv/iris_saturn_live.h",
+      "old": "../../../pipeline/store_front_completion_runtime/empirical_engine.hpp",
+      "new": "../iris/pipeline/store_front_completion_runtime/empirical_engine.hpp"
+    }
+  ]
+}

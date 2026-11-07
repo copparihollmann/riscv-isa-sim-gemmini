@@ -1,3 +1,3 @@
 require_extension('D');
 require_fp;
-MMU.store<uint64_t>(RS1 + insn.s_imm(), FRS2.v[0]);
+IRIS_STORE_FPR(uint64_t,RS1 + insn.s_imm(),insn.rs2());

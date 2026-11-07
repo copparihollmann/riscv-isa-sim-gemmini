@@ -5,10 +5,24 @@
 #include "simif.h"
 #include "sim.h"
 #include "dts.h"
+#include "../iris/board/iris_clint.hpp"
+#include <stdexcept>
 
 clint_t::clint_t(const simif_t* sim, uint64_t freq_hz, bool real_time)
   : sim(sim), freq_hz(freq_hz), real_time(real_time), mtime(0)
 {
+  if (!sim->get_cfg().iris_bootrom_file.empty()) {
+    if (real_time || sim->get_cfg().hartids != std::vector<size_t>({0, 1, 2}))
+      throw std::runtime_error("Iris CLINT requires deterministic harts 0,1,2");
+    iris_timer = std::make_shared<iris_board::TimerRegisters>(3);
+    iris_timer->on_interrupt([this](unsigned hart, bool software, std::optional<bool> timer) {
+      auto* state = this->sim->get_harts().at(hart)->get_state();
+      state->mip->backdoor_write_with_mask(MIP_MSIP | MIP_MTIP,
+        (software ? MIP_MSIP : 0) | (timer.value_or(false) ? MIP_MTIP : 0));
+    });
+    tick(0);
+    return;
+  }
   struct timeval base;
 
   gettimeofday(&base, NULL);
@@ -34,6 +48,7 @@ clint_t::clint_t(const simif_t* sim, uint64_t freq_hz, bool real_time)
 
 bool clint_t::load(reg_t addr, size_t len, uint8_t* bytes)
 {
+  if (iris_timer) return iris_timer->load(addr, len, bytes);
   if (len > 8)
     return false;
 
@@ -66,6 +81,11 @@ bool clint_t::load(reg_t addr, size_t len, uint8_t* bytes)
 
 bool clint_t::store(reg_t addr, size_t len, const uint8_t* bytes)
 {
+  if (iris_timer) {
+    bool accepted = iris_timer->store(addr, len, bytes);
+    if (accepted) tick(0);
+    return accepted;
+  }
   if (len > 8)
     return false;
 
@@ -101,6 +121,12 @@ bool clint_t::store(reg_t addr, size_t len, const uint8_t* bytes)
 
 void clint_t::tick(reg_t rtc_ticks)
 {
+  if (iris_timer) {
+    iris_timer->advance_rtc(rtc_ticks);
+    for (const auto& [id, hart] : sim->get_harts())
+      hart->get_state()->time->sync(iris_timer->mtime());
+    return;
+  }
   if (real_time) {
    struct timeval now;
    uint64_t diff_usecs;
@@ -116,6 +142,22 @@ void clint_t::tick(reg_t rtc_ticks)
     hart->state.time->sync(mtime);
     hart->state.mip->backdoor_write_with_mask(MIP_MTIP, mtime >= mtimecmp[hart_id] ? MIP_MTIP : 0);
   }
+}
+
+uint64_t clint_t::get_mtime() { return iris_timer ? iris_timer->mtime() : mtime; }
+std::optional<uint64_t> clint_t::timer_compare(reg_t hartid) {
+  return iris_timer ? iris_timer->compare(hartid) : std::optional<uint64_t>(mtimecmp[hartid]);
+}
+uint64_t clint_t::get_mtimecmp(reg_t hartid) {
+  auto value = timer_compare(hartid);
+  if (!value) throw std::runtime_error("IRIS_CLINT_UNKNOWN_COMPARE hart=" + std::to_string(hartid));
+  return *value;
+}
+void clint_t::validate_iris_interrupts(unsigned hart, bool read_pending) const {
+  if (iris_timer && !iris_timer->compare(hart) &&
+      (read_pending || (sim->get_harts().at(hart)->get_state()->mie->read() & MIP_MTIP)))
+    throw std::runtime_error("IRIS_CLINT_UNKNOWN_MTIP hart=" + std::to_string(hart) +
+      " initialize all mtimecmp bytes before enabling MTIE or reading mip");
 }
 
 clint_t* clint_parse_from_fdt(const void* fdt, const sim_t* sim, reg_t* base,
