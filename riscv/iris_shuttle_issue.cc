@@ -113,6 +113,7 @@ bool iris_timing_adapter::fadd_eg_scalar_allowed(const insn_fetch_t&fetch)const{
 }
 
 bool iris_timing_adapter::frontend_uop_candidate(unsigned hart,const iris::shuttle::Uop&u)const{
+ if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&!base_integer(u)&&!u.cfi())return false;
  if(profile_.empirical_vadd_eg&&hart<2&&!vadd_eg_pending_[hart].empty()&&!((u.expanded&0xfc00707f)==0x57)&&!base_integer(u)&&!u.cfi()&&!source_counter_read(u))return false;
     if(profile_.empirical_fadd_eg&&hart<2&&!fadd_eg_pending_[hart].empty()&&u.instruction_name!="empirical-RVV-FADD-front"&&!base_integer(u)&&!u.cfi()&&!(profile_.empirical_fadd_eg_counter_csr&&source_counter_read(u)))return false;
     if(!u.control_verified||u.exception)return false;
@@ -128,7 +129,12 @@ bool iris_timing_adapter::frontend_uop_candidate(unsigned hart,const iris::shutt
     return base_integer(u)||source_counter_read(u)||u.cfi()||empirical_load_candidate(hart,u)||empirical_store_candidate(hart,u);
 }
 
+bool iris_timing_adapter::vle8_scalar_allowed(const insn_fetch_t&fetch)const{
+  auto u=pure_decode(fetch,true,false,true,false,false,false,false,false);
+  return u&&(base_integer(*u)||u->cfi());
+}
 bool iris_timing_adapter::pure_candidate(unsigned hart, const insn_fetch_t& fetch) const {
+  if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&!vle8_scalar_allowed(fetch))return false;
   if(profile_.empirical_vadd_eg&&hart<2&&!vadd_eg_pending_[hart].empty()&&!vadd_eg_is_vv(&fetch)&&!vadd_eg_scalar_allowed(fetch))return false;
   if(profile_.empirical_fadd_eg&&hart<2&&!fadd_eg_pending_[hart].empty()&&!fadd_eg_is_vv(&fetch)&&!fadd_eg_scalar_allowed(fetch))return false;
   if(frontend_enabled(hart)){const auto u=frontend_decode(hart,fetch);return u&&frontend_uop_candidate(hart,*u);}
@@ -214,6 +220,7 @@ void iris_timing_adapter::pure_dispatch(unsigned hart, const insn_fetch_t* first
   if (!cores_[hart]->iris_pipeline_context_safe())
     throw std::runtime_error("IRIS_PIPELINE_CONTEXT_CHANGED_DURING_FLIGHT hart="+std::to_string(hart));
   if(scalar_fadd_defer_irq(hart))return;
+  if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&cores_[hart]->iris_pipeline_interrupt_exception()){++vle8_metrics_[hart].IRQ_deferred;return;}
   if(profile_.empirical_async&&empirical_async_[hart]&&cores_[hart]->iris_pipeline_interrupt_exception())return;
   if (auto exception=cores_[hart]->iris_pipeline_interrupt_exception()) {
     if(frontend_enabled(hart)) {
@@ -227,7 +234,7 @@ void iris_timing_adapter::pure_dispatch(unsigned hart, const insn_fetch_t* first
     if (p.packets.empty()) { p.engaged=false; p.last_writer.fill(std::nullopt); }
     return;
   }
-  if (p.deferred_fetch) {if(profile_.empirical_async&&empirical_async_[hart])return;pure_exception(hart,p.deferred_fetch); p.deferred_fetch={}; return; }
+  if (p.deferred_fetch) {if((profile_.empirical_async&&empirical_async_[hart])||(profile_.empirical_vle8_front&&vle8_pending_[hart]))return;pure_exception(hart,p.deferred_fetch); p.deferred_fetch={}; return; }
   std::vector<std::pair<reg_t,insn_fetch_t>> fetched;
   std::vector<iris::shuttle::Uop> uops;
   reg_t next_pc=p.frontier;
@@ -399,6 +406,7 @@ void iris_timing_adapter::pure_accept(unsigned hart,
 }
 
 void iris_timing_adapter::pure_exception(unsigned hart,std::exception_ptr exception) {
+  if(profile_.empirical_vle8_front&&vle8_pending_[hart]){pure_[hart].deferred_fetch=exception;return;}
   if(profile_.empirical_async&&empirical_async_[hart]){pure_[hart].deferred_fetch=exception;return;}
   if(hart==2&&profile_.rocket_scalar_memory&&pure_[2].values&&pure_[2].values->pending_external_count())throw std::runtime_error("IRIS_ROCKET_SOURCE_PENDING_LOAD_PRECISE_INTERRUPT_UNMODELED");
   auto& p=pure_.at(hart);const auto divider=profile_.harts[hart].divider;

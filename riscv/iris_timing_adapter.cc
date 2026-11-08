@@ -70,6 +70,8 @@ iris_timing_adapter::Profile iris_timing_adapter::Profile::load(const std::strin
         if(!singleton.insert(key).second||f[1]!="owned-dirty-L1-COM-v1")throw std::runtime_error("unsupported empirical store front");p.empirical_store_front=true;
       } else if(key=="empirical_pending_base_retry"&&f.size()==2){
         if(!singleton.insert(key).second||f[1]!="h0h1-live-XPR-base-RRD-retry-v1")throw std::runtime_error("unsupported pending-base retry");p.empirical_pending_base_retry=true;
+      } else if(key=="empirical_vle8_front"&&f.size()==2){
+        if(!singleton.insert(key).second||f[1]!="single-row-e8m1-scalar-only-v1")throw std::runtime_error("unsupported single VLE8 front");p.empirical_vle8_front=true;
       } else if(key=="empirical_load_front"&&f.size()==2){
         if(!singleton.insert(key).second||(f[1]!="dram-L1-hit-latched-response-v1"&&f[1]!="dram-L1-hit-Shuttle-COM-forward-v2"))throw std::runtime_error("unsupported empirical load front");p.empirical_load_front=true;p.empirical_shuttle_load_com_forward=f[1]=="dram-L1-hit-Shuttle-COM-forward-v2";
       } else if(key=="empirical_icache"&&f.size()==2){
@@ -188,6 +190,7 @@ iris_timing_adapter::Profile iris_timing_adapter::Profile::load(const std::strin
   }
   if (!purpose || p.source.empty() || !p.base_hz || !p.rtc_divider || !p.max_cycles || !p.trap_cycles)
     throw std::runtime_error("incomplete timing integration fixture");
+  if(p.empirical_vle8_front&&(!p.empirical||!p.shuttle_pure_pipeline||!p.private_forwarded_values||!p.source_counter_clock||p.saved_shuttle_frontend||p.saturn_live))throw std::runtime_error("single VLE8 front requires explicit empirical sequential private Shuttle source-counter scope");
   if(p.empirical_vadd_eg&&(!p.empirical||!p.empirical_async||!p.shuttle_pure_pipeline||!p.private_forwarded_values||!p.source_counter_clock))throw std::runtime_error("VADD EG requires empirical source-counter private Shuttle async front");
   if(p.empirical_fadd_eg&&(!p.empirical||!p.empirical_async_fadd||!p.shuttle_pure_pipeline||!p.private_forwarded_values))throw std::runtime_error("FADD EG requires empirical private Shuttle FADD front");
   if(p.empirical_rocket_packets&&(!p.empirical||!p.rocket_pure_pipeline||p.saved_rocket_frontend||p.saturn_live))throw std::runtime_error("Rocket packet flow requires explicit empirical pure CPU mode and excludes other Rocket frontend actors");
@@ -239,6 +242,7 @@ iris_timing_adapter::iris_timing_adapter(Profile profile, std::vector<processor_
       retired_(cores_.size(), 0), seed_(schedule_seed), rng_(schedule_seed.value_or(0)) {
   empirical_diagnostics_=std::getenv("IRIS_EMPIRICAL_DIAGNOSTICS")!=nullptr;empirical_load_metrics_.resize(cores_.size());empirical_branch_recovery_.resize(cores_.size());empirical_fallback_counts_.resize(cores_.size());empirical_fetch_.resize(cores_.size());empirical_async_.resize(cores_.size());empirical_async_next_.resize(cores_.size());empirical_async_handoffs_.resize(cores_.size());empirical_branches_.resize(cores_.size());features_.resize(cores_.size());memory_features_.resize(cores_.size());
   if(profile_.empirical_store_front&&(profile_.saturn_live||profile_.rocket_scalar_memory||!profile_.private_forwarded_values))throw std::runtime_error("IRIS_STORE_FRONT_EXPLICIT_EMPIRICAL_PRIVATE_PIPELINE_REQUIRED");
+  vle8_pending_.resize(cores_.size());vle8_metrics_.resize(cores_.size());
   store_metrics_.resize(cores_.size());store_deferred_.resize(cores_.size());
   if(profile_.empirical)empirical_cache_=std::make_unique<iris::empirical::CacheHistoryV9>(iris::empirical::iris_geometry_v9(),profile_.empirical_read_overlap,profile_.empirical_shuttle_random);
   empirical_scalar_l2_services_.resize(cores_.size());for(const auto&r:profile_.empirical_scalar_l2_hit_rules)empirical_scalar_l2_services_.at(r.hart).configure(r.coefficient,profile_.max_cycles);
@@ -304,6 +308,7 @@ iris_timing_adapter::iris_timing_adapter(Profile profile, std::vector<processor_
       clock_.configure_resource(prefix + "MEM_ALU", 1);
   
     if(profile_.empirical_load_front)clock_.configure_resource(prefix+"LOAD_RESPONSE",1);
+    if(profile_.empirical_vle8_front)clock_.configure_resource("source.vle8.front"+std::to_string(i),1);
       clock_.configure_resource(prefix + "COM", 2);
       clock_.configure_resource(prefix + "WB", 2);
     }
@@ -317,7 +322,7 @@ iris_timing_adapter::iris_timing_adapter(Profile profile, std::vector<processor_
   if(profile_.saturn_live)saturn_initialize();
   if(profile_.empirical_rocket_packets)rocket_packet_initialize();
 }
-void iris_timing_adapter::retired(unsigned hart, size_t count) { if(profile_.empirical&&count==1)empirical_retired(hart);retired_.at(hart) += count; }
+void iris_timing_adapter::retired(unsigned hart, size_t count) { if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&vle8_pending_[hart]->front_retired)vle8_metrics_[hart].scalar_retired_while_pending+=count; if(profile_.empirical&&count==1)empirical_retired(hart);retired_.at(hart) += count; }
 
 const insn_fetch_t* iris_timing_adapter::completion_fetch(unsigned hart) const {
   if (!completing_ || *completing_ != hart) return nullptr;
@@ -335,6 +340,7 @@ std::exception_ptr iris_timing_adapter::completion_exception(unsigned hart) cons
 }
 
 void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) {
+  if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&!vle8_scalar_allowed(fetch))throw iris_timing_wait{};
   // Source EXU busy is sampled before the last VRF-write edge, including
   // the ordinary conservative FENCE path when there is no OPU tail.
   if(profile_.empirical_fadd_eg&&fadd_eg_fence_wait(hart,fetch))throw iris_timing_wait{};
@@ -409,6 +415,7 @@ void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fet
   if(opu_tail_fence){++opu_fence_admissions_[hart];if(async_trace_)*async_trace_<<"{\"event\":\"opu_fence_admit\",\"hart\":"<<hart<<",\"pc\":"<<pc<<",\"raw\":"<<uint32_t(empirical_instruction.bits())<<",\"cycle\":"<<clock_.now()<<",\"pending_numeric_commands\":"<<opu_pending_[hart].size()<<",\"all_source_queues_front_busy_clear\":true}\n";}
   if(profile_.empirical_fadd_eg&&hart<2&&async_trace_&&empirical_instruction.length()==4&&(uint32_t(empirical_instruction.bits())&0x707f)==0x000f&&fadd_eg_last_edge_[hart])*async_trace_<<"{\"event\":\"fadd_EG_fence_admit\",\"hart\":"<<hart<<",\"pc\":"<<pc<<",\"raw\":"<<uint32_t(empirical_instruction.bits())<<",\"cycle\":"<<clock_.now()<<",\"last_controller_edge\":"<<*fadd_eg_last_edge_[hart]*profile_.harts[hart].divider<<",\"last_preedge_busy\":"<<(fadd_eg_prebusy_[hart]?"true":"false")<<",\"pending\":"<<fadd_eg_pending_[hart].size()<<",\"controller_empty\":"<<(fadd_eg_queues_[hart].empty()?"true":"false")<<"}\n";
   if(profile_.empirical_vadd_eg&&hart<2&&async_trace_&&empirical_instruction.length()==4&&(uint32_t(empirical_instruction.bits())&0x707f)==0x000f&&vadd_eg_last_edge_[hart])*async_trace_<<"{\"event\":\"vadd_EG_fence_admit\",\"hart\":"<<hart<<",\"pc\":"<<pc<<",\"raw\":"<<uint32_t(empirical_instruction.bits())<<",\"cycle\":"<<clock_.now()<<",\"last_controller_edge\":"<<*vadd_eg_last_edge_[hart]*profile_.harts[hart].divider<<",\"last_preedge_busy\":"<<(vadd_eg_prebusy_[hart]?"true":"false")<<",\"pending\":"<<vadd_eg_pending_[hart].size()<<",\"controller_empty\":"<<(vadd_eg_queues_[hart].empty()?"true":"false")<<"}\n";
+  const bool staged_vle8=vle8_candidate(hart,pc,fetch);
   pending_[hart] = Pending{pc, fetch, {},profile_.empirical?empirical_feature(hart,fetch):Feature{}}; blocked_[hart] = true;
   iris::Op op{hart, selected->name, selected->resource, selected->latency, selected->interval};
   std::vector<iris::NodeId> cache_dependencies;std::optional<iris::empirical::Delta> cache_delta;
@@ -434,7 +441,8 @@ void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fet
   op.deps.insert(op.deps.end(),cache_dependencies.begin(),cache_dependencies.end());
   op.pc = pc; op.retires = false; op.issue_period = profile_.harts[hart].divider;
   if (previous_[hart]) op.deps.push_back(*previous_[hart]);
-  op.on_complete = [this, hart] {
+  op.on_complete = [this, hart, staged_vle8] {
+    if(staged_vle8){vle8_response(hart);return;}
     if (cores_[hart]->get_state()->pc != pending_[hart]->pc)
       throw std::runtime_error("IRIS_TIMING_PC_CHANGED_DURING_FLIGHT");
     if(profile_.source_counter_clock && clock_.now()%profile_.harts[hart].divider)throw std::runtime_error("IRIS_SOURCE_COUNTER_COM_OFF_HART_EDGE_UNMODELED");
@@ -483,6 +491,7 @@ void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fet
     memory_transfers_.push_back({hart,access.kind,std::move(transfer)});
   } else previous_[hart] = clock_.issue(std::move(op));
   pending_[hart]->completion_node=previous_[hart];
+  if(staged_vle8)vle8_begin(hart,*previous_[hart]);
   if(pending_[hart]->cache_owner)cache_nodes_[*pending_[hart]->cache_owner]=*previous_[hart];
   if(profile_.empirical_store_front&&async_trace_&&pending_[hart]->cache_owner){const auto&f=pending_[hart]->feature;if(!f.family.starts_with("memory.vector.")&&(f.memory.kind==iris::AccessKind::load||f.memory.kind==iris::AccessKind::store)){*async_trace_<<"{\"event\":\"scalar_cache_intent\",\"scope\":\"V6-approximate-intent-time-tags\",\"hart\":"<<hart<<",\"pc\":"<<pc<<",\"cycle\":"<<clock_.now()<<",\"address\":"<<f.memory.address<<",\"bytes\":"<<f.memory.bytes<<",\"write\":"<<(f.memory.kind==iris::AccessKind::store?"true":"false")<<",\"cache_owner\":"<<*pending_[hart]->cache_owner<<",\"node\":"<<*previous_[hart]<<",\"dependencies\":[";for(unsigned i=0;i<cache_dependencies.size();++i){if(i)*async_trace_<<',';*async_trace_<<cache_dependencies[i];}*async_trace_<<"]}\n";}}
 
@@ -493,6 +502,7 @@ void iris_timing_adapter::dispatch_ready() {
   if (seed_) std::shuffle(order_.begin(), order_.end(), rng_);
   for (unsigned hart : order_) {
     if (blocked_[hart]||empirical_branch_recovery_[hart]) continue;
+    if(profile_.empirical_vle8_front&&vle8_pending_[hart]&&cores_[hart]->iris_pipeline_interrupt_exception()){++vle8_metrics_[hart].IRQ_deferred;continue;}
     if(profile_.empirical_store_front&&store_deferred_[hart])continue;
     if(scalar_fadd_defer_irq(hart))continue;
     if(profile_.empirical_async&&empirical_async_[hart]&&cores_[hart]->iris_pipeline_interrupt_exception()){if(async_trace_)*async_trace_<<"{\"event\":\"interrupt_defer\",\"hart\":"<<hart<<",\"cycle\":"<<clock_.now()<<",\"pending\":"<<(empirical_async_next_[hart]?2:1)<<"}\n";continue;}
@@ -502,6 +512,16 @@ void iris_timing_adapter::dispatch_ready() {
       if (pure_[hart].engaged) continue;
     }
     auto* core = cores_[hart]; auto* state = core->get_state();
+    if(profile_.empirical_vle8_front&&vle8_pending_[hart]) {
+      // Demand fetch itself can trap before issue(). Until the older load
+      // publishes, admit only known pure scalar parcels through lookahead;
+      // retain all faulting/unknown and unsupported boundaries for demand.
+      if(!core->iris_pipeline_can_prefetch(state->pc,true))continue;
+      insn_fetch_t fetch;
+      try{fetch=core->get_mmu()->load_insn(state->pc);}catch(trap_t&){continue;}
+      if(vle8_scalar_allowed(fetch))pure_begin(hart,state->pc,fetch);
+      continue;
+    }
     if(frontend_enabled(hart)) {
       const auto& f=frontend_[hart];
       if(!f.prepared || f.inputs.redirect_flush || !f.outputs.queue[0].valid)continue;
@@ -720,3 +740,5 @@ void iris_timing_adapter::compact_histories(){
 #include "iris_empirical_store.inc"
 
 #include "iris_opu_fence.inc"
+
+#include "iris_vle8_front.inc"

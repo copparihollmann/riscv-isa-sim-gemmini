@@ -71,7 +71,10 @@ class iris_timing_adapter {
     bool saved_rocket_frontend = false;
     bool keep_history=true,empirical=false,empirical_async=false,empirical_async_two_owner=false,empirical_async_rrd_wake=false,empirical_async_fadd=false,empirical_icache=false,empirical_load_front=false,empirical_shuttle_load_com_forward=false,empirical_rocket_packets=false,empirical_vme_shape_work=false,empirical_store_front=false,empirical_read_overlap=false,empirical_shuttle_random=false,empirical_opu_entry=false,empirical_opu_tk124=false,empirical_pending_base_retry=false,empirical_fadd_eg=false,empirical_vadd_eg=false,empirical_fadd_eg_counter_csr=false,empirical_opu_fence=false;std::string empirical_identity;
     bool empirical_scalar_fadd=false;
-    bool saturn_live=false;std::string saturn_manifest;
+    bool saturn_live=false;
+    // Use prior alignment padding; keep existing Profile member offsets.
+    bool empirical_vle8_front=false;
+    std::string saturn_manifest;
     bool rocket_serial=false;unsigned serial_reset_phases=0;iris::fased::Parameters serial_latency{0,0,0,0};std::string serial_system_identity,serial_latency_identity;
     bool rocket_memory_fabric=false,rocket_scalar_memory=false;Cycle fabric_uncore_divider=0,fabric_first_edges=0,fabric_gap_edges=0;
     std::string fabric_initial_elf,fabric_service_source;
@@ -138,6 +141,24 @@ class iris_timing_adapter {
   void empirical_store_write_totals(std::ostream&)const;
   void empirical_store_observe(unsigned,size_t,const char*)const;
   void empirical_store_boundary_observe(unsigned);
+  struct Vle8Owner {
+    reg_t pc=0,address=0;uint32_t raw=0;unsigned destination=0,bytes=0;
+    iris::NodeId response=0,front=0;std::optional<uint64_t>cache_owner;
+    bool front_retired=false,response_done=false;
+    std::vector<uint8_t>vrf;std::vector<char>mrf;iris_definedness::Bytes vrf_known,mrf_known;
+    std::vector<uint8_t>initialized;std::array<uint64_t,10>config{};
+    std::vector<iris_definedness::Value<uint8_t>>data;
+  };
+  struct Vle8Metrics {uint64_t accepted=0,front_retired=0,responses=0,published_bytes=0,scalar_retired_while_pending=0,IRQ_deferred=0;};
+  bool vle8_candidate(unsigned,reg_t,const insn_fetch_t&)const;
+  bool vle8_scalar_allowed(const insn_fetch_t&)const;
+  void vle8_begin(unsigned,iris::NodeId);
+  void vle8_front(unsigned,const std::shared_ptr<Vle8Owner>&);
+  void vle8_response(unsigned);
+  void vle8_publish(unsigned,const std::shared_ptr<Vle8Owner>&);
+  void vle8_check_state(unsigned,const Vle8Owner&)const;
+  void vle8_write_totals(std::ostream&)const;
+  static reg_t vle8_front_handler(processor_t*,insn_t,reg_t);
   struct EmpiricalLoadMetrics{uint64_t accepted=0,hit_responses=0,coherence_fallbacks=0,faults=0,partial_transports=0,discarded_responses=0;};std::vector<EmpiricalLoadMetrics>empirical_load_metrics_;
   struct EmpiricalLoadActor{unsigned hart=0;uint64_t cache_owner=0;std::optional<iris::NodeId>response;bool discarded=false,done=false;};
   std::map<iris::NodeId,std::shared_ptr<EmpiricalLoadActor>>empirical_load_responses_;
@@ -487,4 +508,7 @@ class iris_timing_adapter {
   void rocket_dispatch(unsigned hart,const insn_fetch_t* first=nullptr);
   void rocket_accept(unsigned hart,reg_t pc,const insn_fetch_t& fetch);
   void write_rocket_json(std::ostream& out) const;
+  // Append experimental storage after every preexisting adapter member.
+  std::vector<std::shared_ptr<Vle8Owner>>vle8_pending_;
+  std::vector<Vle8Metrics>vle8_metrics_;
 };

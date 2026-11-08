@@ -1,0 +1,72 @@
+{
+  "schema": "iris.single_vle8_front.validation_reference.v1",
+  "source_pins": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+    "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+    "hardfloat": "0ecaef097ce2accbd16a61613699450ed5533f29",
+    "spike": "72958551566a30f19444bd7e354552824e4d0a98"
+  },
+  "native_experiment": {
+    "base_commit": "86e29f18323f93d8a31b0415dc395dd901caae45",
+    "source_patch_scope": "Six production files; uncommitted v2 experiment. Final candidate changes storage layout only and requires a fresh committed-source build.",
+    "native_sha256": "d9e7774bad41a3f9a00c839933f89fe0939daaf95440f92e8541dffe2794dd83",
+    "delivery_report_sha256": "15281c7303a7e009625d4fb010762c15da3af9c3a8da14410bc267436554875f",
+    "matched_analysis_sha256": "9a9e9215d1e5b3f3a4494132c99cd9c00b4a991ebf5cd131471c845391f61ab9"
+  },
+  "source_cut": {
+    "report_sha256": "70f0cf3497e48f37ee90434c093933020feb24343c2280a04a257373c43343df",
+    "binary_sha256": "352d08e36e518834b70be1644a78990d2a86e898259c56411a4566b8f4f4f47c",
+    "probe_source_sha256": "67dbf2ba801e1263e791ddc957232063ef154ed41c8c3f14d5bb6f4fd93cad8b",
+    "sdk_library_sha256": "047ae13dab928557175002c9a4622ccadae163ec1f6d150eee4e399367d258e6",
+    "source_EX_to_PFC_permission_edges": 2,
+    "memory_request_bytes": 16,
+    "ATL_bus_bytes": 32,
+    "cases": 8,
+    "external_D_hold_edges": 64,
+    "scope": "Source Compute128 unit and ownership ledger; explicit two-state reference and authored external service, no physical-latency calibration."
+  },
+  "matched_FPGA_diagnostic": {
+    "ELF_sha256": "176657f05cfb0440a89eecbc461a4a41d8578bebb1c61aeae9e19f5947cf745f",
+    "shapes": 10,
+    "shape_variants": 20,
+    "regions": 240,
+    "split": "fitting_only",
+    "heldout_used": false,
+    "eligible_vector_loads": 119040,
+    "total_vector_loads": 119040,
+    "loaded_bytes": 3710208,
+    "scalar_instructions_retired_while_pending": 131548,
+    "previous_median_absolute_error_percent": 48.41875453858498,
+    "median_absolute_error_percent": 33.75795995355786,
+    "previous_p90_absolute_error_percent": 71.8244788430779,
+    "p90_absolute_error_percent": 50.2799908294913,
+    "scope": "Same exact ELF/outputs/guards/checksums/minstret against archived FPGA measurements. No parameter fitting; image/source association and global accuracy remain uncertified."
+  },
+  "regression_gates": {
+    "native_directed_cases": 18,
+    "actual_processor_and_permission_checks": 11,
+    "RVV_gate_assertions": 178,
+    "parent_functional_guests": 32,
+    "FP8_cases": 56,
+    "FP8_cartesian_products": 262144,
+    "fetch_cases": 4,
+    "Zephyr_physical_harts": 3,
+    "Zephyr_checksums": 9,
+    "CPU_twin_cases": 20
+  },
+  "limitations": [
+    "Opt-in only; harts0/1 e8m1 VL1..32 ordinary readable DRAM within one32B block and one4KiB page.",
+    "One pending load; scalar integer/CFI overlap only, full VRF/MRF guards and unsupported-boundary drains.",
+    "source_compute MM TK3 remains refused; source_os covers the full enabled56 FP8 corpus.",
+    "Hart0/1 current elaborated DTB has no PMP regions; separate implemented-PMP processor fixture tests denial.",
+    "Legacy ATL beat feature is a proxy and is not a physical Get count.",
+    "Fresh final-source build/regression required; archived dirty build validation does not transfer automatically."
+  ],
+  "default_changed": false,
+  "timing_parameters_changed": false,
+  "hardware_actions_by_component": false,
+  "accuracy_2percent_certified": false,
+  "full_model_certified": false
+}
