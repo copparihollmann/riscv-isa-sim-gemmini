@@ -85,6 +85,11 @@ illegal-instruction trap; the test keeps these cases distinct.
 
 ## Recorded experiment and limits
 
+The [fresh committed-source validation](validation/committed-8923470-v1.json)
+records the rebuilt native/UART/launcher and all rerun gates. Its same-ELF
+240-region timing and numeric results reproduce the historical v2 experiment
+below; the two build identities remain distinct.
+
 [Validation references](validation/single-vle8-front-v1.json) pin the source
 revisions and archived proof/report digests. The paired benchmark used the
 identical FPGA ELF: ten frozen fitting shapes, two kernel variants, 240 regions.
@@ -101,8 +106,9 @@ No held-out timings or parameter fitting were used. The remaining errors are
 substantial. `source_compute` retains its existing MM `TK=1,2,4` boundary and
 refuses `TK=3`; the full four-format FP8 corpus was additionally checked with the
 supported `source_os` profile. Hart 2 and multicore/Zephyr timing receive no new
-accuracy certification. The final committed-source build must rerun its gates;
-archived experimental validation does not transfer automatically.
+accuracy certification. The final committed-source build has rerun its gates,
+recorded separately in [committed-build validation](validation/committed-8923470-v1.json); archived
+experimental validation does not transfer automatically.
 
 New callbacks are nonvirtual. Processor/MMU layouts are unchanged. New owner
 storage is appended to the timing adapter, and its profile flag uses prior

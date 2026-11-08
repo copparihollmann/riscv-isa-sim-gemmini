@@ -1,0 +1,291 @@
+{
+  "schema": "iris.committed_build_validation.v1",
+  "source_commit": "892347034098fba6e37382902777b3d0b08346ef",
+  "source_pins": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+    "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+    "hardfloat": "0ecaef097ce2accbd16a61613699450ed5533f29",
+    "spike": "72958551566a30f19444bd7e354552824e4d0a98"
+  },
+  "changes": [
+    {
+      "commit": "8fe5f2a59b19f74398dccff608e76b92228879f2",
+      "scope": "Read only architecturally consumed RVV operands; preserve unknown actual-source refusals."
+    },
+    {
+      "commit": "86e29f18323f93d8a31b0415dc395dd901caae45",
+      "scope": "Separate timing retries from architectural events; preserve trap/debug/trigger outcomes."
+    },
+    {
+      "commit": "892347034098fba6e37382902777b3d0b08346ef",
+      "scope": "Opt-in single pending e8m1 load front with scalar integer/CFI overlap and unchanged memory service."
+    }
+  ],
+  "build": {
+    "directory": "/users/copparihollmann/iris-work/out/build/iris-vle8-front-final-v1",
+    "source_clean": true,
+    "fresh_native_UART_launcher_rebuild": true,
+    "input_files": 2265,
+    "all_inputs_unchanged_after_gates": true,
+    "native_sha256": "ff5e4f4fdb8b0277aa3f49735f982a5a6d6ad018e5cea0a63502739d143b56fc",
+    "uart_sha256": "8441360150ec1b13e7a754bbb33e5a18833d133fa5862e7408e94fee1779665f",
+    "launcher_sha256": "b12edc768db2a4363e6499ded45be04b96979ee85520fdbe23da71ba184f43ef",
+    "build_receipt_sha256": "51eecb651e1b27ec12a8bb243de4a90db76d6cb347b6ed20d7d661f3f65244b1",
+    "delivery_report": "/users/copparihollmann/iris-work/out/artifacts/probes/vle8-final-committed-delivery-v1/report.json",
+    "delivery_report_sha256": "390e18df040ba9f9ff51297ec6d58d6a6012bc2e06118e4b9f74f83c300cc470"
+  },
+  "gates": [
+    {
+      "name": "directed_vle8_actual_guests",
+      "passed": true,
+      "cases_or_assertions": 18,
+      "scope": "Byte knownness, tails, partial memory, captured address, fallback, precise fault, IRQ and pending fetch fault; opt-in enabled.",
+      "report_sha256": "6d7a189de74973452c6aced686c7ecce4c443b5713de47c7ee9cacffb8402fde"
+    },
+    {
+      "name": "actual_processor_permissions_and_events",
+      "passed": true,
+      "cases_or_assertions": 11,
+      "scope": "Timing wait versus real illegal/access/interrupt/debug/trigger events; nonmutating span, locked PMP and active load trigger.",
+      "report_sha256": "3ded92e797d58f206d520eb7c9d3ca28ac226e0de15be0842037f398555d7835"
+    },
+    {
+      "name": "Compute128_withheld_D",
+      "passed": true,
+      "cases_or_assertions": 8,
+      "scope": "Matching unchanged source-cut SDK; VL1/3/16/32 times two reset seeds; real owner return and1024VRF bytes.",
+      "report_sha256": "b6dbefb9f120594ef80d22d821e39a26ddcb133000fd0bb70173fb4932e5db3d"
+    },
+    {
+      "name": "RVV_consumed_operand_definedness",
+      "passed": true,
+      "cases_or_assertions": 178,
+      "scope": "63 newly compiled directed ELFs; fixed/native legacy/generic comparisons including required negative refusals; all3physical.",
+      "report_sha256": "162641805f463c3e9086b0621a559635632d4f5fb1fd0ec55d06cb75c494cf14"
+    },
+    {
+      "name": "original_functional32",
+      "passed": true,
+      "cases_or_assertions": 32,
+      "scope": "Original argv and environment, exact raw stdout SHA, expected exit and diagnostics; dtc PATH preserved.",
+      "report_sha256": "780da0dc20e0ffc5b57eba9526a6eb14f326ef8b790c099e2b84328e25243357"
+    },
+    {
+      "name": "functional_FP8_fetch_Zephyr_CPUtwins",
+      "passed": true,
+      "cases_or_assertions": 89,
+      "scope": "56FP8 all4formatpairs/262144byteproducts,4fetchcases,3CPUZephyr9checksums,2CPUtwinELFs20cases; timingOFF instruction-count semantics.",
+      "report_sha256": "7c2282fa523196b19fe3bbb6bf0c403320c7c722ec2cf51536f46c811ad470e4"
+    },
+    {
+      "name": "enabled_source_os_FP8",
+      "passed": true,
+      "cases_or_assertions": 56,
+      "scope": "All4formatpairs/262144byteproducts; opt-in source_os timing profile enabled.",
+      "report_sha256": "96e0a8629effb37ee4149eb8d5814531a459577c0c8240debf94a6cc17c0c3ff"
+    },
+    {
+      "name": "enabled_source_compute_supported_FP8",
+      "passed": true,
+      "cases_or_assertions": 28,
+      "scope": "All4formatpairs first7power2 cases each. All4 full-corpus runs preserve expected TK3 refusal; not full56compute support.",
+      "report_sha256": "15c0c0853d6fbddfca136c97c39f813dc26007c6c551c43fe986b6740c49f100"
+    },
+    {
+      "name": "same_ELF_quiet_fitting240",
+      "passed": true,
+      "cases_or_assertions": 240,
+      "scope": "Exact frozen176657 ELF, all3physical/h0active, no latency/bandwidth fit, all fullwords/guards/checksums.",
+      "report_sha256": "e513dc386f281a6c599dd07d92b32ece03fe5710d0d82a78625801326d90995d"
+    },
+    {
+      "name": "fresh_matched_numerical_analysis",
+      "passed": true,
+      "cases_or_assertions": 240,
+      "scope": "All240retirement/checksum/word/guard matches against archived FPGA; 10fitting shapes only. Fresh final load eventscope119040/119040.",
+      "report_sha256": "6c24ca303595a5aa4429538bd275287dc23a79c4b8fd1baadc4d4c61d65beb58"
+    }
+  ],
+  "FP8_scope": {
+    "functional_all_four_E4M3_E5M2_pairs_cases": 56,
+    "cartesian_byte_products": 262144,
+    "enabled_source_os_cases": 56,
+    "enabled_source_compute_supported_cases": 28,
+    "expected_source_compute_TK3_refusals": 4,
+    "full_56_case_source_compute_claimed": false
+  },
+  "single_hart_fitting_diagnostic": {
+    "report": "/users/copparihollmann/iris-work/out/artifacts/probes/vle8-final-committed-matched-analysis-v1/report.json",
+    "report_sha256": "6c24ca303595a5aa4429538bd275287dc23a79c4b8fd1baadc4d4c61d65beb58",
+    "same_ELF_sha256": "176657f05cfb0440a89eecbc461a4a41d8578bebb1c61aeae9e19f5947cf745f",
+    "shapes": 10,
+    "shape_variants": 20,
+    "regions": 240,
+    "warmups_per_variant": 3,
+    "measured_repetitions_per_variant": 9,
+    "all_words_guards_checksums_and_minstret_match_archived_FPGA": true,
+    "median_absolute_error_percent": 33.75795995355786,
+    "p90_absolute_error_percent": 50.2799908294913,
+    "p90_definition": "Linear interpolation of20shape-variant absolute median-cycle errors.",
+    "previous_clean_waitfix_median_absolute_error_percent": 48.41875453858498,
+    "previous_clean_waitfix_p90_absolute_error_percent": 71.8244788430779,
+    "eligible_loads": 119040,
+    "total_vector_loads": 119040,
+    "loaded_bytes": 3710208,
+    "scalar_instructions_retired_while_load_pending": 131548,
+    "physical_utilization_inferred": false,
+    "heldout_used": false,
+    "timing_parameters_fitted": false
+  },
+  "separate_current_FPGA_campaign": {
+    "passing_managed_jobs": 6,
+    "passing_reports": [
+      {
+        "name": "smoke",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/smoke-analysis-v1/report.json",
+        "report_sha256": "abd4e131fcd8b63e0d070a077feb0b41e71906d87c12ec6652cf7f62e5d1b4c1",
+        "archive_sha256": "85f2cfdb70b4b4379dd0f20500d7fb4f71839f8a62a5b5633d9e72998bd832ae",
+        "elf_sha256": "8dc2b98ae2d413782333dfd19be894cbc363e3b1004b754df8026aae2c52b86e",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      },
+      {
+        "name": "broad",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/broad-analysis-v1/report.json",
+        "report_sha256": "6b3b26c8a6eb660f1fbb97b4cde8d151b78a09c0dde351fc48eddc001383c204",
+        "archive_sha256": "77becced26348637786339cfd1f176c47103dbd70a75243c158e90d77811f700",
+        "elf_sha256": "246d90d8081fcfd2cd63d2bd590be222c9cba4ffa2c0a0fa5535b5a54f753813",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      },
+      {
+        "name": "quiet-fitting",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/quiet-fitting-analysis-v1/report.json",
+        "report_sha256": "c7a680415417894868e9bdd6361ad68a48574ffe673a92d1cf5944e5adf9fb11",
+        "archive_sha256": "ab4bccd533986c78564cbdea7d4c93291e2517cdf99f3ea017686617d2c1ffbb",
+        "elf_sha256": "176657f05cfb0440a89eecbc461a4a41d8578bebb1c61aeae9e19f5947cf745f",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      },
+      {
+        "name": "encoder-phases",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/encoder-phases-analysis-v1/report.json",
+        "report_sha256": "ef9bbef3f556abc0f71e25718964f25ec3464ac9865455186297cd5804b401d6",
+        "archive_sha256": "876a67fef07d0f485ee4f751ad40dd59f7fd4a51d7b9f9d678b1fda66c05a836",
+        "elf_sha256": "6832a7e15cd62187505ddfc1a2071023c5f29f85eee5cc20cfb82032596d257a",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      },
+      {
+        "name": "zephyr-onecpu-bridge",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/zephyr-onecpu-bridge-analysis-v1/report.json",
+        "report_sha256": "c43e91a8929fe59bc9ed8a86d9446e3d8606ff8add9a88b24c0d551f5006acc7",
+        "archive_sha256": "cac12adf43c90543adacc776d1c98cefd29e0b26867b924ebc9a033ac2532c73",
+        "elf_sha256": "94441a9a064a40288a6cbb43c6aa44fbe75bc4bd2e907b9f82fd36d8a2baab42",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      },
+      {
+        "name": "zephyr-uart-v11b",
+        "report": "/users/copparihollmann/iris-work/out/artifacts/fpga/parallel-vme-20261108/zephyr-uart-v11b-analysis-v1/report.json",
+        "report_sha256": "27597b39b4e3d4453a30cb0d585e22e108a2465eaa0b5886767c641fa4c12a65",
+        "archive_sha256": "6e5b6264877f8a36a5660bb3ec3ff420f74a898c1942180f63cfd16bad983a5e",
+        "elf_sha256": "9f5d6e0d5c47c37e508a3c4ec3f652dbdd6b2d58177ace38f86e6d8b7e71f53b",
+        "passed": true,
+        "whole_model_validated": false,
+        "hardware_source_association_verified": false
+      }
+    ],
+    "failed_diagnostic_variants_preserved": true,
+    "quiet_fitting_kernel_cycle_examples": [
+      {
+        "shape": [
+          64,
+          64,
+          64
+        ],
+        "baseline_median_cycles": 11122,
+        "hybrid_median_cycles": 9098,
+        "signed_change_of_variant_medians_percent": -18.198165797518428
+      },
+      {
+        "shape": [
+          128,
+          128,
+          128
+        ],
+        "baseline_median_cycles": 58854,
+        "hybrid_median_cycles": 42077,
+        "signed_change_of_variant_medians_percent": -28.506133822679846
+      }
+    ],
+    "encoder_pack": {
+      "grid_median_cycles": 11980,
+      "IEEE_bits_median_cycles": 3313,
+      "speedup_grid_over_IEEE_bits": 3.6160579535164503,
+      "scope": "Packing phase only; measured fixture, not whole-model speedup."
+    },
+    "Zephyr_v11b": {
+      "physical_harts": 3,
+      "online_OS_cpus": 3,
+      "controller_hart": 2,
+      "compute_worker_hart": 0,
+      "management_probe_hart": 1,
+      "full_FP32_words": 128,
+      "all_words_exact": true,
+      "phase_rows": 22,
+      "periodic_ticks_per_second": 10000,
+      "tickless": false,
+      "completion": "Bounded K_NO_WAIT polling plus64nop/yield; controller-owned terminal CAS.",
+      "tickless_failure_cause_identified": false,
+      "two_simultaneous_compute_workers_validated": false,
+      "whole_model_validated": false
+    },
+    "physical_unit_busy_fraction": null,
+    "hardware_source_association_verified": false,
+    "timing_accuracy_certified": false
+  },
+  "separate_full_TinyLlama_native_fixture": {
+    "report": "/users/copparihollmann/iris-work/out/artifacts/applications/iris/v1/applications_iris_v1_20261108T035939Z_d7314dd/hardware-handoff/exact-new-elf-native-gate.json",
+    "report_sha256": "716b10045b79c9182e90178ba845f6318ee3fc183676cd63b5bd3439a72b60e3",
+    "native_binary_sha256": "12e51b98964125d6b18e7172efc92f7bdc0ad95ee4259f33aed98856a5764cad",
+    "ELF_sha256": "0001e17165042f6eb49320ef95b159703f41d9c8fc601e14948b57de4a925fbd",
+    "physical_harts": 3,
+    "online_OS_cpus": 1,
+    "CONFIG_SMP": false,
+    "controller_hart": 0,
+    "worker_hart": 0,
+    "all_32000_FP32_words_equal": true,
+    "full_output_raw_FP32_sha256": "2d856821ffcd4996425e32b4f82cee184e1eaad845c43c37ba6cbdf37376dc13",
+    "all_eight_generated_tokens_equal": true,
+    "generated_tokens": [
+      338,
+      1304,
+      363,
+      3370,
+      10643,
+      29889,
+      450,
+      3815
+    ],
+    "counter_semantics": "functional_instruction_counts_not_RTL_cycles",
+    "independence_scope": "Exact new OS1 ELF executed on native12e; full output compared to originalIEEE native, whose outputs match completed originalgrid native and independent panel CPU twin. Transitive model-math reference; not a separately rebuilt OS1 CPU twin.",
+    "full_model_FPGA_execution": "pending",
+    "timing_certified": false
+  },
+  "default_promoted": false,
+  "provider_default_changed": false,
+  "timing_fixtures_changed": false,
+  "accuracy_2percent_certified": false,
+  "heldout_revalidated": false,
+  "physical_busy_available": false,
+  "historical_accuracy_transferred": false,
+  "evidence_location_note": "External immutable archive paths are retained with SHA256 identity; these large logs and binaries are not shipped in this compact record."
+}

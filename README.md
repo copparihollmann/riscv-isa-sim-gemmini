@@ -1,38 +1,101 @@
 # Iris SoC functional and cycle-approximate Spike model
 
-**Latest recorded capabilities and results — 2026-11-07.** This
-[`iris-model` branch](https://github.com/copparihollmann/riscv-isa-sim-gemmini/tree/iris-model)
+**Latest validated source — `892347034098fba6e37382902777b3d0b08346ef`.**
+This [`iris-model` branch](https://github.com/copparihollmann/riscv-isa-sim-gemmini/tree/iris-model)
 contains the Iris-specific Spike implementation, based on upstream
-`72958551566a30f19444bd7e354552824e4d0a98`. The compiler-facing integration is
-[`ucb-bar/iris-mlir`, `handwritten-implementation`](https://github.com/ucb-bar/iris-mlir/tree/handwritten-implementation),
-which pins the model revision.
+`72958551566a30f19444bd7e354552824e4d0a98`. Compiler integration lives in
+[`ucb-bar/iris-mlir`, `handwritten-implementation`](https://github.com/ucb-bar/iris-mlir/tree/handwritten-implementation).
+The model supports kernel/compiler development, three heterogeneous harts and
+Zephyr, with experimental timing and JSON/Perfetto profiling. **The overall ±2%
+timing target is not met.** Source publication does not promote the compiler
+provider default or change the existing timing fixtures.
 
-The model supports compiler/kernel functional iteration, three-hart Zephyr
-execution and experimental timing/profiling. **The overall ±2% timing target is
-not met.** The strongest accuracy is in isolated RVV arithmetic and VME compute;
-concurrent OS work and memory/computation overlap retain substantial errors.
+## Latest native validation
 
-**Fork build check:** clean native build
-`cc9767615437f72ce7200d75df2aea39d6769a77b9a953c9c5c9bfc0d097c9ea`
-passed all 32 directed functional cases and the baremetal, Zephyr and source
-profiling smokes, with byte-identical stdout to their frozen references. The
-profile smoke admitted three regions and produced JSON/Perfetto output.
-[Build/run guide](iris/BUILD.md) · [exact rebuild evidence](iris/provenance/fork-rebuild-validation.json).
-These migration checks do not establish new timing accuracy; the timing tables
-below identify the separate, historically measured binary.
+A fresh native, UART library and launcher rebuild from the committed source
+produced native SHA256
+`ff5e4f4fdb8b0277aa3f49735f982a5a6d6ad018e5cea0a63502739d143b56fc`.
+All 2,265 recorded build inputs remained unchanged after these fresh gates:
 
-**Compiler-kernel fetch fix:** native build
-`12e51b98964125d6b18e7172efc92f7bdc0ad95ee4259f33aed98856a5764cad`
-passes Merlin's 45 quick `vme_gemm_2x2_bias` cases, all 32 existing functional
-guests with exact reference stdout, and the normal three-hart Zephyr smoke with
-all nine independently checked region checksums and byte-identical stdout.
-Speculative lookahead now stops at undefined instruction bytes beyond a return;
-an actual jump into those bytes still fails closed. Four directed guests check
-both unknown first parcels and missing second parcels against the old and fixed
-builds (eight expected outcomes).
-[Validation receipts](iris/provenance/speculative-fetch-validation.json) bind the
-new build and raw results. These functional checks establish no new timing
-accuracy and do not transfer the historical accuracy tables to this build.
+- 63 newly compiled RVV ELFs / 178 comparison assertions; the original 32
+  functional guests with exact reference stdout, expected exits and diagnostics;
+  four instruction-fetch cases; and 20 CPU-twin cases. Instructions read only
+  the operands they actually consume; required undefined operands still fail closed.
+- All four E4M3/E5M2 operand pairs: 56 FP8 cases and 262,144 byte products in
+  functional mode, plus all 56 cases with the enabled `source_os` timing profile.
+  `source_compute` passes its 28 supported power-of-two cases and preserves all
+  four expected `TK=3` refusals; it does **not** pass the full 56-case compute corpus.
+- The normal three-physical-hart Zephyr smoke with nine independently checked
+  region checksums. Timing retries remain separate from architectural traps,
+  interrupts, debug and trigger events.
+- An **opt-in** vector-load front: 18 directed guests, 11 actual-processor
+  permission/event checks and eight unchanged Compute128 source-cut tests with
+  data return withheld. One pending load permits scalar integer/control-flow
+  progress on harts 0/1; scope is unmasked single-field `e8,m1`, VL 1–32,
+  M-mode readable DRAM within one 32-byte block/page. Full VRF/MRF guards remain
+  active. Other instruction classes and interrupts drain the response.
+
+[Committed-build validation and evidence digests](iris/validation/committed-8923470-v1.json)
+record the separate scopes, exact binaries and raw-report identities.
+[Build/run guide](iris/BUILD.md) · [opt-in load-front details](iris/SINGLE_VLE8_FRONT.md).
+The source-cut proof establishes front permission before data return; it does
+not calibrate physical memory latency or a complete LSU/VRF-bank model.
+
+The **same exact ELF** used in an archived FPGA run was replayed locally: all
+240 full-output, guard, checksum and retired-instruction comparisons passed.
+This diagnostic contains **10 fitting shapes only**, two kernel variants,
+three warmups and nine measured repetitions per pair. Across the 20
+shape/variant medians:
+
+| Fitting-only cycle diagnostic | Prior clean timing-retry build | New opt-in load-front build |
+| --- | ---: | ---: |
+| Median absolute error | 48.42% | 33.76% |
+| P90 absolute error, linear interpolation | 71.82% | 50.28% |
+
+No latency/bandwidth parameters were fitted and no held-out timings were used.
+The remaining errors are substantial. This establishes no new multicore,
+whole-workload or ±2% timing certification. All 119,040 loads matched the narrow
+component scope; 131,548 scalar instructions retired while a load was pending.
+Those instruction counts are **not physical utilization**. Historical accuracy
+tables below retain their own binary, cohort and nearest-rank P90 definition.
+
+## Current compiler and FPGA campaign
+
+A separate managed FPGA campaign has **six passing jobs**: smoke, broad kernel
+batch, quiet fitting batch, encoder phases, one-online-CPU Zephyr, and the
+three-online-CPU periodic/polled Zephyr fixture. Failed diagnostic variants
+remain archived separately. These executions do not establish complete
+loaded-image/source association or whole-model FPGA coverage.
+
+The quiet single-compute-hart FP8 kernel measurements show:
+
+| Shape | Baseline median cycles | Hybrid median cycles | Cycle change |
+| --- | ---: | ---: | ---: |
+| 64 × 64 × 64 | 11,122 | 9,098 | −18.2% |
+| 128 × 128 × 128 | 58,854 | 42,077 | −28.5% |
+
+These are fitting-only, nine-repeat measurements after three warmups, with
+balanced AB/BA ordering and full outputs/guards checked. They are kernel
+measurements, separate from simulator prediction error. In the encoder fixture,
+IEEE-bit packing took 3,313 median cycles versus 11,980 for grid packing:
+**3.616× faster for the packing phase**, not a whole-model speedup. Physical
+unit busy fractions remain unavailable.
+
+The latest Zephyr FPGA fixture passes 128 exact FP32 output words and 22 phase
+observations with controller hart 2, compute hart 0 and management probe hart 1.
+It uses periodic 10,000-ticks/s timing and bounded completion polling. The cause
+of the earlier tickless failures and simultaneous compute on both harts 0/1
+remain unvalidated by this fixture.
+
+A separate full TinyLlama one-online-CPU Zephyr ELF passed on native
+`12e51b98964125d6b18e7172efc92f7bdc0ad95ee4259f33aed98856a5764cad`:
+all 32,000 final FP32 words and eight generated tokens match its preserved
+reference chain, including the original independent panel CPU twin. All three
+physical harts exist; controller/worker 0 is the sole online OS CPU. This is
+functional instruction-count mode. It establishes no RTL cycle accuracy or
+whole-model gate on the new build from `8923470`. **Full-model FPGA validation remains pending.** The
+[compact validation record](iris/validation/committed-8923470-v1.json) binds each
+campaign report and the TinyLlama ELF/output identities separately.
 
 ## Current capabilities
 
@@ -46,8 +109,10 @@ accuracy and do not transfer the historical accuracy tables to this build.
 - Physical memory/device behavior includes the two 128-KiB TCMs, 128-KiB system
   scratchpad, 4-GiB DRAM address map, console, CLINT timers/IPIs, cross-hart
   atomics/LR/SC and Zephyr execution. The shared-resource timing model is approximate.
-- Guest `mcycle` and `mtime` expose modeled time; `minstret` tracks retirement.
-  Runs support deterministic scheduling with a seed and fatal-aware termination.
+- With timing enabled, guest `mcycle` and `mtime` expose modeled time;
+  `minstret` tracks retirement. Functional-only mode reports instruction-count
+  semantics, not modeled cycles. Runs support deterministic scheduling with a
+  seed and fatal-aware termination.
 - `source_compute` enables finite source VADD/FADD/VME control actors. Unsupported
   geometry/active source-vector IRQ contexts refuse explicitly. `source_os` is a
   separately tested Zephyr profile with new VADD/OPU/specialized FENCE actors
@@ -125,17 +190,18 @@ MIPS or whole-workload speed claim is available for these captures.
 
 ## Functional evidence and limits
 
-The latest broad FPGA batch passed **648 regions and 181,440 independently
-checked active values plus guards**: RVV SEW8/16/32, LMUL1/2/4/8, matrix shapes
+The earlier frozen multicore FPGA batch passed **648 regions and 181,440
+independently checked active values plus guards**: RVV SEW8/16/32, LMUL1/2/4/8, matrix shapes
 8/16/32, INT8 and all four E4M3/E5M2 operand-format pairs, one/two compute
 workers and three trials. A separate nine-checksum INT8 Zephyr example completed
 normally on both the FPGA and frozen OS model, using harts 0/1 for compute and
 hart 2 for scalar control.
 
-These results establish those concrete executions. They do not certify every
-ISA case, FP8 special value, competing vector/tile owner, context migration or
-whole GPT-OSS/Llama/Gemma/TinyLlama workload. Complete loaded-image/source
-association and the overall ±2% target remain unverified. The source model's
+These historical results establish those concrete executions. They do not
+certify every ISA case, FP8 special value, competing vector/tile owner, context
+migration or arbitrary GPT-OSS/Llama/Gemma/TinyLlama workload. The newer bounded
+TinyLlama native result above is separate from these historical measurements.
+Complete loaded-image/source association and the overall ±2% target remain unverified. The source model's
 memory/overlap path and concurrent matrix timing still need work.
 
 [Detailed provenance and interpretation](iris/RESULTS.md) records the full
