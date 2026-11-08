@@ -434,7 +434,11 @@ void iris_timing_adapter::pure_commit(unsigned hart,size_t id) {
   if(row.scalar_fadd)scalar_fadd_before(hart,id);
   if(row.empirical_compute)empirical_async_before(hart,id);
   if(row.empirical_load)empirical_load_before_commit(hart,id);
-  try {cores_[hart]->step(1);} catch (...) {if(profile_.empirical_fadd_eg)if(auto a=fadd_eg_find(hart,id))fadd_eg_after(hart,a,false);if(row.empirical_load)empirical_load_after_commit();completion_reads_.clear();completing_node_.reset();completing_pure_.reset();completing_.reset();throw;}
+  try {
+    cores_[hart]->step(1);
+    if (cores_[hart]->iris_step_timing_waited())
+      throw std::runtime_error("IRIS_PIPELINE_COMPLETION_RETRY_UNMODELED hart=" + std::to_string(hart));
+  } catch (...) {if(profile_.empirical_fadd_eg)if(auto a=fadd_eg_find(hart,id))fadd_eg_after(hart,a,false);if(row.empirical_load)empirical_load_after_commit();completion_reads_.clear();completing_node_.reset();completing_pure_.reset();completing_.reset();throw;}
   if(row.empirical_load)empirical_load_after_commit();
   if(row.scalar_fadd)scalar_fadd_after(hart,id,retired_[hart]==before+1);
   if(row.empirical_store)empirical_store_after_commit(hart,id,retired_[hart]==before+1);

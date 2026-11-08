@@ -443,7 +443,11 @@ void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fet
     completion_reads_.clear();
     if (!completing_node_) throw std::logic_error("IRIS_COUNTER_CAPTURE_COMPLETION_NODE_MISSING");
     const auto retired_before = retired_[hart];
-    try { cores_[hart]->step(1); }
+    try {
+      cores_[hart]->step(1);
+      if (cores_[hart]->iris_step_timing_waited())
+        throw std::runtime_error("IRIS_TIMING_COMPLETION_RETRY_UNMODELED hart=" + std::to_string(hart));
+    }
     catch (...) { completion_reads_.clear(); completing_node_.reset(); completing_.reset(); throw; }
     if(retired_[hart]==retired_before+1)empirical_store_boundary_observe(hart);
     finish_counter_reads(hart,retired_before);
@@ -462,7 +466,11 @@ void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fet
       else rocket_frontend_.conservative.reset();
     }
     completing_.reset(); pending_[hart].reset(); blocked_[hart] = false; ++completions_;
-    if (retired_[hart] == retired_before) queue_trap(hart,source_trap_ras_head);
+    if (retired_[hart] == retired_before) {
+      if (!cores_[hart]->iris_step_architectural_event())
+        throw std::runtime_error("IRIS_TIMING_NONRETIRING_COMPLETION_UNMODELED hart=" + std::to_string(hart));
+      queue_trap(hart,source_trap_ras_head);
+    }
   };
   if (access.decode==iris::MemoryDecode::scalar) {
     // Validate address routing before adding any nodes or executing effects.
@@ -545,7 +553,19 @@ void iris_timing_adapter::dispatch_ready() {
           throw std::logic_error("IRIS_SOURCE_DIRECT_WAKE_TRAP_PARCEL_MISSING");
         direct_source_ras_head=f.outputs.queue[0].ras_head;
       }
-      if(hart==2&&rocket_packets_)rocket_packet_waiting_=false;core->step(1);
+      if(hart==2&&rocket_packets_)rocket_packet_waiting_=false;
+      const auto retired_before = retired_[hart];
+      core->step(1);
+      if (core->iris_step_timing_waited()) {
+        if (retired_[hart] != retired_before || core->iris_step_architectural_event())
+          throw std::runtime_error("IRIS_TIMING_MIXED_STEP_OUTCOME_UNMODELED hart=" + std::to_string(hart));
+        // A scheduler retry is not a trap or redirect. Its pending owner/event
+        // determines when this hart can try again.
+        continue;
+      }
+      if (!blocked_[hart] && !pure_[hart].engaged && !core->is_waiting_for_interrupt() &&
+          (retired_[hart] != retired_before || !core->iris_step_architectural_event()))
+        throw std::runtime_error("IRIS_TIMING_DIRECT_STEP_OUTCOME_UNMODELED hart=" + std::to_string(hart));
     }
     if (blocked_[hart] || pure_[hart].engaged || core->is_waiting_for_interrupt() || (hart==2&&rocket_packet_waiting_)) continue;
     // A fetch/interrupt/architectural trap can happen before instruction issue.
