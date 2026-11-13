@@ -582,12 +582,18 @@ class wide_counter_csr_t: public csr_t {
   // Always returns full 64-bit value
   virtual reg_t read() const noexcept override;
   void bump(const reg_t howmuch) noexcept;
+  void advance_time(const reg_t cycles, bool active = true) noexcept;
+  std::optional<reg_t> iris_read_pre_edge() const noexcept {
+    return pre_edge_valid ? std::optional<reg_t>{pre_edge_value} : std::nullopt;
+  }
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
  private:
-  bool is_counting_enabled() const noexcept;
+  bool is_counting_enabled(bool current_time = false) const noexcept;
   reg_t val;
   bool written;
+  reg_t pre_edge_value = 0;
+  bool pre_edge_valid = false;
   smcntrpmf_csr_t_p config_csr;
 };
 

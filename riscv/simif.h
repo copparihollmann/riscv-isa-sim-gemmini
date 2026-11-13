@@ -4,11 +4,14 @@
 #define _RISCV_SIMIF_H
 
 #include <map>
+#include <exception>
 #include "decode.h"
 #include "cfg.h"
 
 class processor_t;
 class mmu_t;
+struct insn_fetch_t;
+struct iris_timing_wait {};
 
 // this is the interface to the simulator used by the processors and memory
 class simif_t
@@ -24,6 +27,13 @@ public:
   virtual bool is_debug_module_access(reg_t, size_t) { return false; }
   // Callback for processors to let the simulation know they were reset.
   virtual void proc_reset(unsigned id) = 0;
+  virtual const insn_fetch_t* iris_completion_fetch(unsigned) const { return nullptr; }
+  virtual std::exception_ptr iris_completion_exception(unsigned) const { return {}; }
+  virtual void iris_issue(unsigned, reg_t, const insn_fetch_t&) {}
+  virtual void iris_retired(unsigned, size_t) {}
+  virtual void iris_counter_read(unsigned, reg_t, uint32_t, unsigned, reg_t, unsigned, const char*) {}
+  virtual std::optional<reg_t> iris_mcycle_pre_edge(unsigned) const { return {}; }
+  virtual void iris_validate_interrupts(unsigned, bool = false) const {}
 
   virtual const cfg_t &get_cfg() const = 0;
   virtual const std::map<size_t, processor_t*>& get_harts() const = 0;
