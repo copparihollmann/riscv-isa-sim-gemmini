@@ -6,8 +6,14 @@ const reg_t len = insn.rs1() + 1;
 require_align(vd, len);
 require_align(vs2, len);
 const reg_t size = len * P.VU.vlenb;
-const reg_t start = P.VU.vstart->read() * (P.VU.vsew >> 3);
+const reg_t start = P.VU.vstart->read_defined(pc) * (P.VU.vsew >> 3);
 
+if(P.VU.iris_mode) {
+// Opaque full-register transport preserves unknown tail/predicate bits.
+if(vd!=vs2)for(reg_t i=start;i<size;++i)
+  P.VU.write_transport(vd,i,P.VU.read_transport<uint8_t>(vs2,i));
+
+} else {
 //register needs one-by-one copy to keep commitlog correct
 if (vd != vs2 && start < size) {
   reg_t i = start / P.VU.vlenb;
@@ -22,6 +28,8 @@ if (vd != vs2 && start < size) {
     memcpy(&P.VU.elt<uint8_t>(vd + i, 0, true),
            &P.VU.elt<uint8_t>(vs2 + i, 0), P.VU.vlenb);
   }
+}
+
 }
 
 VECTOR_END;
