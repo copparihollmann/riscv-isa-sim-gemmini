@@ -1,3 +1,3 @@
 require_extension('D');
 require_fp;
-WRITE_FRD(f64(MMU.load<uint64_t>(RS1 + insn.i_imm())));
+IRIS_LOAD_FPR(uint64_t,f64,insn.rd(),RS1 + insn.i_imm());
