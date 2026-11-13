@@ -1,3 +1,6 @@
+if(P.VU.iris_mode){
+#include "iris_fpcomp_body.h"
+}else{
 // vmfne.vv vd, vs2, rs1
 require_zvfbfa
 
@@ -11,3 +14,5 @@ VI_VFP_VV_LOOP_CMP
 {
   res = !f64_eq(vs2, vs1);
 })
+
+}
