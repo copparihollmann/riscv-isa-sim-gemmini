@@ -1344,16 +1344,21 @@ bool wide_counter_csr_t::unlogged_write(const reg_t val) noexcept {
 
 // Returns true if counting is not inhibited by Smcntrpmf.
 // Note that minstretcfg / mcyclecfg / mhpmevent* share the same inhibit bits.
-bool wide_counter_csr_t::is_counting_enabled() const noexcept {
-  auto prv = state->prv_changed ? state->prev_prv : state->prv;
-  auto v = state->v_changed ? state->prev_v : state->v;
+void wide_counter_csr_t::advance_time(const reg_t cycles) noexcept {
+  if (!(state->mcountinhibit->read() & MCOUNTINHIBIT_CY) && is_counting_enabled(true))
+    val += cycles;
+}
+
+bool wide_counter_csr_t::is_counting_enabled(bool current_time) const noexcept {
+  auto prv = !current_time && state->prv_changed ? state->prev_prv : state->prv;
+  auto v = !current_time && state->v_changed ? state->prev_v : state->v;
   auto mask = MHPMEVENT_MINH;
   if (prv == PRV_S) {
     mask = v ? MHPMEVENT_VSINH : MHPMEVENT_SINH;
   } else if (prv == PRV_U) {
     mask = v ? MHPMEVENT_VUINH : MHPMEVENT_UINH;
   }
-  return (config_csr->read_prev() & mask) == 0;
+  return ((current_time ? config_csr->read() : config_csr->read_prev()) & mask) == 0;
 }
 
 // implement class time_counter_csr_t
@@ -1440,6 +1445,8 @@ mevent_csr_t::mevent_csr_t(processor_t* const proc, const reg_t addr):
 }
 
 bool mevent_csr_t::unlogged_write(const reg_t val) noexcept {
+  // Source nPerfCounters=0: every mhpmevent slot is padded zero and WI.
+  if (proc->VU.iris_mode) return basic_csr_t::unlogged_write(0);
   const reg_t mask = proc->extension_enabled(EXT_SSCOFPMF) ? MHPMEVENT_OF | MHPMEVENT_MINH
     | (proc->extension_enabled_const('U') ? MHPMEVENT_UINH : 0)
     | (proc->extension_enabled_const('S') ? MHPMEVENT_SINH : 0)

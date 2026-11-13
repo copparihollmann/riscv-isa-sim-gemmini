@@ -3,4 +3,6 @@ require_vector_novtype(false);
 
 P.VU.msetmtype(RS1, RS2);
 
+if (P.VU.iris_mode) WRITE_RD(0);
+
 VECTOR_END;

@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <algorithm>
 
@@ -42,7 +43,10 @@ processor_t::processor_t(const char* isa_str, const char* priv_str,
   impl_table(256, false), extension_enable_table(isa.get_extension_table()),
   last_pc(1), executions(1), TM(cfg->trigger_count)
 {
+  if (cfg->iris_vme && id == 2 && isa.extension_enabled(EXT_ZVTBASE))
+    throw std::invalid_argument("Iris hart 2 must not advertise VME/Zvt; supply a non-VME --hart-isa=2:ISA");
   VU.p = this;
+  VU.iris_mode = cfg->iris_vme;
   TM.proc = this;
 
 #ifndef HAVE_INT128
@@ -100,7 +104,7 @@ processor_t::~processor_t()
 
 void state_t::reset(processor_t* const proc, reg_t max_isa)
 {
-  pc = DEFAULT_RSTVEC;
+  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
   XPR.reset();
   FPR.reset();
 
@@ -637,12 +641,20 @@ void processor_t::put_csr(int which, reg_t val)
 // Note that get_csr is sometimes called when read side-effects should not
 // be actioned.  In other words, Spike cannot currently support CSRs with
 // side effects on reads.
+void processor_t::iris_validate_interrupts(bool read_pending) const
+{
+  sim->iris_validate_interrupts(id, read_pending);
+}
+
 reg_t processor_t::get_csr(int which, insn_t insn, bool write, bool peek)
 {
   auto search = state.csrmap.find(which);
   if (search != state.csrmap.end()) {
     if (!peek)
       search->second->verify_permissions(insn, write);
+    // rd=x0 does not expose the pending word. MTIP and external input bits
+    // are read-only, so their unknown placeholders cannot affect a CSR write.
+    if (!peek && which == CSR_MIP && insn.rd() != 0) iris_validate_interrupts(true);
     return search->second->read();
   }
   // If we get here, the CSR doesn't exist.  Unimplemented CSRs always throw

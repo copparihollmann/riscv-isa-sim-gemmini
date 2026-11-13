@@ -237,6 +237,9 @@ public:
 
   const isa_parser_t &get_isa() const & { return isa; }
   const cfg_t &get_cfg() const & { return *cfg; }
+  void iris_validate_interrupts(bool read_pending = false) const;
+  // Decode without execution, for the online model adapter and handler corpus.
+  insn_func_t decode_for_model(insn_t insn) { return decode_insn(insn); }
 
   void set_debug(bool value);
   void set_histogram(bool value);
