@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <algorithm>
 
@@ -42,7 +43,10 @@ processor_t::processor_t(const char* isa_str, const char* priv_str,
   impl_table(256, false), extension_enable_table(isa.get_extension_table()),
   last_pc(1), executions(1), TM(cfg->trigger_count)
 {
+  if (cfg->iris_vme && id == 2 && isa.extension_enabled(EXT_ZVTBASE))
+    throw std::invalid_argument("Iris hart 2 must not advertise VME/Zvt; supply a non-VME --hart-isa=2:ISA");
   VU.p = this;
+  VU.iris_mode = cfg->iris_vme;
   TM.proc = this;
 
 #ifndef HAVE_INT128
@@ -100,7 +104,7 @@ processor_t::~processor_t()
 
 void state_t::reset(processor_t* const proc, reg_t max_isa)
 {
-  pc = DEFAULT_RSTVEC;
+  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
   XPR.reset();
   FPR.reset();
 
@@ -634,15 +638,83 @@ void processor_t::put_csr(int which, reg_t val)
   }
 }
 
+bool processor_t::iris_fcsr_instruction(insn_t insn,reg_t pc)
+{
+  const unsigned csr=insn.csr();
+  reg_t mask=0;
+  switch(csr) {
+    case CSR_FFLAGS:mask=31;break;case CSR_FRM:mask=7;break;case CSR_FCSR:mask=255;break;
+    case CSR_VSTART:mask=VU.VLEN-1;break;case CSR_VXRM:mask=3;break;case CSR_VXSAT:mask=1;break;
+    case CSR_VCSR:mask=7;break;case CSR_MCOUNTEREN:case CSR_SCOUNTEREN:mask=7;break;
+    default:return false;
+  }
+  if(!VU.iris_mode)return false;
+  const unsigned operation=insn.funct3()&3;
+  const bool architectural_write=operation==1||insn.rs1()!=0;
+  // Shuttle forwards CSR.S/C even for rs1=x0/uimm=0; Rocket changes those
+  // commands to CSR.R. For these writable state CSRs, the forwarded zero
+  // update still dirties FS/VS. Preserve old unknown bits through that update.
+  // Scope this to the source/RTL-proved state CSRs; counter phases and other
+  // asynchronous CSR interactions are handled by separate policies.
+  const bool state_csr=csr==CSR_FFLAGS||csr==CSR_FRM||csr==CSR_FCSR||
+    csr==CSR_VSTART||csr==CSR_VXRM||csr==CSR_VXSAT||csr==CSR_VCSR;
+  const bool write=architectural_write||(get_id()<2&&state_csr&&operation!=1);
+  auto cell=state.csrmap.at(csr);cell->verify_permissions(insn,architectural_write);
+  const reg_t old=cell->read();
+  reg_t old_known=cell->iris_known_bits()&mask;
+  if(csr==CSR_FCSR)old_known=((state.frm->iris_known_bits()&7)<<5)|(state.fflags->iris_known_bits()&31);
+  if(csr==CSR_VCSR)old_known=((VU.vxrm->iris_known_bits()&3)<<1)|(state.vxsat->iris_known_bits()&1);
+  auto input=state.XPR.read_transport(insn.rs1());
+  if(insn.funct3()&4){input.value=insn.rs1();input.known.fill(0xff);}
+  reg_t input_known=0;
+  for(size_t byte=0;byte<sizeof(reg_t);++byte)input_known|=reg_t(input.known[byte])<<(byte*8);
+  reg_t value=old,known=old_known;
+  if(write) {
+    if(operation==1){value=input.value;known=input_known;}
+    else if(operation==2){value=old|input.value;known=(old_known&input_known)|(old_known&old)|(input_known&input.value);}
+    else {value=old&~input.value;known=(old_known&input_known)|(old_known&~old)|(input_known&input.value);}
+    value&=mask;known&=mask;cell->write(value);
+    if(csr==CSR_FCSR){state.frm->iris_set_known(known>>5);state.fflags->iris_set_known(known);}
+    else if(csr==CSR_VCSR){VU.vxrm->iris_set_known(known>>1);state.vxsat->iris_set_known(known);}
+    else cell->iris_set_known(known);
+  }
+  iris_definedness::Value<reg_t> result;result.value=old;result.known.fill(0xff);
+  const reg_t result_known=old_known|~mask;
+  for(size_t byte=0;byte<sizeof(reg_t);++byte)result.known[byte]=result_known>>(byte*8);
+  iris_write_xpr_transport(insn.rd(),result);
+  (void)pc;
+  return true;
+}
+
 // Note that get_csr is sometimes called when read side-effects should not
 // be actioned.  In other words, Spike cannot currently support CSRs with
 // side effects on reads.
+void processor_t::iris_validate_interrupts(bool read_pending) const
+{
+  sim->iris_validate_interrupts(id, read_pending);
+}
+
 reg_t processor_t::get_csr(int which, insn_t insn, bool write, bool peek)
 {
   auto search = state.csrmap.find(which);
   if (search != state.csrmap.end()) {
     if (!peek)
       search->second->verify_permissions(insn, write);
+    if(VU.iris_mode) {
+      if(which==CSR_FFLAGS||which==CSR_FCSR)state.fflags->read_defined(VU.iris_pc);
+      if(which==CSR_FRM||which==CSR_FCSR)state.frm->read_defined(VU.iris_pc);
+      reg_t tracked_mask=which==CSR_VSTART?VU.VLEN-1:which==CSR_VXRM?3:which==CSR_VXSAT?1:
+        (which==CSR_MCOUNTEREN||which==CSR_SCOUNTEREN)?7:0;
+      if(which==CSR_VCSR) {
+        VU.vxrm->read_defined(VU.iris_pc);
+        iris_definedness::require_byte(state.vxsat->iris_known_bits(),1,0,{id,VU.iris_pc,"vxsat"});
+      } else if(tracked_mask)
+        for(size_t byte=0;byte<sizeof(reg_t);++byte)
+          iris_definedness::require_byte(search->second->iris_known_bits()>>(byte*8),tracked_mask>>(byte*8),byte,{id,VU.iris_pc,"CSR"});
+    }
+    // rd=x0 does not expose the pending word. MTIP and external input bits
+    // are read-only, so their unknown placeholders cannot affect a CSR write.
+    if (!peek && which == CSR_MIP && insn.rd() != 0) iris_validate_interrupts(true);
     return search->second->read();
   }
   // If we get here, the CSR doesn't exist.  Unimplemented CSRs always throw

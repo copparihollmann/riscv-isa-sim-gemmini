@@ -87,16 +87,22 @@ reg_t mmu_t::translate(mem_access_info_t access_info, reg_t len)
   }
   if (!pmp_ok(paddr, len, access_info.flags.ss_access ? STORE : type, mode, access_info.flags.hlvx))
     throw_access_exception(virt, addr, access_info.flags.ss_access ? STORE : type);
+  const reg_t original_paddr = paddr;
+  paddr = iris_storage_address(paddr);
+  iris_last_translation_aliased = paddr != original_paddr;
+  iris_check_pma(access_info.vaddr, paddr, len, access_info.flags.ss_access ? STORE : type, access_info.flags);
   return paddr;
 }
 
 inline mmu_t::insn_parcel_t mmu_t::perform_intrapage_fetch(reg_t vaddr, uintptr_t host_addr, reg_t paddr)
 {
+  iris_check_pma(vaddr, paddr, sizeof(insn_parcel_t), FETCH);
   insn_parcel_t res;
 
-  if (host_addr)
+  if (host_addr) {
+    if (sim->get_cfg().iris_vme) sim->iris_memory_definedness.require(paddr,sizeof(res),{proc->get_id(),vaddr,"instruction"});
     memcpy(&res, (char*)host_addr, sizeof(res));
-  else if (!mmio_fetch(paddr, sizeof(res), (uint8_t*)&res))
+  } else if (!mmio_fetch(paddr, sizeof(res), (uint8_t*)&res))
     throw trap_instruction_access_fault(proc->state.v, vaddr, 0, 0);
 
   return from_le(res);
@@ -221,10 +227,12 @@ void mmu_t::check_triggers(triggers::operation_t operation, reg_t address, bool 
   }
 }
 
-inline void mmu_t::perform_intrapage_load(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, uint8_t* bytes, xlate_flags_t xlate_flags)
+inline void mmu_t::perform_intrapage_load(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, uint8_t* bytes, xlate_flags_t xlate_flags, uint8_t* known)
 {
+  iris_check_pma(vaddr, paddr, len, xlate_flags.ss_access ? STORE : LOAD, xlate_flags);
   if (host_addr) {
     memcpy(bytes, (char*)host_addr, len);
+    if (known) sim->iris_memory_definedness.read_into(paddr,{known,size_t(len)});
   } else if (!mmio_load(paddr, len, bytes)) {
     auto access_info = generate_access_info(vaddr, LOAD, xlate_flags);
     if (access_info.flags.ss_access)
@@ -237,7 +245,7 @@ inline void mmu_t::perform_intrapage_load(reg_t vaddr, uintptr_t host_addr, reg_
     tracer.trace(paddr, len, LOAD);
 }
 
-void mmu_t::load_slow_path_intrapage(reg_t len, uint8_t* bytes, mem_access_info_t access_info)
+void mmu_t::load_slow_path_intrapage(reg_t len, uint8_t* bytes, mem_access_info_t access_info, uint8_t* known)
 {
   reg_t vaddr = access_info.vaddr;
   auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_load, vaddr, TLB_FLAGS);
@@ -250,19 +258,22 @@ void mmu_t::load_slow_path_intrapage(reg_t len, uint8_t* bytes, mem_access_info_
       refill_tlb(vaddr, paddr, (char*)host_addr, LOAD);
   }
 
-  if (access_info.flags.lr && !sim->reservable(paddr)) {
+  if (access_info.flags.lr && (!sim->reservable(paddr) ||
+      !iris_pma(paddr, len, iris_board::Access::Atomic) ||
+      (sim->get_cfg().iris_vme && paddr >= 0x580000000ULL && paddr - 0x580000000ULL < 0x20000))) {
     throw trap_load_access_fault(access_info.effective_virt, access_info.transformed_vaddr, 0, 0);
   }
 
-  perform_intrapage_load(vaddr, host_addr, paddr, len, bytes, access_info.flags);
+  perform_intrapage_load(vaddr, host_addr, paddr, len, bytes, access_info.flags, known);
 
   if (access_info.flags.lr) {
     load_reservation_address = paddr;
+    load_reservation_size = len;
   }
 }
 
 void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
-  std::uint8_t* bytes, xlate_flags_t xlate_flags)
+  std::uint8_t* bytes, xlate_flags_t xlate_flags, uint8_t* known)
 {
   assert(len > 0);
 
@@ -273,7 +284,7 @@ void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
     bool aligned = (original_addr & (len - 1)) == 0;
 
     if (likely(tlb_hit && (aligned || (intrapage && is_misaligned_enabled())))) {
-      return perform_intrapage_load(original_addr, host_addr, paddr, len, bytes, xlate_flags);
+      return perform_intrapage_load(original_addr, host_addr, paddr, len, bytes, xlate_flags, known);
     }
   }
 
@@ -285,7 +296,7 @@ void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
       transformed_addr, access_info.effective_virt, len);
 
   if ((transformed_addr & (len - 1)) == 0) {
-    load_slow_path_intrapage(len, bytes, access_info);
+    load_slow_path_intrapage(len, bytes, access_info, known);
   } else {
     bool gva = access_info.effective_virt;
     if (!is_misaligned_enabled())
@@ -295,10 +306,10 @@ void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
       throw trap_load_access_fault(gva, transformed_addr, 0, 0);
 
     reg_t len_page0 = std::min<reg_t>(len, PGSIZE - transformed_addr % PGSIZE);
-    load_slow_path_intrapage(len_page0, bytes, access_info);
+    load_slow_path_intrapage(len_page0, bytes, access_info, known);
     if (len_page0 != len) {
       auto tail_access_info = generate_access_info(original_addr + len_page0, LOAD, xlate_flags);
-      load_slow_path_intrapage(len - len_page0, bytes + len_page0, tail_access_info);
+      load_slow_path_intrapage(len - len_page0, bytes + len_page0, tail_access_info, known?known+len_page0:nullptr);
     }
   }
 
@@ -313,20 +324,44 @@ void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
     proc->state.log_mem_read.push_back(std::make_tuple(original_addr, 0, len));
 }
 
-inline void mmu_t::perform_intrapage_store(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, const uint8_t* bytes, xlate_flags_t xlate_flags)
+void mmu_t::invalidate_peer_reservations(reg_t paddr, size_t len)
 {
+  if (!sim->get_cfg().iris_vme) return;
+  for (const auto& entry : sim->get_harts()) {
+    auto* peer = entry.second->get_mmu();
+    const reg_t reserved = peer->load_reservation_address;
+    if (reserved == reg_t(-1) || !peer->load_reservation_size) continue;
+    // Overlapping physical bytes must invalidate LR/SC on another hart.
+    // Wider implementation reservation granules remain a calibration input.
+    const bool overlap = paddr <= reserved ? reserved - paddr < len :
+      paddr - reserved < peer->load_reservation_size;
+    if (overlap) peer->yield_load_reservation();
+  }
+}
+
+inline void mmu_t::perform_intrapage_store(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, const uint8_t* bytes, xlate_flags_t xlate_flags, const uint8_t* known)
+{
+  iris_check_pma(vaddr, paddr, len, STORE, xlate_flags);
+  if (!host_addr && known && sim->get_cfg().iris_vme)
+    for (size_t i=0;i<len;++i) iris_definedness::require_byte(known[i],0xff,vaddr+i,{proc?proc->get_id():uint64_t(-1),proc?proc->get_state()->pc:0,"MMIO-store"});
   if (host_addr) {
      memcpy((char*)host_addr, bytes, len);
+     if (sim->get_cfg().iris_vme) {
+       if (known) sim->iris_memory_definedness.write(paddr,{known,size_t(len)});
+       else sim->iris_memory_definedness.define(paddr,len);
+     }
   } else if (!mmio_store(paddr, len, bytes)) {
     auto access_info = generate_access_info(vaddr, STORE, xlate_flags);
     throw trap_store_access_fault(access_info.effective_virt, access_info.transformed_vaddr, 0, 0);
   }
 
+  invalidate_peer_reservations(paddr, len);
+
   if (tracer.interested_in_range(paddr, paddr + len, STORE))
     tracer.trace(paddr, len, STORE);
 }
 
-void mmu_t::store_slow_path_intrapage(reg_t len, const uint8_t* bytes, mem_access_info_t access_info, bool actually_store)
+void mmu_t::store_slow_path_intrapage(reg_t len, const uint8_t* bytes, mem_access_info_t access_info, bool actually_store, const uint8_t* known)
 {
   reg_t vaddr = access_info.vaddr;
   auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_store, vaddr, TLB_FLAGS);
@@ -347,12 +382,12 @@ void mmu_t::store_slow_path_intrapage(reg_t len, const uint8_t* bytes, mem_acces
   }
 
   if (actually_store)
-    perform_intrapage_store(vaddr, host_addr, paddr, len, bytes, access_info.flags);
+    perform_intrapage_store(vaddr, host_addr, paddr, len, bytes, access_info.flags, known);
 }
 
 void mmu_t::store_slow_path(reg_t original_addr, std::size_t len,
     const std::uint8_t* bytes, xlate_flags_t xlate_flags,
-    bool actually_store, bool require_alignment)
+    bool actually_store, bool require_alignment, const uint8_t* known)
 {
   if (likely(!xlate_flags.is_special_access())) {
     // Fast path for simple cases
@@ -363,7 +398,7 @@ void mmu_t::store_slow_path(reg_t original_addr, std::size_t len,
 
     if (likely(tlb_hit && (aligned || misaligned_ok))) {
       if (actually_store)
-        perform_intrapage_store(original_addr, host_addr, paddr, len, bytes, xlate_flags);
+        perform_intrapage_store(original_addr, host_addr, paddr, len, bytes, xlate_flags, known);
       return;
     }
   }
@@ -390,13 +425,13 @@ void mmu_t::store_slow_path(reg_t original_addr, std::size_t len,
       throw trap_store_access_fault(gva, transformed_addr, 0, 0);
 
     reg_t len_page0 = std::min<reg_t>(len, PGSIZE - transformed_addr % PGSIZE);
-    store_slow_path_intrapage(len_page0, bytes, access_info, actually_store);
+    store_slow_path_intrapage(len_page0, bytes, access_info, actually_store, known);
     if (len_page0 != len) {
       auto tail_access_info = generate_access_info(original_addr + len_page0, STORE, xlate_flags);
-      store_slow_path_intrapage(len - len_page0, bytes + len_page0, tail_access_info, actually_store);
+      store_slow_path_intrapage(len - len_page0, bytes + len_page0, tail_access_info, actually_store, known?known+len_page0:nullptr);
     }
   } else {
-    store_slow_path_intrapage(len, bytes, access_info, actually_store);
+    store_slow_path_intrapage(len, bytes, access_info, actually_store, known);
   }
 
   if (actually_store && proc && unlikely(proc->get_log_commits_enabled())) {
@@ -446,6 +481,7 @@ tlb_entry_t mmu_t::refill_tlb(reg_t vaddr, reg_t paddr, char* host_addr, access_
   tlb_entry_t entry = {uintptr_t(host_addr) - (vaddr % PGSIZE), paddr - (vaddr % PGSIZE)};
 
   if (in_mprv()
+      || iris_last_translation_aliased
       || !pmp_homogeneous(base_paddr, PGSIZE)
       || (proc && proc->get_log_commits_enabled()))
     return entry;

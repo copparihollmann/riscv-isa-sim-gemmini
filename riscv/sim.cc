@@ -3,6 +3,11 @@
 #include "config.h"
 #include "dtb_discovery.h"
 #include "sim.h"
+#include "iris_timing_adapter.h"
+#include "iris_clocked_device.h"
+extern "C" uint64_t iris_device_clock_abi_v3() { return 3; }
+#include "../../../board/iris_boot.hpp"
+#include "../../../board/physical_map.hpp"
 #include "mmu.h"
 #include "dts.h"
 #include "remote_bitbang.h"
@@ -17,6 +22,7 @@
 #include <climits>
 #include <cstdlib>
 #include <cassert>
+#include <algorithm>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -98,10 +104,20 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
 
   debug_mmu = new mmu_t(this, cfg->endianness, NULL, cfg->cache_blocksz);
 
+  std::optional<iris_timing_adapter::Profile> timing_profile;
+  if (!cfg->iris_timing_fixture.empty()) {
+    if (!dtb_enabled || cfg->real_time_clint || halted)
+      throw std::runtime_error("timing integration requires DTB and deterministic non-halted devices");
+    timing_profile = iris_timing_adapter::Profile::load(cfg->iris_timing_fixture, cfg->nprocs());
+    if (!cfg->iris_bootrom_file.empty() &&
+        timing_profile->base_hz / timing_profile->rtc_divider != iris_board::mtime_hz)
+      throw std::runtime_error("Iris physical boot requires its 500kHz timebase");
+  }
+
   // When running without using a dtb, skip the fdt-based configuration steps
   if (!dtb_enabled) {
     for (size_t i = 0; i < cfg->nprocs(); i++) {
-      procs.push_back(new processor_t(cfg->isa, cfg->priv,
+      procs.push_back(new processor_t(cfg->isa_for_hart(cfg->hartids[i]), cfg->priv,
                                       cfg, this, cfg->hartids[i], halted,
                                       log_file.get(), sout_));
       harts[cfg->hartids[i]] = procs[i];
@@ -147,7 +163,14 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
       const std::vector<std::string>& sargs = factory_sargs.second;
       device_nodes.append(factory->generate_dts(this, sargs));
     }
-    dts = make_dts(INSNS_PER_RTC_TICK, CPU_HZ, cfg, mems, device_nodes);
+    // Explicit plugin nodes must be present before parsing their devices.
+    for (const auto& factory_sargs : plugin_device_factories)
+      device_nodes.append(factory_sargs.first->generate_dts(this, factory_sargs.second));
+    std::vector<size_t> hart_clocks;
+    if (timing_profile)
+      for (const auto& hart : timing_profile->harts) hart_clocks.push_back(timing_profile->base_hz / hart.divider);
+    dts = make_dts(timing_profile ? timing_profile->rtc_divider : INSNS_PER_RTC_TICK,
+                   timing_profile ? timing_profile->base_hz : CPU_HZ, cfg, mems, device_nodes, hart_clocks);
     dtb = dts_to_dtb(dts);
   }
 
@@ -164,6 +187,13 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
   }
 
   void *fdt = (void *)dtb.c_str();
+  if (timing_profile && dtb_file) {
+    const int cpus_node = fdt_path_offset(fdt, "/cpus");
+    int length = 0;
+    const auto* timebase = static_cast<const fdt32_t*>(fdt_getprop(fdt, cpus_node, "timebase-frequency", &length));
+    if (!timebase || length != 4 || fdt32_to_cpu(*timebase) != timing_profile->base_hz / timing_profile->rtc_divider)
+      throw std::runtime_error("supplied DTB timebase disagrees with timing fixture");
+  }
 
   // per core attribute
   int cpu_offset = 0, cpu_map_offset, rc;
@@ -195,11 +225,20 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
     // handle hartid
     uint32_t hartid;
     rc = fdt_parse_hartid(fdt, cpu_offset, &hartid);
+    if (timing_profile && dtb_file && rc == 0) {
+      int length = 0;
+      const auto* frequency = static_cast<const fdt32_t*>(fdt_getprop(fdt, cpu_offset, "clock-frequency", &length));
+      if (hartid >= timing_profile->harts.size()) throw std::runtime_error("DTB hart absent from timing fixture");
+      if (frequency && (length != 4 || (fdt32_to_cpu(*frequency) != 0 &&
+          fdt32_to_cpu(*frequency) != timing_profile->base_hz / timing_profile->harts[hartid].divider)))
+        throw std::runtime_error("supplied DTB CPU clock disagrees with timing fixture");
+    }
     if (rc != 0) {
       std::cerr << "core (" << cpu_idx << ") has an invalid or missing `reg` (hartid)\n";
       exit(1);
     }
 
+    if (cfg->hart_isa.count(hartid)) isa_str = cfg->isa_for_hart(hartid);
     procs.push_back(new processor_t(isa_str, cfg->priv,
                                     cfg, this, hartid, halted,
                                     log_file.get(), sout_));
@@ -262,6 +301,33 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
                           plugin_device_factories.begin(),
                           plugin_device_factories.end());
 
+  if (!cfg->iris_bootrom_file.empty()) {
+    // A physical board run must not turn a hole/MMIO aperture into ordinary RAM
+    // through a permissive upstream -m argument, or silently remove real RAM.
+    using Range = std::pair<reg_t, reg_t>;
+    auto normalize = [](std::vector<Range> ranges) {
+      std::sort(ranges.begin(), ranges.end());
+      std::vector<Range> result;
+      for (const auto& range : ranges) {
+        if (!range.second || range.second > UINT64_MAX - range.first)
+          throw std::runtime_error("invalid Iris physical RAM range");
+        if (!result.empty() && range.first < result.back().first + result.back().second)
+          throw std::runtime_error("overlapping Iris physical RAM ranges");
+        if (!result.empty() && range.first == result.back().first + result.back().second)
+          result.back().second += range.second;
+        else result.push_back(range);
+      }
+      return result;
+    };
+    std::vector<Range> expected, actual;
+    for (const auto& region : iris_board::regions)
+      if (std::string(region.name).rfind("memory@", 0) == 0)
+        expected.emplace_back(region.base, region.size);
+    for (const auto& memory : mems) actual.emplace_back(memory.first, memory.second->size());
+    if (normalize(actual) != normalize(expected))
+      throw std::runtime_error("IRIS_PHYSICAL_RAM_MAP_MISMATCH: exact elaborated DRAM/TCM/scratchpad ranges required");
+  }
+
   for (auto& x : mems)
   {
       bus.add_device(x.first, x.second);
@@ -291,9 +357,24 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
   }
 
   for (auto& pair : harts) {
-    if (auto pc = cfg->start_pc.get(pair.first)) {
+    if (auto pc = cfg->start_pc.get(pair.first); pc && cfg->iris_bootrom_file.empty()) {
       pair.second->get_state()->pc = *pc;
     }
+  }
+  if (timing_profile) {
+    if (!clint) throw std::runtime_error("timing integration requires a CLINT");
+    iris_timing = std::make_unique<iris_timing_adapter>(std::move(*timing_profile), procs,
+      [this](uint64_t from, uint64_t to) { iris_advance_clock(from, to); },
+      [this] { return iris_next_timer_event(); },
+      [this] {
+        auto address = get_tohost_addr();
+        if (address && ((address & 7) || !dynamic_cast<abstract_mem_t*>(bus.find_device(address, 8).second)))
+          throw std::runtime_error("IRIS_TIMING_INVALID_TOHOST: aligned 8-byte RAM symbol required");
+        auto* data = address ? addr_to_mem(address) : nullptr;
+        if (!data) return false;
+        for (unsigned i = 0; i < 8; ++i) if (data[i]) return true;
+        return false;
+      }, cfg->iris_schedule_seed);
   }
 }
 
@@ -313,25 +394,107 @@ int sim_t::run()
 
   // htif_t::run() will repeatedly call back into sim_t::idle(), each
   // invocation of which will advance target time
-  return htif_t::run();
+  try {
+    int result = htif_t::run();
+    if (iris_timing) iris_timing->write_json(cfg->iris_timing_trace);
+    return result;
+  } catch (...) {
+    if (iris_timing) iris_timing->write_json(cfg->iris_timing_trace);
+    throw;
+  }
+}
+
+const insn_fetch_t* sim_t::iris_completion_fetch(unsigned hart) const {
+  return iris_timing ? iris_timing->completion_fetch(hart) : nullptr;
+}
+void sim_t::iris_issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) {
+  if (iris_timing) iris_timing->issue(hart, pc, fetch);
+}
+void sim_t::iris_retired(unsigned hart, size_t count) {
+  if (iris_timing) iris_timing->retired(hart, count);
+}
+void sim_t::iris_validate_interrupts(unsigned hart, bool read_pending) const {
+  if (clint) clint->validate_iris_interrupts(hart, read_pending);
+  if (plic) plic->validate_iris_interrupts(hart, read_pending);
+}
+bool sim_t::reservable(reg_t paddr) {
+  // Rocket/Shuttle TLBs allow LR/SC only on AcquireB-capable cacheable RAM.
+  // TCM supports arithmetic/logical AMOs but is not cacheable; its aliases
+  // resolve to the same non-reservable backing storage before reaching here.
+  if (cfg->iris_vme || !cfg->iris_bootrom_file.empty())
+    return paddr >= 0x80000000ULL && paddr - 0x80000000ULL < 0x100000000ULL && addr_to_mem(paddr);
+  return addr_to_mem(paddr);
+}
+void sim_t::iris_advance_clock(uint64_t before, uint64_t after) {
+  const auto& profile = iris_timing->profile();
+  for (size_t i = 0; i < procs.size(); ++i) {
+    const auto& clock = profile.harts[i];
+    if (clock.count_wfi || !procs[i]->is_waiting_for_interrupt())
+      procs[i]->get_state()->mcycle->advance_time(after / clock.divider - before / clock.divider);
+  }
+  uint64_t ticks = after / profile.rtc_divider - before / profile.rtc_divider;
+  for (auto& device : devices) {
+    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get()))
+      clocked->iris_advance_model_clock(before, after, profile.base_hz);
+  }
+  // All device time advances from the model clock, never instruction retirement.
+  for (auto& device : devices) device->tick(ticks);
+}
+std::optional<uint64_t> sim_t::iris_next_timer_event() {
+  const auto now = iris_timing->now(), divider = iris_timing->profile().rtc_divider;
+  const uint64_t current = clint->get_mtime(), max = UINT64_MAX;
+  std::optional<uint64_t> earliest;
+  for (const auto& pair : harts) {
+    auto known_compare = clint->timer_compare(pair.first);
+    if (!known_compare) continue;
+    uint64_t compare = *known_compare;
+    if (current >= compare && compare == 0) continue;
+    // Include timer deassertion on unsigned mtime wrap.
+    uint64_t ticks = current < compare ? compare - current : max - current + 1;
+    uint64_t first = divider - now % divider;
+    if (first >= max - now) continue;
+    uint64_t edge = now + first;
+    if (ticks - 1 > (max - 1 - edge) / divider) continue;
+    edge += (ticks - 1) * divider;
+    if (!earliest || edge < *earliest) earliest = edge;
+  }
+  for (const auto& device : devices) {
+    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get())) {
+      auto edge = clocked->iris_next_model_event(now, iris_timing->profile().base_hz);
+      if (edge && *edge <= now)
+        throw std::runtime_error("IRIS_DEVICE_INVALID_DEADLINE: device event must be future");
+      if (edge && (!earliest || *edge < *earliest)) earliest = edge;
+    }
+  }
+  return earliest;
 }
 
 void sim_t::step(size_t n)
 {
+  if (iris_timing) { iris_timing->step(n); return; }
+  if (iris_hart_order.empty()) {
+    for (size_t hart = 0; hart < procs.size(); ++hart) iris_hart_order.push_back(hart);
+    if (cfg->iris_schedule_seed) {
+      iris_schedule_rng.seed(*cfg->iris_schedule_seed);
+      std::shuffle(iris_hart_order.begin(), iris_hart_order.end(), iris_schedule_rng);
+    }
+  }
   for (size_t i = 0, steps = 0; i < n; i += steps)
   {
     steps = std::min(n - i, INTERLEAVE - current_step);
-    procs[current_proc]->step(steps);
+    procs[iris_hart_order[current_proc]]->step(steps);
 
     current_step += steps;
     if (current_step == INTERLEAVE)
     {
       current_step = 0;
-      procs[current_proc]->get_mmu()->yield_load_reservation();
+      procs[iris_hart_order[current_proc]]->get_mmu()->yield_load_reservation();
       if (++current_proc == procs.size()) {
         current_proc = 0;
         reg_t rtc_ticks = INTERLEAVE / INSNS_PER_RTC_TICK;
         for (auto &dev : devices) dev->tick(rtc_ticks);
+        if (cfg->iris_schedule_seed)
+          std::shuffle(iris_hart_order.begin(), iris_hart_order.end(), iris_schedule_rng);
       }
     }
   }
@@ -466,8 +629,22 @@ const char* sim_t::get_symbol(uint64_t paddr)
 
 void sim_t::reset()
 {
-  if (dtb_enabled)
-    set_rom();
+  if (cfg->iris_bootrom_file.empty()) {
+    if (dtb_enabled) set_rom();
+    return;
+  }
+  if (!dtb_enabled || !clint || cfg->hartids != std::vector<size_t>({0, 1, 2}))
+    throw std::runtime_error("Iris physical boot requires DTB, CLINT and harts 0/1/2");
+  auto rom = std::make_shared<iris_board::ReadOnlyBootROM>(
+      iris_board::read_binary(cfg->iris_bootrom_file), std::vector<char>(dtb.begin(), dtb.end()));
+  auto bootreg = std::make_shared<iris_board::BootAddressRegister>();
+  add_device(iris_board::rom_base, rom); add_device(iris_board::bootreg_base, bootreg);
+  reg_t entry = cfg->start_pc.get(0).value_or(get_entry_point());
+  uint8_t address[8];
+  for (unsigned i = 0; i < 8; ++i) address[i] = uint8_t(entry >> (8 * i));
+  if (!bootreg->store(0, 8, address)) throw std::runtime_error("Iris boot address write failed");
+  const uint8_t release[4] = {1, 0, 0, 0};
+  if (!clint->store(0, 4, release)) throw std::runtime_error("Iris boot release failed");
 }
 
 void sim_t::idle()
@@ -502,6 +679,33 @@ void sim_t::read_chunk(addr_t taddr, size_t len, void* dst)
   memcpy(dst, &data, sizeof data);
 }
 
+void sim_t::iris_read_transport(addr_t address,size_t bytes,void* data,uint8_t* known) {
+  if(!get_cfg().iris_vme){htif_t::iris_read_transport(address,bytes,data,known);return;}
+  if((address|bytes)&7)throw std::runtime_error("IRIS_UNVERIFIED_HTIF_TRANSPORT_ALIGNMENT");
+  for(size_t i=0;i<bytes;i+=8) {
+    auto word=debug_mmu->load_transport<uint64_t>(address+i);
+    const auto target=debug_mmu->to_target(word.value);memcpy((uint8_t*)data+i,&target,8);
+    if(get_target_endianness()==endianness_big)std::reverse(word.known.begin(),word.known.end());
+    std::copy(word.known.begin(),word.known.end(),known+i);
+  }
+}
+void sim_t::iris_write_transport(addr_t address,size_t bytes,const void* data,const uint8_t* known) {
+  if(!get_cfg().iris_vme){htif_t::iris_write_transport(address,bytes,data,known);return;}
+  if((address|bytes)&7)throw std::runtime_error("IRIS_UNVERIFIED_HTIF_TRANSPORT_ALIGNMENT");
+  for(size_t i=0;i<bytes;i+=8) {
+    target_endian<uint64_t> target;memcpy(&target,(const uint8_t*)data+i,8);
+    iris_definedness::Value<uint64_t> word;word.value=debug_mmu->from_target(target);
+    std::copy_n(known+i,8,word.known.begin());
+    if(get_target_endianness()==endianness_big)std::reverse(word.known.begin(),word.known.end());
+    debug_mmu->store_transport<uint64_t>(address+i,word);
+  }
+}
+void sim_t::iris_validate_syscall(reg_t number,const reg_t* args) {
+  if(!get_cfg().iris_vme)return;
+  if(number!=64&&number!=93)throw std::runtime_error("IRIS_UNVERIFIED_HTIF_SYSCALL: definedness qualified for write/exit only");
+  if(number==64)for(reg_t i=0;i<args[2];++i)(void)debug_mmu->load<uint8_t>(args[1]+i);
+}
+
 void sim_t::write_chunk(addr_t taddr, size_t len, const void* src)
 {
   assert(len == 8);
@@ -519,6 +723,10 @@ void sim_t::proc_reset(unsigned id)
 {
   debug_module.proc_reset(id);
   if (harts.count(id)) {
+    if (!cfg->iris_bootrom_file.empty()) {
+      harts[id]->get_state()->pc = iris_board::reset_pc;
+      return;
+    }
     if (auto pc = cfg->start_pc.get(id)) {
       harts[id]->get_state()->pc = *pc;
     }

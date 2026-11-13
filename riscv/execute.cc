@@ -6,6 +6,91 @@
 #include "disasm.h"
 #include "decode_macros.h"
 #include <cassert>
+#include <cstdlib>
+#include <sstream>
+#include <stdexcept>
+
+// The launcher resolves explicit fatal-handler symbols from the guest ELF.
+// Recoverable architectural traps are still delivered normally to the guest.
+static void check_iris_fatal_pc(processor_t* p, reg_t pc)
+{
+  static const std::vector<reg_t> fatal_pcs = [] {
+    std::vector<reg_t> result;
+    if (const char* raw = std::getenv("IRIS_FATAL_PCS")) {
+      std::stringstream stream(raw);
+      std::string token;
+      while (std::getline(stream, token, ',')) {
+        size_t used = 0;
+        reg_t address = std::stoull(token, &used, 0);
+        if (used != token.size()) throw std::runtime_error("invalid IRIS_FATAL_PCS");
+        result.push_back(address);
+      }
+    }
+    return result;
+  }();
+  for (reg_t fatal_pc : fatal_pcs) if (pc == fatal_pc) {
+    auto* state = p->get_state();
+    std::ostringstream error;
+    error << "IRIS_FATAL hart=" << p->get_id() << " pc=0x" << std::hex << pc
+      << " cause=0x" << state->mcause->read() << " epc=0x" << state->mepc->read()
+      << " tval=0x" << state->mtval->read() << std::dec
+      << " cycle=" << state->mcycle->read();
+    throw std::runtime_error(error.str());
+  }
+}
+
+static void check_iris_datatype(processor_t* p, reg_t pc, insn_t insn)
+{
+  if (!p->get_cfg().iris_vme) return;
+  const uint32_t raw = insn.bits(), opcode = raw & 127, f3 = (raw >> 12) & 7;
+  if (raw == 0x30500073 && p->get_id() == 2 && p->get_state()->prv == PRV_M) {
+    std::ostringstream message;
+    message << "IRIS_UNSUPPORTED_CORE_INSTRUCTION hart=2 pc=0x" << std::hex << pc
+      << " instruction=0x30500073 reason=Rocket CEASE halt-until-reset behavior is not modeled";
+    throw std::runtime_error(message.str());
+  }
+  const char* unsupported = nullptr;
+  if ((raw & MASK_FCVT_BF16_S) == MATCH_FCVT_BF16_S ||
+      (raw & MASK_FCVT_S_BF16) == MATCH_FCVT_S_BF16)
+    throw trap_illegal_instruction(insn.bits());
+  if (opcode == 0x57 && (f3 == 1 || f3 == 5)) {
+    const unsigned cmp_f6=raw>>26;
+    const bool known_fpcomp=cmp_f6==4||cmp_f6==5||cmp_f6==6||cmp_f6==7||cmp_f6==8||cmp_f6==9||cmp_f6==10||cmp_f6==0x18||cmp_f6==0x19||cmp_f6==0x1b||cmp_f6==0x1c||(f3==5&&(cmp_f6==0x1d||cmp_f6==0x1f));
+    if (known_fpcomp && p->VU.vsew==8) throw trap_illegal_instruction(insn.bits());
+    if ((!known_fpcomp || p->VU.vsew==8) && p->get_id() >= 2 && (p->VU.vsew == 8 || (p->VU.vsew == 16 && p->VU.altfmt)))
+      unsupported = "hart 2 has no Mx BF16/FP8 arithmetic or conversion datapath";
+    if (p->VU.vsew == 8) {
+      const unsigned f6 = raw >> 26;
+      const bool conversion =
+        (raw & MASK_VFWCVTBF16_F_F_V) == MATCH_VFWCVTBF16_F_F_V ||
+        (raw & MASK_VFNCVTBF16_F_F_W) == MATCH_VFNCVTBF16_F_F_W ||
+        (raw & MASK_VFNCVTBF16_SAT_F_F_W) == MATCH_VFNCVTBF16_SAT_F_F_W;
+      const bool implemented_fma = f6 == 0 || f6 == 1 || f6 == 2 || f6 == 3 ||
+        f6 == 0x31 || f6 == 0x33 || f6 == 0x24 || f6 == 0x27 ||
+        (f6 >= 0x28 && f6 <= 0x2f) || f6 == 0x30 || f6 == 0x32 ||
+        f6 == 0x34 || f6 == 0x36 || f6 == 0x38 || f6 >= 0x3c;
+      if (!conversion && !implemented_fma)
+        unsupported = "vector-FP8 reduction/divide/comparison or other unverified datapath";
+    } else if (p->VU.vsew == 16 && p->VU.altfmt) {
+      // Source-backed BF16 FMA/conversion paths; comparison/division datapaths
+      // do not select BF16. Do not silently emulate idealized BF16 semantics.
+      const unsigned f6 = raw >> 26;
+      const bool fma = f6 == 0 || f6 == 1 || f6 == 2 || f6 == 3 || f6 == 0x31 || f6 == 0x33 ||
+        f6 == 0x24 || f6 == 0x27 ||
+        (f6 >= 0x28 && f6 <= 0x2f) || f6 == 0x30 || f6 == 0x32 ||
+        f6 == 0x34 || f6 == 0x36 || f6 == 0x38 || (f6 >= 0x3c);
+      const bool fpcomp=f6==4||f6==5||f6==6||f6==7||f6==8||f6==9||f6==10||f6==0x18||f6==0x19||f6==0x1b||f6==0x1c||(f3==5&&(f6==0x1d||f6==0x1f));
+      if (!fma && !fpcomp && f6 != 0x12)
+        unsupported = "BF16 comparison/division or other non-FMA datapath has no verified BF16 format selection";
+    }
+  }
+  if (unsupported) {
+    std::ostringstream message;
+    message << "IRIS_UNSUPPORTED_DATATYPE hart=" << p->get_id() << " pc=0x" << std::hex << pc
+      << " instruction=0x" << raw << " reason=" << unsupported;
+    throw std::runtime_error(message.str());
+  }
+}
 
 static void commit_log_reset(processor_t* p)
 {
@@ -159,10 +244,16 @@ inline void processor_t::update_histogram(reg_t pc)
 // These two functions are expected to be inlined by the compiler separately in
 // the processor_t::step() loop. The logged variant is used in the slow path
 static inline reg_t execute_insn_fast(processor_t* p, reg_t pc, insn_fetch_t fetch) {
+  p->iris_validate_interrupts();
+  check_iris_fatal_pc(p, pc);
+  check_iris_datatype(p, pc, fetch.insn);
   return fetch.func(p, fetch.insn, pc);
 }
 static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t fetch)
 {
+  p->iris_validate_interrupts();
+  check_iris_fatal_pc(p, pc);
+  check_iris_datatype(p, pc, fetch.insn);
   if (p->get_log_commits_enabled()) {
     commit_log_reset(p);
     commit_log_stash_privilege(p);
@@ -199,7 +290,8 @@ static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t f
 bool processor_t::slow_path() const
 {
   return debug || state.single_step != state.STEP_NONE || state.debug_mode ||
-         log_commits_enabled || histogram_enabled || is_waiting_for_interrupt() || check_triggers_icount;
+         log_commits_enabled || histogram_enabled || is_waiting_for_interrupt() || check_triggers_icount ||
+         !cfg->iris_timing_fixture.empty();
 }
 
 // fetch/decode/execute loop
@@ -240,7 +332,8 @@ void processor_t::step(size_t n)
 
     try
     {
-      take_pending_interrupt();
+      // An already issued instruction completes before newly pending interrupts.
+      if (!sim->iris_completion_fetch(id)) take_pending_interrupt();
 
       check_if_lpad_required();
 
@@ -273,7 +366,9 @@ void processor_t::step(size_t n)
           if (unlikely(is_waiting_for_interrupt()))
             return;
 
-          insn_fetch_t fetch = mmu->load_insn(pc);
+          const auto* prepared = sim->iris_completion_fetch(id);
+          insn_fetch_t fetch = prepared ? *prepared : mmu->load_insn(pc);
+          if (!prepared) sim->iris_issue(id, pc, fetch);
           if (debug && !state.serialized)
             disasm(fetch.insn);
           pc = execute_insn_logged(this, pc, fetch);
@@ -310,6 +405,12 @@ void processor_t::step(size_t n)
           state.pc = pc = ic_entry->tag;
         }
       }
+    }
+    catch(iris_timing_wait&)
+    {
+      // Fetch/issue has occurred, but no instruction side effects may run until
+      // the shared scheduler grants the completion event.
+      n = instret;
     }
     catch(trap_t& t)
     {
@@ -349,10 +450,13 @@ void processor_t::step(size_t n)
     }
 
 serialize:
+    sim->iris_retired(id, instret);
     state.minstret->bump((state.mcountinhibit->read() & MCOUNTINHIBIT_IR) ? 0 : instret);
 
-    // Model a hart whose CPI is 1.
-    state.mcycle->bump((state.mcountinhibit->read() & MCOUNTINHIBIT_CY) ? 0 : instret);
+    // In timing mode the shared clock advances mcycle, including stall/idle time.
+    // A zero bump still resolves explicit counter-write serialization semantics.
+    state.mcycle->bump(!cfg->iris_timing_fixture.empty() ||
+                      (state.mcountinhibit->read() & MCOUNTINHIBIT_CY) ? 0 : instret);
 
     n -= instret;
   }

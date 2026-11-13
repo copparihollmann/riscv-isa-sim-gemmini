@@ -6,14 +6,20 @@
 #include <map>
 #include "decode.h"
 #include "cfg.h"
+#include "iris_definedness.hpp"
 
 class processor_t;
 class mmu_t;
+struct insn_fetch_t;
+struct iris_timing_wait {};
 
 // this is the interface to the simulator used by the processors and memory
 class simif_t
 {
 public:
+  // Shared canonical physical RAM shadow. Allocation/reset of host backing
+  // storage does not establish target RAM bits; explicit writes do.
+  iris_definedness::Memory iris_memory_definedness;
   // should return NULL for MMIO addresses
   virtual char* addr_to_mem(reg_t paddr) = 0;
   virtual bool reservable(reg_t paddr) { return addr_to_mem(paddr); }
@@ -24,6 +30,10 @@ public:
   virtual bool is_debug_module_access(reg_t, size_t) { return false; }
   // Callback for processors to let the simulation know they were reset.
   virtual void proc_reset(unsigned id) = 0;
+  virtual const insn_fetch_t* iris_completion_fetch(unsigned) const { return nullptr; }
+  virtual void iris_issue(unsigned, reg_t, const insn_fetch_t&) {}
+  virtual void iris_retired(unsigned, size_t) {}
+  virtual void iris_validate_interrupts(unsigned, bool = false) const {}
 
   virtual const cfg_t &get_cfg() const = 0;
   virtual const std::map<size_t, processor_t*>& get_harts() const = 0;

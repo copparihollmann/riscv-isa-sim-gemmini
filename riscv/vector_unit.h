@@ -4,9 +4,12 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
+#include <stdexcept>
 
 #include "decode.h"
 #include "csrs.h"
+#include "iris_definedness.hpp"
 
 class processor_t;
 
@@ -87,6 +90,62 @@ using EGU8x16_t = std::array<uint8_t, 16>;
 class vectorUnit_t
 {
 public:
+
+  // Iris MRF cells are not reset by RTL. Guard reads until software writes them.
+  bool iris_mode = false;
+  uint64_t iris_hart = 0, iris_pc = 0, iris_insn = 0;
+  bool iris_executing = false;
+  iris_definedness::Bytes iris_vrf_definedness, iris_tile_definedness;
+  // Handler macros may obtain a writable destination reference before reading
+  // aliased sources. Source masks must describe instruction-entry bits, never
+  // the destination allocation's freshly marked bits. Save lazily on first
+  // write so scalar instructions do not copy the VRF shadow.
+  std::optional<iris_definedness::Bytes> iris_vrf_instruction_input;
+  const iris_definedness::Bytes& iris_vrf_input() const {
+    return iris_executing&&iris_vrf_instruction_input?*iris_vrf_instruction_input:iris_vrf_definedness;
+  }
+  void iris_vrf_before_write() {
+    if(iris_mode&&iris_executing&&!iris_vrf_instruction_input)
+      iris_vrf_instruction_input.emplace(iris_vrf_definedness);
+  }
+  struct iris_instruction_scope {
+    vectorUnit_t& unit;uint64_t pc,bits;bool executing;
+    std::optional<iris_definedness::Bytes> inputs;
+    iris_instruction_scope(vectorUnit_t& v,uint64_t instruction,uint64_t at)
+      :unit(v),pc(v.iris_pc),bits(v.iris_insn),executing(v.iris_executing),
+       inputs(std::move(v.iris_vrf_instruction_input)) {
+      unit.iris_vrf_instruction_input.reset();
+      unit.iris_executing=unit.iris_mode;unit.iris_pc=at;unit.iris_insn=instruction;
+    }
+    ~iris_instruction_scope() {
+      unit.iris_vrf_instruction_input=std::move(inputs);
+      unit.iris_pc=pc;unit.iris_insn=bits;unit.iris_executing=executing;
+    }
+  };
+  bool iris_integer_self_constant() const {
+    if ((iris_insn&0x707f)!=0x57 || ((iris_insn>>15)&31)!=((iris_insn>>20)&31)) return false;
+    unsigned f6=iris_insn>>26;
+    return f6==2||f6==11||(f6>=0x18&&f6<=0x1d);
+  }
+  bool iris_vd_read_modify_write() const {
+    unsigned f3=(iris_insn>>12)&7,f6=iris_insn>>26;
+    return (iris_insn&0x7f)==0x57&&(f3==2||f3==6)&&
+      (f6==0x29||f6==0x2b||f6==0x2d||f6==0x2f||(f6>=0x3c&&f6<=0x3f));
+  }
+  bool iris_unmasked_move() const {
+    const unsigned f3=(iris_insn>>12)&7;
+    return iris_mode&&iris_executing&&(iris_insn&0x7f)==0x57&&(iris_insn>>26)==0x17&&
+      ((iris_insn>>25)&1)&&(f3==0||f3==3||f3==4||f3==5);
+  }
+  std::vector<uint8_t> iris_initialized;
+  template<typename T> void iris_cell(T& cell, bool write) {
+    if (!iris_mode) return;
+    if (sizeof(T) != 4) throw std::runtime_error("Iris VME supports 32-bit tile cells only");
+    const size_t index = (reinterpret_cast<char*>(&cell) - mt.data()) / 4;
+    if (index >= iris_initialized.size()) throw std::runtime_error("Iris VME cell out of range");
+    if (write) {iris_initialized[index]=1;iris_tile_definedness.define(index*4,4);}
+    else iris_tile_definedness.require(index*4,4,{iris_hart,iris_pc,"tile"});
+  }
   processor_t* p = nullptr;
   void *reg_file = nullptr;
   int setvl_count = 0;
@@ -118,11 +177,69 @@ public:
     // bits when changing SEW, thus we need to index from the end on BE.
     n ^= elts_per_reg - 1;
 #endif
+    const size_t offset=vReg*(VLEN>>3)+n*sizeof(T);
+    if (iris_mode) {
+      if (is_write) {
+        iris_vrf_before_write();
+        if (iris_executing&&iris_vd_read_modify_write())
+          iris_vrf_input().require(offset,sizeof(T),{iris_hart,iris_pc,"VRF-accumulator"});
+        if(!(iris_unmasked_move()&&((iris_insn>>12)&7)==0))iris_vrf_definedness.define(offset,sizeof(T));
+      } else if (iris_executing&&!iris_integer_self_constant()&&!(iris_unmasked_move()&&((iris_insn>>12)&7)==0))
+        iris_vrf_input().require(offset,sizeof(T),{iris_hart,iris_pc,"VRF"});
+    }
     if (is_write)
       log_elt_write_if_needed(vReg);
 
     T *regStart = (T*)((char*)reg_file + vReg * (VLEN >> 3));
     return regStart[n];
+  }
+
+  template<typename T> size_t iris_element_offset(reg_t reg,reg_t element) const {
+    const reg_t per=(VLEN>>3)/sizeof(T);reg+=element/per;element%=per;
+#ifdef WORDS_BIGENDIAN
+    element^=per-1;
+#endif
+    return reg*(VLEN>>3)+element*sizeof(T);
+  }
+  template<typename T> iris_definedness::Value<T> read_transport(reg_t reg,reg_t element) {
+    const auto offset=iris_element_offset<T>(reg,element);
+    iris_definedness::Value<T> value;value.value=*(T*)((char*)reg_file+offset);
+    if(iris_mode) {
+      auto masks=iris_vrf_input().read(offset,sizeof(T));std::copy(masks.begin(),masks.end(),value.known.begin());
+    } else value.known.fill(0xff);
+    return value;
+  }
+  template<typename T> void write_transport(reg_t reg,reg_t element,const iris_definedness::Value<T>& value) {
+    const auto offset=iris_element_offset<T>(reg,element);
+    iris_vrf_before_write();
+    log_elt_write_if_needed(offset/(VLEN>>3));
+    *(T*)((char*)reg_file+offset)=value.value;
+    if(iris_mode)iris_vrf_definedness.write(offset,value.known);
+  }
+  void copy_element_mask(reg_t dest,reg_t source,reg_t element) {
+    if(!iris_mode)return;
+    const size_t bytes=vsew/8;
+    const size_t dst=iris_element_offset<uint8_t>(dest,element*bytes),src=iris_element_offset<uint8_t>(source,element*bytes);
+    iris_vrf_before_write();
+    iris_vrf_definedness.copy_from(dst,iris_vrf_input(),src,bytes);
+  }
+  template<typename T> iris_definedness::Value<T> read_tile_transport(const T& cell) {
+    iris_definedness::Value<T> value;value.value=cell;
+    if(iris_mode) {
+      const size_t offset=(const char*)&cell-mt.data();
+      auto masks=iris_tile_definedness.read(offset,sizeof(T));std::copy(masks.begin(),masks.end(),value.known.begin());
+    } else value.known.fill(0xff);
+    return value;
+  }
+  template<typename T> void write_tile_transport(T& cell,const iris_definedness::Value<T>& value) {
+    cell=value.value;
+    if(iris_mode) {
+      const size_t offset=(char*)&cell-mt.data();iris_tile_definedness.write(offset,value.known);
+      for(size_t cell=offset/4;cell<=(offset+sizeof(T)-1)/4;++cell) {
+        const auto masks=iris_tile_definedness.read(cell*4,4);
+        iris_initialized[cell]=std::all_of(masks.begin(),masks.end(),[](uint8_t mask){return mask==0xff;});
+      }
+    }
   }
 
   // vector element group access, where EG is a std::array<T, N>.
@@ -164,6 +281,14 @@ public:
     // Inclusive first/last register indices.
     const reg_t reg_first = vReg + start_byte / bytes_per_reg;
     const reg_t reg_last = vReg + (start_byte + elt_group_size - 1) / bytes_per_reg;
+    if(iris_mode) {
+      const size_t offset=vReg*bytes_per_reg+start_byte;
+      if(is_write) {
+        iris_vrf_before_write();
+        if(iris_executing&&iris_vd_read_modify_write())iris_vrf_input().require(offset,elt_group_size,{iris_hart,iris_pc,"VRF-accumulator"});
+        iris_vrf_definedness.define(offset,elt_group_size);
+      } else if(iris_executing)iris_vrf_input().require(offset,elt_group_size,{iris_hart,iris_pc,"VRF-group"});
+    }
 
     // Element groups per register groups
     for (reg_t vidx = reg_first; vidx <= reg_last; ++vidx)
@@ -175,12 +300,22 @@ public:
 
   bool mask_elt(reg_t vReg, reg_t n)
   {
-    return (elt<uint8_t>(vReg, n / 8) >> (n % 8)) & 1;
+    const auto offset=iris_element_offset<uint8_t>(vReg,n/8);
+    const unsigned f6=iris_insn>>26;
+    const bool self_constant=(iris_insn&0x707f)==0x2057&&((iris_insn>>15)&31)==((iris_insn>>20)&31)&&
+      (f6==0x18||f6==0x1b||f6==0x1e||f6==0x1f);
+    if(iris_mode&&iris_executing&&!self_constant)
+      iris_vrf_input().require_bits(offset,1u<<(n%8),{iris_hart,iris_pc,"predicate"});
+    return (((uint8_t*)reg_file)[offset]>>(n%8))&1;
   }
 
   void set_mask_elt(reg_t vReg, reg_t n, bool value)
   {
-    auto& e = elt<uint8_t>(vReg, n / 8, true);
+    const auto offset=iris_element_offset<uint8_t>(vReg,n/8);
+    iris_vrf_before_write();
+    auto& e=((uint8_t*)reg_file)[offset];
+    log_elt_write_if_needed(offset/(VLEN>>3));
+    if(iris_mode)iris_vrf_definedness.write_bits(offset,1u<<(n%8));
     e = (e & ~(1U << (n % 8))) | (value << (n % 8));
   }
 
@@ -206,7 +341,7 @@ public:
   reg_t get_slen() { return VLEN; }
 
   VRM get_vround_mode() {
-    return (VRM)(vxrm->read());
+    return (VRM)(vxrm->read_defined(iris_pc));
   }
 
   reg_t read_mtype() const;

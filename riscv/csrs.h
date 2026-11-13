@@ -42,6 +42,8 @@ class csr_t {
   // permission checking needed or allowed.
   // Child classes must implement unlogged_write()
   void write(const reg_t val) noexcept;
+  virtual reg_t iris_known_bits() const {return ~reg_t(0);}
+  virtual void iris_set_known(reg_t) {}
 
   virtual ~csr_t();
 
@@ -506,10 +508,13 @@ class sie_csr_t: public mie_proxy_csr_t {
 class masked_csr_t: public basic_csr_t {
  public:
   masked_csr_t(processor_t* const proc, const reg_t addr, const reg_t mask, const reg_t init);
+  reg_t iris_known_bits() const override {return iris_known;}
+  void iris_set_known(reg_t known) override {iris_known=known&mask;}
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
  private:
   const reg_t mask;
+  reg_t iris_known;
 };
 
 class envcfg_csr_t: public masked_csr_t {
@@ -582,10 +587,11 @@ class wide_counter_csr_t: public csr_t {
   // Always returns full 64-bit value
   virtual reg_t read() const noexcept override;
   void bump(const reg_t howmuch) noexcept;
+  void advance_time(const reg_t cycles) noexcept;
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
  private:
-  bool is_counting_enabled() const noexcept;
+  bool is_counting_enabled(bool current_time = false) const noexcept;
   reg_t val;
   bool written;
   smcntrpmf_csr_t_p config_csr;
@@ -752,8 +758,15 @@ class float_csr_t final: public masked_csr_t {
  public:
   float_csr_t(processor_t* const proc, const reg_t addr, const reg_t mask, const reg_t init);
   virtual void verify_permissions(insn_t insn, bool write) const override;
+  reg_t read_defined(reg_t pc) const;
+  reg_t iris_known_bits() const override {return iris_known;}
+  void iris_set_known(reg_t known) override {iris_known=known&iris_mask;}
+  void write_transport(reg_t value,reg_t known);
+  void accumulate(reg_t flags);
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
+ private:
+  reg_t iris_known=0,iris_mask;
 };
 
 typedef std::shared_ptr<float_csr_t> float_csr_t_p;
@@ -789,10 +802,14 @@ class vector_csr_t: public basic_csr_t {
   virtual void verify_permissions(insn_t insn, bool write) const override;
   // Write without regard to mask, and without touching mstatus.VS
   void write_raw(const reg_t val) noexcept;
+  reg_t iris_known_bits() const override {return iris_known;}
+  void iris_set_known(reg_t known) override {iris_known=known&mask;}
+  reg_t read_defined(reg_t pc) const;
  protected:
   virtual bool unlogged_write(const reg_t val) noexcept override;
  private:
   reg_t mask;
+  reg_t iris_known;
 };
 
 typedef std::shared_ptr<vector_csr_t> vector_csr_t_p;
