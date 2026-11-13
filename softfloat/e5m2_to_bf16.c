@@ -64,7 +64,8 @@ float16_t e5m2_to_bf16( float8_t a )
     *------------------------------------------------------------------------*/
     if ( exp == 0x1F ) {
         if ( frac ) {
-            /* NaN */
+            /* HardFloat widening raises invalid for an E5M2 signaling NaN. */
+            if (frac == 1) softfloat_raiseFlags(softfloat_flag_invalid);
             softfloat_E5M2UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToBF16UI( &commonNaN );
         } else {
