@@ -53,6 +53,24 @@ riscv_precompiled_hdrs = \
 	insn_template.h \
 
 riscv_srcs = \
+	iris_timing_adapter.cc \
+	iris_shuttle_issue.cc \
+	iris_counter_observations.cc \
+	iris_event_graph.cc \
+	iris_frontend.cc \
+	iris_fast_frontend.cc \
+	iris_fast_icache.cc \
+	iris_fast_predictor.cc \
+	iris_fast_cache_control.cc \
+	iris_fast_cache_tags.cc \
+	iris_rocket_frontend.cc \
+	iris_rocket_fabric.cc \
+	iris_rocket_memory.cc \
+	iris_rocket_serial.cc \
+	iris_saturn_oracle.cc \
+	iris_saturn_live.cc \
+	iris_source_counter_clock.cc \
+	iris_memory_adapter.cc \
 	processor.cc \
 	execute.cc \
 	dts.cc \
