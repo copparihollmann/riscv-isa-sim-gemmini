@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <map>
 #include <cassert>
+#include <exception>
 #include "debug_rom_defines.h"
 #include "entropy_source.h"
 #include "csrs.h"
@@ -237,6 +238,12 @@ public:
 
   const isa_parser_t &get_isa() const & { return isa; }
   const cfg_t &get_cfg() const & { return *cfg; }
+  void iris_validate_interrupts(bool read_pending = false) const;
+  // Decode without execution, for the online model adapter and handler corpus.
+  insn_func_t decode_for_model(insn_t insn) { return decode_insn(insn); }
+  bool iris_pipeline_context_safe() const;
+  bool iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed=false) const;
+  std::exception_ptr iris_pipeline_interrupt_exception();
 
   void set_debug(bool value);
   void set_histogram(bool value);

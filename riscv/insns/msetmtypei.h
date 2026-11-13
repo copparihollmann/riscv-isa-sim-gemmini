@@ -6,4 +6,6 @@ reg_t vtype = insn.i_imm() & 0x118;
 
 P.VU.msetmtype(mtype, vtype);
 
+if (P.VU.iris_mode) WRITE_RD(0);
+
 VECTOR_END;

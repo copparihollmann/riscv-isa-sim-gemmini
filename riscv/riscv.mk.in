@@ -53,6 +53,10 @@ riscv_precompiled_hdrs = \
 	insn_template.h \
 
 riscv_srcs = \
+	iris_timing_adapter.cc \
+	iris_shuttle_issue.cc \
+	iris_event_graph.cc \
+	iris_memory_adapter.cc \
 	processor.cc \
 	execute.cc \
 	dts.cc \

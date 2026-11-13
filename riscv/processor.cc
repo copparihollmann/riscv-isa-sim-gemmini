@@ -20,8 +20,41 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <algorithm>
+#include <cstring>
+
+bool processor_t::iris_pipeline_context_safe() const {
+  return xlen == 64 && state.prv == PRV_M && !state.v && !state.debug_mode &&
+      state.single_step == state_t::STEP_NONE && !debug && halt_request == HR_NONE &&
+      !halt_on_reset && !check_triggers_icount && !mmu->iris_execute_trigger_enabled() &&
+      state.elp == elp_t::NO_LP_EXPECTED;
+}
+
+bool processor_t::iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed) const {
+  if (!iris_pipeline_context_safe() || (pc & 1) || pc>std::numeric_limits<reg_t>::max()-1) return false;
+  auto* bytes = sim->addr_to_mem(pc);
+  if (!bytes || reinterpret_cast<uintptr_t>(sim->addr_to_mem(pc+1)) != reinterpret_cast<uintptr_t>(bytes)+1) return false;
+  uint16_t half;
+  std::memcpy(&half, bytes, sizeof half);
+  const unsigned length=insn_length(from_le(half));
+  if (length==2) return allow_compressed && extension_enabled(EXT_ZCA);
+  return length==4 && pc<=std::numeric_limits<reg_t>::max()-3 &&
+      reinterpret_cast<uintptr_t>(sim->addr_to_mem(pc+3))==reinterpret_cast<uintptr_t>(bytes)+3;
+}
+
+std::exception_ptr processor_t::iris_pipeline_interrupt_exception() {
+  if (!iris_pipeline_context_safe())
+    throw std::runtime_error("IRIS_PIPELINE_INTERRUPT_PROBE_CONTEXT_UNMODELED");
+  // take_interrupt normally exits WFI even for a masked interrupt. Preserve
+  // that architectural flag while reusing its precise priority implementation.
+  const bool waiting = state.in_wfi;
+  try { take_pending_interrupt(); }
+  catch (trap_t&) { state.in_wfi = waiting; return std::current_exception(); }
+  state.in_wfi = waiting;
+  return {};
+}
 
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wunused-variable"
@@ -42,7 +75,10 @@ processor_t::processor_t(const char* isa_str, const char* priv_str,
   impl_table(256, false), extension_enable_table(isa.get_extension_table()),
   last_pc(1), executions(1), TM(cfg->trigger_count)
 {
+  if (cfg->iris_vme && id == 2 && isa.extension_enabled(EXT_ZVTBASE))
+    throw std::invalid_argument("Iris hart 2 must not advertise VME/Zvt; supply a non-VME --hart-isa=2:ISA");
   VU.p = this;
+  VU.iris_mode = cfg->iris_vme;
   TM.proc = this;
 
 #ifndef HAVE_INT128
@@ -100,7 +136,7 @@ processor_t::~processor_t()
 
 void state_t::reset(processor_t* const proc, reg_t max_isa)
 {
-  pc = DEFAULT_RSTVEC;
+  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
   XPR.reset();
   FPR.reset();
 
@@ -637,12 +673,20 @@ void processor_t::put_csr(int which, reg_t val)
 // Note that get_csr is sometimes called when read side-effects should not
 // be actioned.  In other words, Spike cannot currently support CSRs with
 // side effects on reads.
+void processor_t::iris_validate_interrupts(bool read_pending) const
+{
+  sim->iris_validate_interrupts(id, read_pending);
+}
+
 reg_t processor_t::get_csr(int which, insn_t insn, bool write, bool peek)
 {
   auto search = state.csrmap.find(which);
   if (search != state.csrmap.end()) {
     if (!peek)
       search->second->verify_permissions(insn, write);
+    // rd=x0 does not expose the pending word. MTIP and external input bits
+    // are read-only, so their unknown placeholders cannot affect a CSR write.
+    if (!peek && which == CSR_MIP && insn.rd() != 0) iris_validate_interrupts(true);
     return search->second->read();
   }
   // If we get here, the CSR doesn't exist.  Unimplemented CSRs always throw
