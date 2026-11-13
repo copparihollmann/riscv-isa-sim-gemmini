@@ -543,7 +543,7 @@ freg_t sim_t::get_freg(const std::vector<std::string>& args, int size)
       r = atoi(args[1].c_str());
     if (r >= NFPR)
       throw trap_interactive();
-    return p->get_state()->FPR[r];
+    return p->iris_read_fpr(r,p->get_state()->pc);
   }
 }
 
@@ -575,6 +575,7 @@ void sim_t::interactive_vreg(const std::string& cmd, const std::vector<std::stri
     out << std::dec << "VLEN=" << (vlen << 3) << " bits; ELEN=" << (elen << 3) << " bits" << std::endl;
 
     for (int r = rstart; r < rend; ++r) {
+      if(p->VU.iris_mode)p->VU.iris_vrf_definedness.require(r*vlen,vlen,{p->get_id(),p->get_state()->pc,"vector-debug-observation"});
       out << std::setfill (' ') << std::left << std::setw(4) << vr_name[r] << std::right << ": ";
       for (int e = num_elem-1; e >= 0; --e) {
         uint64_t val;
@@ -816,6 +817,7 @@ void sim_t::interactive_until(const std::string& cmd, const std::vector<std::str
 
 void sim_t::interactive_dumpmems(const std::string& cmd, const std::vector<std::string>& args)
 {
+  if(get_cfg().iris_vme)throw std::runtime_error("IRIS_UNVERIFIED_MEMORY_DUMP: unknown RAM requires shadow-mask output");
   for (unsigned i = 0; i < mems.size(); i++) {
     std::stringstream mem_fname;
     mem_fname << "mem.0x" << std::hex << mems[i].first << ".bin";
