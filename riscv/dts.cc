@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -15,14 +16,13 @@
 std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
                      const cfg_t* cfg,
                      std::vector<std::pair<reg_t, abstract_mem_t*>> mems,
-                     std::string device_nodes)
+                     std::string device_nodes, std::vector<size_t> hart_clock_hz)
 {
   reg_t initrd_start = cfg->initrd_bounds.first;
   reg_t initrd_end = cfg->initrd_bounds.second;
   const char* bootargs = cfg->bootargs;
   reg_t pmpregions = cfg->pmpregions;
   reg_t pmpgranularity = cfg->pmpgranularity;
-  isa_parser_t isa(cfg->isa, cfg->priv);
   auto emit_addr = [](std::stringstream& s, reg_t addr) {
     s << "0x" << std::hex << (addr >> 32) << " 0x" << (addr & (uint32_t)-1) << std::dec;
   };
@@ -65,16 +65,26 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
          "    #size-cells = <0>;\n"
          "    timebase-frequency = <" << (cpu_hz/insns_per_rtc_tick) << ">;\n";
     for (size_t i = 0; i < cfg->nprocs(); i++) {
+    isa_parser_t isa(cfg->isa_for_hart(cfg->hartids[i]), cfg->priv);
+    const bool iris_layout = cfg->iris_vme || !cfg->iris_bootrom_file.empty();
+    const auto hart = cfg->hartids[i];
+    if (iris_layout && (hart > 2 || isa.get_max_xlen() != 64))
+      throw std::invalid_argument("Iris CPU layout requires RV64 architectural harts 0,1,2");
+    // Shuttle Parameters.scala: pgLevels3/nPMPs0. RocketCore.scala:
+    // pgLevels3/nPMPs8. The saved Iris DTS also records hart2's 4-byte grain.
+    const auto hart_pmpregions = iris_layout ? (hart < 2 ? 0 : 8) : pmpregions;
+    const auto hart_pmpgranularity = iris_layout ? 4 : pmpgranularity;
+    const char* mmu = iris_layout ? "sv39" : (isa.get_max_xlen() <= 32 ? "sv32" : "sv57");
     s << "    CPU" << i << ": cpu@" << i << " {\n"
          "      device_type = \"cpu\";\n"
          "      reg = <" << cfg->hartids[i] << ">;\n"
          "      status = \"okay\";\n"
          "      compatible = \"riscv\";\n"
          "      riscv,isa = \"" << isa.get_isa_string() << "\";\n"
-         "      mmu-type = \"riscv," << (isa.get_max_xlen() <= 32 ? "sv32" : "sv57") << "\";\n"
-         "      riscv,pmpregions = <" << pmpregions << ">;\n"
-         "      riscv,pmpgranularity = <" << pmpgranularity << ">;\n"
-         "      clock-frequency = <" << cpu_hz << ">;\n"
+         "      mmu-type = \"riscv," << mmu << "\";\n"
+         "      riscv,pmpregions = <" << hart_pmpregions << ">;\n"
+         "      riscv,pmpgranularity = <" << hart_pmpgranularity << ">;\n"
+         "      clock-frequency = <" << (hart_clock_hz.empty() ? cpu_hz : hart_clock_hz.at(i)) << ">;\n"
          "      CPU" << i << "_intc: interrupt-controller {\n"
          "        #address-cells = <2>;\n"
          "        #interrupt-cells = <1>;\n"

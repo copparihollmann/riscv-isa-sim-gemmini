@@ -20,8 +20,99 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <algorithm>
+#include <cstring>
+
+iris_definedness::Value<uint64_t> processor_t::iris_frontend_read_beat(reg_t address) {
+  // Source I-cache requests use a physical, side-effect-free instruction port.
+  // Do not route these through a data MMU or interpret MPRV as fetch privilege.
+  if(address&7)throw std::runtime_error("IRIS_FRONTEND_UNALIGNED_BEAT");
+  const auto physical=iris_board::storage_address(id,address);
+  if(!iris_board::permits(physical,8,iris_board::Access::Execute))
+    throw std::runtime_error("IRIS_FRONTEND_REFILL_PHYSICAL_ROUTE_UNMODELED");
+  iris_definedness::Value<uint64_t> value;std::array<uint8_t,8> bytes{};
+  if(sim->addr_to_mem(physical)) {
+    for(unsigned i=0;i<8;++i) {
+      const auto* p=sim->addr_to_mem(physical+i);
+      if(!p)throw std::runtime_error("IRIS_FRONTEND_REFILL_RAM_HOLE");
+      bytes[i]=uint8_t(*p);
+    }
+    sim->iris_memory_definedness.read_into(physical,value.known);
+  } else {
+    if(physical<0x10000 || physical+8>0x20000 || !sim->mmio_fetch(physical,8,bytes.data()))
+      throw std::runtime_error("IRIS_FRONTEND_REFILL_DEVICE_UNMODELED");
+    value.known.fill(0xff);
+  }
+  value.value=0;for(unsigned i=0;i<8;++i)value.value|=uint64_t(bytes[i])<<(8*i);
+  return value;
+}
+
+void processor_t::iris_fabric_commit_cached_store(reg_t address,unsigned bytes,uint64_t value) {
+  if(!bytes||bytes>8||address<0x80000000||address>=0x180000000ULL||bytes>0x180000000ULL-address)throw std::runtime_error("IRIS_ROCKET_SOURCE_CACHED_STORE_MIRROR_RANGE");
+  for(unsigned n=0;n<bytes;++n){auto*p=sim->addr_to_mem(address+n);if(!p)throw std::runtime_error("IRIS_ROCKET_SOURCE_CACHED_STORE_MIRROR_HOLE");*p=value>>(8*n);}
+  sim->iris_memory_definedness.define(address,bytes);
+}
+
+uint64_t processor_t::iris_fabric_external_io_read(reg_t address,unsigned size) {
+  if(!size||size>8||sim->addr_to_mem(address))throw std::runtime_error("IRIS_ROCKET_FABRIC_EXTERNAL_IO_READ_SCOPE");
+  std::array<uint8_t,8> data{};
+  if(!sim->mmio_load(address,size,data.data()))throw std::runtime_error("IRIS_ROCKET_FABRIC_EXTERNAL_IO_READ_REFUSED");
+  uint64_t value=0;for(unsigned i=0;i<size;++i)value|=uint64_t(data[i])<<(8*i);return value;
+}
+void processor_t::iris_fabric_external_io_write(reg_t address,unsigned size,uint64_t value,uint64_t mask) {
+  if(!size||size>8||sim->addr_to_mem(address))throw std::runtime_error("IRIS_ROCKET_FABRIC_EXTERNAL_IO_WRITE_SCOPE");
+  for(unsigned i=0;i<size;){if(!(mask&(uint64_t(1)<<i))){++i;continue;}unsigned count=1;while(i+count<size&&(mask&(uint64_t(1)<<(i+count))))++count;
+    if(count!=1&&count!=2&&count!=4&&count!=8)throw std::runtime_error("IRIS_ROCKET_FABRIC_EXTERNAL_IO_MASK_UNMODELED");
+    std::array<uint8_t,8> data{};for(unsigned n=0;n<count;++n)data[n]=value>>(8*(i+n));
+    if(!sim->mmio_store(address+i,count,data.data()))throw std::runtime_error("IRIS_ROCKET_FABRIC_EXTERNAL_IO_WRITE_REFUSED");i+=count;
+  }
+}
+
+std::array<std::pair<uint8_t,uint64_t>,8> processor_t::iris_frontend_pmp() const {
+  if(n_pmp!=8 || lg_pmp_granularity!=2)throw std::runtime_error("IRIS_ROCKET_FRONTEND_PMP_SOURCE_CONFIG_MISMATCH");
+  const auto cfg=state.csrmap.at(CSR_PMPCFG0)->read();std::array<std::pair<uint8_t,uint64_t>,8> out;
+  for(unsigned i=0;i<8;++i){const auto address=state.pmpaddr[i]->read();
+    if(address>>33)throw std::runtime_error("IRIS_ROCKET_FRONTEND_PMP_ADDRESS_WIDTH_UNMODELED");
+    out[i]={uint8_t(cfg>>(i*8)),address};}
+  return out;
+}
+
+bool processor_t::iris_pipeline_context_safe() const {
+  return xlen == 64 && state.prv == PRV_M && !state.v && !state.debug_mode &&
+      state.single_step == state_t::STEP_NONE && !debug && halt_request == HR_NONE &&
+      !halt_on_reset && !check_triggers_icount && !mmu->iris_execute_trigger_enabled() &&
+      state.elp == elp_t::NO_LP_EXPECTED;
+}
+
+bool processor_t::iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed, bool allow_split_pages) const {
+  if (!iris_pipeline_context_safe() || (pc & 1) || pc>std::numeric_limits<reg_t>::max()-1) return false;
+  auto* low=sim->addr_to_mem(pc);auto* high=sim->addr_to_mem(pc+1);
+  if (!low || !high) return false;
+  if (!allow_split_pages && reinterpret_cast<uintptr_t>(high)!=reinterpret_cast<uintptr_t>(low)+1) return false;
+  // mem_t uses separately allocated host pages. Guest RAM at a page boundary
+  // need not have contiguous host pointers. Read only the required mapped
+  // bytes here; the ordinary MMU fetch retains its architectural access checks.
+  const uint16_t half=uint8_t(*low)|(uint16_t(uint8_t(*high))<<8);
+  const unsigned length=insn_length(half);
+  if (length==2) return allow_compressed && extension_enabled(EXT_ZCA);
+  return length==4 && pc<=std::numeric_limits<reg_t>::max()-3 &&
+      sim->addr_to_mem(pc+2) && sim->addr_to_mem(pc+3) &&
+      (allow_split_pages || reinterpret_cast<uintptr_t>(sim->addr_to_mem(pc+3))==reinterpret_cast<uintptr_t>(low)+3);
+}
+
+std::exception_ptr processor_t::iris_pipeline_interrupt_exception() {
+  if (!iris_pipeline_context_safe())
+    throw std::runtime_error("IRIS_PIPELINE_INTERRUPT_PROBE_CONTEXT_UNMODELED");
+  // take_interrupt normally exits WFI even for a masked interrupt. Preserve
+  // that architectural flag while reusing its precise priority implementation.
+  const bool waiting = state.in_wfi;
+  try { take_pending_interrupt(); }
+  catch (trap_t&) { state.in_wfi = waiting; return std::current_exception(); }
+  state.in_wfi = waiting;
+  return {};
+}
 
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wunused-variable"
@@ -42,7 +133,10 @@ processor_t::processor_t(const char* isa_str, const char* priv_str,
   impl_table(256, false), extension_enable_table(isa.get_extension_table()),
   last_pc(1), executions(1), TM(cfg->trigger_count)
 {
+  if (cfg->iris_vme && id == 2 && isa.extension_enabled(EXT_ZVTBASE))
+    throw std::invalid_argument("Iris hart 2 must not advertise VME/Zvt; supply a non-VME --hart-isa=2:ISA");
   VU.p = this;
+  VU.iris_mode = cfg->iris_vme;
   TM.proc = this;
 
 #ifndef HAVE_INT128
@@ -100,7 +194,7 @@ processor_t::~processor_t()
 
 void state_t::reset(processor_t* const proc, reg_t max_isa)
 {
-  pc = DEFAULT_RSTVEC;
+  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
   XPR.reset();
   FPR.reset();
 
@@ -156,7 +250,10 @@ void processor_t::reset()
   if (any_vector_extensions())
     VU.reset();
 
-  if (n_pmp > 0) {
+  if (n_pmp > 0 && !cfg->iris_vme) {
+    // Iris PMP resets A/L to zero in the saved CSRFile; upstream compatibility
+    // initialization is not a source power-on policy. Other PMP bits remain
+    // outside current production-definedness qualification.
     // For backwards compatibility with software that is unaware of PMP,
     // initialize PMP to permit unprivileged access to all of memory.
     put_csr(CSR_PMPADDR0, ~reg_t(0));
@@ -634,16 +731,116 @@ void processor_t::put_csr(int which, reg_t val)
   }
 }
 
+bool processor_t::iris_fcsr_instruction(insn_t insn,reg_t pc)
+{
+  const unsigned csr=insn.csr();
+  reg_t mask=0;
+  switch(csr) {
+    case CSR_FFLAGS:mask=31;break;case CSR_FRM:mask=7;break;case CSR_FCSR:mask=255;break;
+    case CSR_VSTART:mask=VU.VLEN-1;break;case CSR_VXRM:mask=3;break;case CSR_VXSAT:mask=1;break;
+    case CSR_VCSR:mask=7;break;case CSR_MCOUNTEREN:case CSR_SCOUNTEREN:mask=7;break;
+    default:return false;
+  }
+  if(!VU.iris_mode)return false;
+  const unsigned operation=insn.funct3()&3;
+  const bool architectural_write=operation==1||insn.rs1()!=0;
+  // Shuttle forwards CSR.S/C even for rs1=x0/uimm=0; Rocket changes those
+  // commands to CSR.R. For these writable state CSRs, the forwarded zero
+  // update still dirties FS/VS. Preserve old unknown bits through that update.
+  // Scope this to the source/RTL-proved state CSRs; counter phases and other
+  // asynchronous CSR interactions are handled by separate policies.
+  const bool state_csr=csr==CSR_FFLAGS||csr==CSR_FRM||csr==CSR_FCSR||
+    csr==CSR_VSTART||csr==CSR_VXRM||csr==CSR_VXSAT||csr==CSR_VCSR;
+  const bool write=architectural_write||(get_id()<2&&state_csr&&operation!=1);
+  auto cell=state.csrmap.at(csr);cell->verify_permissions(insn,architectural_write);
+  const reg_t old=cell->read();
+  reg_t old_known=cell->iris_known_bits()&mask;
+  if(csr==CSR_FCSR)old_known=((state.frm->iris_known_bits()&7)<<5)|(state.fflags->iris_known_bits()&31);
+  if(csr==CSR_VCSR)old_known=((VU.vxrm->iris_known_bits()&3)<<1)|(state.vxsat->iris_known_bits()&1);
+  auto input=state.XPR.read_transport(insn.rs1());
+  if(insn.funct3()&4){input.value=insn.rs1();input.known.fill(0xff);}
+  reg_t input_known=0;
+  for(size_t byte=0;byte<sizeof(reg_t);++byte)input_known|=reg_t(input.known[byte])<<(byte*8);
+  reg_t value=old,known=old_known;
+  if(write) {
+    if(operation==1){value=input.value;known=input_known;}
+    else if(operation==2){value=old|input.value;known=(old_known&input_known)|(old_known&old)|(input_known&input.value);}
+    else {value=old&~input.value;known=(old_known&input_known)|(old_known&~old)|(input_known&input.value);}
+    value&=mask;known&=mask;cell->write(value);
+    if(csr==CSR_FCSR){state.frm->iris_set_known(known>>5);state.fflags->iris_set_known(known);}
+    else if(csr==CSR_VCSR){VU.vxrm->iris_set_known(known>>1);state.vxsat->iris_set_known(known);}
+    else cell->iris_set_known(known);
+  }
+  iris_definedness::Value<reg_t> result;result.value=old;result.known.fill(0xff);
+  const reg_t result_known=old_known|~mask;
+  for(size_t byte=0;byte<sizeof(reg_t);++byte)result.known[byte]=result_known>>(byte*8);
+  iris_write_xpr_transport(insn.rd(),result);
+  (void)pc;
+  return true;
+}
+
 // Note that get_csr is sometimes called when read side-effects should not
 // be actioned.  In other words, Spike cannot currently support CSRs with
 // side effects on reads.
+void processor_t::iris_validate_interrupts(bool read_pending) const
+{
+  sim->iris_validate_interrupts(id, read_pending);
+}
+
 reg_t processor_t::get_csr(int which, insn_t insn, bool write, bool peek)
 {
   auto search = state.csrmap.find(which);
   if (search != state.csrmap.end()) {
     if (!peek)
       search->second->verify_permissions(insn, write);
-    return search->second->read();
+    if(VU.iris_mode) {
+      if(which==CSR_FFLAGS||which==CSR_FCSR)state.fflags->read_defined(VU.iris_pc);
+      if(which==CSR_FRM||which==CSR_FCSR)state.frm->read_defined(VU.iris_pc);
+      reg_t tracked_mask=which==CSR_VSTART?VU.VLEN-1:which==CSR_VXRM?3:which==CSR_VXSAT?1:
+        (which==CSR_MCOUNTEREN||which==CSR_SCOUNTEREN)?7:0;
+      if(which==CSR_VCSR) {
+        VU.vxrm->read_defined(VU.iris_pc);
+        iris_definedness::require_byte(state.vxsat->iris_known_bits(),1,0,{id,VU.iris_pc,"vxsat"});
+      } else if(tracked_mask)
+        for(size_t byte=0;byte<sizeof(reg_t);++byte)
+          iris_definedness::require_byte(search->second->iris_known_bits()>>(byte*8),tracked_mask>>(byte*8),byte,{id,VU.iris_pc,"CSR"});
+    }
+    // rd=x0 does not expose the pending word. MTIP and external input bits
+    // are read-only, so their unknown placeholders cannot affect a CSR write.
+    if (!peek && which == CSR_MIP && insn.rd() != 0) iris_validate_interrupts(true);
+    auto value=search->second->read();
+    const auto raw=uint32_t(insn.bits()), funct=(raw>>12)&7;
+    const bool counter=which==CSR_MCYCLE || which==CSR_MINSTRET || which==CSR_CYCLE || which==CSR_INSTRET ||
+        (which>=CSR_MHPMCOUNTER3 && which<=CSR_MHPMCOUNTER31) || (which>=CSR_HPMCOUNTER3 && which<=CSR_HPMCOUNTER31);
+    const bool instruction_counter_read=!peek && counter && (raw&127)==0x73 &&
+        (funct==1 || funct==2 || funct==3 || funct==5 || funct==6 || funct==7) && (raw>>20)==unsigned(which);
+    const char* phase="model_instruction_completion_get_csr";
+    if (instruction_counter_read && cfg->iris_vme) {
+      if (!cfg->iris_timing_fixture.empty()) {
+        // The completion timestamp denotes the modeled retirement edge. Read
+        // its pre-update counter state, then apply any explicit CSR write at
+        // that edge. The global/device clock itself remains unchanged.
+        const auto sample=sim->iris_mcycle_pre_edge(id);
+        if (!sample) throw std::runtime_error("IRIS_COUNTER_READ_PRE_EDGE_SNAPSHOT_UNAVAILABLE");
+        if (which==CSR_MCYCLE || which==CSR_CYCLE) {
+          value=*sample;
+        }
+        phase="model_retirement_edge_pre_update";
+      }
+    }
+    // Validate/buffer the actual instruction context before applying any
+    // source-specific rewrite. Trapping instructions discard this buffer.
+    if (instruction_counter_read)
+      sim->iris_counter_read(id,state.pc,raw,which,value,insn.rd(),phase);
+    if (instruction_counter_read && cfg->iris_vme) {
+      // Shuttle does not rewrite zero-field S/C to CSR.R. CSRFile writes
+      // these writable counters back, overriding the same edge's increment.
+      // Do not generalize this to read-only aliases or other CSR side effects.
+      if (id<2 && (which==CSR_MCYCLE || which==CSR_MINSTRET) && insn.rs1()==0 &&
+          (funct==2 || funct==3 || funct==6 || funct==7))
+        put_csr(which,value);
+    }
+    return value;
   }
   // If we get here, the CSR doesn't exist.  Unimplemented CSRs always throw
   // illegal-instruction exceptions, not virtual-instruction exceptions.
