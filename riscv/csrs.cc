@@ -715,6 +715,11 @@ bool mstatus_csr_t::unlogged_write(const reg_t val) noexcept {
   const reg_t requested_mpp = proc->legalize_privilege(get_field(val, MSTATUS_MPP));
   const reg_t adjusted_val = set_field(val, MSTATUS_MPP, requested_mpp);
   reg_t new_mstatus = (this->val & ~mask) | (adjusted_val & mask);
+  // Audited Iris Rocket has haveFSDirty=false: CSRFile.formFS maps every
+  // nonzero FS encoding to Dirty. Shuttle retains the written two-bit value.
+  // sstatus writes reach this same mstatus implementation through its proxy.
+  if (proc->get_cfg().iris_vme && proc->get_id()==2 && (new_mstatus&MSTATUS_FS))
+    new_mstatus|=MSTATUS_FS;
   new_mstatus = (new_mstatus & MSTATUS_MDT) ? (new_mstatus & ~MSTATUS_MIE) : new_mstatus;
   new_mstatus = (new_mstatus & MSTATUS_SDT) ? (new_mstatus & ~MSTATUS_SIE) : new_mstatus;
   maybe_flush_tlb(new_mstatus);
@@ -1192,10 +1197,11 @@ bool sie_csr_t::unlogged_write(const reg_t val) noexcept {
 // implement class masked_csr_t
 masked_csr_t::masked_csr_t(processor_t* const proc, const reg_t addr, const reg_t mask, const reg_t init):
   basic_csr_t(proc, addr, init),
-  mask(mask) {
+  mask(mask),iris_known(addr==CSR_MCOUNTEREN||addr==CSR_SCOUNTEREN||addr==CSR_VXSAT?0:mask) {
 }
 
 bool masked_csr_t::unlogged_write(const reg_t val) noexcept {
+  iris_known=mask;
   return basic_csr_t::unlogged_write((read() & ~mask) | (val & mask));
 }
 
@@ -1344,16 +1350,26 @@ bool wide_counter_csr_t::unlogged_write(const reg_t val) noexcept {
 
 // Returns true if counting is not inhibited by Smcntrpmf.
 // Note that minstretcfg / mcyclecfg / mhpmevent* share the same inhibit bits.
-bool wide_counter_csr_t::is_counting_enabled() const noexcept {
-  auto prv = state->prv_changed ? state->prev_prv : state->prv;
-  auto v = state->v_changed ? state->prev_v : state->v;
+void wide_counter_csr_t::advance_time(const reg_t cycles, bool active) noexcept {
+  if (!cycles) return;
+  const bool enabled=active && !(state->mcountinhibit->read() & MCOUNTINHIBIT_CY) && is_counting_enabled(true);
+  // Preserve the registered value immediately before the LAST local edge
+  // in this advance, including wrap and a frozen/inhibited clock. This is
+  // state history, not a guessed global counter offset.
+  pre_edge_value=val+(enabled?cycles-1:0);pre_edge_valid=true;
+  if (enabled) val+=cycles;
+}
+
+bool wide_counter_csr_t::is_counting_enabled(bool current_time) const noexcept {
+  auto prv = !current_time && state->prv_changed ? state->prev_prv : state->prv;
+  auto v = !current_time && state->v_changed ? state->prev_v : state->v;
   auto mask = MHPMEVENT_MINH;
   if (prv == PRV_S) {
     mask = v ? MHPMEVENT_VSINH : MHPMEVENT_SINH;
   } else if (prv == PRV_U) {
     mask = v ? MHPMEVENT_VUINH : MHPMEVENT_UINH;
   }
-  return (config_csr->read_prev() & mask) == 0;
+  return ((current_time ? config_csr->read() : config_csr->read_prev()) & mask) == 0;
 }
 
 // implement class time_counter_csr_t
@@ -1419,6 +1435,12 @@ bool counter_proxy_csr_t::myenable(csr_t_p counteren) const noexcept {
 void counter_proxy_csr_t::verify_permissions(insn_t insn, bool write) const {
   proxy_csr_t::verify_permissions(insn, write);
 
+  if(proc->VU.iris_mode&&(address&31)<3) {
+    const uint8_t bit=uint8_t(1u<<(address&31));
+    if(state->prv<PRV_M)iris_definedness::require_byte(state->mcounteren->iris_known_bits(),bit,0,{proc->get_id(),proc->VU.iris_pc,"mcounteren-control"});
+    if(state->prv<PRV_S)iris_definedness::require_byte(state->scounteren->iris_known_bits(),bit,0,{proc->get_id(),proc->VU.iris_pc,"scounteren-control"});
+  }
+
   const bool mctr_ok = (state->prv < PRV_M) ? myenable(state->mcounteren) : true;
   const bool hctr_ok = state->v ? myenable(state->hcounteren) : true;
   const bool sctr_ok = (proc->extension_enabled('S') && state->prv < PRV_S) ? myenable(state->scounteren) : true;
@@ -1440,6 +1462,8 @@ mevent_csr_t::mevent_csr_t(processor_t* const proc, const reg_t addr):
 }
 
 bool mevent_csr_t::unlogged_write(const reg_t val) noexcept {
+  // Source nPerfCounters=0: every mhpmevent slot is padded zero and WI.
+  if (proc->VU.iris_mode) return basic_csr_t::unlogged_write(0);
   const reg_t mask = proc->extension_enabled(EXT_SSCOFPMF) ? MHPMEVENT_OF | MHPMEVENT_MINH
     | (proc->extension_enabled_const('U') ? MHPMEVENT_UINH : 0)
     | (proc->extension_enabled_const('S') ? MHPMEVENT_SINH : 0)
@@ -1643,7 +1667,20 @@ void dcsr_csr_t::update_fields(const uint8_t cause, uint8_t ext_cause, const reg
 }
 
 float_csr_t::float_csr_t(processor_t* const proc, const reg_t addr, const reg_t mask, const reg_t init):
-  masked_csr_t(proc, addr, mask, init) {
+  masked_csr_t(proc, addr, mask, init),iris_mask(mask) {
+}
+
+reg_t float_csr_t::read_defined(reg_t pc) const {
+  if(proc->VU.iris_mode)
+    iris_definedness::require_byte(iris_known,iris_mask,0,{proc->get_id(),pc,address==CSR_FRM?"frm":"fflags"});
+  return read();
+}
+void float_csr_t::write_transport(reg_t value,reg_t known) {
+  write(value);iris_known=known&iris_mask;
+}
+void float_csr_t::accumulate(reg_t flags) {
+  const reg_t old_known=iris_known;
+  write(read()|flags);iris_known=(old_known|flags)&iris_mask;
 }
 
 void float_csr_t::verify_permissions(insn_t insn, bool write) const {
@@ -1670,6 +1707,7 @@ void float_csr_t::verify_permissions(insn_t insn, bool write) const {
 }
 
 bool float_csr_t::unlogged_write(const reg_t val) noexcept {
+  iris_known=iris_mask;
   if (!proc->extension_enabled(EXT_ZFINX))
     dirty_fp_state;
   return masked_csr_t::unlogged_write(val);
@@ -1731,7 +1769,15 @@ bool seed_csr_t::unlogged_write(const reg_t val) noexcept {
 
 vector_csr_t::vector_csr_t(processor_t* const proc, const reg_t addr, const reg_t mask, const reg_t init):
   basic_csr_t(proc, addr, init),
-  mask(mask) {
+  mask(mask),iris_known(addr==CSR_VSTART||addr==CSR_VXRM?0:mask) {
+}
+
+reg_t vector_csr_t::read_defined(reg_t pc) const {
+  if(proc->VU.iris_mode) {
+    for(size_t byte=0;byte<sizeof(reg_t);++byte)
+      iris_definedness::require_byte(iris_known>>(byte*8),mask>>(byte*8),byte,{proc->get_id(),pc,address==CSR_VXRM?"vxrm":"vstart"});
+  }
+  return read();
 }
 
 void vector_csr_t::verify_permissions(insn_t insn, bool write) const {
@@ -1740,6 +1786,7 @@ void vector_csr_t::verify_permissions(insn_t insn, bool write) const {
 }
 
 void vector_csr_t::write_raw(const reg_t val) noexcept {
+  iris_known=mask;
   const bool success = basic_csr_t::unlogged_write(val);
   if (success)
     log_write();
@@ -1747,6 +1794,7 @@ void vector_csr_t::write_raw(const reg_t val) noexcept {
 
 bool vector_csr_t::unlogged_write(const reg_t val) noexcept {
   if (mask == 0) return false;
+  iris_known=mask;
   STATE.sstatus->dirty(SSTATUS_VS);
   return basic_csr_t::unlogged_write(val & mask);
 }
