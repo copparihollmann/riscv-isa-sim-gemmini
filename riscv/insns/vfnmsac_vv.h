@@ -1,3 +1,8 @@
+if (P.VU.iris_mode && P.VU.vsew == 8) {
+#include "iris_native_fp8_body.h"
+} else if (P.VU.iris_mode) {
+#include "iris_ieee_fma_body.h"
+} else {
 // vfnmsac.vv vd, vs1, vs2, vm   # vd[i] = -(vs2[i] * vs1[i]) + vd[i]
 
 require_zvfbfa
@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
 {
   vd = f64_mulAdd(f64(vs1.v ^ F64_SIGN), vs2, vd);
 })
+
+}

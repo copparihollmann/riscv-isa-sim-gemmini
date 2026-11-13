@@ -1,1 +1,1 @@
-WRITE_RD(MMU.load<int8_t>(RS1 + insn.i_imm()));
+IRIS_LOAD_XPR(int8_t,insn.rd(),RS1 + insn.i_imm());
