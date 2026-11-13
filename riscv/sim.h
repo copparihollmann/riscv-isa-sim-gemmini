@@ -4,6 +4,7 @@
 #define _RISCV_SIM_H
 
 #include "cfg.h"
+#include <random>
 #include "debug_module.h"
 #include "devices.h"
 #include "common.h"
@@ -22,6 +23,7 @@
 class mmu_t;
 class remote_bitbang_t;
 class socketif_t;
+class iris_timing_adapter;
 
 // Type for holding a pair of device factory and device specialization arguments.
 using device_factory_sargs_t = std::pair<const device_factory_t*, std::vector<std::string>>;
@@ -62,9 +64,14 @@ public:
   abstract_interrupt_controller_t* get_intctrl() const { assert(plic.get()); return plic.get(); }
   virtual const cfg_t &get_cfg() const override { return *cfg; }
   virtual bool is_debug_module_access(reg_t paddr, size_t len) override;
+  bool reservable(reg_t paddr) override;
 
   virtual const std::map<size_t, processor_t*>& get_harts() const override { return harts; }
   const bus_t& get_bus() const {  return bus;}
+  const insn_fetch_t* iris_completion_fetch(unsigned hart) const override;
+  void iris_issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) override;
+  void iris_retired(unsigned hart, size_t count) override;
+  void iris_validate_interrupts(unsigned hart, bool read_pending = false) const override;
 
   // Callback for processors to let the simulation know they were reset.
   virtual void proc_reset(unsigned id) override;
@@ -75,6 +82,9 @@ public:
 
 private:
   const cfg_t * const cfg;
+  std::unique_ptr<iris_timing_adapter> iris_timing;
+  void iris_advance_clock(uint64_t before, uint64_t after);
+  std::optional<uint64_t> iris_next_timer_event();
   std::vector<std::pair<reg_t, abstract_mem_t*>> mems;
   std::vector<processor_t*> procs;
   std::map<size_t, processor_t*> harts;
@@ -100,6 +110,8 @@ private:
   processor_t* get_core(const std::string& i);
   void step(size_t n); // step through simulation
   size_t current_step;
+  std::vector<size_t> iris_hart_order;
+  std::mt19937_64 iris_schedule_rng;
   size_t current_proc;
   bool debug;
   bool histogram_enabled; // provide a histogram of PCs

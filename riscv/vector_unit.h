@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstdint>
+#include <stdexcept>
 
 #include "decode.h"
 #include "csrs.h"
@@ -87,6 +88,18 @@ using EGU8x16_t = std::array<uint8_t, 16>;
 class vectorUnit_t
 {
 public:
+
+  // Iris MRF cells are not reset by RTL. Guard reads until software writes them.
+  bool iris_mode = false;
+  std::vector<uint8_t> iris_initialized;
+  template<typename T> void iris_cell(T& cell, bool write) {
+    if (!iris_mode) return;
+    if (sizeof(T) != 4) throw std::runtime_error("Iris VME supports 32-bit tile cells only");
+    const size_t index = (reinterpret_cast<char*>(&cell) - mt.data()) / 4;
+    if (index >= iris_initialized.size()) throw std::runtime_error("Iris VME cell out of range");
+    if (write) iris_initialized[index] = 1;
+    else if (!iris_initialized[index]) throw std::runtime_error("Iris VME read of uninitialized tile cell; explicitly zero or load tile first");
+  }
   processor_t* p = nullptr;
   void *reg_file = nullptr;
   int setvl_count = 0;

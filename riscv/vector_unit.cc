@@ -25,6 +25,7 @@ void vectorUnit_t::vectorUnit_t::reset()
   mtype = std::make_shared<vector_csr_t>(p, CSR_MTYPE, 0);
   if (TE) {
     mt.resize(16 * TE * TE);
+    iris_initialized.assign(mt.size() / 4, 0);
     state->add_csr(CSR_MTYPE, mtype);
   }
 
@@ -34,6 +35,36 @@ void vectorUnit_t::vectorUnit_t::reset()
 
 void vectorUnit_t::msetmtype(reg_t newMType, reg_t newVType)
 {
+  if (iris_mode) {
+    // Matrix.scala msetmtypeNewType/update: use the NEW configuration and
+    // clear tm/tk. The Iris stand-in implemented subset has 32-bit tile cells.
+    reg_t tw = (reg_t(1) << (newMType & 3)) >> 1;
+    reg_t sew = reg_t(8) << ((newVType >> 3) & 7);
+    if (tw == 0) {
+      set_vl(0, 1, 0, newVType & reg_t(0x1ff));
+      return;
+    }
+    if (!((tw == 4 && sew == 8) || (tw == 1 && sew == 32))) {
+      set_vl(0, 1, 0, reg_t(-1));
+      widen = tm = tk = 0;
+      mtype->write_raw(read_mtype());
+      return;
+    }
+    const reg_t km = 32 / sew;
+    const reg_t eve_new = VLEN / sew;
+    const reg_t lm = std::max(reg_t(1), std::min(reg_t(8) / km,
+      std::min(reg_t(8) / tw, (TE + eve_new - 1) / eve_new)));
+    reg_t log_lm = 0;
+    while ((reg_t(1) << log_lm) < lm) ++log_lm;
+    // Matrix altfmt is legal independently of ordinary RVV altfmt extensions.
+    const reg_t matrix_alt = newVType & reg_t(0x100);
+    set_vl(0, 1, 0, (newVType & reg_t(0xf8)) | log_lm | 0xc0);
+    if (!vill) { altfmt = matrix_alt != 0; vtype->write_raw(vtype->read() | matrix_alt); }
+    widen = vill ? 0 : tw;
+    tm = tk = 0;
+    mtype->write_raw(read_mtype());
+    return;
+  }
   reg_t twiden = widen = (1 << extract64(newMType, 0, 2)) >> 1;
 
   if (twiden) {
@@ -65,6 +96,10 @@ reg_t vectorUnit_t::read_mtype() const
 
 reg_t vectorUnit_t::msettn(reg_t atn)
 {
+  if (iris_mode && (!widen || vill)) {
+    set_vl(0, 1, 0, reg_t(-1));
+    return 0;
+  }
   if (widen) {
     reg_t tn = std::min(atn, std::min(reg_t(vflmul) * eve(), ete()));
     vl->write_raw(tn);
@@ -76,6 +111,10 @@ reg_t vectorUnit_t::msettn(reg_t atn)
 
 reg_t vectorUnit_t::msettm(reg_t atm)
 {
+  if (iris_mode && (!widen || vill)) {
+    set_vl(0, 1, 0, reg_t(-1));
+    return 0;
+  }
   tm = std::min(atm, std::min(reg_t(vflmul) * eve(), ete()));
   mtype->write_raw(read_mtype());
   return tm;
@@ -83,6 +122,10 @@ reg_t vectorUnit_t::msettm(reg_t atm)
 
 reg_t vectorUnit_t::msettk(reg_t atk)
 {
+  if (iris_mode && (!widen || vill)) {
+    set_vl(0, 1, 0, reg_t(-1));
+    return 0;
+  }
   tk = std::min(atk, kmax());
   mtype->write_raw(read_mtype());
   return tk;
@@ -103,7 +146,10 @@ reg_t vectorUnit_t::vectorUnit_t::set_vl(int rd, int rs1, reg_t reqVL, reg_t new
 
     bool ill_altfmt = true;
     if (altfmt) {
-      if (p->extension_enabled(EXT_ZVQWBDOTA8I) && vsew == 8)
+      // Pinned Rocket VType.fromUInt never gates altfmt by ISA extensions.
+      // Individual Iris datapaths either consume or ignore that field.
+      if (iris_mode) ill_altfmt = false;
+      else if (p->extension_enabled(EXT_ZVQWBDOTA8I) && vsew == 8)
         ill_altfmt = false;
       else if (p->extension_enabled(EXT_ZVQWBDOTA16I) && vsew == 16)
         ill_altfmt = false;

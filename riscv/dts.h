@@ -9,7 +9,8 @@
 std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
                      const cfg_t* cfg,
                      std::vector<std::pair<reg_t, abstract_mem_t*>> mems,
-                     std::string device_nodes);
+                     std::string device_nodes,
+                     std::vector<size_t> hart_clock_hz = {});
 
 std::string dts_to_dtb(const std::string& dtc_input);
 std::string dtb_to_dts(const std::string& dtc_input);

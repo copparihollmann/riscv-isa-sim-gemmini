@@ -13,6 +13,8 @@
 #include "../fesvr/byteorder.h"
 #include "triggers.h"
 #include "cfg.h"
+#include "../../../board/physical_map.hpp"
+#include "../../../board/addressing.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -96,6 +98,21 @@ class mmu_t
 private:
   reg_t get_pmlen(bool effective_virt, reg_t effective_priv, xlate_flags_t flags) const;
   mem_access_info_t generate_access_info(reg_t addr, access_type type, xlate_flags_t xlate_flags);
+  reg_t iris_storage_address(reg_t address) const {
+    return proc && (sim->get_cfg().iris_vme || !sim->get_cfg().iris_bootrom_file.empty())
+      ? iris_board::storage_address(proc->get_id(), address) : address;
+  }
+  bool iris_pma(reg_t paddr, size_t bytes, iris_board::Access access) const {
+    return sim->get_cfg().iris_bootrom_file.empty() || iris_board::permits(paddr, bytes, access);
+  }
+  void iris_check_pma(reg_t vaddr, reg_t paddr, size_t bytes, access_type type, xlate_flags_t flags = {}) {
+    auto access = type == FETCH ? iris_board::Access::Execute :
+                  type == STORE ? iris_board::Access::Write : iris_board::Access::Read;
+    if (!iris_pma(paddr, bytes, access)) {
+      auto info = generate_access_info(vaddr, type, flags);
+      throw_access_exception(info.effective_virt, info.transformed_vaddr, type);
+    }
+  }
 
 public:
   mmu_t(simif_t* sim, endianness_t endianness, processor_t* proc, reg_t cache_blocksz);
@@ -105,9 +122,10 @@ public:
   T ALWAYS_INLINE load(reg_t addr, xlate_flags_t xlate_flags = {}) {
     target_endian<T> res;
     bool aligned = (addr & (sizeof(T) - 1)) == 0;
-    auto [tlb_hit, host_addr, _] = access_tlb(tlb_load, addr);
+    auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_load, addr);
 
     if (likely(!xlate_flags.is_special_access() && aligned && tlb_hit)) {
+      iris_check_pma(addr, paddr, sizeof(T), LOAD, xlate_flags);
       res = *(target_endian<T>*)host_addr;
     } else {
       load_slow_path(addr, sizeof(T), (uint8_t*)&res, xlate_flags);
@@ -145,10 +163,12 @@ public:
   void ALWAYS_INLINE store(reg_t addr, T val, xlate_flags_t xlate_flags = {}) {
     MMU_OBSERVE_STORE(addr, val, sizeof(T));
     bool aligned = (addr & (sizeof(T) - 1)) == 0;
-    auto [tlb_hit, host_addr, _] = access_tlb(tlb_store, addr);
+    auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_store, addr);
 
     if (!xlate_flags.is_special_access() && likely(aligned && tlb_hit)) {
+      iris_check_pma(addr, paddr, sizeof(T), STORE, xlate_flags);
       *(target_endian<T>*)host_addr = to_target(val);
+      invalidate_peer_reservations(paddr, sizeof(T));
     } else {
       target_endian<T> target_val = to_target(val);
       store_slow_path(addr, sizeof(T), (const uint8_t*)&target_val, xlate_flags, true, false);
@@ -190,9 +210,20 @@ public:
     return true;
   }
 
+  void check_iris_atomic(reg_t addr, size_t size) {
+    if (!sim->get_cfg().iris_vme && sim->get_cfg().iris_bootrom_file.empty()) return;
+    const auto info = generate_access_info(addr, STORE, {});
+    const reg_t physical = translate(info, size);
+    // IrisConfig system-bus scratchpad 0x580000000..0x58001ffff (128 KiB).
+    if (!iris_pma(physical, size, iris_board::Access::Atomic) ||
+        (physical >= 0x580000000ULL && physical - 0x580000000ULL < 0x20000))
+      throw trap_store_access_fault(info.effective_virt, info.transformed_vaddr, 0, 0);
+  }
+
   // template for functions that perform an atomic memory operation
   template<typename T, typename op>
   T amo(reg_t addr, op f) {
+    check_iris_atomic(addr, sizeof(T));
     convert_load_traps_to_store_traps({
       store_slow_path(addr, sizeof(T), nullptr, {}, false, enforce_amo_alignment(addr, sizeof(T)));
       auto lhs = load<T>(addr);
@@ -204,6 +235,7 @@ public:
   // for shadow stack amoswap
   template<typename T>
   T ssamoswap(reg_t addr, reg_t value) {
+    check_iris_atomic(addr, sizeof(T));
     convert_load_traps_to_store_traps({
       store_slow_path(addr, sizeof(T), nullptr, {.ss_access=true}, false, true);
       auto data = load<T>(addr, {.ss_access=true});
@@ -214,6 +246,7 @@ public:
 
   template<typename T>
   T amo_compare_and_swap(reg_t addr, T comp, T swap) {
+    check_iris_atomic(addr, sizeof(T));
     convert_load_traps_to_store_traps({
       store_slow_path(addr, sizeof(T), nullptr, {}, false, enforce_amo_alignment(addr, sizeof(T)));
       auto lhs = load<T>(addr);
@@ -230,6 +263,7 @@ public:
     check_triggers(triggers::OPERATION_STORE, transformed_addr, false, blocksz);
 
     reg_t paddr = translate(access_info, 1) - (transformed_addr & (blocksz - 1));
+    iris_check_pma(addr, paddr, blocksz, STORE);
     if (auto host_addr = sim->addr_to_mem(paddr)) {
       if (tracer.interested_in_range(paddr, paddr + blocksz, STORE))
         tracer.trace(paddr, blocksz, STORE);
@@ -260,6 +294,10 @@ public:
     load_reservation_address = (reg_t)-1;
   }
 
+  // Iris online scheduling cannot rely on the upstream 5000-instruction
+  // round-robin yield to invalidate other harts' LR reservations.
+  void invalidate_peer_reservations(reg_t paddr, size_t len);
+
   inline bool check_load_reservation(reg_t vaddr, size_t size)
   {
     if (vaddr & (size-1)) {
@@ -270,6 +308,12 @@ public:
     auto [tlb_hit, _, paddr] = access_tlb(tlb_store, vaddr);
     if (!tlb_hit)
       paddr = translate(generate_access_info(vaddr, STORE, {}), 1);
+
+    if (!iris_pma(paddr, size, iris_board::Access::Atomic) ||
+        (sim->get_cfg().iris_vme && paddr >= 0x580000000ULL && paddr - 0x580000000ULL < 0x20000)) {
+      auto info = generate_access_info(vaddr, STORE, {});
+      throw trap_store_access_fault(info.effective_virt, info.transformed_vaddr, 0, 0);
+    }
 
     if (sim->reservable(paddr))
       return load_reservation_address == paddr;
@@ -382,9 +426,11 @@ public:
 
 private:
   simif_t* sim;
+  bool iris_last_translation_aliased = false;
   processor_t* proc;
   memtracer_list_t tracer;
   reg_t load_reservation_address;
+  size_t load_reservation_size = 0;
   reg_t blocksz;
 
   // implement an instruction cache for simulator performance
@@ -471,13 +517,17 @@ private:
 
   template<typename T> inline reg_t pte_load(reg_t pte_paddr, reg_t addr, bool virt, access_type trap_type)
   {
-    if (auto [hit, pte] = pte_cache_access(pte_paddr); hit)
-      return pte;
-
     const size_t ptesize = sizeof(T);
 
+    // PMP sees the core's original physical address before the tile-local
+    // routing adjustment. RAM/PMA and reservations see the shared storage.
     if (!pmp_ok(pte_paddr, ptesize, LOAD, PRV_S, false))
       throw_access_exception(virt, addr, trap_type);
+    pte_paddr = iris_storage_address(pte_paddr);
+    if (!iris_pma(pte_paddr, ptesize, iris_board::Access::Read))
+      throw_access_exception(virt, addr, trap_type);
+    if (auto [hit, pte] = pte_cache_access(pte_paddr); hit)
+      return pte;
 
     void* host_pte_addr = sim->addr_to_mem(pte_paddr);
     target_endian<T> target_pte;
@@ -497,6 +547,9 @@ private:
     const size_t ptesize = sizeof(T);
 
     if (!pmp_ok(pte_paddr, ptesize, STORE, PRV_S, false))
+      throw_access_exception(virt, addr, trap_type);
+    pte_paddr = iris_storage_address(pte_paddr);
+    if (!iris_pma(pte_paddr, ptesize, iris_board::Access::Write))
       throw_access_exception(virt, addr, trap_type);
 
     void* host_pte_addr = sim->addr_to_mem(pte_paddr);
