@@ -57,10 +57,12 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
   minstret = std::make_shared<wide_counter_csr_t>(proc, CSR_MINSTRET, minstretcfg);
   mcycle = std::make_shared<wide_counter_csr_t>(proc, CSR_MCYCLE, mcyclecfg);
   time = std::make_shared<time_counter_csr_t>(proc, CSR_TIME);
-  if (proc->extension_enabled_const(EXT_ZICNTR)) {
+  if (proc->VU.iris_mode || proc->extension_enabled_const(EXT_ZICNTR)) {
     add_csr(CSR_INSTRET, std::make_shared<counter_proxy_csr_t>(proc, CSR_INSTRET, minstret));
     add_csr(CSR_CYCLE, std::make_shared<counter_proxy_csr_t>(proc, CSR_CYCLE, mcycle));
-    add_csr(CSR_TIME, time_proxy = std::make_shared<counter_proxy_csr_t>(proc, CSR_TIME, time));
+    // Iris exposes cycle/instret, but not CSR_TIME; RTC is CLINT mtime MMIO.
+    if (!proc->VU.iris_mode)
+      add_csr(CSR_TIME, time_proxy = std::make_shared<counter_proxy_csr_t>(proc, CSR_TIME, time));
   }
   if (xlen == 32) {
     csr_t_p minstreth, mcycleh;
@@ -101,7 +103,8 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
     add_csr(which_mcounter, mcounter);
 
     auto counter = std::make_shared<counter_proxy_csr_t>(proc, which_counter, mcounter);
-    add_const_ext_csr(EXT_ZIHPM, which_counter, counter);
+    if (proc->VU.iris_mode) add_csr(which_counter,counter);
+    else add_const_ext_csr(EXT_ZIHPM, which_counter, counter);
 
     if (xlen == 32) {
       add_csr(which_mevent, std::make_shared<rv32_low_csr_t>(proc, which_mevent, mevent[i]));
@@ -195,7 +198,9 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
   } else {
     add_supervisor_csr(CSR_MIDELEG, mideleg);
   }
-  const reg_t counteren_mask = (proc->extension_enabled_const(EXT_ZICNTR) ? 0x7UL : 0x0) | (proc->extension_enabled_const(EXT_ZIHPM) ? 0xfffffff8ULL : 0x0);
+  // All3 Iris CSRFiles have counters[0]; only CY/TM/IR survive read masks.
+  const reg_t counteren_mask = proc->VU.iris_mode ? 0x7UL :
+    (proc->extension_enabled_const(EXT_ZICNTR) ? 0x7UL : 0x0) | (proc->extension_enabled_const(EXT_ZIHPM) ? 0xfffffff8ULL : 0x0);
   add_user_csr(CSR_MCOUNTEREN, mcounteren = std::make_shared<masked_csr_t>(proc, CSR_MCOUNTEREN, counteren_mask, 0));
   add_csr(CSR_MCOUNTINHIBIT, mcountinhibit = std::make_shared<masked_csr_t>(proc, CSR_MCOUNTINHIBIT, counteren_mask & (~MCOUNTEREN_TIME), 0));
   add_supervisor_csr(CSR_SCOUNTEREN, scounteren = std::make_shared<masked_csr_t>(proc, CSR_SCOUNTEREN, counteren_mask, 0));
