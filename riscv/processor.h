@@ -247,6 +247,8 @@ public:
   void iris_fabric_external_io_write(reg_t address,unsigned bytes,uint64_t value,uint64_t mask);
   std::array<std::pair<uint8_t,uint64_t>,8> iris_frontend_pmp() const;
   bool iris_pipeline_context_safe() const;
+  bool iris_step_timing_waited() const { return iris_step_timing_waited_; }
+  bool iris_step_architectural_event() const { return iris_step_architectural_event_; }
   bool iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed=false, bool allow_split_pages=false) const;
   std::exception_ptr iris_pipeline_interrupt_exception();
 
@@ -408,6 +410,8 @@ public:
   reg_t select_an_interrupt_with_default_priority(reg_t enabled_interrupts) const;
 
 private:
+  bool iris_step_timing_waited_ = false;
+  bool iris_step_architectural_event_ = false;
   const isa_parser_t isa;
   const cfg_t * const cfg;
 
