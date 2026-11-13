@@ -32,6 +32,11 @@ class htif_t : public chunked_memif_t
   int exit_code();
   void set_expected_xlen(unsigned int m) { expected_xlen = m; }
   virtual memif_t& memif() { return mem; }
+  // Optional target-definedness hooks. Other HTIF implementations retain the
+  // ordinary byte transport; Iris preserves masks through syscall packets.
+  virtual void iris_read_transport(addr_t address,size_t bytes,void* data,uint8_t* known);
+  virtual void iris_write_transport(addr_t address,size_t bytes,const void* data,const uint8_t* known);
+  virtual void iris_validate_syscall(reg_t,const reg_t*) {}
 
   template<typename T> inline T from_target(target_endian<T> n) const
   {
