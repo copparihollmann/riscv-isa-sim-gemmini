@@ -1,3 +1,6 @@
+if(P.VU.iris_mode){
+#include "iris_fpcomp_body.h"
+}else{
 // vfsgnx
 VI_VFP_VV_LOOP
 ({
@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP
 {
   vd = fsgnj64(vs2.v, vs1.v, false, true);
 })
+
+}
