@@ -3,6 +3,7 @@
 #include "config.h"
 #include "syscall.h"
 #include "htif.h"
+#include <algorithm>
 #include "byteorder.h"
 #include <unistd.h>
 #include <fcntl.h>
@@ -465,15 +466,26 @@ reg_t syscall_t::sys_chdir(reg_t path, reg_t a1, reg_t a2, reg_t a3, reg_t a4, r
 void syscall_t::dispatch(reg_t mm)
 {
   target_endian<reg_t> magicmem[8];
-  memif->read(mm, sizeof(magicmem), magicmem);
+  uint8_t known[sizeof(magicmem)];
+  htif->iris_read_transport(mm,sizeof(magicmem),magicmem,known);
+  const auto require=[&](size_t bytes) {
+    for(size_t i=0;i<bytes;++i)if(known[i]!=0xff)
+      throw std::runtime_error("IRIS_UNDEFINED_HTIF_PACKET address="+std::to_string(mm+i));
+  };
+  require(sizeof(reg_t));
 
   reg_t n = htif->from_target(magicmem[0]);
   if (n >= table.size() || !table[n])
     throw std::runtime_error("bad syscall #" + std::to_string(n));
+  const size_t argument_count=n==64?3:n==93?1:7;
+  require((argument_count+1)*sizeof(reg_t));
+  reg_t args[7];for(size_t i=0;i<7;++i)args[i]=htif->from_target(magicmem[i+1]);
+  htif->iris_validate_syscall(n,args);
 
   magicmem[0] = htif->to_target((this->*table[n])(htif->from_target(magicmem[1]), htif->from_target(magicmem[2]), htif->from_target(magicmem[3]), htif->from_target(magicmem[4]), htif->from_target(magicmem[5]), htif->from_target(magicmem[6]), htif->from_target(magicmem[7])));
 
-  memif->write(mm, sizeof(magicmem), magicmem);
+  std::fill_n(known,sizeof(reg_t),0xff);
+  htif->iris_write_transport(mm,sizeof(magicmem),magicmem,known);
 }
 
 reg_t fds_t::alloc(int fd)

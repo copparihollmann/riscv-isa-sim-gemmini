@@ -15,8 +15,8 @@
 #define STATE (*p->get_state())
 #define FLEN (p->get_flen())
 #define CHECK_REG(reg) ((void) 0)
-#define READ_REG(reg) (CHECK_REG(reg), STATE.XPR[reg])
-#define READ_FREG(reg) STATE.FPR[reg]
+#define READ_REG(reg) (CHECK_REG(reg), p->iris_read_xpr(reg,p->VU.iris_pc))
+#define READ_FREG(reg) p->iris_read_fpr(reg,p->VU.iris_pc)
 #define RD READ_REG(insn.rd())
 #define RS1 READ_REG(insn.rs1())
 #define RS2 READ_REG(insn.rs2())
@@ -129,6 +129,31 @@
 #define dirty_ext_state STATE.sstatus->dirty(SSTATUS_XS)
 #define DO_WRITE_FREG(reg, value) (STATE.FPR.write(reg, value), dirty_fp_state)
 #define WRITE_FRD(value) WRITE_FREG(insn.rd(), value)
+
+// Pure register/memory transport carries shadow masks. Computation continues to
+// use READ_REG/READ_FREG and refuses unknown required operands in Iris mode.
+#define IRIS_LOAD_XPR(type, reg, address) do { \
+  CHECK_REG(reg); \
+  const auto transported=MMU.load_transport<type>(address); \
+  p->iris_write_xpr_transport(reg,iris_definedness::extend_integer<reg_t>(transported)); \
+} while(0)
+#define IRIS_STORE_XPR(type, address, reg) do { \
+  CHECK_REG(reg); \
+  MMU.store_transport<type>(address,iris_definedness::truncate<type>(STATE.XPR.read_transport(reg))); \
+} while(0)
+#define IRIS_LOAD_FPR(type, boxing, reg, address) do { \
+  const auto transported=MMU.load_transport<type>(address); \
+  iris_definedness::Value<freg_t> boxed;boxed.value=freg(boxing(transported.value));boxed.known.fill(0xff); \
+  if(!std::all_of(transported.known.begin(),transported.known.end(),[](uint8_t mask){return mask==0xff;})) \
+    std::fill_n(boxed.known.begin(),8,0); /* conservative unverified partial RecFN mapping */ \
+  p->iris_write_fpr_transport(reg,boxed); \
+} while(0)
+#define IRIS_STORE_FPR(type, address, reg) do { \
+  const auto source=STATE.FPR.read_transport(reg); \
+  iris_definedness::Value<type> transported;transported.value=type(source.value.v[0]); \
+  std::copy_n(source.known.begin(),sizeof(type),transported.known.begin()); \
+  MMU.store_transport<type>(address,transported); \
+} while(0)
 #define WRITE_FRD_H(value) \
 do { \
   if (p->extension_enabled(EXT_ZFINX)) \
@@ -163,7 +188,7 @@ do { \
 #define BRANCH_TARGET (pc + insn.sb_imm())
 #define JUMP_TARGET (pc + insn.uj_imm())
 #define validate_rm(rm) ({ require(rm < 5); rm; })
-#define VFP_RM validate_rm(STATE.frm->read())
+#define VFP_RM validate_rm(STATE.frm->read_defined(pc))
 #define RM (insn.rm() == 7 ? VFP_RM : validate_rm(insn.rm()))
 
 static inline bool is_aligned(const unsigned val, const unsigned pos)
@@ -223,7 +248,7 @@ static inline bool is_aligned(const unsigned val, const unsigned pos)
     } \
   } while (0);
 
-#define raise_fp_exceptions(flags) do { if (flags) STATE.fflags->write(STATE.fflags->read() | (flags)); } while (0);
+#define raise_fp_exceptions(flags) do { if (flags) STATE.fflags->accumulate(flags); } while (0);
 #define set_fp_exceptions \
   do { \
     raise_fp_exceptions(softfloat_exceptionFlags); \

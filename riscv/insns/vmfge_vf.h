@@ -1,3 +1,6 @@
+if(P.VU.iris_mode){
+#include "iris_fpcomp_body.h"
+}else{
 // vmfge.vf vd, vs2, rs1
 VI_VFP_VF_LOOP_CMP
 ({
@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
 {
   res = f64_le(rs1, vs2);
 })
+
+}
