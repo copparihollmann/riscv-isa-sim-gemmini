@@ -43,6 +43,12 @@ static void help(int exit_code = 1)
   fprintf(stderr, "  --log=<name>          File name for option -l\n");
   fprintf(stderr, "  --debug-cmd=<name>    Read commands from file (use with -d)\n");
   fprintf(stderr, "  --isa=<name>          RISC-V ISA string [default %s]\n", DEFAULT_ISA);
+  fprintf(stderr, "  --hart-isa=<H:ISA>    Override ISA for one hart (repeatable)\n");
+  fprintf(stderr, "  --iris-vme            Enable Iris VME subset semantics (experimental)\n");
+  fprintf(stderr, "  --iris-timing-fixture=<file>  Enable uncalibrated event-clock integration test mode\n");
+  fprintf(stderr, "  --iris-timing-trace=<file>    Write the online dependency graph\n");
+  fprintf(stderr, "  --iris-bootrom=<file>         Use Iris physical reset ROM and boot protocol\n");
+  fprintf(stderr, "  --iris-schedule-seed=<n>  Shuffle hart visitation per round reproducibly\n");
   fprintf(stderr, "  --pmpregions=<n>      Number of PMP regions [default 16]\n");
   fprintf(stderr, "  --pmpgranularity=<n>  PMP Granularity in bytes [default 4]\n");
   fprintf(stderr, "  --priv=<m|mu|msu>     RISC-V privilege modes supported [default %s]\n", DEFAULT_PRIV);
@@ -413,6 +419,31 @@ int main(int argc, char** argv)
   parser.option(0, "big-endian", 0, [&](const char UNUSED *s){cfg.endianness = endianness_big;});
   parser.option(0, "log-cache-miss", 0, [&](const char UNUSED *s){log_cache = true;});
   parser.option(0, "isa", 1, [&](const char* s){cfg.isa = s;});
+  parser.option(0, "iris-vme", 0, [&](const char*){cfg.iris_vme = true;});
+  parser.option(0, "iris-timing-fixture", 1, [&](const char* path){cfg.iris_timing_fixture = path;});
+  parser.option(0, "iris-timing-trace", 1, [&](const char* path){cfg.iris_timing_trace = path;});
+  parser.option(0, "iris-bootrom", 1, [&](const char* path){cfg.iris_bootrom_file = path;});
+  parser.option(0, "iris-schedule-seed", 1, [&](const char* raw){
+    std::string value(raw); size_t used = 0;
+    try {
+      const auto seed = std::stoull(value, &used, 0);
+      if (value.empty() || value[0] == '-' || used != value.size()) throw std::invalid_argument("seed");
+      cfg.iris_schedule_seed = seed;
+    } catch (...) { std::cerr << "Invalid --iris-schedule-seed\n"; exit(1); }
+  });
+  parser.option(0, "hart-isa", 1, [&](const char* s){
+    std::string arg(s);
+    auto colon = arg.find(':');
+    if (colon == std::string::npos || colon == 0 || colon + 1 == arg.size()) {
+      std::cerr << "--hart-isa requires H:ISA\n"; exit(1);
+    }
+    size_t used = 0, id = 0;
+    try { id = std::stoull(arg.substr(0, colon), &used); }
+    catch (...) { std::cerr << "Invalid --hart-isa hart ID\n"; exit(1); }
+    if (arg[0] == '-' || used != colon || !cfg.hart_isa.emplace(id, arg.substr(colon + 1)).second) {
+      std::cerr << "Invalid or duplicate --hart-isa hart ID\n"; exit(1);
+    }
+  });
   parser.option(0, "pmpregions", 1, [&](const char* s){cfg.pmpregions = atoul_safe(s);});
   parser.option(0, "pmpgranularity", 1, [&](const char* s){cfg.pmpgranularity = atoul_safe(s);});
   parser.option(0, "priv", 1, [&](const char* s){cfg.priv = s;});
@@ -541,6 +572,19 @@ int main(int argc, char** argv)
     cfg.hartids = default_hartids;
   }
 
+  for (const auto& entry : cfg.hart_isa) {
+    if (std::find(cfg.hartids.begin(), cfg.hartids.end(), entry.first) == cfg.hartids.end()) {
+      std::cerr << "--hart-isa refers to absent hart " << entry.first << "\n"; exit(1);
+    }
+  }
+
+  if (cfg.iris_vme && std::find(cfg.hartids.begin(), cfg.hartids.end(), 2) != cfg.hartids.end()) {
+    isa_parser_t dma_isa(cfg.isa_for_hart(2), cfg.priv);
+    if (dma_isa.extension_enabled(EXT_ZVTBASE)) {
+      std::cerr << "Iris hart 2 must not advertise VME/Zvt; supply --hart-isa=2:ISA\n";
+      return 1;
+    }
+  }
   if (dtb_discovery){
    if (memory_option) {   std::cerr << "--dtb-discovery option is not compatible with --memory/-m;."<<std::endl; exit(1);}
    if (!plugin_device_factories.empty()) {   std::cerr << "--dtb-discovery option is not compatible with --device option."<<std::endl; exit(1);}
@@ -583,7 +627,12 @@ int main(int argc, char** argv)
   s.configure_log(log, log_commits);
   s.set_histogram(histogram);
 
-  auto return_code = s.run();
+  int return_code;
+  try { return_code = s.run(); }
+  catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
+  }
 
   for (auto& mem : mems)
     delete mem.second;
