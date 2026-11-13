@@ -7,6 +7,7 @@
 #include "decode.h"
 #include <cassert>
 #include <map>
+#include <string>
 class abstract_sim_if_t;
 
 typedef enum {
@@ -82,6 +83,17 @@ public:
   std::pair<reg_t, reg_t> initrd_bounds;
   const char *            bootargs;
   const char *            isa;
+  // Iris fork: explicit heterogeneous ISA overrides keyed by architectural hart ID.
+  std::map<size_t, std::string> hart_isa;
+  bool                    iris_vme = false;
+  std::string             iris_timing_fixture;
+  std::string             iris_timing_trace;
+  std::string             iris_bootrom_file;
+  std::optional<uint64_t>  iris_schedule_seed;
+  const char* isa_for_hart(size_t id) const {
+    auto it = hart_isa.find(id);
+    return it == hart_isa.end() ? isa : it->second.c_str();
+  }
   const char *            priv;
   endianness_t            endianness;
   reg_t                   pmpregions;
