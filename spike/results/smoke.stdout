@@ -1,0 +1,13 @@
+IRIS_REGION {"case_id":"baseline.empty","region":"kernel","hart":0,"start_cycle":15007,"end_cycle":15019,"instret_delta":9,"checksum":0,"expected_checksum":0,"pass":true}
+IRIS_REGION {"case_id":"baseline.empty","region":"kernel","hart":1,"start_cycle":10052,"end_cycle":10064,"instret_delta":9,"checksum":1,"expected_checksum":1,"pass":true}
+IRIS_REGION {"case_id":"baseline.empty","region":"kernel","hart":2,"start_cycle":10016,"end_cycle":10028,"instret_delta":9,"checksum":2,"expected_checksum":2,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.256","region":"kernel","hart":0,"start_cycle":55009,"end_cycle":55792,"instret_delta":780,"checksum":769,"expected_checksum":769,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.256","region":"kernel","hart":1,"start_cycle":55013,"end_cycle":55796,"instret_delta":780,"checksum":770,"expected_checksum":770,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.256","region":"kernel","hart":2,"start_cycle":50051,"end_cycle":50834,"instret_delta":780,"checksum":771,"expected_checksum":771,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.1024","region":"kernel","hart":0,"start_cycle":130008,"end_cycle":133095,"instret_delta":3084,"checksum":3073,"expected_checksum":3073,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.1024","region":"kernel","hart":1,"start_cycle":130013,"end_cycle":133100,"instret_delta":3084,"checksum":3074,"expected_checksum":3074,"pass":true}
+IRIS_REGION {"case_id":"scalar.dep.1024","region":"kernel","hart":2,"start_cycle":125054,"end_cycle":128141,"instret_delta":3084,"checksum":3075,"expected_checksum":3075,"pass":true}
+IRIS_REGION {"case_id":"scalar.branch.256","region":"kernel","hart":0,"start_cycle":205006,"end_cycle":206428,"instret_delta":1419,"checksum":512,"expected_checksum":512,"pass":true}
+IRIS_REGION {"case_id":"scalar.branch.256","region":"kernel","hart":1,"start_cycle":205016,"end_cycle":206438,"instret_delta":1419,"checksum":513,"expected_checksum":513,"pass":true}
+IRIS_REGION {"case_id":"scalar.branch.256","region":"kernel","hart":2,"start_cycle":200052,"end_cycle":201474,"instret_delta":1419,"checksum":514,"expected_checksum":514,"pass":true}
+IRIS_BATCH_DONE {"failed":0}

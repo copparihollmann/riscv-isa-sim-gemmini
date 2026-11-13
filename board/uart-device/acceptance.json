@@ -1,0 +1,73 @@
+{
+  "schema": "iris.uart.integration_acceptance.v1",
+  "status": "passed_isolated_uart_integration",
+  "generator_sha256": "a529517a30e6fd0d4a948360610a2b5bf4f5d6c98dfeb28dc33bcef2269c3cef",
+  "snapshot_manifest_sha256": "73e04455a5992280bf362214fc7511e5559ff6fd83ed72ac418ae525c0ee550a",
+  "native_sha256": "91361ceb45f6511ff4df852da4585aeace6d0eb88cd7661b4479c93b84cc56cc",
+  "uart_sha256": "7ada590044fbd9b97f2ce56aae8dcfd625b5c25ef3e4bd48ca1ea31b7f70793e",
+  "base_native_sha256": "db964603d91ffb19f7e63dde0e14397635b879559011f1da8acaf5ecd06319a8",
+  "native_device_abi": 1,
+  "helper_cases": 10,
+  "clock_adapter_cases": 9,
+  "actual_guest_processes": 12,
+  "drained_runtime_process_cases": 12,
+  "mismatched_native_refused": true,
+  "physical_uart_hz": 500000000,
+  "rtc_hz": 500000,
+  "live_fixture_base_hz": [
+    100000000,
+    500000000
+  ],
+  "clock_source": {
+    "path": "hardware/evidence/firesim-clocks.freq-summary",
+    "sha256": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+    "locator": "Output clock uart_clock requested/actual500.0MHz"
+  },
+  "register_source": {
+    "path": "board/uart-source-evidence.json",
+    "sha256": "3b231e167fb16dd60c957d0e5505bf868aa28cc1438047402b195a171bfdf788",
+    "locator": "facts and full40-character source revisions: FIFO256,wm9,resetDIV135,64bitport"
+  },
+  "zephyr_compiler_evidence": {
+    "scalar": {
+      "path": "build/uart-zephyr-scalar-final/results.json",
+      "sha256": "abac32b6d19b913ac726faf9a7bb96bb666f817b7dcd8b3c6e9161becf877353",
+      "regions": 6
+    },
+    "mixed": {
+      "path": "build/uart-zephyr-mixed-final/results.json",
+      "sha256": "b6f47f2e5dae02f195ad0e70b10088252fedbd74dce5360910b83c3dd2711ade",
+      "regions": 9
+    },
+    "mixed-live": {
+      "path": "build/uart-zephyr-mixed-live-final/results.json",
+      "sha256": "ddd434c34781952a507f7a414e68dc5b3a3606402f596d62184af7e1a09d2bc4",
+      "regions": 9
+    },
+    "real-mlir-gemm": {
+      "path": "build/uart-compiled-gemm-h2-final/results.json",
+      "sha256": "6c0a30e37d5230d8670819c6dbffee60e87ec0a7fb1356ee643fe8775ec58edd",
+      "full_output_elements_per_kind": 12288
+    },
+    "drained-runtime": {
+      "path": "build/uart-device-drained-runtime-qualified/results.json",
+      "sha256": "ed60bc22b8e6970cdf6533e48897f8e20fc7076e4cea08eca06efc8760c6ba33",
+      "actual_process_cases": 12,
+      "uart_drain_header_sha256": "82e66ede042a7cceea516e6c34fcbded313b6c1185d7a7236cde5c53c26aff5a"
+    }
+  },
+  "empty_rx_data": "fail closed while selected FIFO cell is unknown; status-byte reads remain defined",
+  "rx_stimulus": "explicit start/completion frame boundaries; pin sampling unmodeled",
+  "same_edge_arbitration": "ordered model calls; cycle-accurate TL pipeline unqualified",
+  "source_image_association_verified": false,
+  "primary_modified": false,
+  "primary_published": false,
+  "rtl_certified": false,
+  "timing_accuracy_certified": false,
+  "remaining": [
+    "Coordinated primary runtime/native/device publication with full epoch gates",
+    "UARTRx pin sampling and safe unused-undefined-bit handling for fullword empty-poll drivers",
+    "RTL bus/FIFO simultaneous-edge timing and deployed image association",
+    "Hardware calibration and held-out accuracy"
+  ]
+}

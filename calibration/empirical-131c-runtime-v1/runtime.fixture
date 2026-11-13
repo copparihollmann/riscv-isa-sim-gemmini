@@ -1,0 +1,35 @@
+purpose experimental-empirical-partial-calibration-pilot
+source actual-FPGA6750-training-prefix-positive-fit-no-full-certificate
+base_hz 500000000
+rtc_divider 1000
+max_cycles 100000000000
+trap_cycles 4
+hart 0 1 source
+hart 1 1 source
+hart 2 1 source
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+rule 0 0 0 scalar0 3 1 uncalibrated-conservative-boundary base_cycles
+rule 1 0 0 scalar1 3 1 uncalibrated-conservative-boundary base_cycles
+rule 2 0 0 scalar2 3 1 uncalibrated-conservative-boundary base_cycles
+shuttle_pipeline pure-integer-rvc-counter-sequential-frontend
+rocket_pipeline pure-integer-rvc-counter-sequential-frontend
+pipeline_values private-pure-integer
+
+empirical_profile experimental-effective-services iris-empirical-131c-pilot-v1 bounded
+
+empirical_async integer-vme-nonmemory-v1
+
+counter_policy source-ungated-stall
+
+empirical_icache address-tags-refill-proxy-v1
+empirical_cache_service 0 0 0 30.2400988668 597.483336499 448 663.987605371 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+resource empirical.tcm0 1
+empirical_family 0 memory.LOCAL_TCM.load empirical.tcm0 2.00532497323 0 1 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+empirical_family 0 memory.LOCAL_TCM.store empirical.tcm0 2.00532497323 0 1 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+empirical_cache_service 1 0 0 30.2400988668 597.483336499 448 663.987605371 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+resource empirical.tcm1 1
+empirical_family 1 memory.LOCAL_TCM.load empirical.tcm1 2.00532497323 0 1 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+empirical_family 1 memory.LOCAL_TCM.store empirical.tcm1 2.00532497323 0 1 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles
+empirical_cache_service 2 0 1.23721216545 145.050523694 486.309173643 448 0 PARTIAL_LIVE_PILOT 8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8 core_cycles

@@ -1,0 +1,721 @@
+{
+  "schema_version": 1,
+  "hardware_id": "IrisFiresimNOCflushCombinedConfig-local-elaboration",
+  "certified": false,
+  "calibration_usable": false,
+  "artifact_source_association": "unverified: elaboration files are local evidence, not proven build inputs for deployed image",
+  "repositories": {
+    "chipyard": {
+      "local_path": "/scratch/eygao/iris-cy",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd",
+      "tracked_diff": "patches/chipyard.patch",
+      "untracked_files_included": false
+    },
+    "saturn": {
+      "local_path": "/scratch/eygao/iris-cy/generators/saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b",
+      "tracked_diff": "patches/saturn.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "checkout_matches_chipyard_pin": true
+    },
+    "rocket-chip": {
+      "local_path": "/scratch/eygao/iris-cy/generators/rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/rocket-chip.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "checkout_matches_chipyard_pin": true
+    },
+    "shuttle": {
+      "local_path": "/scratch/eygao/iris-cy/generators/shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/shuttle.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "checkout_matches_chipyard_pin": true
+    },
+    "testchipip": {
+      "local_path": "/scratch/eygao/iris-cy/generators/testchipip",
+      "commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/testchipip.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "checkout_matches_chipyard_pin": true
+    },
+    "spike_chipyard_pin": {
+      "local_path": "/scratch/eygao/iris-cy/toolchains/riscv-tools/riscv-isa-sim",
+      "commit": "9c190a07c6838f6392bafa4ad83acea462c7f759",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/spike_chipyard_pin.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "9c190a07c6838f6392bafa4ad83acea462c7f759",
+      "checkout_matches_chipyard_pin": true
+    },
+    "firesim": {
+      "local_path": "/scratch/eygao/iris-cy/sims/firesim",
+      "commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+      "tracked_diff": "patches/firesim.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "e1bdea8bb042b900995436ecc3d7c44100eb9da0",
+      "checkout_matches_chipyard_pin": false
+    }
+  },
+  "sources": {
+    "iris-config": {
+      "path": "generators/chipyard/src/main/scala/config/IrisConfigs.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/iris-config.scala"
+    },
+    "firesim-target-config": {
+      "path": "generators/firechip/chip/src/main/scala/TargetConfigs.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/firesim-target-config.scala"
+    },
+    "matrix-config-decode": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/Matrix.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "ae61b49059dfa45b0812d5ab684c07ad54eee4959f5cdd2752de8cc13a0538d7",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/matrix-config-decode.scala"
+    },
+    "saturn-decode": {
+      "path": "generators/saturn/src/main/scala/insns/Instructions.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/saturn-decode.scala"
+    },
+    "saturn-parameters": {
+      "path": "generators/saturn/src/main/scala/common/Parameters.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/saturn-parameters.scala"
+    },
+    "outer-product-unit": {
+      "path": "generators/saturn/src/main/scala/exu/OuterProductUnit.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "be2f6842fc72538ef7b458e22e0f3a3668a58ae3038d03a5deea47f629adf3ff",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/outer-product-unit.scala"
+    },
+    "outer-product-sequencer": {
+      "path": "generators/saturn/src/main/scala/backend/OuterProductSequencer.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "59dd5e0c462272ab0aca03516ab5516af62c1609029c0fdf8ebad8f04bff3580",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/outer-product-sequencer.scala"
+    },
+    "shuttle-parameters": {
+      "path": "generators/shuttle/src/main/scala/common/Parameters.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/shuttle-parameters.scala"
+    },
+    "shuttle-config": {
+      "path": "generators/shuttle/src/main/scala/common/Configs.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "sha256": "04d646dc789044b8b4402bc783f0cca61be7f39c7d89ea9dcdf279e25bc7e89e",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/shuttle-config.scala"
+    },
+    "boot-config": {
+      "path": "generators/chipyard/src/main/scala/config/fragments/PeripheralFragments.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "65f495f847c5ffd09ed96b25890643123556a6ff324c9ba7c7389744777be53d",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/boot-config.scala"
+    },
+    "boot-address-register": {
+      "path": "generators/testchipip/src/main/scala/boot/BootAddrReg.scala",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "sha256": "cb69e7997221ad6a9b6de097dfd8066f4d761d56f9a284be97b3766f22f4c9b9",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/boot-address-register.scala"
+    },
+    "boot-rom": {
+      "path": "generators/testchipip/bootrom/bootrom.S",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "sha256": "0741269bb151f738f141362d733c4687310a0f2f9a638d8aa9c537860bd3d923",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/boot-rom.S"
+    },
+    "boot-rom-disassembly": {
+      "path": "generators/testchipip/bootrom/bootrom.rv64.dump",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "sha256": "0d9ef874143f09deb33cd1af828c381663b0ef69c7a49aab3165ac63d5a705e8",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/boot-rom-disassembly.dump"
+    },
+    "memmap-permissions": {
+      "path": "generators/rocket-chip/src/main/scala/tilelink/Parameters.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "7d9e843dbd267389824692ee6861c79ebe336aabb64312d7267673439b604702",
+      "source_state": "tracked-clean-repository-or-generated-artifact",
+      "snapshot": "evidence/memmap-permissions.scala"
+    },
+    "firesim-dts": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.dts",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/firesim-dts.dts"
+    },
+    "firesim-memmap": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.memmap.json",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "1ac5e83588fc89417f42d1dbc8e6da605f283ff2fe5d52ed35843ba30359c0dd",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/firesim-memmap.json"
+    },
+    "firesim-l2": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.l2.json",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "b96975453b4f25d51305200d769accdb25690ee3cef288bd567fe9d38365d401",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/firesim-l2.json"
+    },
+    "firesim-clocks": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.firesimRationalClockBridge.freq-summary",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+      "source_state": "local-working-tree",
+      "snapshot": "evidence/firesim-clocks.freq-summary"
+    },
+    "firesim-fir": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "artifact_build_revision": null,
+      "excerpt": "    connect bootROMResetVectorSourceNodeOut, UInt<17>(0h10000) @[generators/rocket-chip/src/main/scala/devices/tilelink/BootROM.scala 113:45]"
+    }
+  },
+  "facts": {
+    "harts": [
+      {
+        "value": {
+          "hart_id": 0,
+          "compatible": "ucb-bar,shuttle",
+          "isa": "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t",
+          "icache": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "dcache": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          }
+        },
+        "evidence": {
+          "source": "firesim-dts",
+          "lines": [
+            18,
+            45
+          ]
+        },
+        "status": "elaboration-evidence"
+      },
+      {
+        "value": {
+          "hart_id": 1,
+          "compatible": "ucb-bar,shuttle",
+          "isa": "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t",
+          "icache": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "dcache": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          }
+        },
+        "evidence": {
+          "source": "firesim-dts",
+          "lines": [
+            46,
+            73
+          ]
+        },
+        "status": "elaboration-evidence"
+      },
+      {
+        "value": {
+          "hart_id": 2,
+          "compatible": "sifive,rocket0",
+          "isa": "rv64imafdcvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zvbb_xrocket",
+          "icache": {
+            "size_bytes": 16384,
+            "sets": 128,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "dcache": {
+            "size_bytes": 16384,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 4
+          }
+        },
+        "evidence": {
+          "source": "firesim-dts",
+          "lines": [
+            74,
+            103
+          ]
+        },
+        "status": "elaboration-evidence"
+      }
+    ],
+    "memory_map": {
+      "value": [
+        {
+          "name": "boot-address-reg@1000",
+          "base": 4096,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "error-device@3000",
+          "base": 12288,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": true,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "rom@10000",
+          "base": 65536,
+          "size_bytes": 65536,
+          "r": true,
+          "w": false,
+          "x": true,
+          "c": false,
+          "a": false
+        },
+        {
+          "name": "tile-reset-setter@110000",
+          "base": 1114112,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "clint@2000000",
+          "base": 33554432,
+          "size_bytes": 65536,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "cache-controller@2010000",
+          "base": 33619968,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "trace-encoder-controller0@3000000",
+          "base": 50331648,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": false
+        },
+        {
+          "name": "trace-encoder-controller1@3001000",
+          "base": 50335744,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": false
+        },
+        {
+          "name": "trace-encoder-controller2@3002000",
+          "base": 50339840,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "trace-sink-dma0@3010000",
+          "base": 50397184,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": false
+        },
+        {
+          "name": "trace-sink-dma1@3011000",
+          "base": 50401280,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": false
+        },
+        {
+          "name": "trace-sink-dma2@3012000",
+          "base": 50405376,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "interrupt-controller@c000000",
+          "base": 201326592,
+          "size_bytes": 67108864,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "serial@10020000",
+          "base": 268566528,
+          "size_bytes": 4096,
+          "r": true,
+          "w": true,
+          "x": false,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "memory@70000000",
+          "base": 1879048192,
+          "size_bytes": 131072,
+          "r": true,
+          "w": true,
+          "x": true,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "memory@70020000",
+          "base": 1879179264,
+          "size_bytes": 131072,
+          "r": true,
+          "w": true,
+          "x": true,
+          "c": false,
+          "a": true
+        },
+        {
+          "name": "memory@80000000",
+          "base": 2147483648,
+          "size_bytes": 4294967296,
+          "r": true,
+          "w": true,
+          "x": true,
+          "c": true,
+          "a": true
+        },
+        {
+          "name": "memory@580000000",
+          "base": 23622320128,
+          "size_bytes": 131072,
+          "r": true,
+          "w": true,
+          "x": true,
+          "c": false,
+          "a": false
+        }
+      ],
+      "evidence": {
+        "source": "firesim-memmap",
+        "lines": [
+          1,
+          1
+        ]
+      },
+      "status": "elaboration-evidence"
+    },
+    "memory_map_permission_fields": {
+      "value": {
+        "r": "Get or AcquireB",
+        "w": "PutFull or AcquireT",
+        "x": "executable",
+        "c": "AcquireB",
+        "a": "Arithmetic and Logical atomic support"
+      },
+      "evidence": {
+        "source": "memmap-permissions",
+        "lines": [
+          252,
+          258
+        ]
+      },
+      "status": "source-derived"
+    },
+    "mtime_hz": {
+      "value": 500000,
+      "evidence": {
+        "source": "firesim-dts",
+        "lines": [
+          14,
+          17
+        ]
+      },
+      "status": "elaboration-evidence"
+    },
+    "reset_vector": {
+      "value": 65536,
+      "evidence": {
+        "source": "firesim-fir",
+        "lines": [
+          2414552,
+          2414552
+        ]
+      },
+      "status": "elaboration-evidence"
+    },
+    "default_program_boot_address": {
+      "value": 2147483648,
+      "evidence": {
+        "source": "boot-address-register",
+        "lines": [
+          12,
+          14
+        ]
+      },
+      "status": "source-derived"
+    },
+    "l2": {
+      "value": {
+        "banks": 4,
+        "capacity_bytes": 524288,
+        "ways": 4,
+        "block_bytes": 64,
+        "sets_per_bank": 512,
+        "subbank_width_bytes": [
+          8,
+          8,
+          8,
+          8
+        ]
+      },
+      "evidence": {
+        "source": "firesim-l2",
+        "lines": [
+          1,
+          1
+        ]
+      },
+      "status": "elaboration-evidence"
+    },
+    "compute_vlen_dlen_bits": {
+      "value": [
+        256,
+        128
+      ],
+      "evidence": {
+        "source": "iris-config",
+        "lines": [
+          284,
+          290
+        ]
+      },
+      "status": "source-derived"
+    },
+    "rocket_vlen_dlen_bits": {
+      "value": [
+        256,
+        256
+      ],
+      "evidence": {
+        "source": "iris-config",
+        "lines": [
+          277,
+          279
+        ]
+      },
+      "status": "source-derived"
+    },
+    "tcm_banks": {
+      "value": 2,
+      "evidence": {
+        "source": "iris-config",
+        "lines": [
+          291,
+          292
+        ]
+      },
+      "status": "source-derived"
+    },
+    "scratchpad_banks": {
+      "value": 2,
+      "evidence": {
+        "source": "iris-config",
+        "lines": [
+          222,
+          228
+        ]
+      },
+      "status": "source-derived"
+    },
+    "tile_edge_formula": {
+      "value": "VLEN / 8",
+      "evidence": {
+        "source": "saturn-parameters",
+        "lines": [
+          408,
+          408
+        ]
+      },
+      "status": "source-derived"
+    },
+    "tile_register_count": {
+      "value": 4,
+      "evidence": {
+        "source": "outer-product-unit",
+        "lines": [
+          19,
+          25
+        ]
+      },
+      "status": "source-derived"
+    },
+    "tile_storage_reset": {
+      "value": "uninitialized Reg storage; software must initialize before reading",
+      "evidence": {
+        "source": "outer-product-unit",
+        "lines": [
+          70,
+          78
+        ]
+      },
+      "status": "source-derived"
+    },
+    "tile_discard_behavior": {
+      "value": "no-op",
+      "evidence": {
+        "source": "outer-product-sequencer",
+        "lines": [
+          29,
+          38
+        ]
+      },
+      "status": "source-derived"
+    },
+    "serial_tl_iris_link_bits": {
+      "value": {
+        "phit": 16,
+        "flit": 16
+      },
+      "evidence": {
+        "source": "firesim-target-config",
+        "lines": [
+          417,
+          430
+        ]
+      },
+      "status": "source-derived"
+    },
+    "serial_tl_bringup_clock_mhz": {
+      "value": 100,
+      "evidence": {
+        "source": "firesim-target-config",
+        "lines": [
+          458,
+          466
+        ]
+      },
+      "status": "source-derived"
+    }
+  },
+  "unknowns": {
+    "deployed_bitstream_sha256": null,
+    "bitstream_build_input_digests": null,
+    "elaboration_build_input_digests": null,
+    "calibrated_timing_parameters": null,
+    "shuttle_pipeline_issue_restrictions": null,
+    "branch_predictor_parameters": null,
+    "tcm_access_latency": null,
+    "scratchpad_access_latency": null,
+    "dram_model_parameters": null,
+    "serial_tl_transaction_latency_and_effective_bandwidth": null,
+    "per_hart_clock_assignment": null
+  },
+  "notes": [
+    "Do not infer target frequency from host FPGA execution throughput (e.g. 60 MHz).",
+    "DTS clock-frequency=0 on CPU nodes is not a measured hart frequency.",
+    "Scratchpad DTS status=disabled prevents automatic OS RAM use; memmap still declares addressable R/W/X storage.",
+    "Source-dependent facts are provisional until bound to exact image build inputs.",
+    "Global patch digests cover tracked modifications only; explicit evidence snapshots bind individual files.",
+    "Chipyard Spike pin predates referenced Zvt addition; functional-model Spike revision must be recorded separately."
+  ]
+}

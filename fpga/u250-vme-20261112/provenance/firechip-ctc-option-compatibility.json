@@ -1,0 +1,6 @@
+{
+  "reason": "Pinned testchipip CTCParams.translationParams takes Option; old unused CTC example supplies bare value",
+  "change": "Wrap preexisting OutwardAddressTranslatorParams in Some",
+  "affected_example": "CTCFireSimConfig",
+  "requested_configuration_unchanged": true
+}

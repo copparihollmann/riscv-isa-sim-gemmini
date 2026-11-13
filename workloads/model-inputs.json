@@ -1,0 +1,174 @@
+{
+  "schema": "iris.model_inputs.v1",
+  "models": [
+    {
+      "model_id": "openai/gpt-oss-20b",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/config.json",
+          "sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/model.safetensors.index.json",
+          "sha256": "0e085b977c4c9942f85938828e8c989ed7d5cdabf852e4da6a67c116cd502cd1",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/model.safetensors.index.json"
+        },
+        "original/config.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/original/config.json",
+          "sha256": "317522155fc243327ee341857d0c752d0094a0817e0e9aee2890d5ad8e009e04",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/original/config.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "6cee5e81ee83917806bbde320786a8fb61efebee"
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/config.json",
+          "sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/model.safetensors.index.json",
+          "sha256": "ede2655fdc05008561983b6e0829c600727c28d591e071077377059f03a6c00e",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/model.safetensors.index.json"
+        },
+        "original/config.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/original/config.json",
+          "sha256": "063aaa98e012cac330d58d18471700f0b0eb90bb15c58fb227809d45090f3e65",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/original/config.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "b5c939de8f754692c1647ca79fbf85e8c1e70f8a"
+    },
+    {
+      "model_id": "google/gemma-4-E4B-it",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/google--gemma-4-E4B-it/config.json",
+          "sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "url": "https://huggingface.co/google/gemma-4-E4B-it/resolve/4ecc2ba63bcac23ba4a767fc87025b1450f84c9c/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "4ecc2ba63bcac23ba4a767fc87025b1450f84c9c"
+    },
+    {
+      "model_id": "google/gemma-4-26B-A4B-it",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/google--gemma-4-26B-A4B-it/config.json",
+          "sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "url": "https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/4d7ae4984b7db7de8f8457170b3f1a419ee76d52/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/google--gemma-4-26B-A4B-it/model.safetensors.index.json",
+          "sha256": "907826a6e46ff454272bd6db1fee629d5531a2303be22986d825a0871d7dc7a7",
+          "url": "https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/4d7ae4984b7db7de8f8457170b3f1a419ee76d52/model.safetensors.index.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52"
+    },
+    {
+      "model_id": "meta-llama/Llama-2-7b-hf",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {},
+      "unknowns": [
+        "config.json unavailable: HTTP Error 401: Unauthorized",
+        "model.safetensors.index.json unavailable: HTTP Error 401: Unauthorized"
+      ],
+      "revision": "01c7f73d771dfac7d292323805ebc428287df4f9"
+    },
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "validation_only": true,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/TinyLlama--TinyLlama-1.1B-Chat-v1.0/config.json",
+          "sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9",
+          "url": "https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/fe8a4ea1ffedaf415f4da2f062534de366a451e6/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6"
+    },
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T",
+      "validation_only": true,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/TinyLlama--TinyLlama-1.1B-intermediate-step-1431k-3T/config.json",
+          "sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50",
+          "url": "https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T/resolve/59f6f375b26bde864a6ca194a9a3044570490064/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "59f6f375b26bde864a6ca194a9a3044570490064"
+    }
+  ],
+  "implementations": {
+    "transformers": {
+      "commit": "f262c71703eb138381d65ced86b3aaa496be0196",
+      "files": {
+        "src/transformers/models/gemma4/modeling_gemma4.py": {
+          "path": "third_party/transformers/src/transformers/models/gemma4/modeling_gemma4.py",
+          "sha256": "6845c98e2d5bb0a7e50ac65e69ba36399166319a0ef99f33b11a101b8ec6153b"
+        },
+        "src/transformers/models/gemma4/configuration_gemma4.py": {
+          "path": "third_party/transformers/src/transformers/models/gemma4/configuration_gemma4.py",
+          "sha256": "961665805532efd0829aa5665c6b9d2c12ac43a0ff91b75eadca421d08ad8ce0"
+        }
+      }
+    },
+    "gpt-oss": {
+      "commit": "277020131d524f06bed5f66b694a92ed7f6e5224",
+      "files": {
+        "gpt_oss/torch/model.py": {
+          "path": "third_party/gpt-oss/gpt_oss/torch/model.py",
+          "sha256": "319ba3c6e4d827eb3115fe4838942af448376b513c02cea4b6b471bf6c21a346"
+        }
+      }
+    },
+    "meta-llama": {
+      "commit": "689c7f261b9c5514636ecc3c5fefefcbb3e6eed7",
+      "files": {
+        "llama/model.py": {
+          "path": "third_party/meta-llama/llama/model.py",
+          "sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        "README.md": {
+          "path": "third_party/meta-llama/README.md",
+          "sha256": "1256609c6ae78ecda5c2d98cf17d28de5018427bbc602caaa51bf280ee2273ea"
+        }
+      }
+    }
+  },
+  "merlin_commit": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
+  "claim_policy": {
+    "path": "integration/merlin/merlin/contract/claim_models.yaml",
+    "sha256": "73bea540900337e33e804713864b52f5052b200e79cb271c83fafe3a0347e8b2"
+  },
+  "weights_downloaded": false
+}

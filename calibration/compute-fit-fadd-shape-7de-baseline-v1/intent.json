@@ -1,0 +1,14 @@
+{
+  "schema": "iris.fadd_shape_baseline_intent.v1",
+  "actual_parameter_fit_performed": false,
+  "source_frontend_strict_ON": true,
+  "shape_ON": true,
+  "scalar_fadd_source_phase_ON": true,
+  "outer_prior_unqualified_for_new_native": true,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-outer-prior-v1/runtime.fixture": "2d9e27763b190bbef696dce9fb37c4484fecf4e8b6d0c566942e7b552a05fe96",
+    "/scratch/copparihollmann/iris-model/build/scalar-fadd-first-v1/fixture": "204c6b57984891dfc53b6e67a1e2f71c38df2bac5c764f4ac42e165b681755d7",
+    "/scratch/copparihollmann/iris-model/build/fadd-shape-composition-v2/composition.json": "edbe4fa14f01aa804cbce898a9746f567bdca6d4c91f2a17b66b7331f4eacc80"
+  }
+}

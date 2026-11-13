@@ -1,0 +1,7 @@
+V3 preserves the frozen v2 instruction/data model and adds `data_hit(hart,address,bytes) const` for a narrow fast scalar-load admission hint. It returns true only when every requested DRAM line is already present in that hart's data tags and no accepted instruction/data request on any of those lines remains pending.
+
+The lookup does not install or touch tags, change LRU ages, create owners, advance model time, read functional memory, or infer hardware readiness. Non-DRAM addresses return false so the existing architectural path retains permissions, faults and device behavior. Malformed hart/length/overflow arguments refuse. A true result is a prediction, not a reservation: the CPU must recheck at its actual MEM edge and preserve accepted-owner ordering.
+
+Private-load forwarding must preserve functional knownness. This helper does not return data or definedness. A CPU implementation that cannot carry a partial defined mask must use its normal transport path for an unknown payload, rather than treating it as a defined integer. Coherence may change after admission; the caller must replay or use its conservative path when rechecking fails.
+
+The proof adds10,028 query checks, including10,000 repeated lookups that leave LRU replacement unchanged, pending I/data dependency checks, cross-line and peer-store invalidation checks. All v1 data and v2 mixed instruction/data tests are replayed on the new class. The component still supplies no latency constants, observed hardware state, source/image certificate or ±2% claim.

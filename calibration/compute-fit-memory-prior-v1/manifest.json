@@ -1,0 +1,16 @@
+{
+  "schema": "iris.compute_fit_prior_baseline.v1",
+  "calibration_identity": "compute-v1-28a0-memory-prior-v1",
+  "prior_parameters_sha256": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258",
+  "fixture_sha256": "068d0edebce5ca9c70da78350af8503533218ee526d123efc4500e1dd434fa95",
+  "nonmemory_compute_extra_costs_applied": false,
+  "new_compute_parameter_fit_performed": false,
+  "new_compute_reference_timings_consumed": false,
+  "global_heldout_timings_consumed": false,
+  "full_2pct_certified": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/runtime.fixture": "e41504da843728e57fcde6195b5a15fdba58084f4b2fda19c20ecee8f98fc960",
+    "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/parameters.json": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258"
+  },
+  "scope": "Actual native baseline with separately-provenanced prior positive memory/cache/branch costs, before fresh compute-family fitting; not a new source-physical timing model."
+}

@@ -1,0 +1,127 @@
+#ifndef IRIS_HARTS
+#define IRIS_HARTS 3
+#endif
+.section .text.init,"ax",@progbits
+.globl _start
+_start:
+  csrr a0, mhartid
+  li t0, IRIS_HARTS
+  bgeu a0, t0, .Lpark
+  .option push
+  .option norelax
+  la gp, __global_pointer$
+  .option pop
+  la sp, stacks
+  addi t0, a0, 1
+  slli t0, t0, 12
+  add sp, sp, t0
+  bnez a0, .Lwait_init
+  # Local RTL functional probe ABI: FESVR ELF loader zero-fills all PT_LOAD BSS.
+  # Skip redundant guest zeroing; this changes startup timing and the ELF hash.
+.Linitialized:
+  # The real UART TX enable resets low. Initialize once before publishing boot.
+  li t0, 0x10020008
+  li t1, 1
+  sw t1, 0(t0)
+  fence rw,rw
+  la t0, boot_ready
+  li t1, 1
+  sd t1, 0(t0)
+.Lwait_init:
+  la t0, boot_ready
+  ld t1, 0(t0)
+  beqz t1, .Lwait_init
+  fence rw,rw
+  la t0, trap_vector
+  csrw mtvec, t0
+  li t0, 0x6600
+  csrs mstatus, t0
+  # frm/fflags are unreset in all three source CSRFiles. Establish the CRT ABI.
+  csrw fcsr, zero
+  li t0, 8
+  csrw mie, t0
+  csrs mstatus, t0
+  call benchmark_main
+.Lpark:
+  wfi
+  j .Lpark
+
+.align 2
+.globl trap_vector
+trap_vector:
+  addi sp, sp, -256
+  sd ra, 8(sp)
+  sd gp, 24(sp)
+  sd tp, 32(sp)
+  sd t0, 40(sp)
+  sd t1, 48(sp)
+  sd t2, 56(sp)
+  sd s0, 64(sp)
+  sd s1, 72(sp)
+  sd a0, 80(sp)
+  sd a1, 88(sp)
+  sd a2, 96(sp)
+  sd a3, 104(sp)
+  sd a4, 112(sp)
+  sd a5, 120(sp)
+  sd a6, 128(sp)
+  sd a7, 136(sp)
+  sd s2, 144(sp)
+  sd s3, 152(sp)
+  sd s4, 160(sp)
+  sd s5, 168(sp)
+  sd s6, 176(sp)
+  sd s7, 184(sp)
+  sd s8, 192(sp)
+  sd s9, 200(sp)
+  sd s10, 208(sp)
+  sd s11, 216(sp)
+  sd t3, 224(sp)
+  sd t4, 232(sp)
+  sd t5, 240(sp)
+  sd t6, 248(sp)
+  csrr a0, mcause
+  csrr a1, mepc
+  csrr a2, mtval
+  csrr a3, mhartid
+  call trap_dispatch
+  csrw mepc, a0
+  ld ra, 8(sp)
+  ld gp, 24(sp)
+  ld tp, 32(sp)
+  ld t0, 40(sp)
+  ld t1, 48(sp)
+  ld t2, 56(sp)
+  ld s0, 64(sp)
+  ld s1, 72(sp)
+  ld a0, 80(sp)
+  ld a1, 88(sp)
+  ld a2, 96(sp)
+  ld a3, 104(sp)
+  ld a4, 112(sp)
+  ld a5, 120(sp)
+  ld a6, 128(sp)
+  ld a7, 136(sp)
+  ld s2, 144(sp)
+  ld s3, 152(sp)
+  ld s4, 160(sp)
+  ld s5, 168(sp)
+  ld s6, 176(sp)
+  ld s7, 184(sp)
+  ld s8, 192(sp)
+  ld s9, 200(sp)
+  ld s10, 208(sp)
+  ld s11, 216(sp)
+  ld t3, 224(sp)
+  ld t4, 232(sp)
+  ld t5, 240(sp)
+  ld t6, 248(sp)
+  addi sp, sp, 256
+  mret
+
+.section .data,"aw",@progbits
+.align 3
+boot_ready: .quad 0
+.section .bss,"aw",@nobits
+.align 6
+stacks: .skip IRIS_HARTS * 4096

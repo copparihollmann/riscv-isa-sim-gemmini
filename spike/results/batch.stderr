@@ -1,0 +1,1 @@
+<stdin>:109.18-90: Warning (interrupts_property): /soc/serial@10020000: Missing interrupt-parent

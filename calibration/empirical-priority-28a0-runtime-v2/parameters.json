@@ -1,0 +1,562 @@
+{
+  "actual_calibrated_native_replay_completed": false,
+  "actual_parameter_fit_performed": true,
+  "base_hz": 500000000,
+  "branch": {
+    "0": 2,
+    "1": 2,
+    "2": 5
+  },
+  "cache": {
+    "0": {
+      "dirty_extra": 0.0,
+      "l1_miss": 0.0,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "read_base": 0.0,
+      "write_base": 0.0
+    },
+    "1": {
+      "dirty_extra": 0.0,
+      "l1_miss": 0.0,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "read_base": 0.0,
+      "write_base": 0.0
+    },
+    "2": {
+      "dirty_extra": 0.0,
+      "l1_miss": 0.0,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "read_base": 0.0,
+      "write_base": 0.0
+    }
+  },
+  "calibration_identity": "iris-empirical-priority-28a0-v2",
+  "counter_policy": "source-ungated-stall",
+  "families": [
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_local_tcm_load",
+      "setup": 2.8238199794525087,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_local_tcm_store",
+      "setup": 0.8740048113059146,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_load",
+      "setup": 25.997176729215745,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_store",
+      "setup": 24.90118275712621,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_load",
+      "setup": 19.672236657820356,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_store",
+      "setup": 16.728060706928453,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.vector-memory0",
+      "scope": "additional_vector_service_preserving_actual_cache_outer_layer",
+      "setup": 79.57324943993824,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.9005414879839163,
+        0.0
+      ],
+      "resource": "fit.vectorFP0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.7214959340848913,
+        0.05263308107519174
+      ],
+      "resource": "fit.vectorFP0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.519668486777497,
+        0.09046864778331733
+      ],
+      "resource": "fit.vectorFP0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        1.2093436007620937,
+        0.0
+      ],
+      "resource": "fit.vector0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        1.302502368461567,
+        1.0834282085719184e-16
+      ],
+      "resource": "fit.vme0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.5509867659866579,
+        3.205403315380475e-17
+      ],
+      "resource": "fit.vme0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.zero",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        2.6121415314827736,
+        1.0822781322995213e-15
+      ],
+      "resource": "fit.vme0",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 3,
+      "training_work_per_instruction": [
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_local_tcm_load",
+      "setup": 2.8238199794525087,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_local_tcm_store",
+      "setup": 0.8740048113059146,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_load",
+      "setup": 25.997176729215745,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_store",
+      "setup": 24.90118275712621,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_load",
+      "setup": 19.672236657820356,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_store",
+      "setup": 16.728060706928453,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.vector-memory1",
+      "scope": "additional_vector_service_preserving_actual_cache_outer_layer",
+      "setup": 79.57324943993824,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.9005414879839163,
+        0.0
+      ],
+      "resource": "fit.vectorFP1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.7214959340848913,
+        0.05263308107519174
+      ],
+      "resource": "fit.vectorFP1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.519668486777497,
+        0.09046864778331733
+      ],
+      "resource": "fit.vectorFP1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        1.2093436007620937,
+        0.0
+      ],
+      "resource": "fit.vector1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        1.302502368461567,
+        1.0834282085719184e-16
+      ],
+      "resource": "fit.vme1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.5509867659866579,
+        3.205403315380475e-17
+      ],
+      "resource": "fit.vme1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.zero",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        2.6121415314827736,
+        1.0822781322995213e-15
+      ],
+      "resource": "fit.vme1",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 3,
+      "training_work_per_instruction": [
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_load",
+      "setup": 24.873283886696335,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "effective_additional_remote_tcm_store",
+      "setup": 20.741666469231923,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_load",
+      "setup": 28.43895263138708,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "effective_additional_scratchpad_store",
+      "setup": 25.68392647386509,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.vector-memory2",
+      "scope": "additional_vector_service_preserving_actual_cache_outer_layer",
+      "setup": 65.10242762451578,
+      "work": 6.1756532947590665
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        2.3839491788582747,
+        0.0
+      ],
+      "resource": "fit.sharedFPU2",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 2,
+      "training_work_per_instruction": [
+        16.0,
+        32.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        3.727978069906472,
+        0.0
+      ],
+      "resource": "fit.sharedFPU2",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 4,
+      "training_work_per_instruction": [
+        8.0,
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        0.8186589015150157,
+        0.0
+      ],
+      "resource": "fit.sharedFPU2",
+      "scope": "integer_backend_projection; outside_observed_work_domain_unqualified",
+      "setup": 1,
+      "training_work_per_instruction": [
+        4.0,
+        8.0
+      ],
+      "work": 0
+    }
+  ],
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "instruction": {
+    "0": {
+      "l1_miss": 32,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "outer_status": "common_outer_transfer_not_independently_fitted"
+    },
+    "1": {
+      "l1_miss": 32,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "outer_status": "common_outer_transfer_not_independently_fitted"
+    },
+    "2": {
+      "l1_miss": 45,
+      "outer_interval": 461,
+      "outer_miss": 545.7320411260428,
+      "outer_status": "common_outer_transfer_not_independently_fitted"
+    }
+  },
+  "native_binary_sha256": "28a0a52ba04ca05aec01b1c1a9ca86becbd47336d4eec112873695cdb7ea6c50",
+  "quantization": "Async extra setup/work projected onto nonnegative integer cycle coefficients over actual training work domains; data/path services retain native per-family fractional carry. Icache/branch services integer-rounded before native ceil.",
+  "raw_parameters_sha256": "4d34a14718ad1ddf5f7e2619da865cb31a82de826347971415c1008fa1215f48",
+  "resource_alias_scope": "Declared fit.* logical-unit aliases; cache miss layer and canonical TCM routing retain the native transport resources.",
+  "rtc_divider": 1000,
+  "schema": "iris.empirical_selected_priority_parameters.v1",
+  "shared_outer": {
+    "effective_launch_interval_core_cycles_per64B": 461,
+    "effective_return_additional_cycles": 545.7320411260428,
+    "launch_fit_samples": [
+      {
+        "case_id": "buffered.v2.v2.contention.private-read.1048576.mask3.trial.0",
+        "effective_cycles_per_accepted_line": 450.29114851152787,
+        "max_active_hart_elapsed_cycles": 29510731,
+        "runtime_model_outer_line_misses": 65537
+      },
+      {
+        "case_id": "buffered.v2.v2.contention.private-read.1048576.mask3.trial.1",
+        "effective_cycles_per_accepted_line": 461.09219219677436,
+        "max_active_hart_elapsed_cycles": 30218599,
+        "runtime_model_outer_line_misses": 65537
+      },
+      {
+        "case_id": "buffered.v2.v2.contention.private-read.1048576.mask3.trial.2",
+        "effective_cycles_per_accepted_line": 465.8368860338435,
+        "max_active_hart_elapsed_cycles": 30529552,
+        "runtime_model_outer_line_misses": 65537
+      }
+    ],
+    "launch_scope": "train-only saturated two-compute private-read1MiB; traffic history and physical miss counts remain unqualified",
+    "single_hart_service_basis": "train-only Rocket shared-DRAM outer-miss coefficient; common service transfer to compute is an explicit approximation, not a separately identified NoC path"
+  },
+  "source_image_association_verified": false,
+  "uart_library_sha256": "92f6168dadd84d18628e04281abd83d134efe022a3db2aae331673b0be6c5b03",
+  "unapplied": [
+    "ScalarFP pipeline is structurally overconservative; no negative correction.",
+    "DRAM hot-load read-base forced0 because it is not charged by the actual L1-hit front.",
+    "Dirty-writeback separate cost not identified in this selected basis; left0.",
+    "Icache outer service has no independent fitted ROI miss basis; common service transfer is explicit.",
+    "BF16 and FP8 vector-FADD have no training instruction coverage; no timing coefficient applied.",
+    "Heavy late417reference regions lack matched native coverage.",
+    "TCM/scratch2banks and source ingress/NoC contention are not fully modeled.",
+    "Atomic/synchronization timing and hardware vector transport hang are unqualified."
+  ]
+}

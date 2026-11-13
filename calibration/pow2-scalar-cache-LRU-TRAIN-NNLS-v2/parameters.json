@@ -1,0 +1,92 @@
+{
+  "schema": "iris.pow2_scalar_cache_two_predeclared_modes_TRAIN_NNLS.v2",
+  "pass": true,
+  "mode": "LRU",
+  "zero_baseline": "/scratch/copparihollmann/iris-model/build/pow2-memory-new-native-zero-bases-v1",
+  "coefficients": [
+    {
+      "hart": 0,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 55.28462916532587,
+      "beta_core_cycles_per_modeled_outer_miss_line": 96.2988602987404,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.004909599459253353,
+            5.207413815131243e-06
+          ],
+          [
+            5.207413815131243e-06,
+            4.7628581411693094e-05
+          ]
+        ],
+        "determinant": 2.3381014038521068e-07,
+        "relative_squared_loss_sum": 12.590237144032862,
+        "zero_basis_rows": 12
+      }
+    },
+    {
+      "hart": 1,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 49.25889623214221,
+      "beta_core_cycles_per_modeled_outer_miss_line": 78.29363174558824,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.005457807300153824,
+            2.7924286564267834e-06
+          ],
+          [
+            2.7924286564267834e-06,
+            5.1895358475340446e-05
+          ]
+        ],
+        "determinant": 2.8322706867301144e-07,
+        "relative_squared_loss_sum": 14.137079629819365,
+        "zero_basis_rows": 12
+      }
+    },
+    {
+      "hart": 2,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 61.95762149101804,
+      "beta_core_cycles_per_modeled_outer_miss_line": 50.64680010737867,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.003100953384914267,
+            1.0472239358181102e-09
+          ],
+          [
+            1.0472239358181102e-09,
+            5.687202945602352e-05
+          ]
+        ],
+        "determinant": 1.7635751224750337e-07,
+        "relative_squared_loss_sum": 14.816139492218356,
+        "zero_basis_rows": 18
+      }
+    }
+  ],
+  "estimator": "Fixed per-hart2-column nonnegative relative LS; all60TRAIN rows/hart; no intercept, no filtering. Target=HWminus actual same-mode zero native cycles. X=actual ordinary scalar load L2-hit/outer-miss probes with strict same-run class equality.",
+  "finite_comparison_plan": "Only LRU versus fixed-source ShuttleRandom; no seed/PRNG/policy tuning; mode selection uses sum of TRAIN relative-square loss only; actual replay required.",
+  "TRAIN_relative_squared_loss_sum": 41.543456266070585,
+  "reserved_labels_consumed": false,
+  "physical_latencies_identified": false,
+  "actual_nonlinear_replay_qualified": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/pipeline/fit_pow2_scalar_cache_modes_v2.py": "bf495ebcdfc89298e9092328dc3ff9fe74c8c8d7b0362e67f44612b599f3b6ae",
+    "/scratch/copparihollmann/iris-model/pipeline/fit_pow2_scalar_cache_v1.py": "ffc763e1e83896875b7999c77a5fd56643fa1695ada41d69146525347fc01339",
+    "/scratch/copparihollmann/iris-model/build/scalar-L2hit-v2-root-zero-bases-v1/alpha0-beta0.fixture": "45d431d55b048722376d49f4abf4a33477ef65ea2289f243f2869676ea7c6add",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-HARDWARE-TRAIN-v2/report.json": "8f69d16c89bc200812af52c729d2611bee19e587ff01ba0dbf2e0fae1d3c196d",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-HARDWARE-TRAIN-v2/regions.jsonl": "896f97794b8ef4490ad6d54b5ca8da9e7023aabc7356926072465ff07cb041a5",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-single-v1/corpus.json": "d1658cb28517384d2000177db974909c2795c398465d3c39e297b16e94250abd",
+    "/scratch/copparihollmann/iris-model/benchmarks/pow2_memory_v1/validate.py": "b270a9485b70dbcdc7f5c97d0e9546e1d2976d226cad002f835527df7ba3d735",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-new-native-zero-bases-v1/run.json": "0c848c74a9df3fc0ba329946340717f9884511d7b95b57e1fc545a9c55dcd4b0",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-new-native-zero-bases-v1/stdout": "1b554a47717dadf715b03ca27011ba39233b62056cd885d000fe0505af2b6403",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-new-native-zero-bases-v1/features.jsonl": "c5dff7bd99cafebed394c847f881ba24bf08c3881ee4fd131ef94e6140090594"
+  }
+}

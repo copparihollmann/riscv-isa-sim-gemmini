@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/copparihollmann/riscv-isa-sim-gemmini.git",
+  "branch_observed": "feat/megaphase-feedback-integration",
+  "commit": "daa72b035894db10e98bbf118f274c97093dd7bd",
+  "observed_at_utc": "2026-11-06T00:47:12.591011+00:00",
+  "role": "reference_only; not functionalmodelbase or Iris hardwaretruth"
+}

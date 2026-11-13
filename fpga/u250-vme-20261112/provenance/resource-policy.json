@@ -1,0 +1,12 @@
+{
+  "max_simultaneous_bitstream_builds": 2,
+  "cpu_budget_per_build": 12,
+  "total_cpu_budget": 24,
+  "cpu_affinity": {
+    "15mhz": "0-11",
+    "25mhz": "12-23"
+  },
+  "make_jobs": 12,
+  "vivado_jobs": 12,
+  "jvm_active_processors": 12
+}

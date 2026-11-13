@@ -1,0 +1,5 @@
+mainmenu "Iris compiler Zephyr pipeline"
+source "Kconfig.zephyr"
+config IRIS_PIPELINE_SCALAR_TWIN
+  bool "Use the emitted kernel's scalar stand-in twin"
+  default n

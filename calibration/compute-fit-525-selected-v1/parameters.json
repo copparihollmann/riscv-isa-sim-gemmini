@@ -1,0 +1,453 @@
+{
+  "actual_calibrated_native_replay_completed": false,
+  "actual_parameter_fit_performed": true,
+  "base_hz": 500000000,
+  "branch": {
+    "0": 2.0,
+    "1": 2.0,
+    "2": 1.0
+  },
+  "cache": {
+    "0": {
+      "dirty_extra": 0.0,
+      "l1_miss": 6.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 40.0,
+      "write_base": 0.0
+    },
+    "1": {
+      "dirty_extra": 0.0,
+      "l1_miss": 6.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 40.0,
+      "write_base": 0.0
+    },
+    "2": {
+      "dirty_extra": 0.0,
+      "l1_miss": 6.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 40.0,
+      "write_base": 0.0
+    }
+  },
+  "calibration_identity": "iris-empirical-compute-525-v1",
+  "cost_semantics": {
+    "async": "Positive integer backend extras over current source/scoped-work baseline; nonlinear actual counter replay required.",
+    "l1_miss": "Additional effective DATA-L1 miss response service; private hits unchanged. Accepted same-line actors keep their existing dependency order; no source NoC/probe queue equivalence claim.",
+    "outer": "Separately bound prior28 effective outer-return and shared launch services, not newly identified on this small source525 compute corpus.",
+    "read_base": "Charged by native conservative scalar DRAM reads and coherence fallbacks; integer private L1-hit load front bypasses it. Scalar FP load fallback also charges it. Not a physical L1 latency.",
+    "vector_memory": "Additional generic unitstride ATL load/store services; direct-L2 vector path retains zero L1D allocation and preserves outer transport reservation."
+  },
+  "counter_policy": "source-ungated-stall",
+  "families": [
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 2.82381997945,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 0.874004811306,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 25.9971767292,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 24.9011827571,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 19.6722366578,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 16.7280607069,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 2.82381997945,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 0.874004811306,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 25.9971767292,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 24.9011827571,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 19.6722366578,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 16.7280607069,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 24.8732838867,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 20.7416664692,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 28.4389526314,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "Prior28path service, unqualified525transfer",
+      "setup": 25.6839264739,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 108.403452446,
+      "work": 2.28344370895
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vme0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vme0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.zero",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vme0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 108.403452446,
+      "work": 2.28344370895
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vme1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vme1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.zero",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vme1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory2",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 91.8439430313,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 4.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 3.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector-load0",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 20.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector-load1",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 20.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.vector-load2",
+      "scope": "Own525 actual compute training/live counter fit; effective model cost, not physical unit latency.",
+      "setup": 20.0,
+      "work": 0.0
+    }
+  ],
+  "full_2pct_certified": false,
+  "full_model_certified": false,
+  "global_heldout_timings_consumed": false,
+  "instruction": {
+    "0": {
+      "l1_miss": 0.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    },
+    "1": {
+      "l1_miss": 0.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    },
+    "2": {
+      "l1_miss": 47.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    }
+  },
+  "native_binary_sha256": "525cc4afafa8a235c036d70b68abdb34ee35b4b343dfff80d14442ed9c971a03",
+  "own_epoch_training_selection": {
+    "candidate_objectives": {
+      "intent18": 0.0323243834835217,
+      "lf4": 0.03608269514747478,
+      "outer": 0.12994497448616435,
+      "read55": 0.0324227256700764
+    },
+    "chosen": "intent18",
+    "internal_validation_used_for_selection": false,
+    "objective": "Mean squared relative error of TRAIN parent/hart trial medians; all families included for transport tuning."
+  },
+  "prior_memory_parameters": {
+    "path": "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/parameters.json",
+    "qualified_for_525": false,
+    "runtime_binding": "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-binding-v2/runtime-binding.json",
+    "runtime_binding_sha256": "0b39ed529a98084dbdbdcaf8475c17dd175680ee5158e4a57cff0005702ded69",
+    "sha256": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258"
+  },
+  "raw_parameters_sha256": "cd5ec63a655479d654ec98306156e3813307c5852e0a9241dc4b390968f9ff5c",
+  "rtc_divider": 1000,
+  "schema": "iris.empirical_compute_parameters.v1",
+  "source_image_association_verified": false,
+  "uart_library_sha256": "62eff3025bcfa77c4d272d096947c0675eb65060f97ce3224675e3212bbb2e84",
+  "unqualified": [
+    "ScalarFP and warm scalar-store/atomic intrinsic pipeline floors remain.",
+    "Memory hierarchy uses approximate LRU/intent-time coherence bookkeeping, not full physical bank/NoC queues.",
+    "Shared outer545.732/461 and noncompute TCM/scratch paths are prior transfers; new-epoch heavy memory coverage remains incomplete.",
+    "Conservative scalar read service includes hot scalarFP-load fallback; no isolated physical NoC/read latency certification.",
+    "FADD/OPU baseline work and added costs are empirical; static native unfitted-work-duration describes the physical baseline, not absence of fixture-bound corrections.",
+    "No BF16/FP8 vector-FADD timing fit: no training instruction coverage.",
+    "Observed shape/work domains only; no arbitrary-shape, Zephyr end-to-end, source/image or full2% certification.",
+    "Known actual FPGA vector-transport hangs and unsupported VME column behavior are not emulated."
+  ],
+  "vme_work": "source-shape-subtiles-v1"
+}

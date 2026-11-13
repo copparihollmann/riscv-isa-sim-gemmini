@@ -1,0 +1,33 @@
+{
+  "schema": "iris.empirical_scalar_L2_hit_provenance_mapping.v1",
+  "pass": true,
+  "baseline_fixture_sha256": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+  "fit_provenance_sha256": "190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37",
+  "basis_correspondence_sha256": "0343fe6ffc95d9a95fe9f86b77a457486ecfb0a53f976d41c5bc33b440b4805b",
+  "runtime_qualification_inherited": false,
+  "current_candidate_accuracy_certified": false,
+  "training_only": true,
+  "internal_validation_used_for_coefficients": false,
+  "coefficients": [
+    {
+      "hart": 0,
+      "cycles_per_modeled_scalar_L2_hit_line": 52.32337048349108
+    },
+    {
+      "hart": 1,
+      "cycles_per_modeled_scalar_L2_hit_line": 48.85169191685408
+    },
+    {
+      "hart": 2,
+      "cycles_per_modeled_scalar_L2_hit_line": 63.38750567457621
+    }
+  ],
+  "scope": "Ordinary scalar DRAM loads only; actual modeled64B L2-hit probes. Existing outerresponse/launchII, allvector/store/atomic and explicitIcache service costs unchanged. Fractional charge has separate per-hart state.",
+  "new_pow2_validation_required": true,
+  "beta_outer_surcharge_fitted": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-selected-v1/runtime.fixture": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+    "/scratch/copparihollmann/iris-model/build/scalar-L2hit-WFI-basis-proof-v1/report.json": "0343fe6ffc95d9a95fe9f86b77a457486ecfb0a53f976d41c5bc33b440b4805b",
+    "/scratch/copparihollmann/iris-model/calibration/WFI-L2-hit-effective-TRAIN-candidate-v1/parameters.json": "190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37"
+  }
+}

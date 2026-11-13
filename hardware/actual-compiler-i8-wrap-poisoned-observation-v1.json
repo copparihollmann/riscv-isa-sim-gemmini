@@ -1,0 +1,96 @@
+{
+  "schema": "iris.actual_compiler_i8_wrap_observation.v1",
+  "hardware_executed": true,
+  "archive_validation_passed": true,
+  "job": "/scratch/copparihollmann/iris-model/runs/fpga-compiler-i8-wrap-poisoned-v1",
+  "run_manifest_sha256": "0993518b22fd259947a153f1b91c62411dff67133ea1e9a9037e87ea7f6c44a2",
+  "elf_sha256": "54dfa0459f390447a3098d3272ecad66fe69009acd23ca6f595412ba30c77bd8",
+  "archive_sha256": "73d383fd9ae1f6b60ffc01b5839cef3c9b994b7a2dab17f43305e9300c723400",
+  "analysis_report": "/scratch/copparihollmann/iris-model/build/fpga-compiler-i8-wrap-poisoned-v1-archive-analysis/report.json",
+  "analysis_report_sha256": "f17043fabefe7ca59aa80d29f57ce97f578f32a64f71b5a981641cb3367dc52b",
+  "prelaunch_analyzer_unchanged": true,
+  "regions": 126,
+  "per_hart": [
+    42,
+    42,
+    42
+  ],
+  "variants": [
+    "vme",
+    "twin"
+  ],
+  "trials": 3,
+  "observed_output_words_matching_independent_goldens": 64152,
+  "fresh_poison_before_every_call": true,
+  "fresh_poison_source": "volatile uint32 stores of every independent golden XOR 0xffffffff before pre-region barrier",
+  "actual_deliberate_noop_control": {
+    "pass": true,
+    "actual_executed_negative": true,
+    "elf_sha256": "511494ae67475606bd7fe3f685d7b0b86cb6be76d089dddbd0d151e442c49a98",
+    "gate_report_sha256": "d16d6532f61a94660ff7c233a9083cf9435c8c25f3b6823ef613c058f4438b65",
+    "regions": 126,
+    "failed_compute_words": 63984,
+    "hart2_producer_passed": true,
+    "every_compute_word_retained_independent_poison": true
+  },
+  "admission_report_sha256": "6bf246a9270e7e74b65ebe139982fb7c693a69d06218053b5b7254cbf435fa68",
+  "parser_negative_controls": 19,
+  "active_harts": [
+    0,
+    1,
+    2
+  ],
+  "matrix_harts": [
+    0,
+    1
+  ],
+  "hart2_role": "Concurrent ordinary RVV producer.",
+  "numerical_scope": "Seven concrete shapes, signed I8 products and bias to wrapping I32; tested both signed overflow directions, matrix accumulation beyond signed2^31, four tiles, tails, zero/short reduction. This hardware corpus does not cross full unsigned2^32 accumulation boundary; host emitter tests cover that separately.",
+  "source_image_association_verified": false,
+  "full_functional_certified": false,
+  "timing_calibrated": false,
+  "calibration_usable": false,
+  "heldout": false,
+  "managed_lifecycle": [
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 23.55757813109085,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "infrasetup",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 115.30533883580938,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "runworkload",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 37.23260434996337,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": true,
+      "host_elapsed_seconds": 23.462169230915606,
+      "returncode": 0,
+      "timed_out": false
+    }
+  ],
+  "hpm_or_trace_claims": false,
+  "actual_instrumentation": "Per-region mcycle/minstret/checksum/failed-word counts, frozen goldens, heartbeat/aggregate FASED CSV; no TracerV/AutoCounter/SynthPrint.",
+  "qualifications": [
+    "This is baremetal rather than Zephyr scheduling/context validation.",
+    "Matching outputs establish this concrete compiler route, not all opcodes/dtypes or complete compiler support.",
+    "Full image/source association and held-out2% timing are unverified.",
+    "Raw cycle variation across sequential repetitions is retained, not averaged away into calibration."
+  ]
+}

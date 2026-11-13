@@ -1,0 +1,38 @@
+{
+  "inputs": {
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/insns/Instructions.scala": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/src/main/scala/common/Consts.scala": "e0e4d75be9b2c97ca1dd8b03cdc2b2aec94bfcae8499b227446d09fa54ce586d"
+  },
+  "cases": [
+    {
+      "name": "SF_MM_INT",
+      "match": 4026531959,
+      "mask": 4227887231
+    },
+    {
+      "name": "SF_MM_FP8",
+      "match": 4026536055,
+      "mask": 4227887231
+    },
+    {
+      "name": "SF_VTMV_V_T",
+      "match": 1106272343,
+      "mask": 4260393087
+    },
+    {
+      "name": "SF_VTMV_T_V",
+      "match": 1543528535,
+      "mask": 4227887231
+    },
+    {
+      "name": "SF_VTZERO_T",
+      "match": 1105223767,
+      "mask": 4261408895
+    },
+    {
+      "name": "SF_VTDISCARD",
+      "match": 1103126615,
+      "mask": 4261408895
+    }
+  ]
+}

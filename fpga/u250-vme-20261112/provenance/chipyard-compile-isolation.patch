@@ -1,0 +1,20 @@
+diff --git a/build.sbt b/build.sbt
+index f0aa122..c8fb6a3 100644
+--- a/build.sbt
++++ b/build.sbt
+@@ -278,6 +278,15 @@ lazy val chipyard = {
+       }.filter(_.exists)
+   )
+ 
++  // Isolate this pinned dual-Shuttle build from unrelated incompatible examples.
++  cy = cy.settings(
++    Compile / unmanagedSources ~= { files =>
++      files.filterNot { f =>
++        Set("IrisConfigs.scala", "ChipletConfigs.scala").contains(f.getName) ||
++          f.getCanonicalPath.contains("/generators/tacit/chipyard/")
++      }
++    }
++  )
+   cy
+ }
+ 

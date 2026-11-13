@@ -1,0 +1,18 @@
+if BOARD_IRIS
+
+config SYS_CLOCK_HW_CYCLES_PER_SEC
+	default 500000
+
+config RTC_CLOCK_DIVIDER_VALUE
+	default 1000
+
+config MP_MAX_NUM_CPUS
+	default 3
+
+config NUM_IRQS
+	default 14
+
+config MAX_IRQ_PER_AGGREGATOR
+	default 2
+
+endif

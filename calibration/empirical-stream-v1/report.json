@@ -1,0 +1,29 @@
+{
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "internal_validation_already_used_for_v1_review": true,
+  "live_model_verified": false,
+  "metrics": {
+    "internal_validation": {
+      "absolute_max_pct": 37.67152990632469,
+      "absolute_median_pct": 17.40040851074349,
+      "absolute_p90_pct": 32.43407645878868,
+      "regions": 95,
+      "signed_mean_pct": 3.6485731679163105,
+      "signed_median_pct": 7.23660325123644,
+      "within_2pct_fraction": 0.021052631578947368
+    },
+    "train": {
+      "absolute_max_pct": 51.94298092186994,
+      "absolute_median_pct": 14.172413319840356,
+      "absolute_p90_pct": 35.427983780483196,
+      "regions": 325,
+      "signed_mean_pct": -4.676907879612884,
+      "signed_median_pct": 0.5700484972615764,
+      "within_2pct_fraction": 0.07076923076923076
+    }
+  },
+  "parameters_sha256": "edfd77535706951baf29869c6568daaaf60153c622d4adb9f2fcf342e0002384",
+  "predictions_sha256": "7c720db5d3b287e487bd284f32f9acbaa7a401d24c2cf7cbbf585e8b6fd87d9b",
+  "schema": "iris.empirical_cache_tier_proxy_validation.v1"
+}

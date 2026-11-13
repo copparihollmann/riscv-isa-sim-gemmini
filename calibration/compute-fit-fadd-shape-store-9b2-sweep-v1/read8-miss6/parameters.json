@@ -1,0 +1,350 @@
+{
+  "actual_calibrated_native_replay_completed": false,
+  "actual_parameter_fit_performed": true,
+  "base_fixture_sha256": "182b6b0c1add9561adee13b7b50dfa4f92f706cc1b48c9c5f934ef7ce2699989",
+  "base_hz": 500000000,
+  "base_scope": "Shared outer545.732/461 and noncompute paths are separately bound prior28 values, not qualified as new-native physical memory parameters.",
+  "branch": {
+    "0": 5,
+    "1": 5,
+    "2": 2
+  },
+  "calibration_identity": "iris-compute-fadd-shape-store-9b2-read8-miss6-v1",
+  "counter_policy": "source-ungated-stall",
+  "families": [
+    {
+      "family": "memory.vector.store",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        93.52526395171168,
+        3.254881916089494
+      ],
+      "resource": "fit.compute.vector-memory0",
+      "scope": "Additional vector-store service; native fractional accumulation, preserves actual outer transport reservation.",
+      "setup": 93.52526395171168,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 3.254881916089494
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.0,
+        0.4866006870796692
+      ],
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        1.6095975086775218,
+        0.0
+      ],
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        1.0401322795835732,
+        0.26038980947572105
+      ],
+      "resource": "fit.compute.vectorFP0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        1.0126379476946776,
+        0.0
+      ],
+      "resource": "fit.compute.vector0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.687700540073367,
+        7.545179854837296e-18
+      ],
+      "resource": "fit.compute.vme0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 0,
+      "interval": 1,
+      "raw_setup_work": [
+        0.7111831640114628,
+        1.5542370528684296e-16
+      ],
+      "resource": "fit.compute.vme0",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        93.52526395171168,
+        3.254881916089494
+      ],
+      "resource": "fit.compute.vector-memory1",
+      "scope": "Additional vector-store service; native fractional accumulation, preserves actual outer transport reservation.",
+      "setup": 93.52526395171168,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 3.254881916089494
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.0,
+        0.4866006870796692
+      ],
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        1.6095975086775218,
+        0.0
+      ],
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        1.0401322795835732,
+        0.26038980947572105
+      ],
+      "resource": "fit.compute.vectorFP1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 2,
+      "training_work_per_instruction": [
+        2.0,
+        4.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        1.0126379476946776,
+        0.0
+      ],
+      "resource": "fit.compute.vector1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        2.0,
+        4.0,
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.687700540073367,
+        7.545179854837296e-18
+      ],
+      "resource": "fit.compute.vme1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 1,
+      "interval": 1,
+      "raw_setup_work": [
+        0.7111831640114628,
+        1.5542370528684296e-16
+      ],
+      "resource": "fit.compute.vme1",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        8.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        88.2517635872008,
+        0.0
+      ],
+      "resource": "fit.compute.vector-memory2",
+      "scope": "Additional vector-store service; native fractional accumulation, preserves actual outer transport reservation.",
+      "setup": 88.2517635872008,
+      "training_work_per_instruction": [
+        1.0,
+        2.0,
+        4.0
+      ],
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        3.921334847215002,
+        0.0
+      ],
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 4,
+      "training_work_per_instruction": [
+        16.0,
+        32.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        3.984820820282746,
+        0.0
+      ],
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 4,
+      "training_work_per_instruction": [
+        8.0,
+        16.0
+      ],
+      "work": 0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 2,
+      "interval": 1,
+      "raw_setup_work": [
+        0.8101409807921325,
+        0.0
+      ],
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "Positive integer async extra duration over this new-native baseline; observed-work domain only.",
+      "setup": 1,
+      "training_work_per_instruction": [
+        4.0,
+        8.0
+      ],
+      "work": 0
+    }
+  ],
+  "full_2pct_certified": false,
+  "generic_scalar_DRAM_extra_costs_fitted": true,
+  "global_heldout_timings_consumed": false,
+  "instruction_l1_extra": {
+    "0": 0,
+    "1": 0,
+    "2": 47
+  },
+  "native_binary_sha256": "9b2a9053b2c62e4ca3deaa5c860d5d3f275d788488a20cc708cfb1c17db0317e",
+  "raw_parameters_sha256": "eab156f715e163b8ccd45a76fd860c748ff54b25f387799ce4d38a35f903926d",
+  "rtc_divider": 1000,
+  "scalar_FADD_source_phase": "FixedEX-write4/3, no family coefficient or override",
+  "scalar_L1_miss_service": 6,
+  "scalar_read_service": 8,
+  "schema": "iris.empirical_compute_selected_parameters.v1",
+  "selection_scope": "Finite positive runtime service grid; actual TRAIN replay required; no CV selection.",
+  "source_image_association_verified": false,
+  "uart_library_sha256": "4f51c75ba72aa3d6a3258a5a680960d887d588348313ac9c4c100c6e1895d7d2",
+  "unqualified": [
+    "ScalarFP structural floor and source memory store pipeline remain outside this positive coefficient fit.",
+    "Shared outer service and noncompute paths are prior transfers, not identified by this compute-only reference.",
+    "No BF16/FP8 vector-FADD coefficient: absent training instruction coverage.",
+    "Atomic/polling-pipeline timing excluded from coefficient selection; all errors still reported.",
+    "Setup/work equivalence and async overlap require actual counter replays; this selection is not live accuracy evidence."
+  ],
+  "vector_load_service": 20,
+  "vme_work": "source-shape-subtiles-v1"
+}

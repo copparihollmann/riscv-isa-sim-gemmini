@@ -1,0 +1,9 @@
+[
+  {
+    "id": "hello-smoke",
+    "active_harts": [
+      0
+    ],
+    "note": "Existing ELF; not an SMP certification workload."
+  }
+]

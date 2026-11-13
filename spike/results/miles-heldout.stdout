@@ -1,0 +1,34 @@
+VME fused GEMM+bias (transpose-A): TE=32 M=64 N=64, sweeping K=4..32 step 4
+-- vme_gemm_2x2_bias (k4) --
+k,cycles,ndiverge
+4,1002,0
+8,1046,0
+12,1084,0
+16,1122,0
+20,1160,0
+24,1198,0
+28,1236,0
+32,1274,0
+PASSED
+-- vme_gemm_2x2_bias_k1 --
+k,cycles,ndiverge
+4,984,0
+8,1040,0
+12,1096,0
+16,1152,0
+20,1208,0
+24,1264,0
+28,1320,0
+32,1376,0
+PASSED
+-- vme_gemm_2x2_bias_k2 --
+k,cycles,ndiverge
+4,997,0
+8,1041,0
+12,1085,0
+16,1129,0
+20,1173,0
+24,1217,0
+28,1261,0
+32,1305,0
+PASSED

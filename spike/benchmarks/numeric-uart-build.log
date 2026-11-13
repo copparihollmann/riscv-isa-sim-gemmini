@@ -1,0 +1,18 @@
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/native-fp8.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/wide-reduce-fp8.elf has a LOAD segment with RWX permissions
+ieee_fma_integer_oracle 23360 reductions 1120
+scalar_bf16_decoder_patterns=835 normal=807 custom=28 both_opcodes_disjoint pass
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/ieee-bf16.elf has a LOAD segment with RWX permissions
+{"operation_cases": 21000, "reduction_cases": 1200, "forms": 45, "formats": ["FP16", "FP32", "FP64"], "rounding_modes": 5, "seed": 1397117013, "host_float_used": false, "rtl_executed": false, "header_sha256": "8ab1f282715dea3ffff09fe49a5d668a5c997b6bfaa9ca13ea4b45f77f84021e", "policy": "full IEEE flags including masked elements; ignored widening-converter flags; scalar ascending reduction plus final+0 for both opcodes"}
+{"cases": 21, "intersections": 0, "terms": 17}
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/shared-fpu.elf has a LOAD segment with RWX permissions
+{"cases": 8448, "forms": 22, "seed": 301994298704, "host_float_used": false, "rtl_executed": false, "source_image_association_verified": false, "header_sha256": "c1d135bc03184a9ae1ff96bbbc575b2608ee1d7b4e112467beaf97fc842c92e1", "policy": "flags H chunks except S chunks at SEW64; full unmasked physical EG incl tail; min/max ties vs1; altfmt accepted and ignored at H/S/D widths on all harts; reductions DLEN-dependent per-lane plus halving fold"}
+{"cases": 11, "intersections": 0, "terms": 17}
+{"cases": 11, "intersections": 0, "terms": 17}
+{"cases": 11, "intersections": 0, "terms": 17}
+{"cases": 11, "intersections": 0, "terms": 17}
+{"cases": 11, "intersections": 0, "terms": 17}
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/fpcomp.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/bitmanip.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/cease.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/cpu_config.elf has a LOAD segment with RWX permissions

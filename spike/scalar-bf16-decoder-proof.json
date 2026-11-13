@@ -1,0 +1,33 @@
+{
+  "all_instruction_patterns": 835,
+  "pattern_counts": {
+    "Instructions.scala": 807,
+    "CustomInstructions.scala": 28
+  },
+  "proof": "No fixed-bit intersection with any of the 807 Rocket Instructions.scala or 28 CustomInstructions.scala patterns, including patterns not enabled by Iris. The inspected scalar integer/control and FPU decode tables select these definitions; Saturn EarlyDecode opcode alternatives exclude scalar FP opcode0x53. This proves source decoder absence, not deployed-image equivalence.",
+  "rtl_executed": false,
+  "cases": [
+    {
+      "instruction": "fcvt.bf16.s",
+      "value": "0x44800053",
+      "mask": "0xfff0007f",
+      "intersections": [],
+      "result": "architectural-illegal-no-decoder-entry"
+    },
+    {
+      "instruction": "fcvt.s.bf16",
+      "value": "0x40600053",
+      "mask": "0xfff0007f",
+      "intersections": [],
+      "result": "architectural-illegal-no-decoder-entry"
+    }
+  ],
+  "source_inputs": {
+    "third_party/rocket-chip/src/main/scala/rocket/Instructions.scala": "9aeb6c05db25e5d026e6055ef3f2c9080832c2b28c404f127cdc44e726e1cf1a",
+    "third_party/rocket-chip/src/main/scala/rocket/CustomInstructions.scala": "6313d95d0fd760a092ae50f6b0dcb27a1bfbac42c7e1e841b008e893fdc72bb1",
+    "third_party/rocket-chip/src/main/scala/rocket/IDecode.scala": "56ff065ff7b6ed15283afe071f2e79b6f09d2848df6729f0fc4ba3bea9036ace",
+    "third_party/rocket-chip/src/main/scala/tile/FPU.scala": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+    "third_party/shuttle/src/main/scala/exu/Core.scala": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+    "third_party/saturn/src/main/scala/frontend/EarlyDecode.scala": "1a207d20a11bd2acc590eadfa56a5bee0d605c7fbb4977eaad26039554163650"
+  }
+}

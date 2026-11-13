@@ -1,0 +1,785 @@
+diff --git a/generators/chipyard/src/main/scala/config/AbstractConfig.scala b/generators/chipyard/src/main/scala/config/AbstractConfig.scala
+index 30bcf0ec..4fcf0509 100644
+--- a/generators/chipyard/src/main/scala/config/AbstractConfig.scala
++++ b/generators/chipyard/src/main/scala/config/AbstractConfig.scala
+@@ -60,7 +60,7 @@ class AbstractConfig extends Config(
+   new chipyard.iobinders.WithL2FBusAXI4Punchthrough ++
+   new chipyard.iobinders.WithBlockDeviceIOPunchthrough ++
+   new chipyard.iobinders.WithNICIOPunchthrough ++
+-  new chipyard.iobinders.WithTraceIOPunchthrough ++
++  // new chipyard.iobinders.WithTraceIOPunchthrough ++
+   new chipyard.iobinders.WithUARTTSIPunchthrough ++
+   new chipyard.iobinders.WithGCDIOPunchthrough ++
+   new chipyard.iobinders.WithNMITiedOff ++
+diff --git a/generators/chipyard/src/main/scala/config/ChipletConfigs.scala b/generators/chipyard/src/main/scala/config/ChipletConfigs.scala
+index fb99eac2..09a8662d 100644
+--- a/generators/chipyard/src/main/scala/config/ChipletConfigs.scala
++++ b/generators/chipyard/src/main/scala/config/ChipletConfigs.scala
+@@ -5,193 +5,193 @@ import freechips.rocketchip.diplomacy.{AddressSet}
+ import freechips.rocketchip.subsystem.{SBUS}
+ import testchipip.soc.{OBUS, InwardAddressTranslatorParams, OutwardAddressTranslatorParams}
+ 
+-// ------------------------------------------------
+-// Configs demonstrating chip-to-chip communication
+-// ------------------------------------------------
++// // ------------------------------------------------
++// // Configs demonstrating chip-to-chip communication
++// // ------------------------------------------------
+ 
+-// Simple design which exposes a second serial-tl port that can connect to another instance of itself
+-class SymmetricChipletRocketConfig extends Config(
+-  new testchipip.soc.WithChipIdPin ++                               // Add pin to identify chips
+-  new chipyard.harness.WithSerialTLTiedOff(tieoffs=Some(Seq(1))) ++ // Tie-off the chip-to-chip link in single-chip sims
+-  new testchipip.serdes.WithSerialTL(Seq(
+-    testchipip.serdes.SerialTLParams(                               // 0th serial-tl is chip-to-bringup-fpga
+-      client = Some(testchipip.serdes.SerialTLClientParams()),      // bringup serial-tl acts only as a client
+-      phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()   // bringup serial-tl is sync'd to external clock
+-    ),
+-    testchipip.serdes.SerialTLParams(                               // 1st serial-tl is chip-to-chip
+-      client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
+-      manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
+-        memParams = Seq(testchipip.serdes.ManagerRAMParams(
+-          address = 0,
+-          size = 1L << 32,
+-        )),
+-        slaveWhere = OBUS
+-      )),
+-      phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams() // chip-to-chip serial-tl is symmetric source-sync'd
+-    ))
+-  ) ++
+-  new testchipip.soc.WithOffchipBusClient(SBUS,                     // obus provides path to other chip's memory
+-    blockRange = Seq(AddressSet(0, (1L << 32) - 1)),                // The lower 4GB is mapped to this chip
+-    replicationBase = Some(1L << 32)                                // The upper 4GB goes off-chip
+-  ) ++
+-  new testchipip.soc.WithOffchipBus ++
+-  new freechips.rocketchip.rocket.WithNHugeCores(1) ++
+-  new chipyard.config.AbstractConfig)
++// // Simple design which exposes a second serial-tl port that can connect to another instance of itself
++// class SymmetricChipletRocketConfig extends Config(
++//   new testchipip.soc.WithChipIdPin ++                               // Add pin to identify chips
++//   new chipyard.harness.WithSerialTLTiedOff(tieoffs=Some(Seq(1))) ++ // Tie-off the chip-to-chip link in single-chip sims
++//   new testchipip.serdes.WithSerialTL(Seq(
++//     testchipip.serdes.SerialTLParams(                               // 0th serial-tl is chip-to-bringup-fpga
++//       client = Some(testchipip.serdes.SerialTLClientParams()),      // bringup serial-tl acts only as a client
++//       phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()   // bringup serial-tl is sync'd to external clock
++//     ),
++//     testchipip.serdes.SerialTLParams(                               // 1st serial-tl is chip-to-chip
++//       client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
++//       manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
++//         memParams = Seq(testchipip.serdes.ManagerRAMParams(
++//           address = 0,
++//           size = 1L << 32,
++//         )),
++//         slaveWhere = OBUS
++//       )),
++//       phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams() // chip-to-chip serial-tl is symmetric source-sync'd
++//     ))
++//   ) ++
++//   new testchipip.soc.WithOffchipBusClient(SBUS,                     // obus provides path to other chip's memory
++//     blockRange = Seq(AddressSet(0, (1L << 32) - 1)),                // The lower 4GB is mapped to this chip
++//     replicationBase = Some(1L << 32)                                // The upper 4GB goes off-chip
++//   ) ++
++//   new testchipip.soc.WithOffchipBus ++
++//   new freechips.rocketchip.rocket.WithNHugeCores(1) ++
++//   new chipyard.config.AbstractConfig)
+ 
+-// Simulates 2X of the SymmetricChipletRocketConfig in a multi-sim config
+-class MultiSimSymmetricChipletRocketConfig extends Config(
+-  new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
+-  new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=1) ++
+-  new chipyard.harness.WithMultiChip(0, new SymmetricChipletRocketConfig) ++
+-  new chipyard.harness.WithMultiChip(1, new SymmetricChipletRocketConfig)
+-)
++// // Simulates 2X of the SymmetricChipletRocketConfig in a multi-sim config
++// class MultiSimSymmetricChipletRocketConfig extends Config(
++//   new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
++//   new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=1) ++
++//   new chipyard.harness.WithMultiChip(0, new SymmetricChipletRocketConfig) ++
++//   new chipyard.harness.WithMultiChip(1, new SymmetricChipletRocketConfig)
++// )
+ 
+-// Similar to the SymmetricChipletRocketConfig, but demonstrates a selectable c2c link
+-// with two variants of the SerialTL interface
+-class MultiLinkSymmetricChipletRocketConfig extends Config(
+-  new testchipip.soc.WithChipIdPin ++                               // Add pin to identify chips
+-  new chipyard.harness.WithSerialTLTiedOff(tieoffs=Some(Seq(1))) ++ // Tie-off the chip-to-chip link in single-chip sims
+-  new testchipip.serdes.WithSerialTL(Seq(
+-    testchipip.serdes.SerialTLParams(                               // 0th serial-tl is chip-to-bringup-fpga
+-      client = Some(testchipip.serdes.SerialTLClientParams()),      // bringup serial-tl acts only as a client
+-      phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()   // bringup serial-tl is sync'd to external clock
+-    ),
+-    testchipip.serdes.SerialTLParams(                               // 1st serial-tl is narrow chip-to-chip
+-      client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
+-      manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
+-        memParams = Seq(testchipip.serdes.ManagerRAMParams(
+-          address = 0,
+-          size = 1L << 32,
+-        )),
+-        slaveWhere = OBUS
+-      )),
+-      phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams(phitWidth=1) // narrow link
+-    ),
+-    testchipip.serdes.SerialTLParams(                               // 2nd serial-tl is wide chip-to-chip
+-      client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
+-      manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
+-        memParams = Seq(testchipip.serdes.ManagerRAMParams(
+-          address = 0,
+-          size = 1L << 32,
+-        )),
+-        slaveWhere = OBUS
+-      )),
+-      phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams(phitWidth=16) // wide link
+-    ))
+-  ) ++
+-  new testchipip.soc.WithOffchipBusClient(SBUS,                     // obus provides path to other chip's memory
+-    blockRange = Seq(AddressSet(0, (1L << 32) - 1)),                // The lower 4GB is mapped to this chip
+-    replicationBase = Some(1L << 32)                                // The upper 4GB goes off-chip
+-  ) ++
+-  new testchipip.soc.WithOffchipBus ++
+-  new freechips.rocketchip.rocket.WithNBigCores(1) ++
+-  new chipyard.config.AbstractConfig)
++// // Similar to the SymmetricChipletRocketConfig, but demonstrates a selectable c2c link
++// // with two variants of the SerialTL interface
++// class MultiLinkSymmetricChipletRocketConfig extends Config(
++//   new testchipip.soc.WithChipIdPin ++                               // Add pin to identify chips
++//   new chipyard.harness.WithSerialTLTiedOff(tieoffs=Some(Seq(1))) ++ // Tie-off the chip-to-chip link in single-chip sims
++//   new testchipip.serdes.WithSerialTL(Seq(
++//     testchipip.serdes.SerialTLParams(                               // 0th serial-tl is chip-to-bringup-fpga
++//       client = Some(testchipip.serdes.SerialTLClientParams()),      // bringup serial-tl acts only as a client
++//       phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()   // bringup serial-tl is sync'd to external clock
++//     ),
++//     testchipip.serdes.SerialTLParams(                               // 1st serial-tl is narrow chip-to-chip
++//       client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
++//       manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
++//         memParams = Seq(testchipip.serdes.ManagerRAMParams(
++//           address = 0,
++//           size = 1L << 32,
++//         )),
++//         slaveWhere = OBUS
++//       )),
++//       phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams(phitWidth=1) // narrow link
++//     ),
++//     testchipip.serdes.SerialTLParams(                               // 2nd serial-tl is wide chip-to-chip
++//       client = Some(testchipip.serdes.SerialTLClientParams()),      // chip-to-chip serial-tl acts as a client
++//       manager = Some(testchipip.serdes.SerialTLManagerParams(       // chip-to-chip serial-tl managers other chip's memory
++//         memParams = Seq(testchipip.serdes.ManagerRAMParams(
++//           address = 0,
++//           size = 1L << 32,
++//         )),
++//         slaveWhere = OBUS
++//       )),
++//       phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams(phitWidth=16) // wide link
++//     ))
++//   ) ++
++//   new testchipip.soc.WithOffchipBusClient(SBUS,                     // obus provides path to other chip's memory
++//     blockRange = Seq(AddressSet(0, (1L << 32) - 1)),                // The lower 4GB is mapped to this chip
++//     replicationBase = Some(1L << 32)                                // The upper 4GB goes off-chip
++//   ) ++
++//   new testchipip.soc.WithOffchipBus ++
++//   new freechips.rocketchip.rocket.WithNBigCores(1) ++
++//   new chipyard.config.AbstractConfig)
+ 
+-// Simulates 2X of the SymmetricChipletRocketConfig in a multi-sim config
+-class MultiSimMultiLinkSymmetricChipletRocketConfig extends Config(
+-  new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
+-  new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=1) ++
+-  new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=2, chip1portId=2) ++
+-  new chipyard.harness.WithMultiChip(0, new MultiLinkSymmetricChipletRocketConfig) ++
+-  new chipyard.harness.WithMultiChip(1, new MultiLinkSymmetricChipletRocketConfig)
+-)
++// // Simulates 2X of the SymmetricChipletRocketConfig in a multi-sim config
++// class MultiSimMultiLinkSymmetricChipletRocketConfig extends Config(
++//   new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
++//   new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=1) ++
++//   new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=2, chip1portId=2) ++
++//   new chipyard.harness.WithMultiChip(0, new MultiLinkSymmetricChipletRocketConfig) ++
++//   new chipyard.harness.WithMultiChip(1, new MultiLinkSymmetricChipletRocketConfig)
++// )
+ 
+-// Core-only chiplet config, where the coherent memory is located on the LLC-chiplet
+-class RocketCoreChipletConfig extends Config(
+-  new testchipip.serdes.WithSerialTL(Seq(
+-    testchipip.serdes.SerialTLParams(
+-      client = Some(testchipip.serdes.SerialTLClientParams()),
+-      phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()     // chip-to-chip serial-tl is symmetric source-sync'd
+-    ),
+-    testchipip.serdes.SerialTLParams(
+-      manager = Some(testchipip.serdes.SerialTLManagerParams(
+-        cohParams = Seq(testchipip.serdes.ManagerCOHParams(
+-          address = BigInt("80000000", 16),
+-          size    = BigInt("100000000", 16)
+-        )),
+-        slaveWhere = OBUS,
+-        isMemoryDevice = true
+-      )),
+-      phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams()
+-    )
+-  )) ++
+-  new testchipip.soc.WithOffchipBusClient(SBUS) ++
+-  new testchipip.soc.WithOffchipBus ++
+-  new testchipip.soc.WithNoScratchpads ++
+-  new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++
+-  new freechips.rocketchip.subsystem.WithNoMemPort ++
+-  new freechips.rocketchip.subsystem.WithNMemoryChannels(0) ++
+-  new freechips.rocketchip.rocket.WithNHugeCores(1) ++
+-  new chipyard.config.AbstractConfig)
++// // Core-only chiplet config, where the coherent memory is located on the LLC-chiplet
++// class RocketCoreChipletConfig extends Config(
++//   new testchipip.serdes.WithSerialTL(Seq(
++//     testchipip.serdes.SerialTLParams(
++//       client = Some(testchipip.serdes.SerialTLClientParams()),
++//       phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams()     // chip-to-chip serial-tl is symmetric source-sync'd
++//     ),
++//     testchipip.serdes.SerialTLParams(
++//       manager = Some(testchipip.serdes.SerialTLManagerParams(
++//         cohParams = Seq(testchipip.serdes.ManagerCOHParams(
++//           address = BigInt("80000000", 16),
++//           size    = BigInt("100000000", 16)
++//         )),
++//         slaveWhere = OBUS,
++//         isMemoryDevice = true
++//       )),
++//       phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams()
++//     )
++//   )) ++
++//   new testchipip.soc.WithOffchipBusClient(SBUS) ++
++//   new testchipip.soc.WithOffchipBus ++
++//   new testchipip.soc.WithNoScratchpads ++
++//   new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++
++//   new freechips.rocketchip.subsystem.WithNoMemPort ++
++//   new freechips.rocketchip.subsystem.WithNMemoryChannels(0) ++
++//   new freechips.rocketchip.rocket.WithNHugeCores(1) ++
++//   new chipyard.config.AbstractConfig)
+ 
+-// LLC-only chiplet
+-class LLCChipletConfig extends Config(
+-  new chipyard.harness.WithSerialTLTiedOff ++
+-  new testchipip.serdes.WithSerialTL(Seq(testchipip.serdes.SerialTLParams(                               // 1st serial-tl is chip-to-chip
+-    client = Some(testchipip.serdes.SerialTLClientParams(supportsProbe=true)),
+-    phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams()  // chip-to-chip serial-tl is symmetric source-sync'd
+-  ))) ++
+-  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 4L) ++
+-  new chipyard.NoCoresConfig
+-)
++// // LLC-only chiplet
++// class LLCChipletConfig extends Config(
++//   new chipyard.harness.WithSerialTLTiedOff ++
++//   new testchipip.serdes.WithSerialTL(Seq(testchipip.serdes.SerialTLParams(                               // 1st serial-tl is chip-to-chip
++//     client = Some(testchipip.serdes.SerialTLClientParams(supportsProbe=true)),
++//     phyParams = testchipip.serdes.CreditedSourceSyncSerialPhyParams()  // chip-to-chip serial-tl is symmetric source-sync'd
++//   ))) ++
++//   new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 4L) ++
++//   new chipyard.NoCoresConfig
++// )
+ 
+-class MultiSimLLCChipletRocketConfig extends Config(
+-  new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
+-  new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=0) ++
+-  new chipyard.harness.WithMultiChip(0, new RocketCoreChipletConfig) ++
+-  new chipyard.harness.WithMultiChip(1, new LLCChipletConfig)
+-)
++// class MultiSimLLCChipletRocketConfig extends Config(
++//   new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
++//   new chipyard.harness.WithMultiChipSerialTL(chip0=0, chip1=1, chip0portId=1, chip1portId=0) ++
++//   new chipyard.harness.WithMultiChip(0, new RocketCoreChipletConfig) ++
++//   new chipyard.harness.WithMultiChip(1, new LLCChipletConfig)
++// )
+ 
+-// --------------------------------------------
+-// ------------ IO Chiplet Example ------------
+-// --------------------------------------------
++// // --------------------------------------------
++// // ------------ IO Chiplet Example ------------
++// // --------------------------------------------
+ 
+-class ComputeChiplet1Config extends Config(
+-  new chipyard.harness.WithCTCLoopback ++
+-  new testchipip.soc.WithChipIdPinWidth(2) ++
+-  new testchipip.soc.WithChipIdPin ++
+-  new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
+-    translationParams = InwardAddressTranslatorParams(chipID=1, offset=0x100000000L), 
+-    offchip=Seq.tabulate(3)(i => AddressSet(0x100000000L << i, 0x100000000L - 1)), 
+-    phyParams = None))) ++ 
+-  new chipyard.RocketConfig
+-)
++// class ComputeChiplet1Config extends Config(
++//   new chipyard.harness.WithCTCLoopback ++
++//   new testchipip.soc.WithChipIdPinWidth(2) ++
++//   new testchipip.soc.WithChipIdPin ++
++//   new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
++//     translationParams = InwardAddressTranslatorParams(chipID=1, offset=0x100000000L), 
++//     offchip=Seq.tabulate(3)(i => AddressSet(0x100000000L << i, 0x100000000L - 1)), 
++//     phyParams = None))) ++ 
++//   new chipyard.RocketConfig
++// )
+ 
+-class ComputeChiplet2Config extends Config(
+-  new chipyard.harness.WithCTCLoopback ++
+-  new testchipip.soc.WithChipIdPinWidth(2) ++
+-  new testchipip.soc.WithChipIdPin ++
+-  new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
+-    translationParams = InwardAddressTranslatorParams(chipID=2, offset=0x100000000L), 
+-    offchip=Seq.tabulate(3)(i => AddressSet(0x100000000L << i, 0x100000000L - 1)), 
+-    phyParams = None))) ++ 
+-  new chipyard.RocketConfig
+-)
++// class ComputeChiplet2Config extends Config(
++//   new chipyard.harness.WithCTCLoopback ++
++//   new testchipip.soc.WithChipIdPinWidth(2) ++
++//   new testchipip.soc.WithChipIdPin ++
++//   new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
++//     translationParams = InwardAddressTranslatorParams(chipID=2, offset=0x100000000L), 
++//     offchip=Seq.tabulate(3)(i => AddressSet(0x100000000L << i, 0x100000000L - 1)), 
++//     phyParams = None))) ++ 
++//   new chipyard.RocketConfig
++// )
+ 
+-class IOChipletConfig extends Config(
+-  new chipyard.harness.WithCTCTiedOff ++
+-  new testchipip.soc.WithChipIdPinWidth(2) ++
+-  new testchipip.soc.WithChipIdPin ++
+-  new testchipip.ctc.WithCTC(Seq(
+-    new testchipip.ctc.CTCParams(
+-      translationParams = InwardAddressTranslatorParams(chipID=0, offset=0x100000000L), 
+-      offchip=Seq(AddressSet(0x200000000L, 0x100000000L - 1)), 
+-      phyParams = None), 
+-    new testchipip.ctc.CTCParams(
+-      translationParams = InwardAddressTranslatorParams(chipID=0, offset=0x100000000L), 
+-      offchip=Seq(AddressSet(0x400000000L, 0x100000000L - 1)), 
+-      phyParams = None)
+-    )) ++ 
+-  new chipyard.RocketConfig
+-)
++// class IOChipletConfig extends Config(
++//   new chipyard.harness.WithCTCTiedOff ++
++//   new testchipip.soc.WithChipIdPinWidth(2) ++
++//   new testchipip.soc.WithChipIdPin ++
++//   new testchipip.ctc.WithCTC(Seq(
++//     new testchipip.ctc.CTCParams(
++//       translationParams = InwardAddressTranslatorParams(chipID=0, offset=0x100000000L), 
++//       offchip=Seq(AddressSet(0x200000000L, 0x100000000L - 1)), 
++//       phyParams = None), 
++//     new testchipip.ctc.CTCParams(
++//       translationParams = InwardAddressTranslatorParams(chipID=0, offset=0x100000000L), 
++//       offchip=Seq(AddressSet(0x400000000L, 0x100000000L - 1)), 
++//       phyParams = None)
++//     )) ++ 
++//   new chipyard.RocketConfig
++// )
+ 
+-class TripleChipletConfig extends Config(
+-  new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
+-  new chipyard.harness.WithANDSuccessFn ++
+-  new chipyard.harness.WithMultiChipCTC(chip0=1, chip1=0, chip0portId=0, chip1portId=0) ++ // C1 to IO port 0
+-  new chipyard.harness.WithMultiChipCTC(chip0=2, chip1=0, chip0portId=0, chip1portId=1) ++ // C2 to IO port 1
+-  new chipyard.harness.WithMultiChip(0, new IOChipletConfig) ++
+-  new chipyard.harness.WithMultiChip(1, new ComputeChiplet1Config) ++
+-  new chipyard.harness.WithMultiChip(2, new ComputeChiplet2Config) 
+-)
++// class TripleChipletConfig extends Config(
++//   new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++
++//   new chipyard.harness.WithANDSuccessFn ++
++//   new chipyard.harness.WithMultiChipCTC(chip0=1, chip1=0, chip0portId=0, chip1portId=0) ++ // C1 to IO port 0
++//   new chipyard.harness.WithMultiChipCTC(chip0=2, chip1=0, chip0portId=0, chip1portId=1) ++ // C2 to IO port 1
++//   new chipyard.harness.WithMultiChip(0, new IOChipletConfig) ++
++//   new chipyard.harness.WithMultiChip(1, new ComputeChiplet1Config) ++
++//   new chipyard.harness.WithMultiChip(2, new ComputeChiplet2Config) 
++// )
+ 
+diff --git a/generators/chipyard/src/main/scala/config/IrisConfigs.scala b/generators/chipyard/src/main/scala/config/IrisConfigs.scala
+index 7b0ad9ba..e88eb49b 100644
+--- a/generators/chipyard/src/main/scala/config/IrisConfigs.scala
++++ b/generators/chipyard/src/main/scala/config/IrisConfigs.scala
+@@ -107,7 +107,8 @@ class WithIrisTacitTrace
+       // register (soft-reset the DMA before changing it):
+       //   0 (reset): FBUS -> SBUS, reaches the SBUS scratchpad, or DRAM through the L2
+       //   1:         MBUS -> DRAM below the L2 (bypasses it)
+-      new tacit.WithTraceSinkDMA(1, buses = Some(Seq(FBUS, MBUS))) ++        new tacit.WithTraceSinkAlways(0) ++
++      new tacit.WithTraceSinkDMA(1, buses = Some(Seq(FBUS, MBUS))) ++
++        new tacit.WithTraceSinkAlways(0) ++
+         // new chipyard.WithTacitTraceArbiterMonitor ++
+         new chipyard.WithTacitParallelEncoder
+     )
+@@ -248,7 +249,7 @@ class IrisConfig extends Config(
+             constellation.protocol.DiplomaticNetworkNodeMapping(
+               inNodeMapping = ListMap(
+                 "Core 0 ICache" -> 0, // Shuttle tile 0 (top)
+-                "debug[0]" -> 4, // Front BUS
++                "serial_tl_0_0" -> 4, // Front BUS
+                 "Core 1 ICache" -> 3, // Shuttle tile 1 (bottom)
+                 "Core 2 DCache" -> 5, // RocketTile
+                 "ucie-client" -> 6              ),
+diff --git a/generators/chipyard/src/main/scala/iobinders/IOBinders.scala b/generators/chipyard/src/main/scala/iobinders/IOBinders.scala
+index 62ce55d6..81f12282 100644
+--- a/generators/chipyard/src/main/scala/iobinders/IOBinders.scala
++++ b/generators/chipyard/src/main/scala/iobinders/IOBinders.scala
+@@ -480,84 +480,84 @@ class WithTraceGenSuccessPunchthrough extends OverrideIOBinder({
+   }
+ })
+ 
+-class WithTraceIOPunchthrough extends OverrideLazyIOBinder({
+-  (system: CanHaveTraceIO) => InModuleBody {
+-    val ports: Option[TracePort] = system.traceIO.map { t =>
+-      val trace = IO(DataMirror.internal.chiselTypeClone[TraceOutputTop](t)).suggestName("trace")
+-      trace <> t
+-      val p = GetSystemParameters(system)
+-      val chipyardSystem = system.asInstanceOf[ChipyardSystem]
+-      val tiles = chipyardSystem.totalTiles.values
+-      val viewpointBus = system.asInstanceOf[HasConfigurableTLNetworkTopology].viewpointBus
+-      val ignoreAddresses = Seq(
+-        BigInt(0x10000) // bootrom is handled specially
+-      )
+-      // The debug module goes in neither list: access is denied outside debug mode,
+-      // so spike having no device there is what makes both models fault.
+-      val debugAddresses = p(DebugModuleKey).toSeq.map(_.address.base)
+-      val skipAddresses = ignoreAddresses ++ debugAddresses
+-      val memRegionTypes = Seq(RegionType.CACHED, RegionType.TRACKED,
+-                               RegionType.UNCACHED, RegionType.IDEMPOTENT)
+-      val mems = viewpointBus.unifyManagers.filter { m =>
+-        memRegionTypes.contains(m.regionType) && !skipAddresses.contains(m.address.map(_.base).min)
+-      }.map { m =>
+-        val base = m.address.map(_.base).min
+-        val size = m.address.map(_.max).max - base + 1
+-        (base, size)
+-      }
+-      // A device is anything in the map that is not memory. The complement, not a
+-      // list of region types: enumerating types silently omits any rocket adds or
+-      // renames, which is how RegionType.VOLATILE (rocket's TLError) was missed.
+-      val devices = viewpointBus.unifyManagers.filter { m =>
+-        !memRegionTypes.contains(m.regionType) && !skipAddresses.contains(m.address.map(_.base).min)
+-      }.map { m =>
+-        val base = m.address.map(_.base).min
+-        val size = m.address.map(_.max).max - base + 1
+-        (base, size)
+-      }
+-      // Asserted, not assumed: a later change to the address map, the region types
+-      // or the filter above fails elaboration instead of hiding a bug class.
+-      require(!devices.exists { case (base, size) =>
+-                debugAddresses.exists(d => d >= base && d < base + size) },
+-              s"cospike: the debug module must not be registered as a device " +
+-              s"(devices=$devices, debug=$debugAddresses)")
+-      val useSimDTM = p(ExportDebug).protocols.contains(DMI) // assume that exposing clockeddmi means we will connect SimDTM
+-      val cfg = SpikeCosimConfig(
+-        isa = tiles.headOption.map(_.isaDTS).getOrElse(""),
+-        priv = tiles.headOption.map(t => if (t.usingUser) "MSU" else if (t.usingSupervisor) "MS" else "M").getOrElse(""),
+-        maxpglevels = tiles.headOption.map(_.tileParams.core.pgLevels).getOrElse(0),
+-        pmpregions = tiles.headOption.map(_.tileParams.core.nPMPs).getOrElse(0),
+-        nharts = tiles.size,
+-        bootrom = chipyardSystem.bootROM.headOption.map(_.module.contents.toArray.mkString(" ")).getOrElse(""),
+-        has_dtm = useSimDTM,
+-        mems = mems,
+-        devices = devices,
+-        customCSRs = tiles.headOption.toSeq.flatMap { t =>
+-          // t.p, not p: CustomCSRs builds a CoreBundle, which needs p(TileKey).
+-          t.tileParams.core.customCSRs(t.p).decls.map(c =>
+-            (c.id, c.mask, c.init.getOrElse(BigInt(0))))
+-        },
+-        paddrBits = viewpointBus.busView.bundle.addressBits,
+-        // Mirrors HasTileParameters.{vaddrBits,vpnBitsExtended}, which tiles do
+-        // not mix in (BaseTile only gets HasNonDiplomaticTileParameters).
+-        vaddrBitsExtended = tiles.headOption.map { t =>
+-          val pa = viewpointBus.busView.bundle.addressBits
+-          val va = if (t.usingVM) t.maxHVAddrBits else ((pa + 1) min t.xLen)
+-          va + (if (va < t.xLen) 1 + (if (t.usingHypervisor) 1 else 0) else 0)
+-        }.getOrElse(0),
+-        // The CSR count, not nPMPs: rocket fixes it at CSR.maxPMPs if any PMP exists.
+-        npmpcsrs = tiles.headOption.map(t =>
+-          if (t.tileParams.core.nPMPs > 0) freechips.rocketchip.rocket.CSR.maxPMPs
+-          else 0).getOrElse(0),
+-        // Connect using the legacy API for firesim only
+-        mem0_base = p(ExtMem).map(_.master.base).getOrElse(BigInt(0)),
+-        mem0_size = p(ExtMem).map(_.master.size).getOrElse(BigInt(0)),
+-      )
+-      TracePort(() => trace, cfg)
+-    }
+-    (ports.toSeq, Nil)
+-  }
+-})
++// class WithTraceIOPunchthrough extends OverrideLazyIOBinder({
++//   (system: CanHaveTraceIO) => InModuleBody {
++//     val ports: Option[TracePort] = system.traceIO.map { t =>
++//       val trace = IO(DataMirror.internal.chiselTypeClone[TraceOutputTop](t)).suggestName("trace")
++//       trace <> t
++//       val p = GetSystemParameters(system)
++//       val chipyardSystem = system.asInstanceOf[ChipyardSystem]
++//       val tiles = chipyardSystem.totalTiles.values
++//       val viewpointBus = system.asInstanceOf[HasConfigurableTLNetworkTopology].viewpointBus
++//       val ignoreAddresses = Seq(
++//         BigInt(0x10000) // bootrom is handled specially
++//       )
++//       // The debug module goes in neither list: access is denied outside debug mode,
++//       // so spike having no device there is what makes both models fault.
++//       val debugAddresses = p(DebugModuleKey).toSeq.map(_.address.base)
++//       val skipAddresses = ignoreAddresses ++ debugAddresses
++//       val memRegionTypes = Seq(RegionType.CACHED, RegionType.TRACKED,
++//                                RegionType.UNCACHED, RegionType.IDEMPOTENT)
++//       val mems = viewpointBus.unifyManagers.filter { m =>
++//         memRegionTypes.contains(m.regionType) && !skipAddresses.contains(m.address.map(_.base).min)
++//       }.map { m =>
++//         val base = m.address.map(_.base).min
++//         val size = m.address.map(_.max).max - base + 1
++//         (base, size)
++//       }
++//       // A device is anything in the map that is not memory. The complement, not a
++//       // list of region types: enumerating types silently omits any rocket adds or
++//       // renames, which is how RegionType.VOLATILE (rocket's TLError) was missed.
++//       val devices = viewpointBus.unifyManagers.filter { m =>
++//         !memRegionTypes.contains(m.regionType) && !skipAddresses.contains(m.address.map(_.base).min)
++//       }.map { m =>
++//         val base = m.address.map(_.base).min
++//         val size = m.address.map(_.max).max - base + 1
++//         (base, size)
++//       }
++//       // Asserted, not assumed: a later change to the address map, the region types
++//       // or the filter above fails elaboration instead of hiding a bug class.
++//       require(!devices.exists { case (base, size) =>
++//                 debugAddresses.exists(d => d >= base && d < base + size) },
++//               s"cospike: the debug module must not be registered as a device " +
++//               s"(devices=$devices, debug=$debugAddresses)")
++//       val useSimDTM = p(ExportDebug).protocols.contains(DMI) // assume that exposing clockeddmi means we will connect SimDTM
++//       val cfg = SpikeCosimConfig(
++//         isa = tiles.headOption.map(_.isaDTS).getOrElse(""),
++//         priv = tiles.headOption.map(t => if (t.usingUser) "MSU" else if (t.usingSupervisor) "MS" else "M").getOrElse(""),
++//         maxpglevels = tiles.headOption.map(_.tileParams.core.pgLevels).getOrElse(0),
++//         pmpregions = tiles.headOption.map(_.tileParams.core.nPMPs).getOrElse(0),
++//         nharts = tiles.size,
++//         bootrom = chipyardSystem.bootROM.headOption.map(_.module.contents.toArray.mkString(" ")).getOrElse(""),
++//         has_dtm = useSimDTM,
++//         mems = mems,
++//         devices = devices,
++//         customCSRs = tiles.headOption.toSeq.flatMap { t =>
++//           // t.p, not p: CustomCSRs builds a CoreBundle, which needs p(TileKey).
++//           t.tileParams.core.customCSRs(t.p).decls.map(c =>
++//             (c.id, c.mask, c.init.getOrElse(BigInt(0))))
++//         },
++//         paddrBits = viewpointBus.busView.bundle.addressBits,
++//         // Mirrors HasTileParameters.{vaddrBits,vpnBitsExtended}, which tiles do
++//         // not mix in (BaseTile only gets HasNonDiplomaticTileParameters).
++//         vaddrBitsExtended = tiles.headOption.map { t =>
++//           val pa = viewpointBus.busView.bundle.addressBits
++//           val va = if (t.usingVM) t.maxHVAddrBits else ((pa + 1) min t.xLen)
++//           va + (if (va < t.xLen) 1 + (if (t.usingHypervisor) 1 else 0) else 0)
++//         }.getOrElse(0),
++//         // The CSR count, not nPMPs: rocket fixes it at CSR.maxPMPs if any PMP exists.
++//         npmpcsrs = tiles.headOption.map(t =>
++//           if (t.tileParams.core.nPMPs > 0) freechips.rocketchip.rocket.CSR.maxPMPs
++//           else 0).getOrElse(0),
++//         // Connect using the legacy API for firesim only
++//         mem0_base = p(ExtMem).map(_.master.base).getOrElse(BigInt(0)),
++//         mem0_size = p(ExtMem).map(_.master.size).getOrElse(BigInt(0)),
++//       )
++//       TracePort(() => trace, cfg)
++//     }
++//     (ports.toSeq, Nil)
++//   }
++// })
+ 
+ class WithCustomBootPin extends OverrideIOBinder({
+   (system: CanHavePeripheryCustomBootPin) => system.custom_boot_pin.map({ p =>
+diff --git a/generators/firechip/chip/src/main/scala/BridgeBinders.scala b/generators/firechip/chip/src/main/scala/BridgeBinders.scala
+index 5ef4c56a..0144abd3 100644
+--- a/generators/firechip/chip/src/main/scala/BridgeBinders.scala
++++ b/generators/firechip/chip/src/main/scala/BridgeBinders.scala
+@@ -68,8 +68,10 @@ class WithTSIBridgeAndHarnessRAMOverSerialTL extends HarnessBinder({
+         // This assumes that:
+         // If ExtMem for the target is defined, then FASED bridge will be attached
+         // If FASED bridge is attached, loadmem widget is present
+-        val hasMainMemory = th.chipParameters(chipId)(ExtMem).isDefined
+-        val mainMemoryName = Option.when(hasMainMemory)(MainMemoryConsts.globalName(chipId))
++        // Iterate through all chiptops in the system to find the lowest numbered one with external memory
++        val mainMemoryChipIndex = th.chipParameters.map(c => c(ExtMem).isDefined).indexWhere(identity)
++        val hasMainMemory = mainMemoryChipIndex != -1
++        val mainMemoryName = Option.when(hasMainMemory)(MainMemoryConsts.globalName(mainMemoryChipIndex))
+         TSIBridge(th.harnessBinderClock, ram.io.tsi.get, mainMemoryName, th.harnessBinderReset.asBool)(th.p)
+       }
+     }
+diff --git a/generators/firechip/chip/src/main/scala/FireSim.scala b/generators/firechip/chip/src/main/scala/FireSim.scala
+index 77ccfac2..355ce658 100644
+--- a/generators/firechip/chip/src/main/scala/FireSim.scala
++++ b/generators/firechip/chip/src/main/scala/FireSim.scala
+@@ -11,6 +11,7 @@ import freechips.rocketchip.prci._
+ import freechips.rocketchip.subsystem._
+ import org.chipsalliance.cde.config.{Field, Parameters}
+ import freechips.rocketchip.tile.{RocketTile}
++import shuttle.common.{ShuttleTile}
+ import boom.v3.common.{BoomTile}
+ import freechips.rocketchip.util.property
+ 
+diff --git a/generators/firechip/chip/src/main/scala/TargetConfigs.scala b/generators/firechip/chip/src/main/scala/TargetConfigs.scala
+index 8e6b55a1..45e5b02f 100644
+--- a/generators/firechip/chip/src/main/scala/TargetConfigs.scala
++++ b/generators/firechip/chip/src/main/scala/TargetConfigs.scala
+@@ -21,6 +21,8 @@ import icenet._
+ import chipyard.clocking.{ChipyardPRCIControlKey}
+ import chipyard.harness.{HarnessClockInstantiatorKey}
+ 
++import scala.collection.immutable.ListMap
++
+ // Disables clock-gating; doesn't play nice with our FAME-1 pass
+ class WithoutClockGating extends Config((site, here, up) => {
+   case DebugModuleKey => up(DebugModuleKey).map(_.copy(clockGate = false))
+@@ -378,19 +380,117 @@ class FireSimLargeBoomSV39CospikeConfig extends Config(
+   new freechips.rocketchip.rocket.WithSV39 ++
+   new chipyard.LargeBoomV3Config)
+ 
+-class CTCFireSimConfig extends Config(
+-  new WithCTCBridge ++
+-  new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
+-    translationParams = testchipip.soc.OutwardAddressTranslatorParams(
+-      // Outward CTC: accesses from this chip to offchipAddr+x are interpreted as going off chip via CTC/accesses are routed to CTC.
+-      // The translator strips that local off-chip base value before forwarding, so
+-      // the other chip receives onchipAddr+x in its normal Chipyard address map.
+-      onchipAddr = 0x0L,
+-      offchipAddr = 0x1000000000L,
+-      size = ((1L << 32) - 1)),
+-    phyParams = None))) ++
+-  new chipyard.iobinders.WithCTCPunchthrough ++ 
+-  new FireSimRocketConfig
++// class CTCFireSimConfig extends Config(
++//   new WithCTCBridge ++
++//   new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
++//     translationParams = testchipip.soc.OutwardAddressTranslatorParams(
++//       // Outward CTC: accesses from this chip to offchipAddr+x are interpreted as going off chip via CTC/accesses are routed to CTC.
++//       // The translator strips that local off-chip base value before forwarding, so
++//       // the other chip receives onchipAddr+x in its normal Chipyard address map.
++//       onchipAddr = 0x0L,
++//       offchipAddr = 0x1000000000L,
++//       size = ((1L << 32) - 1)),
++//     phyParams = None))) ++
++//   new chipyard.iobinders.WithCTCPunchthrough ++ 
++//   new FireSimRocketConfig
++// )
++
++class IrisFiresimConfig extends Config(
++  new firechip.chip.WithDefaultFireSimBridges ++
++  new WithFireSimHarnessClockBridgeInstantiator ++
++  // new chipyard.harness.WithHarnessBinderClockFreqMHz(1000.0) ++
++  new chipyard.harness.WithClockFromHarness ++
++  new chipyard.harness.WithResetFromHarness ++
++  new chipyard.config.WithNoClockTap ++
++  new chipyard.clocking.WithPassthroughClockGenerator ++
++  // Required: Existing FAME-1 transform cannot handle black-box clock gates
++  new WithoutClockGating ++
++  // Optional: Do not support debug module w. JTAG until FIRRTL stops emitting @(posedge ~clock)
++  new chipyard.config.WithNoDebug ++
++
++  new testchipip.serdes.WithSerialTL(Seq(
++    testchipip.serdes.SerialTLParams(
++      manager = None,
++      client = Some(testchipip.serdes.SerialTLClientParams()),                                        // Allow chip to access this device's memory (DRAM)
++      phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams(phitWidth=32, flitWidth=32)  // serial-tilelink interface with 32 lanes
++    ),
++    testchipip.serdes.SerialTLParams(
++      // port acts as a manager of offchip memory
++      manager = Some(testchipip.serdes.SerialTLManagerParams(
++        memParams = Seq(testchipip.serdes.ManagerRAMParams(
++          address = BigInt("80000000", 16),
++          size = BigInt("100000000", 16)
++        )),
++        isMemoryDevice = true,
++        slaveWhere = MBUS
++      )),
++      // Allow an external manager to probe this chip
++      client = Some(testchipip.serdes.SerialTLClientParams()),
++      // 16-bit bidir interface, synced to an external clock
++      phyParams = testchipip.serdes.DecoupledExternalSyncSerialPhyParams(phitWidth=16, flitWidth=16)  // serial-tilelink interface with 16 lanes
++    ))
++  ) ++
++  
++  new chipyard.config.WithUART(
++    baudrate=BigInt(3686400L),
++    txEntries=256, rxEntries=256) ++        // FireSim requires a larger UART FIFO buffer,
++  new chipyard.config.WithNoUART() ++       // so we overwrite the default one
++
++  new chipyard.IrisConfig
++)
++
++class IrisFiresimBringupConfig extends Config(
++  //=============================
++  // Set up TestHarness for standalone-sim
++  //=============================
++  new firechip.chip.WithDefaultFireSimBridges ++
++  new WithFireSimHarnessClockBridgeInstantiator ++
++  // new chipyard.harness.WithHarnessBinderClockFreqMHz(1000.0) ++
++  new chipyard.harness.WithClockFromHarness ++
++  new chipyard.harness.WithResetFromHarness ++
++  new chipyard.config.WithNoClockTap ++
++  new chipyard.clocking.WithPassthroughClockGenerator ++
++  new WithoutClockGating ++
++
++  //=============================
++  // Setup the SerialTL side on the bringup device
++  //=============================
++  new testchipip.serdes.WithSerialTL(Seq(testchipip.serdes.SerialTLParams(
++    manager = Some(testchipip.serdes.SerialTLManagerParams(
++      memParams = Seq(testchipip.serdes.ManagerRAMParams(                            // Bringup platform can access all memory from 0 to DRAM_BASE
++        address = BigInt("00000000", 16),
++        size    = BigInt("80000000", 16)
++      ))
++    )),
++    client = Some(testchipip.serdes.SerialTLClientParams()),                                        // Allow chip to access this device's memory (DRAM)
++    phyParams = testchipip.serdes.DecoupledInternalSyncSerialPhyParams(phitWidth=16, flitWidth=16, freqMHz = 100) // bringup platform provides the clock
++  ))) ++
++
++  //============================
++  // Setup bus topology on the bringup system
++  //============================
++  new testchipip.soc.WithOffchipBusClient(SBUS,                                // offchip bus hangs off the SBUS
++    blockRange = AddressSet.misaligned(0x80000000L, (BigInt(1) << 30) * 4)) ++ // offchip bus should not see the main memory of the testchip, since that can be accessed directly
++  new testchipip.soc.WithOffchipBus ++                                         // offchip bus
++
++  //=============================
++  // Set up memory on the bringup system
++  //=============================
++  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 4L) ++         // match what the chip believes the max size should be
++
++  //=============================
++  // Set up clocks of the bringup system
++  //=============================
++  new chipyard.config.WithUniformBusFrequencies(1000) ++   // run all buses of this system at 75 MHz
++
++  // Base is the no-cores config
++  new chipyard.NoCoresConfig
+ )
+ 
++class IrisFiresimNOCflushCombinedConfig extends Config(
++  new WithFireSimHarnessClockBridgeInstantiator ++
++  new chipyard.harness.WithMultiChipSerialTL(0, 1, 1, 0) ++                // connect the serial-tl ports of the chips together
++  new chipyard.harness.WithMultiChip(0, new IrisFiresimConfig) ++
++  new chipyard.harness.WithMultiChip(1, new IrisFiresimBringupConfig)
+ 
++)
+\ No newline at end of file
+diff --git a/generators/saturn b/generators/saturn
+--- a/generators/saturn
++++ b/generators/saturn
+@@ -1 +1 @@
+-Subproject commit 536774bd4c5e3bcd7813a4a0dc72fc87e5818532
++Subproject commit 536774bd4c5e3bcd7813a4a0dc72fc87e5818532-dirty
+diff --git a/generators/tacit b/generators/tacit
+--- a/generators/tacit
++++ b/generators/tacit
+@@ -1 +1 @@
+-Subproject commit 6a0ca0949f9b5ec4726e056a18322537dd32dfa3
++Subproject commit 6a0ca0949f9b5ec4726e056a18322537dd32dfa3-dirty
+diff --git a/sims/firesim b/sims/firesim
+index e1bdea8b..69b17767 160000
+--- a/sims/firesim
++++ b/sims/firesim
+@@ -1 +1 @@
+-Subproject commit e1bdea8bb042b900995436ecc3d7c44100eb9da0
++Subproject commit 69b17767e0b227e31ea341c50899e49f02d6f5ea-dirty
+diff --git a/software/baremetal-ide b/software/baremetal-ide
+index 0eb41e63..6e01715b 160000
+--- a/software/baremetal-ide
++++ b/software/baremetal-ide
+@@ -1 +1 @@
+-Subproject commit 0eb41e63fb48f7c8f8c217a6730340e2f9cc1541
++Subproject commit 6e01715bea3e4a4015138e9583e40caa08205408
+diff --git a/software/firemarshal b/software/firemarshal
+index 61fae80f..d0e1f48c 160000
+--- a/software/firemarshal
++++ b/software/firemarshal
+@@ -1 +1 @@
+-Subproject commit 61fae80f49b97366254720f3b07ee8f8da762799
++Subproject commit d0e1f48ce22e4c1751b6a1597eeafd25ca2b52f3

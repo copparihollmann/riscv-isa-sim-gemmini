@@ -1,0 +1,1 @@
+PASSED NATIVE_FP8 h0/h1 parallel arithmetic, h2 IEEE32 producer/consumer; 23 forms 2 formats 5 rm 5 LMUL masks/tails

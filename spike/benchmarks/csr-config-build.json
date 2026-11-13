@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "/scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/riscv64-unknown-elf-gcc",
+    "-O2",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-fno-tree-vectorize",
+    "-fno-tree-slp-vectorize",
+    "-mcmodel=medany",
+    "-mabi=lp64d",
+    "-march=rv64gcv_zicsr_zifencei",
+    "-nostdlib",
+    "-static",
+    "-Wl,--build-id=none,--gc-sections",
+    "-I/scratch/copparihollmann/iris-model/benchmarks",
+    "-T",
+    "/scratch/copparihollmann/iris-model/benchmarks/link.ld",
+    "/scratch/copparihollmann/iris-model/benchmarks/start.S",
+    "/scratch/copparihollmann/iris-model/benchmarks/runtime.c",
+    "/scratch/copparihollmann/iris-model/spike/csr_config_guest.c",
+    "-lgcc",
+    "-o",
+    "/scratch/copparihollmann/iris-model/spike/benchmarks/csr_config.elf"
+  ],
+  "compiler_sha256": "4eba3eb299b30d2981ff82d69ae5f90c4e21ddf79694eb5cf1913391e8791d7f",
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/spike/compile_csr.py": "8b14da87db1753247c5a5f43956215bc4b0f18bba3417846557b729ee1d9be09",
+    "/scratch/copparihollmann/iris-model/spike/csr_case_switch.h": "7593d8850cd529fe6f06f20fb2f0bfc21c10f3ffed307498e34042a3d66e7cba",
+    "/scratch/copparihollmann/iris-model/spike/csr_config_guest.c": "669a53bf4401b7fd5bc5a2d7435fd335cfdd5cd434a64cc10525f96afc971038",
+    "/scratch/copparihollmann/iris-model/benchmarks/runtime.h": "e3da5009740db4f21479441aff26ae1851ea10ffd58749e0066dbe0e1946572a",
+    "/scratch/copparihollmann/iris-model/benchmarks/runtime.c": "847d74868197fd6bc032c7a9710f7488b273ea8c0ae86bad0b71174f4a1a6111",
+    "/scratch/copparihollmann/iris-model/benchmarks/start.S": "117cd22b48d6456ef22030d74a8de241319255d83771fb3aa2482538559ba4ec",
+    "/scratch/copparihollmann/iris-model/benchmarks/link.ld": "b0bee5ac384edfd3f28c309313afdafb01e53d3e0e0e688b8afd957229334626",
+    "/scratch/copparihollmann/iris-model/benchmarks/uart_drain.h": "82e66ede042a7cceea516e6c34fcbded313b6c1185d7a7236cde5c53c26aff5a",
+    "/scratch/copparihollmann/iris-model/benchmarks/uart_drain.S": "679992fb5482f407f4411735e5a7b630aa14791e55deedcbe563338e11c3073d"
+  },
+  "elf_sha256": "fa25fb998e438eaf84f10cf016b7bed9ebac04d85dbd5d6fbb0358af6eebe360"
+}

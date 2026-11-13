@@ -1,0 +1,300 @@
+{
+  "schema": "iris.empirical_inherited_runtime_evaluation.v1",
+  "pass": true,
+  "actual_own_native_replay_completed": true,
+  "regions": 1008,
+  "actual_CSR_ELF_boundary_joins": 2016,
+  "all_numeric_goldens_passed": true,
+  "normal_guest_exit_verified": false,
+  "timed_scope": "all measured regions via intentional post-ROI debugger stop",
+  "native_binary_sha256": "7bd58b4f702c1bd964151deb83eba5a8b353f61bfc25ecb05d7456353f7e611a",
+  "uart_library_sha256": "9c6d1bcc31cb9216d1190ce80c375bb9943f22898d810260aa0c4b9f52ba02a9",
+  "fixture_sha256": "7a4c0c08ddb746829098fd610f14f8d84ce05ee138644859f67943e972b8eb7f",
+  "parameter_refit_for_this_native_performed": false,
+  "coefficient_selection_for_this_native_performed": false,
+  "parameters_changed": false,
+  "global_heldout_timings_consumed": false,
+  "inherited_parameters": {
+    "parameters": "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-selected-v2/parameters.json",
+    "parameters_sha256": "70faceedd109011f05435823ca3ac1032b5264d783dba83729f62b0145ad2d00",
+    "binding": "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-binding-v6/runtime-binding.json",
+    "binding_sha256": "2489529cc6ef2163765e2d21dbb15672770d7729a503eb2e2dc4787a98821288",
+    "origin_native_sha256": "9b2a9053b2c62e4ca3deaa5c860d5d3f275d788488a20cc708cfb1c17db0317e",
+    "origin_fit_report_sha256": "bec98dd1d4fb7cf5374933f28dc969529a0c52770eef65fcc48b6f42e578efe8",
+    "origin_actual_parameter_fit_performed": true,
+    "qualified_by_transfer": false
+  },
+  "reference": {
+    "analysis": "/scratch/copparihollmann/iris-model/build/fpga-compute-fit-v1-001-analysis/report.json",
+    "analysis_sha256": "900f26f11171828f5a28dcdd08e3b45f255839e25c1bba00c255743c502c20a5",
+    "capture_archive_sha256": "326faca74b31737342acc176157e4afa2c062b28c43904b7e42cf8a1a4dd77c7",
+    "elf_sha256": "694295b288d92e906b629ab553c1c7722a5720abe2bc0959be68fa5d72b00526",
+    "run_manifest": "/scratch/copparihollmann/iris-model/runs/fpga-compute-fit-v1-001/run.json",
+    "run_manifest_sha256": "7cdf2ccb81cbe81af9cc29df38958910f3d6a08fccbb25856ce9c559f2af50f1"
+  },
+  "validation_metrics": {
+    "train": {
+      "regions": 816,
+      "absolute_median_pct": 8.27523718153715,
+      "absolute_p90_pct": 35.82555329565132,
+      "absolute_max_pct": 84.04255319148936,
+      "signed_median_pct": -4.329277748207257,
+      "signed_mean_pct": -4.306008594566822,
+      "within_2pct_count": 159,
+      "within_2pct_fraction": 0.1948529411764706,
+      "instret_mismatches": 45
+    },
+    "internal_validation": {
+      "regions": 192,
+      "absolute_median_pct": 8.540925266903914,
+      "absolute_p90_pct": 29.15800598907874,
+      "absolute_max_pct": 52.3602033405955,
+      "signed_median_pct": -4.392458686351816,
+      "signed_mean_pct": -5.668500283808262,
+      "within_2pct_count": 28,
+      "within_2pct_fraction": 0.14583333333333334,
+      "instret_mismatches": 0
+    }
+  },
+  "overall": {
+    "regions": 1008,
+    "absolute_median_pct": 8.366919640597654,
+    "absolute_p90_pct": 34.712812960235645,
+    "absolute_max_pct": 84.04255319148936,
+    "signed_median_pct": -4.363130216656374,
+    "signed_mean_pct": -4.565530821089001,
+    "within_2pct_count": 187,
+    "within_2pct_fraction": 0.18551587301587302,
+    "instret_mismatches": 45
+  },
+  "family_metrics": {
+    "atomic": {
+      "regions": 108,
+      "absolute_median_pct": 20.570134071152903,
+      "absolute_p90_pct": 52.37266635588409,
+      "absolute_max_pct": 63.37907375643225,
+      "signed_median_pct": 15.756374679054087,
+      "signed_mean_pct": 19.939779993270353,
+      "within_2pct_count": 6,
+      "within_2pct_fraction": 0.05555555555555555,
+      "instret_mismatches": 0
+    },
+    "branch": {
+      "regions": 36,
+      "absolute_median_pct": 1.122327957985126,
+      "absolute_p90_pct": 3.6101718697124685,
+      "absolute_max_pct": 10.636833046471601,
+      "signed_median_pct": -0.7962069624080464,
+      "signed_mean_pct": -1.3436414884264705,
+      "within_2pct_count": 23,
+      "within_2pct_fraction": 0.6388888888888888,
+      "instret_mismatches": 0
+    },
+    "dependent": {
+      "regions": 63,
+      "absolute_median_pct": 3.8181818181818183,
+      "absolute_p90_pct": 6.45446507515473,
+      "absolute_max_pct": 11.370262390670554,
+      "signed_median_pct": -3.8181818181818183,
+      "signed_mean_pct": -3.118516733832112,
+      "within_2pct_count": 25,
+      "within_2pct_fraction": 0.3968253968253968,
+      "instret_mismatches": 0
+    },
+    "frontend": {
+      "regions": 54,
+      "absolute_median_pct": 1.7686058578741901,
+      "absolute_p90_pct": 50.09740875048903,
+      "absolute_max_pct": 51.84075952977609,
+      "signed_median_pct": -1.7686058578741901,
+      "signed_mean_pct": -13.072780510669375,
+      "within_2pct_count": 29,
+      "within_2pct_fraction": 0.5370370370370371,
+      "instret_mismatches": 0
+    },
+    "independent": {
+      "regions": 63,
+      "absolute_median_pct": 3.8489469862018884,
+      "absolute_p90_pct": 8.248587570621469,
+      "absolute_max_pct": 10.276243093922652,
+      "signed_median_pct": -3.8489469862018884,
+      "signed_mean_pct": -3.4191012213281646,
+      "within_2pct_count": 27,
+      "within_2pct_fraction": 0.42857142857142855,
+      "instret_mismatches": 0
+    },
+    "pipeline": {
+      "regions": 27,
+      "absolute_median_pct": 44.39626041901329,
+      "absolute_p90_pct": 48.22664971857217,
+      "absolute_max_pct": 48.57821183834242,
+      "signed_median_pct": -44.39626041901329,
+      "signed_mean_pct": -44.542195703322946,
+      "within_2pct_count": 0,
+      "within_2pct_fraction": 0.0,
+      "instret_mismatches": 27
+    },
+    "pipeline_vme": {
+      "regions": 18,
+      "absolute_median_pct": 32.49652260759211,
+      "absolute_p90_pct": 34.599025581691194,
+      "absolute_max_pct": 35.17232255077066,
+      "signed_median_pct": -32.49652260759211,
+      "signed_mean_pct": -32.75122897207399,
+      "within_2pct_count": 0,
+      "within_2pct_fraction": 0.0,
+      "instret_mismatches": 18
+    },
+    "row_read": {
+      "regions": 12,
+      "absolute_median_pct": 8.3431460324257,
+      "absolute_p90_pct": 12.1904626693799,
+      "absolute_max_pct": 22.727272727272727,
+      "signed_median_pct": -1.5018287633419214,
+      "signed_mean_pct": 1.5182549642408605,
+      "within_2pct_count": 1,
+      "within_2pct_fraction": 0.08333333333333333,
+      "instret_mismatches": 0
+    },
+    "row_write": {
+      "regions": 12,
+      "absolute_median_pct": 12.038677850450895,
+      "absolute_p90_pct": 16.954439388278814,
+      "absolute_max_pct": 18.862815884476536,
+      "signed_median_pct": 2.4000473879943547,
+      "signed_mean_pct": 1.4260275637056126,
+      "within_2pct_count": 2,
+      "within_2pct_fraction": 0.16666666666666666,
+      "instret_mismatches": 0
+    },
+    "scalar_fp": {
+      "regions": 54,
+      "absolute_median_pct": 13.653699466056445,
+      "absolute_p90_pct": 31.523861344941267,
+      "absolute_max_pct": 37.125748502994014,
+      "signed_median_pct": -13.653699466056445,
+      "signed_mean_pct": -14.993998786401315,
+      "within_2pct_count": 3,
+      "within_2pct_fraction": 0.05555555555555555,
+      "instret_mismatches": 0
+    },
+    "shared_fpu": {
+      "regions": 12,
+      "absolute_median_pct": 7.478019003757299,
+      "absolute_p90_pct": 26.597273306325185,
+      "absolute_max_pct": 28.637413394919168,
+      "signed_median_pct": -6.934735589686014,
+      "signed_mean_pct": -8.06893754094171,
+      "within_2pct_count": 0,
+      "within_2pct_fraction": 0.0,
+      "instret_mismatches": 0
+    },
+    "tile_zero": {
+      "regions": 12,
+      "absolute_median_pct": 2.8014108017877337,
+      "absolute_p90_pct": 14.215226247635675,
+      "absolute_max_pct": 14.25233644859813,
+      "signed_median_pct": -2.8014108017877337,
+      "signed_mean_pct": -5.96439871619491,
+      "within_2pct_count": 5,
+      "within_2pct_fraction": 0.4166666666666667,
+      "instret_mismatches": 0
+    },
+    "vector_fp": {
+      "regions": 144,
+      "absolute_median_pct": 11.910464259395727,
+      "absolute_p90_pct": 22.57559829324099,
+      "absolute_max_pct": 26.10062893081761,
+      "signed_median_pct": -10.268958227302978,
+      "signed_mean_pct": -9.404758119943018,
+      "within_2pct_count": 9,
+      "within_2pct_fraction": 0.0625,
+      "instret_mismatches": 0
+    },
+    "vector_int": {
+      "regions": 252,
+      "absolute_median_pct": 10.496295486376866,
+      "absolute_p90_pct": 23.597127222982216,
+      "absolute_max_pct": 28.571428571428573,
+      "signed_median_pct": -7.0675184126457795,
+      "signed_mean_pct": -6.558782836869275,
+      "within_2pct_count": 23,
+      "within_2pct_fraction": 0.09126984126984126,
+      "instret_mismatches": 0
+    },
+    "vme_fp8": {
+      "regions": 72,
+      "absolute_median_pct": 4.850542224352644,
+      "absolute_p90_pct": 10.233496055864476,
+      "absolute_max_pct": 26.330532212885153,
+      "signed_median_pct": 1.1254426431547004,
+      "signed_mean_pct": 1.0838856614886887,
+      "within_2pct_count": 25,
+      "within_2pct_fraction": 0.3472222222222222,
+      "instret_mismatches": 0
+    },
+    "vme_int": {
+      "regions": 66,
+      "absolute_median_pct": 6.389289722623056,
+      "absolute_p90_pct": 36.941716252061084,
+      "absolute_max_pct": 84.04255319148936,
+      "signed_median_pct": 1.8836773515005911,
+      "signed_mean_pct": 2.393810694393083,
+      "within_2pct_count": 9,
+      "within_2pct_fraction": 0.13636363636363635,
+      "instret_mismatches": 0
+    },
+    "vme_refusal": {
+      "regions": 3,
+      "absolute_median_pct": 29.11392405063291,
+      "absolute_p90_pct": 35.910248366977896,
+      "absolute_max_pct": 37.60932944606414,
+      "signed_median_pct": -29.11392405063291,
+      "signed_mean_pct": -27.802326395862508,
+      "within_2pct_count": 0,
+      "within_2pct_fraction": 0.0,
+      "instret_mismatches": 0
+    }
+  },
+  "all_TRAIN_parent_group_normalized_MSE": 0.03789891800297266,
+  "instret_mismatch_scope": {
+    "pipeline": 27,
+    "pipeline_vme": 18
+  },
+  "methodology": "Fixed inherited coefficients chosen before this new native evaluation; all1008 fitting/development rows retained. Parent split inherited from pre-hardware frozen compute packet; internal validation has been viewed in development and is not blind acceptance.",
+  "readiness": {
+    "own_compute_numeric_and_CSR_joins": true,
+    "own_memory2592_causal_evaluation": true,
+    "strict_RAS_boundary_remains": true,
+    "default_promotion_allowed": false,
+    "OS_compiler_qualification": "Owned by root/other agent; not inferred by this evaluation."
+  },
+  "full_model_certified": false,
+  "full_2pct_certified": false,
+  "source_image_association_verified": false,
+  "hardware_contacted": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/empirical_read_overlap_compute_evaluate_v1.py": "5255233e5763d90d5ff026153042eafb6890ce4ae032843a6fe1ad9cf97b3d65",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-inherited-fixed-v1/run.json": "0d1b94dc7b3c05f64996c016f7fe97e8702b42011c3819c149445dcc1db3b2bd",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-inherited-fixed-v1/regions.jsonl": "6b5fb69c4eddd3dc1a9445eb621a703e5277d37920572b18705a00df40a31b08",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-inherited-fixed-v1/features.jsonl": "64c844784d1b5b4ee6742f92b70d078029801429dfa2fed6a57d0aca9ca8454d",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/campaign.elf": "694295b288d92e906b629ab553c1c7722a5720abe2bc0959be68fa5d72b00526",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/corpus.json": "77e0ebfcd2ee74ee67bfd7ab101b4bb33ad63b08ea4154299446decd99454371",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/split.json": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd",
+    "/scratch/copparihollmann/iris-model/build/fpga-compute-fit-v1-001-analysis/report.json": "900f26f11171828f5a28dcdd08e3b45f255839e25c1bba00c255743c502c20a5",
+    "/scratch/copparihollmann/iris-model/build/fpga-compute-fit-v1-001-analysis/regions.json": "eee1dc7de3555ab527cda27e265d8a368e3a3c25da0d17ec043e8b616ced89c3",
+    "/scratch/copparihollmann/iris-model/runs/fpga-compute-fit-v1-001/run.json": "7cdf2ccb81cbe81af9cc29df38958910f3d6a08fccbb25856ce9c559f2af50f1",
+    "/scratch/copparihollmann/iris-model/runs/fpga-compute-fit-v1-001.capture.tar.gz": "326faca74b31737342acc176157e4afa2c062b28c43904b7e42cf8a1a4dd77c7",
+    "/scratch/copparihollmann/iris-model/build/empirical-read-overlap-response-inputs-v2/on.fixture": "7a4c0c08ddb746829098fd610f14f8d84ce05ee138644859f67943e972b8eb7f",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-selected-v2/runtime.fixture": "bdda7d6b23b9e9c591fc3998d7b943d0971e2c8724df32ff8251b079fd58c7fc",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-binding-v6/runtime-binding.json": "2489529cc6ef2163765e2d21dbb15672770d7729a503eb2e2dc4787a98821288",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-selected-v2/parameters.json": "70faceedd109011f05435823ca3ac1032b5264d783dba83729f62b0145ad2d00",
+    "/scratch/copparihollmann/iris-model/build/empirical-read-overlap-response-frozen-7bd58b4f/manifest.json": "3dc7851600562136a3e97f778006f76ee49c351827d6ba72b212224b15549803",
+    "/scratch/copparihollmann/iris-model/build/memory-routes-current-7bd5-causal-review-v1/report.json": "0480d3397ed7671eb11d62ea7f06b5808fe9a335fa02c02a4358b41cf2d14a1c"
+  },
+  "artifact_sha256": {
+    "regions.jsonl": "adbfa51d34098b2e06c80b4ce830fa99236a85dc2063240ecd31f5121a1720f5",
+    "parent-groups.json": "f9a011402979c5d9ff0f32565822f728f84d231fa58fe85eed8658787aeb459b",
+    "regions.csv": "3abd9a2b356c0e90fb7c4b9b6cb760241b431bf287bd627807e7529de9306ab6"
+  }
+}

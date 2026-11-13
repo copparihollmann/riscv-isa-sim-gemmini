@@ -1,0 +1,16 @@
+{
+  "schema": "iris.empirical_compute_selection.v1",
+  "status": "selected_actual_replay_pending",
+  "parameters_sha256": "35f4266884c69005082ca496ebee7f2aeb5bdd424f7db0702d18720b4c2df127",
+  "fixture_sha256": "5bc214581bca817417db8d52bc989259ca8c81d5eb9c991073937657e09926bc",
+  "actual_native_quality_claimed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/empirical_compute_select_v2.py": "d00a39a607407f2177ff9bbf2ccf2a51d8ae4aeb9d79579d68e22b028b355827",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-constrained-v1/parameters.json": "eab156f715e163b8ccd45a76fd860c748ff54b25f387799ce4d38a35f903926d",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-store-9b2-baseline-v1/outer-prior.fixture": "182b6b0c1add9561adee13b7b50dfa4f92f706cc1b48c9c5f934ef7ce2699989",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-features-fadd-shape-store-9b2-outer-prior-v1/regions.jsonl": "07c9e51ac96c6ff74216351879d9fbd90b3075336dd1ff9e633d26934e6d2a4f",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/split.json": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd"
+  },
+  "global_heldout_timings_consumed": false,
+  "full_2pct_certified": false
+}

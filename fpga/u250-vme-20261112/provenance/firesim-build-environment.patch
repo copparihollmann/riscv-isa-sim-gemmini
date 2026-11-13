@@ -1,0 +1,26 @@
+diff --git a/platforms/xilinx_alveo_u250/build-bitstream.sh b/platforms/xilinx_alveo_u250/build-bitstream.sh
+index 46ec8f1..0448185 100755
+--- a/platforms/xilinx_alveo_u250/build-bitstream.sh
++++ b/platforms/xilinx_alveo_u250/build-bitstream.sh
+@@ -72,4 +72,4 @@ fi
+ 
+ # run build
+ cd $CL_DIR
+-vivado -mode batch -source $CL_DIR/scripts/main.tcl -tclargs $FREQUENCY $STRATEGY $BOARD
++"/scratch/copparihollmann/u250-vme-20261112/bin/vivado" -mode batch -source $CL_DIR/scripts/main.tcl -tclargs $FREQUENCY $STRATEGY $BOARD
+diff --git a/platforms/xilinx_alveo_u250/cl_firesim/scripts/main.tcl b/platforms/xilinx_alveo_u250/cl_firesim/scripts/main.tcl
+index cda9d34..05df8e6 100644
+--- a/platforms/xilinx_alveo_u250/cl_firesim/scripts/main.tcl
++++ b/platforms/xilinx_alveo_u250/cl_firesim/scripts/main.tcl
+@@ -1,3 +1,4 @@
++set_param board.repoPaths [list {/scratch/copparihollmann/u250-vme-20261112/provenance/open-nic-board-files}]
+ set root_dir [pwd]
+ set vivado_version [version -short]
+ set vivado_version_major [string range $vivado_version 0 3]
+diff --git a/platforms/xilinx_alveo_u250/cl_firesim/scripts/platform_env.tcl b/platforms/xilinx_alveo_u250/cl_firesim/scripts/platform_env.tcl
+index 84ef64e..e8fc14d 100644
+--- a/platforms/xilinx_alveo_u250/cl_firesim/scripts/platform_env.tcl
++++ b/platforms/xilinx_alveo_u250/cl_firesim/scripts/platform_env.tcl
+@@ -1 +1 @@
+-set jobs 8
++set jobs 12

@@ -1,0 +1,128 @@
+TE (tile edge) = 32
+diag_vsettnt_clamp: e32w1
+  e32w1 req=32 -> tn=32 vtype=0xd2 mtype=0x1
+  e32w1 req=31 -> tn=31 vtype=0xd2 mtype=0x1
+  e32w1 req=30 -> tn=30 vtype=0xd2 mtype=0x1
+  e32w1 req=29 -> tn=29 vtype=0xd2 mtype=0x1
+  e32w1 req=28 -> tn=28 vtype=0xd2 mtype=0x1
+  e32w1 req=27 -> tn=27 vtype=0xd2 mtype=0x1
+  e32w1 req=26 -> tn=26 vtype=0xd2 mtype=0x1
+  e32w1 req=25 -> tn=25 vtype=0xd2 mtype=0x1
+  e32w1 req=24 -> tn=24 vtype=0xd2 mtype=0x1
+  e32w1 req=23 -> tn=23 vtype=0xd2 mtype=0x1
+  e32w1 req=22 -> tn=22 vtype=0xd2 mtype=0x1
+  e32w1 req=21 -> tn=21 vtype=0xd2 mtype=0x1
+  e32w1 req=20 -> tn=20 vtype=0xd2 mtype=0x1
+  e32w1 req=19 -> tn=19 vtype=0xd2 mtype=0x1
+  e32w1 req=18 -> tn=18 vtype=0xd2 mtype=0x1
+  e32w1 req=17 -> tn=17 vtype=0xd2 mtype=0x1
+  e32w1 req=16 -> tn=16 vtype=0xd2 mtype=0x1
+  e32w1 req=15 -> tn=15 vtype=0xd2 mtype=0x1
+  e32w1 req=14 -> tn=14 vtype=0xd2 mtype=0x1
+  e32w1 req=13 -> tn=13 vtype=0xd2 mtype=0x1
+  e32w1 req=12 -> tn=12 vtype=0xd2 mtype=0x1
+  e32w1 req=11 -> tn=11 vtype=0xd2 mtype=0x1
+  e32w1 req=10 -> tn=10 vtype=0xd2 mtype=0x1
+  e32w1 req=9 -> tn=9 vtype=0xd2 mtype=0x1
+  e32w1 req=8 -> tn=8 vtype=0xd2 mtype=0x1
+  e32w1 req=7 -> tn=7 vtype=0xd2 mtype=0x1
+  e32w1 req=6 -> tn=6 vtype=0xd2 mtype=0x1
+  e32w1 req=5 -> tn=5 vtype=0xd2 mtype=0x1
+  e32w1 req=4 -> tn=4 vtype=0xd2 mtype=0x1
+  e32w1 req=3 -> tn=3 vtype=0xd2 mtype=0x1
+  e32w1 req=2 -> tn=2 vtype=0xd2 mtype=0x1
+  e32w1 req=1 -> tn=1 vtype=0xd2 mtype=0x1
+diag_vsettnt_clamp: e8w4
+  e8w4 req=32 -> tn=32 vtype=0xc0 mtype=0x4
+  e8w4 req=31 -> tn=31 vtype=0xc0 mtype=0x4
+  e8w4 req=30 -> tn=30 vtype=0xc0 mtype=0x4
+  e8w4 req=29 -> tn=29 vtype=0xc0 mtype=0x4
+  e8w4 req=28 -> tn=28 vtype=0xc0 mtype=0x4
+  e8w4 req=27 -> tn=27 vtype=0xc0 mtype=0x4
+  e8w4 req=26 -> tn=26 vtype=0xc0 mtype=0x4
+  e8w4 req=25 -> tn=25 vtype=0xc0 mtype=0x4
+  e8w4 req=24 -> tn=24 vtype=0xc0 mtype=0x4
+  e8w4 req=23 -> tn=23 vtype=0xc0 mtype=0x4
+  e8w4 req=22 -> tn=22 vtype=0xc0 mtype=0x4
+  e8w4 req=21 -> tn=21 vtype=0xc0 mtype=0x4
+  e8w4 req=20 -> tn=20 vtype=0xc0 mtype=0x4
+  e8w4 req=19 -> tn=19 vtype=0xc0 mtype=0x4
+  e8w4 req=18 -> tn=18 vtype=0xc0 mtype=0x4
+  e8w4 req=17 -> tn=17 vtype=0xc0 mtype=0x4
+  e8w4 req=16 -> tn=16 vtype=0xc0 mtype=0x4
+  e8w4 req=15 -> tn=15 vtype=0xc0 mtype=0x4
+  e8w4 req=14 -> tn=14 vtype=0xc0 mtype=0x4
+  e8w4 req=13 -> tn=13 vtype=0xc0 mtype=0x4
+  e8w4 req=12 -> tn=12 vtype=0xc0 mtype=0x4
+  e8w4 req=11 -> tn=11 vtype=0xc0 mtype=0x4
+  e8w4 req=10 -> tn=10 vtype=0xc0 mtype=0x4
+  e8w4 req=9 -> tn=9 vtype=0xc0 mtype=0x4
+  e8w4 req=8 -> tn=8 vtype=0xc0 mtype=0x4
+  e8w4 req=7 -> tn=7 vtype=0xc0 mtype=0x4
+  e8w4 req=6 -> tn=6 vtype=0xc0 mtype=0x4
+  e8w4 req=5 -> tn=5 vtype=0xc0 mtype=0x4
+  e8w4 req=4 -> tn=4 vtype=0xc0 mtype=0x4
+  e8w4 req=3 -> tn=3 vtype=0xc0 mtype=0x4
+  e8w4 req=2 -> tn=2 vtype=0xc0 mtype=0x4
+  e8w4 req=1 -> tn=1 vtype=0xc0 mtype=0x4
+test_moves: t=0 load_tile_rows
+test_moves: t=0 store_tile_cols
+test_moves: t=0 compare_tile
+test_moves: t=1 load_tile_rows
+test_moves: t=1 store_tile_cols
+test_moves: t=1 compare_tile
+test_moves: t=2 load_tile_rows
+test_moves: t=2 store_tile_cols
+test_moves: t=2 compare_tile
+test_moves: t=3 load_tile_rows
+test_moves: t=3 store_tile_cols
+test_moves: t=3 compare_tile
+test_moves: column-in/row-out loop
+test_moves: column-in/row-out store_tile_rows
+test_moves: column-in/row-out compare_tile
+test_moves: partial move section
+diag: load_tile_rows(0)
+diag: store_tile_rows(0) [mvout tile0 row]
+diag: store_tile_cols(0) [mvout tile0 col]
+diag: load_tile_rows(1)
+diag: store_tile_cols(1) [mvout tile1 col]
+diag: done
+vtzero: load_tile_rows
+vtzero: after load_tile_rows c_ref[0][0]=0x83fbf1
+vtzero: VME_VTZERO
+vtzero: store_tile_rows
+vtzero: after store_tile_rows c_mem[0][0]=0x0 c_ref[0][0]=0x83fbf1
+vtzero: after zeroing c_ref c_ref[0][0]=0x0 c_mem[0][0]=0x0
+vtzero: compare_tile
+vtzero: VTDISCARD
+vtzero: done
+mm_int8: v=0 s=0
+mm_int8: v=0 s=1
+mm_int8: v=0 s=2
+mm_int8: v=0 s=3
+mm_int8: v=0 s=4
+mm_int8: v=0 s=5
+mm_int8: v=1 s=0
+mm_int8: v=1 s=1
+mm_int8: v=1 s=2
+mm_int8: v=1 s=3
+mm_int8: v=1 s=4
+mm_int8: v=1 s=5
+mm_int8: v=2 s=0
+mm_int8: v=2 s=1
+mm_int8: v=2 s=2
+mm_int8: v=2 s=3
+mm_int8: v=2 s=4
+mm_int8: v=2 s=5
+mm_int8: v=3 s=0
+mm_int8: v=3 s=1
+mm_int8: v=3 s=2
+mm_int8: v=3 s=3
+mm_int8: v=3 s=4
+mm_int8: v=3 s=5
+mm.e4m3.e4m3: 992/992 bit-exact vs sequential-FP32 model
+mm.e4m3.e5m2: 832/992 bit-exact vs sequential-FP32 model
+mm.e5m2.e4m3: 835/992 bit-exact vs sequential-FP32 model
+mm.e5m2.e5m2: 566/992 bit-exact vs sequential-FP32 model
+checksum 0xbd60bc6a
+PASSED

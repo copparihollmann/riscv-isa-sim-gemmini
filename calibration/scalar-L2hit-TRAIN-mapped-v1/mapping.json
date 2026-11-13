@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "parameters_sha256": "03dddf36a0597d66878a5ad9259e719d9ec3b67d4b0c0f6920509c34daa82b82",
+  "basis_proof_sha256": "0343fe6ffc95d9a95fe9f86b77a457486ecfb0a53f976d41c5bc33b440b4805b",
+  "fixture_sha256": {
+    "baseline.fixture": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+    "alpha.fixture": "1a3d2854bfe63099134336d47805a2f220bba7d5ecf6b2f1aa2cd0ab644583b2",
+    "random-only.fixture": "65dc54ded2bfd45f9e6673ba6e0bea89a491bc6c0efb70ac1b5236df435491f7",
+    "alpha-random.fixture": "14be01d3af3312e44d85dd17494b334096ebed59194b8ec6328b0aafaa8c7d64"
+  },
+  "outer_service_lines_byteidentical": true,
+  "Icache_service_lines_byteidentical": true,
+  "beta_service_disabled": true,
+  "qualification": "NEW unvalidated runtime mapping; own model replay required; no promotion"
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "file": "board.xml",
+    "url": "https://raw.githubusercontent.com/Xilinx/open-nic-shell/940907fc99fc8d73dbea0028b3a23095a660a42a/board_files/Xilinx/au250/1.3/board.xml",
+    "source_sha256": "bec3d29f5c615f64d2b923a6c8f482f54e142071e777246445d5f6fcb8f2b5f0",
+    "installed_sha256": "60bdaedeaa8859fd3c034d85e0c282cee90e828d21d3dceab085b2804ed799a1",
+    "matches_installed": false
+  },
+  {
+    "file": "preset.xml",
+    "url": "https://raw.githubusercontent.com/Xilinx/open-nic-shell/940907fc99fc8d73dbea0028b3a23095a660a42a/board_files/Xilinx/au250/1.3/preset.xml",
+    "source_sha256": "6bfec0581f955af2da1542296512ca7a7390f189f0ef180020747de9b6ed9950",
+    "installed_sha256": "699392215a8cb1e736dcd7f38e3cd9880760f667dadbd46bdf0c247d7ca796cc",
+    "matches_installed": false
+  },
+  {
+    "file": "part0_pins.xml",
+    "url": "https://raw.githubusercontent.com/Xilinx/open-nic-shell/940907fc99fc8d73dbea0028b3a23095a660a42a/board_files/Xilinx/au250/1.3/part0_pins.xml",
+    "source_sha256": "e199e1229152777d1bc97fc427b89a4303b14202bddb980533b050ebbc850528",
+    "installed_sha256": "e199e1229152777d1bc97fc427b89a4303b14202bddb980533b050ebbc850528",
+    "matches_installed": true
+  }
+]

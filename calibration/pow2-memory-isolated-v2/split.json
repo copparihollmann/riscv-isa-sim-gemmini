@@ -1,0 +1,101 @@
+{
+  "schema": "iris.pow2_isolated_memory_frozen_split.v2",
+  "split_id": "iris-pow2-isolated-memory-v2",
+  "frozen_before_new_hardware": true,
+  "hardware_timing_labels_observed": false,
+  "hardware_timing_labels_used_for_selection": false,
+  "global_Zephyr_holdouts_untouched": true,
+  "reserved_timing_labels_root_only": true,
+  "grouping": "Footprint size; all physical harts, all3repetitions and bothpasses stay together.",
+  "groups": [
+    {
+      "group_id": "footprint-bytes:1024",
+      "footprint_bytes": 1024,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:2048",
+      "footprint_bytes": 2048,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:4096",
+      "footprint_bytes": 4096,
+      "partition": "reserved_holdout"
+    },
+    {
+      "group_id": "footprint-bytes:8192",
+      "footprint_bytes": 8192,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:16384",
+      "footprint_bytes": 16384,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:32768",
+      "footprint_bytes": 32768,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:65536",
+      "footprint_bytes": 65536,
+      "partition": "reserved_holdout"
+    },
+    {
+      "group_id": "footprint-bytes:131072",
+      "footprint_bytes": 131072,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:262144",
+      "footprint_bytes": 262144,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:524288",
+      "footprint_bytes": 524288,
+      "partition": "reserved_holdout"
+    },
+    {
+      "group_id": "footprint-bytes:1048576",
+      "footprint_bytes": 1048576,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:2097152",
+      "footprint_bytes": 2097152,
+      "partition": "train"
+    },
+    {
+      "group_id": "footprint-bytes:4194304",
+      "footprint_bytes": 4194304,
+      "partition": "train"
+    }
+  ],
+  "train_sizes": [
+    1024,
+    2048,
+    8192,
+    16384,
+    32768,
+    131072,
+    262144,
+    1048576,
+    2097152,
+    4194304
+  ],
+  "reserved_sizes": [
+    4096,
+    65536,
+    524288
+  ],
+  "expected_regions": {
+    "train": 180,
+    "reserved_holdout": 54,
+    "total": 234
+  },
+  "new_exact_ELF_reference_required": true,
+  "protocol": "Active-only preparation and8MiB read-conditioning; inactiveWFI; minimum1024LD wholelaps; alloutputbufferedafter234measurements"
+}

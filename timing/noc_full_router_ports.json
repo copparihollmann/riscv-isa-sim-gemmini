@@ -1,0 +1,377 @@
+[
+  {
+    "direction": "input",
+    "name": "clock",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "reset",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_va_stall_0",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_va_stall_1",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_va_stall_2",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_va_stall_3",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_sa_stall_0",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_sa_stall_1",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_sa_stall_2",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_debug_out_sa_stall_3",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_egress_nodes_out_flit_ready",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_egress_nodes_out_flit_valid",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_egress_nodes_out_flit_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_egress_nodes_out_flit_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_egress_nodes_out_flit_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "output",
+    "name": "auto_ingress_nodes_in_1_flit_ready",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_1_flit_valid",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_1_flit_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_1_flit_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_1_flit_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_1_flit_bits_egress_id",
+    "bits": 5
+  },
+  {
+    "direction": "output",
+    "name": "auto_ingress_nodes_in_0_flit_ready",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_0_flit_valid",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_0_flit_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_0_flit_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_0_flit_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "input",
+    "name": "auto_ingress_nodes_in_0_flit_bits_egress_id",
+    "bits": 5
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_valid",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_flow_vnet_id",
+    "bits": 2
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_flow_ingress_node",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_flow_ingress_node_id",
+    "bits": 2
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_flow_egress_node",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_flow_egress_node_id",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_1_flit_0_bits_virt_channel_id",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_source_nodes_out_1_credit_return",
+    "bits": 6
+  },
+  {
+    "direction": "input",
+    "name": "auto_source_nodes_out_1_vc_free",
+    "bits": 6
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_valid",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_flow_vnet_id",
+    "bits": 2
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_flow_ingress_node",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_flow_ingress_node_id",
+    "bits": 2
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_flow_egress_node",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_flow_egress_node_id",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_source_nodes_out_0_flit_0_bits_virt_channel_id",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_source_nodes_out_0_credit_return",
+    "bits": 6
+  },
+  {
+    "direction": "input",
+    "name": "auto_source_nodes_out_0_vc_free",
+    "bits": 6
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_valid",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_flow_vnet_id",
+    "bits": 2
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_flow_ingress_node",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_flow_ingress_node_id",
+    "bits": 2
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_flow_egress_node",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_flow_egress_node_id",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_1_flit_0_bits_virt_channel_id",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_dest_nodes_in_1_credit_return",
+    "bits": 6
+  },
+  {
+    "direction": "output",
+    "name": "auto_dest_nodes_in_1_vc_free",
+    "bits": 6
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_valid",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_head",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_tail",
+    "bits": 1
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_payload",
+    "bits": 73
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_flow_vnet_id",
+    "bits": 2
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_flow_ingress_node",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_flow_ingress_node_id",
+    "bits": 2
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_flow_egress_node",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_flow_egress_node_id",
+    "bits": 3
+  },
+  {
+    "direction": "input",
+    "name": "auto_dest_nodes_in_0_flit_0_bits_virt_channel_id",
+    "bits": 3
+  },
+  {
+    "direction": "output",
+    "name": "auto_dest_nodes_in_0_credit_return",
+    "bits": 6
+  },
+  {
+    "direction": "output",
+    "name": "auto_dest_nodes_in_0_vc_free",
+    "bits": 6
+  }
+]

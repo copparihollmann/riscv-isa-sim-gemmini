@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "checks": 1656,
+  "actual_csr_instructions": 2031,
+  "harts": 3,
+  "isa_profiles": 2,
+  "hardware_hpm_count": 0,
+  "generic_preserved": true,
+  "log_sha256": "70dfaf3d9d50f99cde7871aa4e84712e4208fcc942bea1f91ddd72d8f5a40c5e",
+  "binary_sha256": "5e6cc309b8cd1085e30ee0c31b43c2bc27ef9c325136a94bfdd4d86700787f7e",
+  "overlay_sha256": "7b92dcd4b68416f6445c908f82b4d4d34960471d207f23b045eaa78cd9750854",
+  "rtl_certified": false
+}

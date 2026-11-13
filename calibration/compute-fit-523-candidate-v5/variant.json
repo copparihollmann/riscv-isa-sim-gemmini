@@ -1,0 +1,8 @@
+{
+  "schema": "iris.empirical_compute_controlled_variant.v1",
+  "parameters_sha256": "f298a3dfcf0e44fccf82d7709e7ffdc4fa9d914bd6a0868c61f69e888e70a40f",
+  "fixture_sha256": "39139e1204c02c5b7c436a9382eb9d590427997b61b511dfe50991439974075a",
+  "actual_native_replay_pending": true,
+  "new_reference_archive_sha256": "326faca74b31737342acc176157e4afa2c062b28c43904b7e42cf8a1a4dd77c7",
+  "global_heldout_timings_consumed": false
+}

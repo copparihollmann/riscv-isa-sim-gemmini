@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "status": "passed_functional_context_abi",
+  "generator_sha256": "2ce85782c1d387a82d62cd632c165759ddd5196963c7ab4ffe7e444469e1d89e",
+  "repositories": {
+    "chipyard": {
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "saturn": {
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "rocket-chip": {
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "shuttle": {
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "zephyr": {
+      "commit": "cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0",
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "riscv-isa-sim": {
+      "commit": "72958551566a30f19444bd7e354552824e4d0a98",
+      "applied_patch_sha256": "c4ad71ca6687e1fab6b936ab995259a4763c2c0fc9aff231f69866f320239168",
+      "binary_sha256": "0c0fd7785d3e7ba2785e2e9eabc0d0af719037ab2fa761b71bab33fe24a5f257",
+      "provenance_sha256": "f442c8c0ae847b6c5a42d6b23cdd16a7a47b1aaf3d97bb5372db42e35fe63e41"
+    }
+  },
+  "hardware_repository_state_is_current_workspace_observation": true,
+  "model_under_test_snapshot": "build/zephyr-primary-0c0fd778/manifest.json",
+  "model_under_test_snapshot_sha256": "3e724838bdc00abf5ee8223f7e017460856ae92c5d7435f343dbb631cbc4b170",
+  "base_zephyr_sha": "cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0",
+  "cumulative_patch_sha256": "558cefc2f57225774cc891e1df0d2f7149f6e834a7012b4c0735f0fba0d1aa1b",
+  "fact_sources": {
+    "vector-save-restore": {
+      "path": "third_party/zephyr-iris/arch/riscv/core/fpu.c",
+      "sha256": "54d51d2a807e4b16f467929d589f68587a13a264c6a92fb1e19ceabd7d0313c8",
+      "locator": "z_riscv_vstate_csr_save/restore, z_riscv_vstate_save/restore, arch_flush_local_fpu; read-write early-clobber cursor; mtype before vector copy; full tiles and forced VME save"
+    },
+    "ownership-api": {
+      "path": "third_party/zephyr-iris/arch/riscv/core/iris_vme.c",
+      "sha256": "44acb5409b121cc40d248c764a3e58f829c3f2d9bccb7f0deed2def8ba3f5733",
+      "locator": "iris_vme_enable: hart/mask/context validation, normal lazy-owner claim, explicit four-tile initialization"
+    },
+    "api-contract": {
+      "path": "third_party/zephyr-iris/include/zephyr/arch/riscv/iris_vme.h",
+      "sha256": "de506867f6c3356be5a8645b5337241a66cc63e421ece012b77279645f3e9f65",
+      "locator": "explicit first-use initialization, allowed harts and caller obligations"
+    },
+    "tile-serialization": {
+      "path": "third_party/zephyr-iris/arch/riscv/core/iris_vme_tiles.S",
+      "sha256": "04fc36aae3625a98f90476116ae5de324cff863e52835f0a27952e6868fc68a8",
+      "locator": "full_tile_config and 4 tiles x32 rows x128-byte bit-copy"
+    },
+    "matrix-readable-configuration": {
+      "path": "third_party/rocket-chip/src/main/scala/rocket/CSR.scala",
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10",
+      "locator": "read_vtype/read_mtype: widenDecode(vtwiden) | (tk<<5) | (tm<<10)"
+    },
+    "matrix-configuration-restore": {
+      "path": "third_party/rocket-chip/src/main/scala/rocket/Matrix.scala",
+      "sha256": "ae61b49059dfa45b0812d5ab684c07ad54eee4959f5cdd2752de8cc13a0538d7",
+      "locator": "msetmtypeNewType clears geometry; update sets TN/TM/TK with source clamps"
+    },
+    "tile-storage": {
+      "path": "third_party/saturn/src/main/scala/exu/OuterProductUnit.scala",
+      "sha256": "daf0818c30404a870ae643c75570014941d36b6afa79c9d2dada1c6c6f3671a1",
+      "locator": "OPUParameters nMrfRegs=4, cWidth=32; TE=VLEN/8; regs=Reg(Vec(...)) without reset initialization"
+    },
+    "matrix-supported-configurations": {
+      "path": "third_party/saturn/src/main/scala/common/Parameters.scala",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "locator": "opuMatrixTypes=(8,4),(32,1); opuTE=vLen/8"
+    },
+    "instruction-encodings": {
+      "path": "third_party/saturn/benchmarks/common/vme.h",
+      "sha256": "f340e62fd813406f1eba5635e7476b20ef07cee6c4721f91f65b22b273168208",
+      "locator": "OP-V0x57 configuration/zero/row-move; OP-VE0x77 INT8/FP8; TSS row indexing"
+    },
+    "undefined-read-policy": {
+      "path": "build/zephyr-primary-0c0fd778/final-source-snapshot/spike/iris.patch",
+      "sha256": "c4ad71ca6687e1fab6b936ab995259a4763c2c0fc9aff231f69866f320239168",
+      "locator": "Exact tested native overlay, riscv/vector_unit.h iris_cell: reads refused until explicitly written; no OS context magic"
+    },
+    "thread-affinity": {
+      "path": "third_party/zephyr-iris/kernel/cpu_mask.c",
+      "sha256": "de1c0f7a63c48fe1d17eb4a302e82cc88ace4651bdfec8e048b3175f6cf39497",
+      "locator": "initialized VME threads reject masks outside compute harts0/1"
+    },
+    "lazy-recognition": {
+      "path": "third_party/zephyr-iris/arch/riscv/core/isr.S",
+      "sha256": "218cb6c25c42e5e9d95088f0ba41eeef5991650442ee6c10044dadbd9804bc06",
+      "locator": "CONFIG_RISCV_IRIS_VME_CONTEXT adds OP-VE0x77 and mtype0xc23"
+    },
+    "ordinary-smp-flush": {
+      "path": "third_party/zephyr-iris/arch/riscv/core/fpu.c",
+      "sha256": "54d51d2a807e4b16f467929d589f68587a13a264c6a92fb1e19ceabd7d0313c8",
+      "locator": "flush_owned_fpu uses existing remote flush IPI before migration restore"
+    }
+  },
+  "evidence": {
+    "ordinary-base": {
+      "path": "build/zephyr-context-base-certified-run/results.json",
+      "sha256": "28cedea30f1790623d8ef011f2b0b253de2245b58f6dbbcc47c1aa449889a3f9",
+      "status": "passed"
+    },
+    "ordinary-derived": {
+      "path": "build/zephyr-context-vme-aware-certified-run/results.json",
+      "sha256": "8836080f3138d0f6f6b1bf24d30372d4047ca65acb74a626dfde9317b4dfd756",
+      "status": "passed"
+    },
+    "competing-vme": {
+      "path": "build/zephyr-vme-context-certified-run/results.json",
+      "sha256": "5458e312886532560436b68e00a12f9eed2e07dd044d901b297e03a2c8e5a754",
+      "status": "passed"
+    },
+    "mixed-app": {
+      "path": "build/zephyr-mixed-vme-mask7-final-run/results.json",
+      "sha256": "8c79d7c4dca1aaa421f653b0747b45e3524709e70d2b86a71a3613127f1e6189",
+      "status": "passed_mixed_zephyr_smp"
+    },
+    "scalar-placements": {
+      "path": "build/zephyr-placements-ownership/results.json",
+      "sha256": "869cb976166e59b8fe1a5d6befe627cdc9d4324583113e716a7b696c6c6d6843",
+      "status": "passed_all_seven_scalar_zephyr_placements"
+    },
+    "host-protocol-negatives": {
+      "path": "build/zephyr-negative-validation-ownership-checked/results.json",
+      "sha256": "2953a6e182244e236866e87ab2bbcf4f75700f17f6c242c81bc7892b7cfdfd30",
+      "status": "passed_negative_validation"
+    },
+    "omitted-ownership": {
+      "path": "build/zephyr-vme-ownership-negative-run/negative-results.json",
+      "sha256": "2733efe168727356c7c5e87d0e3622d6928f8a066ca8527d5dcdb09549bb4a2e",
+      "status": "passed_expected_failure"
+    },
+    "omitted-kernel-tile-restore": {
+      "path": "build/zephyr-no-tile-restore/run/negative-results.json",
+      "sha256": "2e39d9c220b4dc8331f8a2adf60b283419df5b5212866ca536c5dca37dbdf2e6",
+      "status": "passed_expected_failure"
+    },
+    "zephyr/vme_context_run.py": {
+      "path": "build/zephyr-context-suite-current/results.json",
+      "sha256": "b6f54adee74134b165a38eed6f118aa8328d82f5d58a22af09e4c5a126fae10d",
+      "status": "passed_context_corpus"
+    },
+    "real-mlir-zephyr-gates": {
+      "path": "zephyr/compiler-acceptance.json",
+      "sha256": "6e93633e7d15b51325c3a8bb165bda9b3641e803e67a1923a50023fc6865ef95",
+      "status": "passed_real_mlir_zephyr_pipeline"
+    }
+  },
+  "architectural_state": {
+    "fp_registers": 32,
+    "fp_max_register_bits": 64,
+    "fcsr": true,
+    "vector_registers": 32,
+    "vector_register_bits": 256,
+    "vector_csrs": [
+      "vstart",
+      "vl",
+      "vtype(including-altfmt)",
+      "vcsr"
+    ],
+    "vlenb_checked": 32,
+    "matrix_csr": "mtype0xc23: widen/TK/TM; VL holds TN",
+    "tile_shape": [
+      4,
+      32,
+      32
+    ],
+    "tile_cell_bits": 32,
+    "tile_bytes_per_initialized_thread": 16384
+  },
+  "ownership_policy": {
+    "explicit_api": "iris_vme_enable",
+    "initialization": "software zeros all four complete tiles before first use",
+    "allowed_harts": [
+      0,
+      1
+    ],
+    "migration": "between harts0/1 with existing SMP remote-owner flush",
+    "hart2": "ordinary FP/RVV, VME API refused and initialized VME task placement rejected",
+    "interrupt_vme": false,
+    "unregistered_vme_supported": false,
+    "simulator_automatic_tile_context": false
+  },
+  "ordinary_rvv_constraint": {
+    "base_defect": "assembly mutates input-only cursor",
+    "fix": "separate +&r cursor; preserve original context pointer",
+    "base_gcc16_miscompile_observed": false,
+    "baseline_and_derived_full_register_checks_each": 72
+  },
+  "functional_context_validated": true,
+  "rtl_certified": false,
+  "fpga_certified": false,
+  "timing_certified": false,
+  "remaining": [
+    "RTL/FPGA context test and deployed image association",
+    "Hardware asynchronous OPU drain/ordering validation",
+    "Calibrated context-switch/memory cost and held-out cycle accuracy",
+    "FP8 numerical edge certification is separate from exact context examples"
+  ]
+}

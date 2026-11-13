@@ -1,0 +1,39 @@
+{
+  "schema": "iris.broad_fit_campaign_capture_checklist.v1",
+  "scope": "Preparation requirements; no hardware launch authorization",
+  "split": "fitting",
+  "cases": 3680,
+  "parent_cases": 736,
+  "trials": 5,
+  "per_hart_regions": [2375, 2300, 2075],
+  "total_regions": 6750,
+  "phase_markers": 30,
+  "completion": "Exactly one IRIS_BATCH_DONE with failed=0,cases=3680,regions=6750,trials=5",
+  "required_guest_capture": [
+    "Every raw IRIS_REGION JSON line including unique trial ID and parent_case_id",
+    "Raw mcycle boundaries, minstret delta, independent checksum and pass flag",
+    "Every suite/trial phase marker, final completion, fatal/trap and partial failure output",
+    "All five raw samples plus variance grouped by parent_case_id and hart"
+  ],
+  "required_manager_capture": [
+    "Raw manager stdout/stderr, UART and simulation logs on success and failure",
+    "Exact ELF, generated tables, runtime/CRT, compiler/libgcc and source inputs with hashes",
+    "Exact image/driver/platform/HWDB/runtime/plusargs hashes and source/loaded-image association unknowns",
+    "Separate kill, transfer, programming/setup, workload and cleanup host durations where observable",
+    "Current allocation/host boot/all-user process FD+maps inspection and shared lock receipts"
+  ],
+  "instrumentation_before_launch": {
+    "guest_mcycle_minstret_checksums": "Compiled and locally validated",
+    "image_trace_support": "Must inspect exact selected image; currently unverified here",
+    "trace_windows_filters_and_volume": "Coordinator must record supported settings or explicit unavailability",
+    "image_autocounter_support": "Must inspect exact selected image; no counter inferred from unrelated source",
+    "extra_hpm_events": "No fabricated events or perf counters; selected source CSR policy remains separate"
+  },
+  "smoke": "Separate existing 12-region smoke first, without modifying its frozen inputs",
+  "hardware_lifecycle": "Coordinator only: current exclusive allocation and complete visibility, hold host lock, kill -> infrasetup -> runworkload -> kill with owned failure cleanup",
+  "cache_policy": "Stage/cache only exact hash-verified artifacts; never bypass reset/programming/setup",
+  "archive_policy": "Archive quiescent job including failures outside job directory using user-owned firesim/capture_run.py",
+  "heldout_policy": "Genuine heldouts remain separate and are never used to fit",
+  "calibration_usable": false,
+  "hardware_contacted": false
+}

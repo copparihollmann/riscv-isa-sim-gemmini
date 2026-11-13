@@ -1,0 +1,6440 @@
+{
+  "schema_version": 1,
+  "scope": "hardware-source-audit",
+  "bitstream_match_verified": false,
+  "model_support_is_separate": true,
+  "hardware_manifest_sha256": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+  "repositories": {
+    "chipyard": {
+      "local_path": "/scratch/eygao/iris-cy",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd",
+      "tracked_diff": "patches/chipyard.patch",
+      "untracked_files_included": false
+    },
+    "saturn": {
+      "local_path": "/scratch/eygao/iris-cy/generators/saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b",
+      "tracked_diff": "patches/saturn.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "checkout_matches_chipyard_pin": true
+    },
+    "rocket-chip": {
+      "local_path": "/scratch/eygao/iris-cy/generators/rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/rocket-chip.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "checkout_matches_chipyard_pin": true
+    },
+    "shuttle": {
+      "local_path": "/scratch/eygao/iris-cy/generators/shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff": "patches/shuttle.patch",
+      "untracked_files_included": false,
+      "chipyard_declared_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "checkout_matches_chipyard_pin": true
+    },
+    "hardfloat": {
+      "commit": "0ecaef097ce2accbd16a61613699450ed5533f29",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_path": "/scratch/eygao/iris-cy/generators/hardfloat",
+      "tracked_diff": "dtypes-evidence/hardfloat.patch"
+    }
+  },
+  "sources": {
+    "iris": {
+      "path": "generators/chipyard/src/main/scala/config/IrisConfigs.scala",
+      "repository": "chipyard",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
+      "snapshot": "dtypes-evidence/iris.scala",
+      "required_substrings": [
+        "VectorParams.opuMxParams",
+        "VectorParams.dmaParams"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "saturn-params": {
+      "path": "generators/saturn/src/main/scala/common/Parameters.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "snapshot": "dtypes-evidence/saturn-params.scala",
+      "required_substrings": [
+        "useMxOPU = true",
+        "useOpuColReadout: Boolean = false",
+        "case object Unified"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "shuttle-core": {
+      "path": "generators/shuttle/src/main/scala/common/Parameters.scala",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "snapshot": "dtypes-evidence/shuttle-core.scala",
+      "required_substrings": [
+        "FPUParams(minFLen = 16"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "shuttle-vec": {
+      "path": "generators/saturn/src/main/scala/shuttle/Configs.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "74850fbda13a0ad1ed5a215cbfc28485a9dc4e782ecace3dccc336981a61abf8",
+      "snapshot": "dtypes-evidence/shuttle-vec.scala",
+      "required_substrings": [
+        "vfLen = 64",
+        "vfh = true"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "rocket-vec": {
+      "path": "generators/saturn/src/main/scala/rocket/Configs.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "f8185e622376b661c8af071b0b40e051f5b1099acc8f5b3c7101bfd6b5a4c21e",
+      "snapshot": "dtypes-evidence/rocket-vec.scala",
+      "required_substrings": [
+        "minFLen = 16",
+        "vfLen = 64"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "rocket-core": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/RocketCore.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+      "snapshot": "dtypes-evidence/rocket-core.scala",
+      "required_substrings": [
+        "fpu: Option[FPUParams] = Some(FPUParams())"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "rocket-big": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/Configs.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "78e97e9c2d1fa129629a3ee200a21f89a597aacee43c9ee50f403f74cf098254",
+      "snapshot": "dtypes-evidence/rocket-big.scala",
+      "required_substrings": [
+        "class WithNBigCores"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fpu": {
+      "path": "generators/rocket-chip/src/main/scala/tile/FPU.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+      "snapshot": "dtypes-evidence/fpu.scala",
+      "required_substrings": [
+        "fLen: Int = 64",
+        "case (16, 64) => h ++ f ++ d ++ fcvt_hd"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "csr": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/CSR.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10",
+      "snapshot": "dtypes-evidence/csr.scala",
+      "required_substrings": [
+        "val altfmt = Bool()"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "int-decode": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/IDecode.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "56ff065ff7b6ed15283afe071f2e79b6f09d2848df6729f0fc4ba3bea9036ace",
+      "snapshot": "dtypes-evidence/int-decode.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "scalar-instructions": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/Instructions.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "9aeb6c05db25e5d026e6055ef3f2c9080832c2b28c404f127cdc44e726e1cf1a",
+      "snapshot": "dtypes-evidence/scalar-instructions.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "custom-instructions": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/CustomInstructions.scala",
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "6313d95d0fd760a092ae50f6b0dcb27a1bfbac42c7e1e841b008e893fdc72bb1",
+      "snapshot": "dtypes-evidence/custom-instructions.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "shuttle-exec": {
+      "path": "generators/shuttle/src/main/scala/exu/Core.scala",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "snapshot": "dtypes-evidence/shuttle-exec.scala",
+      "required_substrings": [
+        "rrd_illegal_insn(i) := (!ctrl.legal"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "mx-types": {
+      "path": "generators/saturn/src/main/scala/exu/fp/MXFType.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "74be22b5ff7165169e80bdb9af8dc991cbe69eafaa02cb70679e492a6ce02333",
+      "snapshot": "dtypes-evidence/mx-types.scala",
+      "required_substrings": [
+        "val BF16 = new FType(8, 8)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fma": {
+      "path": "generators/saturn/src/main/scala/exu/fp/FPFMAPipe.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "34a4e41f68861c4dc7b4803c49fd6d0b393964b633e9892a68310b5fcf0afaff",
+      "snapshot": "dtypes-evidence/fma.scala",
+      "required_substrings": [
+        "rawUnroundedToFp8",
+        "MXFType.BF16"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "shared-fma": {
+      "path": "generators/saturn/src/main/scala/exu/fp/SharedFPFMA.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "65c440405300c4df7295d7349c54c5709d33ae27cc02e836c6f3f71d18a871be",
+      "snapshot": "dtypes-evidence/shared-fma.scala",
+      "required_substrings": [
+        "base_insns.map(_.elementWise)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fp-conv": {
+      "path": "generators/saturn/src/main/scala/exu/fp/FPConv.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "650995c0babdc42f8d502d0aa36396d2cae91b877dcf2ecc625149c6713e43ce",
+      "snapshot": "dtypes-evidence/fp-conv.scala",
+      "required_substrings": [
+        "if (mxConversion)",
+        "fp82bf16",
+        "bf162s"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fp-div": {
+      "path": "generators/saturn/src/main/scala/exu/fp/FPDiv.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "952f3de2a44415a89436872877ba5c2b3fc8c4b55b237b3e085772fc4e318ec6",
+      "snapshot": "dtypes-evidence/fp-div.scala",
+      "required_substrings": [
+        "restrictSEW(1,2,3)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fp-comp": {
+      "path": "generators/saturn/src/main/scala/exu/fp/FPComp.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "eb524711ba0ad3292787a404e974c570220e392c8b348920d3d8367cac38be8c",
+      "snapshot": "dtypes-evidence/fp-comp.scala",
+      "required_substrings": [
+        "Seq(FType.H, FType.S, FType.D)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fp8-expand": {
+      "path": "generators/saturn/src/main/scala/exu/fp/fp8ToE5M3.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "b397dccf44a6beb3800b52e88bbc7138ef7dedb03a0f368283f0ae29003762b4",
+      "snapshot": "dtypes-evidence/fp8-expand.scala",
+      "required_substrings": [
+        "val isNaN = exp.andR && sig.andR"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fp8-narrow": {
+      "path": "generators/saturn/src/main/scala/exu/fp/e5M3ToFp8.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "211bb985106e610699eadff02c370f249a418d9d93591f58631a55ac212ea34b",
+      "snapshot": "dtypes-evidence/fp8-narrow.scala",
+      "required_substrings": [
+        "object assembleOFPE4M3"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "opu": {
+      "path": "generators/saturn/src/main/scala/exu/OuterProductUnit.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "be2f6842fc72538ef7b458e22e0f3a3668a58ae3038d03a5deea47f629adf3ff",
+      "snapshot": "dtypes-evidence/opu.scala",
+      "required_substrings": [
+        "if (useMxOPU)",
+        "fma.io.roundingMode := io.rm.get"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "opu-seq": {
+      "path": "generators/saturn/src/main/scala/backend/OuterProductSequencer.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "59dd5e0c462272ab0aca03516ab5516af62c1609029c0fdf8ebad8f04bff3580",
+      "snapshot": "dtypes-evidence/opu-seq.scala",
+      "required_substrings": [
+        "signed_t := dis_inst.vconfig.vtype.altfmt"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "backend": {
+      "path": "generators/saturn/src/main/scala/backend/Backend.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "d4a4df872b47f50bcca1b845890845084deaf884daf0ce4e1c7aa11b8a6b8c96",
+      "snapshot": "dtypes-evidence/backend.scala",
+      "required_substrings": [
+        "if (useOpuColReadout)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "issue-queue": {
+      "path": "generators/saturn/src/main/scala/backend/IssueQueue.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "f4df3a0c349d503a56cdab264d514d45783ad4a259e48ccdf93c8f077ed8c91d",
+      "snapshot": "dtypes-evidence/issue-queue.scala",
+      "required_substrings": [
+        "io.deq <> io.enq"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "early-decode": {
+      "path": "generators/saturn/src/main/scala/frontend/EarlyDecode.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "1a207d20a11bd2acc590eadfa56a5bee0d605c7fbb4977eaad26039554163650",
+      "snapshot": "dtypes-evidence/early-decode.scala",
+      "required_substrings": [
+        "io.fp := funct3 === OPFVF"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "int-div": {
+      "path": "generators/saturn/src/main/scala/exu/int/IntegerDivide.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "d79ecb2d20051cda48d0c3805099c29b45e8e0e9d4e593bbab457726d86cbff0",
+      "snapshot": "dtypes-evidence/int-div.scala",
+      "required_substrings": [
+        "if (supportsMul) mulInsns else Nil"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "int-mul": {
+      "path": "generators/saturn/src/main/scala/exu/int/SegmentedMultiplyPipe.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "19518c313551a8b561429bb79c0b172405fc4f7e8d73ad9786e70c6ceb0ee664",
+      "snapshot": "dtypes-evidence/int-mul.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "int-alu": {
+      "path": "generators/saturn/src/main/scala/exu/int/IntegerPipe.scala",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "4f8c24673fac6b181f145f00f4c0f3f339d57837377d303a52ebe9da659a344e",
+      "snapshot": "dtypes-evidence/int-alu.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "hardfloat-round": {
+      "path": "generators/hardfloat/hardfloat/src/main/scala/RoundAnyRawFNToRecFN.scala",
+      "repository": "hardfloat",
+      "commit": "0ecaef097ce2accbd16a61613699450ed5533f29",
+      "sha256": "31cdb3be147471d52e721f14914031c19b915bd7aaffe5c0e333393a0c7fb67d",
+      "snapshot": "dtypes-evidence/hardfloat-round.scala",
+      "required_substrings": [
+        "val signOut = Mux(isNaNOut, false.B, io.in.sign)"
+      ],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "hardfloat-convert": {
+      "path": "generators/hardfloat/hardfloat/src/main/scala/RecFNToRecFN.scala",
+      "repository": "hardfloat",
+      "commit": "0ecaef097ce2accbd16a61613699450ed5533f29",
+      "sha256": "97042141693cd2e8aaa90f88ee39d2c3c4177fc76c48f9ad46aaea71fee34f09",
+      "snapshot": "dtypes-evidence/hardfloat-convert.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "hardfloat-fma": {
+      "path": "generators/hardfloat/hardfloat/src/main/scala/MulAddRecFN.scala",
+      "repository": "hardfloat",
+      "commit": "0ecaef097ce2accbd16a61613699450ed5533f29",
+      "sha256": "be8ad43e761922ca479c8814f0ab202eef77a45bbfb17c83d70e10f2e78ff037",
+      "snapshot": "dtypes-evidence/hardfloat-fma.scala",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "dts": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.dts",
+      "repository": "chipyard",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "snapshot": "dtypes-evidence/dts.dts",
+      "required_substrings": [],
+      "association": "local working-tree file; bytes identified independently of repository dirty status"
+    },
+    "fir-opu-ports": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "repository": "chipyard",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "original_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "sha256": "765feb41f93c3371698cd387975b442819178c3d1688c88c0a12e8e63a99a871",
+      "snapshot": "dtypes-evidence/fir-opu-ports.txt",
+      "original_line_ranges": [
+        {
+          "snapshot_start_line": 1,
+          "original_start_line": 605718,
+          "line_count": 4
+        },
+        {
+          "snapshot_start_line": 5,
+          "original_start_line": 1066582,
+          "line_count": 4
+        }
+      ],
+      "required_substrings": [
+        "flip fp8",
+        "flip e5m2_l",
+        "out : UInt<32>[4]"
+      ],
+      "association": "local elaboration; exact build source identity and deployed image match remain unverified"
+    }
+  },
+  "scalar_bf16_decoder_proof": {
+    "all_instruction_patterns": 835,
+    "pattern_counts": {
+      "scalar-instructions": 807,
+      "custom-instructions": 28
+    },
+    "cases": [
+      {
+        "instruction": "fcvt.bf16.s",
+        "value": "0x44800053",
+        "mask": "0xfff0007f",
+        "intersections": [],
+        "result": "no-scalar-decoder-entry"
+      },
+      {
+        "instruction": "fcvt.s.bf16",
+        "value": "0x40600053",
+        "mask": "0xfff0007f",
+        "intersections": [],
+        "result": "no-scalar-decoder-entry"
+      }
+    ],
+    "sources": [
+      "scalar-instructions",
+      "custom-instructions"
+    ],
+    "rtl_executed": false
+  },
+  "types": {
+    "i4": {
+      "category": "integer"
+    },
+    "u4": {
+      "category": "integer"
+    },
+    "i8": {
+      "category": "integer"
+    },
+    "u8": {
+      "category": "integer"
+    },
+    "i16": {
+      "category": "integer"
+    },
+    "u16": {
+      "category": "integer"
+    },
+    "i32": {
+      "category": "integer"
+    },
+    "u32": {
+      "category": "integer"
+    },
+    "i64": {
+      "category": "integer"
+    },
+    "u64": {
+      "category": "integer"
+    },
+    "f16": {
+      "category": "floating"
+    },
+    "f32": {
+      "category": "floating"
+    },
+    "f64": {
+      "category": "floating"
+    },
+    "bf16": {
+      "category": "floating"
+    },
+    "ofp8_e4m3": {
+      "category": "floating"
+    },
+    "ofp8_e5m2": {
+      "category": "floating"
+    }
+  },
+  "aliases": {
+    "fp8": "ambiguous: choose ofp8_e4m3 or ofp8_e5m2 explicitly",
+    "bf8": "no separately identified BF8 type; do not silently alias this name"
+  },
+  "capabilities": [
+    {
+      "id": "hart0.scalar.narrow-integers",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "promoted_arithmetic"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "8/16-bit storage and sign/zero extension; arithmetic uses 32/64-bit registers, not native narrow ALUs."
+      ]
+    },
+    {
+      "id": "hart0.scalar.native-integers",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare",
+        "amo_lrsc"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            71,
+            130
+          ]
+        },
+        {
+          "source": "int-decode",
+          "lines": [
+            214,
+            305
+          ]
+        }
+      ],
+      "notes": [
+        "RV64 word operations and extension/truncation rules apply; unsigned 32-bit values may need zero extension."
+      ]
+    },
+    {
+      "id": "hart0.scalar.ieee-floating",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "load_store",
+        "convert",
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "classify"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            39,
+            45
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            17,
+            24
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "Full H/S/D decode, including half arithmetic; this is stronger than Zfhmin-only support. Conversion pairs follow the individual instructions, not an arbitrary Cartesian product."
+      ]
+    },
+    {
+      "id": "hart0.scalar.minifloat-storage",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Bit transport through integer loads/stores does not imply floating arithmetic."
+      ]
+    },
+    {
+      "id": "hart0.scalar.bf16-convert",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "dts",
+          "lines": [
+            18,
+            44
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        },
+        {
+          "source": "scalar-instructions",
+          "lines": [
+            12,
+            818
+          ]
+        },
+        {
+          "source": "custom-instructions",
+          "lines": [
+            8,
+            38
+          ]
+        },
+        {
+          "source": "shuttle-exec",
+          "lines": [
+            243,
+            263
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "Compute DTS advertises Zfbfmin, but both scalar BF16 encodings are disjoint from all 807 Rocket Instructions.scala and 28 CustomInstructions.scala patterns. Scalar/FPU decoders select only those definitions; Saturn vector EarlyDecode excludes scalar opcode 0x53. The source therefore has no executable scalar BF16 conversion path, despite the advertisement. Exact deployed-image association remains unverified."
+      ]
+    },
+    {
+      "id": "hart0.scalar.bf16-arithmetic",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "No native BF16 scalar arithmetic path in the reviewed FPU."
+      ]
+    },
+    {
+      "id": "hart0.scalar.fp8-arithmetic",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "FP8 hardware is in vector/VME units, not the scalar FPU."
+      ]
+    },
+    {
+      "id": "hart0.scalar.int4",
+      "hart": 0,
+      "unit": "scalar",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Packed int4 can be manipulated in software; no native 4-bit scalar arithmetic is claimed."
+      ]
+    },
+    {
+      "id": "hart0.vector.integer-arithmetic",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "mac",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            39
+          ]
+        },
+        {
+          "source": "int-alu",
+          "lines": [
+            177,
+            210
+          ]
+        },
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "DLEN 128 vector datapath; supported operation variants follow decoder definitions."
+      ]
+    },
+    {
+      "id": "hart0.vector.integer-widen",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "widen_mul",
+        "widen_mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "Input widths 8/16/32 widen to 16/32/64; no 64-to-128 widening operation."
+      ]
+    },
+    {
+      "id": "hart0.vector.int4",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "csr",
+          "lines": [
+            383,
+            390
+          ]
+        }
+      ],
+      "notes": [
+        "Minimum vector element width is 8 bits; packed 4-bit values require software unpacking."
+      ]
+    },
+    {
+      "id": "hart0.vector.ieee-fma",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": [
+        "Compute has segmented SIMD FP16/32/64; default useElementwiseFP64=false makes every 64-bit lane support double precision."
+      ]
+    },
+    {
+      "id": "hart0.vector.ieee-misc",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "recip_estimate",
+        "rsqrt_estimate",
+        "classify",
+        "compare",
+        "minmax",
+        "sign_inject"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            240
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        }
+      ],
+      "notes": [
+        "Divide/sqrt are elementwise iterative; compare/minmax have H/S/D formats only."
+      ]
+    },
+    {
+      "id": "hart0.vector.ieee-convert",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            13,
+            19
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        }
+      ],
+      "notes": [
+        "Adjacent IEEE widths: FP16\u2194FP32 and FP32\u2194FP64; no claim of arbitrary direct width conversion."
+      ]
+    },
+    {
+      "id": "hart0.vector.ieee-integer-convert",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "integer_float_convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            147
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            250,
+            274
+          ]
+        }
+      ],
+      "notes": [
+        "Width, signedness, widening/narrowing and rounding restrictions follow each individual conversion; no BF16/FP8-to-integer conversion is claimed."
+      ]
+    },
+    {
+      "id": "hart0.vector.widen-f16",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "f16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vector.widen-f32",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "f32"
+      ],
+      "accumulator_type": "f64",
+      "output_types": [
+        "f64"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vector.minifloat-storage",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "Storage of bit patterns is available independent of Mx arithmetic."
+      ]
+    },
+    {
+      "id": "hart0.vector.bf16-fma",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            185,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            368
+          ]
+        }
+      ],
+      "notes": [
+        "Requires the compute Mx FMA path and altfmt=1 at SEW16; does not imply BF16 divide/compare."
+      ]
+    },
+    {
+      "id": "hart0.vector.bf16-widen-fma",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            174
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vector.bf16-convert",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            324,
+            352
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vector.fp8-fma",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            188,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            245,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            355
+          ]
+        },
+        {
+          "source": "fp8-narrow",
+          "lines": [
+            41,
+            46
+          ]
+        }
+      ],
+      "notes": [
+        "altfmt selects one common FP8 format for vector operands; E4M3 result flags are explicitly zero in rawUnroundedToFp8. This source capability exceeds what the min extension name alone establishes."
+      ]
+    },
+    {
+      "id": "hart0.vector.fp8-widen-fma",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            190
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": [
+        "Widening SEW8 output is BF16, not a direct FP32 VME-style accumulator."
+      ]
+    },
+    {
+      "id": "hart0.vector.fp8-bf16-convert",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            289,
+            312
+          ]
+        },
+        {
+          "source": "fp8-expand",
+          "lines": [
+            8,
+            29
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vector.minifloat-misc",
+      "hart": 0,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "integer_float_convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            238
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            41,
+            50
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            95
+          ]
+        }
+      ],
+      "notes": [
+        "Reviewed non-FMA units interpret H/S/D only; accepted encodings at an altfmt are not proof of BF16 semantics."
+      ]
+    },
+    {
+      "id": "hart0.vme.int8-mac",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "i8",
+        "u8"
+      ],
+      "accumulator_type": "i32",
+      "output_types": [
+        "i32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            71,
+            78
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        }
+      ],
+      "notes": [
+        "32-bit accumulator bit pattern wraps modulo 2^32; A signedness is rd bit0, B signedness is altfmt."
+      ],
+      "input_type_pairs": [
+        [
+          "i8",
+          "i8"
+        ],
+        [
+          "i8",
+          "u8"
+        ],
+        [
+          "u8",
+          "i8"
+        ],
+        [
+          "u8",
+          "u8"
+        ]
+      ]
+    },
+    {
+      "id": "hart0.vme.fp8-mac",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            84,
+            110
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        },
+        {
+          "source": "hardfloat-round",
+          "lines": [
+            235,
+            288
+          ]
+        },
+        {
+          "source": "hardfloat-convert",
+          "lines": [
+            58,
+            86
+          ]
+        },
+        {
+          "source": "hardfloat-fma",
+          "lines": [
+            264,
+            292
+          ]
+        }
+      ],
+      "notes": [
+        "Separate A/B formats; exact input expansion, then sequential FP32 FMA using frm and tininess-after-rounding. OPU exceptionFlags are not connected to architectural fflags. No FPGA/RTL bit-exact certification yet."
+      ],
+      "input_type_pairs": [
+        [
+          "ofp8_e4m3",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e4m3",
+          "ofp8_e5m2"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e5m2"
+        ]
+      ]
+    },
+    {
+      "id": "hart0.vme.tile-row-transport",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_row_read",
+        "tile_row_write",
+        "tile_zero"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            207
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        }
+      ],
+      "notes": [
+        "Raw 32-bit transport, not a conversion or FP32 matrix multiply."
+      ]
+    },
+    {
+      "id": "hart0.vme.tile-column-write",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_write"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            199
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            303,
+            308
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart0.vme.tile-column-read",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_read"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            371,
+            373
+          ]
+        },
+        {
+          "source": "shuttle-vec",
+          "lines": [
+            24,
+            28
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            209,
+            215
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        }
+      ],
+      "notes": [
+        "No column readout ports in elaborated OPU. The instruction may decode but cannot be certified as a column read. Do not invent an illegal-instruction trap for this missing datapath."
+      ]
+    },
+    {
+      "id": "hart0.vme.other-native-matmul",
+      "hart": 0,
+      "unit": "vme",
+      "input_types": [
+        "i4",
+        "u4",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "bf16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [],
+      "operations": [
+        "mac"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            397,
+            406
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        }
+      ],
+      "notes": [
+        "VME computes 8-bit operands into 32-bit tiles; 32-bit tile moves do not make other input types native matrix operations."
+      ]
+    },
+    {
+      "id": "hart1.scalar.narrow-integers",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "promoted_arithmetic"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "8/16-bit storage and sign/zero extension; arithmetic uses 32/64-bit registers, not native narrow ALUs."
+      ]
+    },
+    {
+      "id": "hart1.scalar.native-integers",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare",
+        "amo_lrsc"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            71,
+            130
+          ]
+        },
+        {
+          "source": "int-decode",
+          "lines": [
+            214,
+            305
+          ]
+        }
+      ],
+      "notes": [
+        "RV64 word operations and extension/truncation rules apply; unsigned 32-bit values may need zero extension."
+      ]
+    },
+    {
+      "id": "hart1.scalar.ieee-floating",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "load_store",
+        "convert",
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "classify"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            39,
+            45
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            17,
+            24
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "Full H/S/D decode, including half arithmetic; this is stronger than Zfhmin-only support. Conversion pairs follow the individual instructions, not an arbitrary Cartesian product."
+      ]
+    },
+    {
+      "id": "hart1.scalar.minifloat-storage",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Bit transport through integer loads/stores does not imply floating arithmetic."
+      ]
+    },
+    {
+      "id": "hart1.scalar.bf16-convert",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "dts",
+          "lines": [
+            18,
+            44
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        },
+        {
+          "source": "scalar-instructions",
+          "lines": [
+            12,
+            818
+          ]
+        },
+        {
+          "source": "custom-instructions",
+          "lines": [
+            8,
+            38
+          ]
+        },
+        {
+          "source": "shuttle-exec",
+          "lines": [
+            243,
+            263
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "Compute DTS advertises Zfbfmin, but both scalar BF16 encodings are disjoint from all 807 Rocket Instructions.scala and 28 CustomInstructions.scala patterns. Scalar/FPU decoders select only those definitions; Saturn vector EarlyDecode excludes scalar opcode 0x53. The source therefore has no executable scalar BF16 conversion path, despite the advertisement. Exact deployed-image association remains unverified."
+      ]
+    },
+    {
+      "id": "hart1.scalar.bf16-arithmetic",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "No native BF16 scalar arithmetic path in the reviewed FPU."
+      ]
+    },
+    {
+      "id": "hart1.scalar.fp8-arithmetic",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "FP8 hardware is in vector/VME units, not the scalar FPU."
+      ]
+    },
+    {
+      "id": "hart1.scalar.int4",
+      "hart": 1,
+      "unit": "scalar",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Packed int4 can be manipulated in software; no native 4-bit scalar arithmetic is claimed."
+      ]
+    },
+    {
+      "id": "hart1.vector.integer-arithmetic",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "mac",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            39
+          ]
+        },
+        {
+          "source": "int-alu",
+          "lines": [
+            177,
+            210
+          ]
+        },
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "DLEN 128 vector datapath; supported operation variants follow decoder definitions."
+      ]
+    },
+    {
+      "id": "hart1.vector.integer-widen",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "widen_mul",
+        "widen_mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "Input widths 8/16/32 widen to 16/32/64; no 64-to-128 widening operation."
+      ]
+    },
+    {
+      "id": "hart1.vector.int4",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "csr",
+          "lines": [
+            383,
+            390
+          ]
+        }
+      ],
+      "notes": [
+        "Minimum vector element width is 8 bits; packed 4-bit values require software unpacking."
+      ]
+    },
+    {
+      "id": "hart1.vector.ieee-fma",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": [
+        "Compute has segmented SIMD FP16/32/64; default useElementwiseFP64=false makes every 64-bit lane support double precision."
+      ]
+    },
+    {
+      "id": "hart1.vector.ieee-misc",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "recip_estimate",
+        "rsqrt_estimate",
+        "classify",
+        "compare",
+        "minmax",
+        "sign_inject"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            240
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        }
+      ],
+      "notes": [
+        "Divide/sqrt are elementwise iterative; compare/minmax have H/S/D formats only."
+      ]
+    },
+    {
+      "id": "hart1.vector.ieee-convert",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            13,
+            19
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        }
+      ],
+      "notes": [
+        "Adjacent IEEE widths: FP16\u2194FP32 and FP32\u2194FP64; no claim of arbitrary direct width conversion."
+      ]
+    },
+    {
+      "id": "hart1.vector.ieee-integer-convert",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "integer_float_convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            147
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            250,
+            274
+          ]
+        }
+      ],
+      "notes": [
+        "Width, signedness, widening/narrowing and rounding restrictions follow each individual conversion; no BF16/FP8-to-integer conversion is claimed."
+      ]
+    },
+    {
+      "id": "hart1.vector.widen-f16",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "f16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vector.widen-f32",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "f32"
+      ],
+      "accumulator_type": "f64",
+      "output_types": [
+        "f64"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            387,
+            417
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            437,
+            449
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vector.minifloat-storage",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "Storage of bit patterns is available independent of Mx arithmetic."
+      ]
+    },
+    {
+      "id": "hart1.vector.bf16-fma",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            185,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            368
+          ]
+        }
+      ],
+      "notes": [
+        "Requires the compute Mx FMA path and altfmt=1 at SEW16; does not imply BF16 divide/compare."
+      ]
+    },
+    {
+      "id": "hart1.vector.bf16-widen-fma",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            174
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vector.bf16-convert",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            324,
+            352
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vector.fp8-fma",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            188,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            245,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            355
+          ]
+        },
+        {
+          "source": "fp8-narrow",
+          "lines": [
+            41,
+            46
+          ]
+        }
+      ],
+      "notes": [
+        "altfmt selects one common FP8 format for vector operands; E4M3 result flags are explicitly zero in rawUnroundedToFp8. This source capability exceeds what the min extension name alone establishes."
+      ]
+    },
+    {
+      "id": "hart1.vector.fp8-widen-fma",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            190
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": [
+        "Widening SEW8 output is BF16, not a direct FP32 VME-style accumulator."
+      ]
+    },
+    {
+      "id": "hart1.vector.fp8-bf16-convert",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            289,
+            312
+          ]
+        },
+        {
+          "source": "fp8-expand",
+          "lines": [
+            8,
+            29
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vector.minifloat-misc",
+      "hart": 1,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "integer_float_convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            238
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            41,
+            50
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            95
+          ]
+        }
+      ],
+      "notes": [
+        "Reviewed non-FMA units interpret H/S/D only; accepted encodings at an altfmt are not proof of BF16 semantics."
+      ]
+    },
+    {
+      "id": "hart1.vme.int8-mac",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "i8",
+        "u8"
+      ],
+      "accumulator_type": "i32",
+      "output_types": [
+        "i32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            71,
+            78
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        }
+      ],
+      "notes": [
+        "32-bit accumulator bit pattern wraps modulo 2^32; A signedness is rd bit0, B signedness is altfmt."
+      ],
+      "input_type_pairs": [
+        [
+          "i8",
+          "i8"
+        ],
+        [
+          "i8",
+          "u8"
+        ],
+        [
+          "u8",
+          "i8"
+        ],
+        [
+          "u8",
+          "u8"
+        ]
+      ]
+    },
+    {
+      "id": "hart1.vme.fp8-mac",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            84,
+            110
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        },
+        {
+          "source": "hardfloat-round",
+          "lines": [
+            235,
+            288
+          ]
+        },
+        {
+          "source": "hardfloat-convert",
+          "lines": [
+            58,
+            86
+          ]
+        },
+        {
+          "source": "hardfloat-fma",
+          "lines": [
+            264,
+            292
+          ]
+        }
+      ],
+      "notes": [
+        "Separate A/B formats; exact input expansion, then sequential FP32 FMA using frm and tininess-after-rounding. OPU exceptionFlags are not connected to architectural fflags. No FPGA/RTL bit-exact certification yet."
+      ],
+      "input_type_pairs": [
+        [
+          "ofp8_e4m3",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e4m3",
+          "ofp8_e5m2"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e5m2"
+        ]
+      ]
+    },
+    {
+      "id": "hart1.vme.tile-row-transport",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_row_read",
+        "tile_row_write",
+        "tile_zero"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            207
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        }
+      ],
+      "notes": [
+        "Raw 32-bit transport, not a conversion or FP32 matrix multiply."
+      ]
+    },
+    {
+      "id": "hart1.vme.tile-column-write",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_write"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            199
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            303,
+            308
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart1.vme.tile-column-read",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_read"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            371,
+            373
+          ]
+        },
+        {
+          "source": "shuttle-vec",
+          "lines": [
+            24,
+            28
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            209,
+            215
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        }
+      ],
+      "notes": [
+        "No column readout ports in elaborated OPU. The instruction may decode but cannot be certified as a column read. Do not invent an illegal-instruction trap for this missing datapath."
+      ]
+    },
+    {
+      "id": "hart1.vme.other-native-matmul",
+      "hart": 1,
+      "unit": "vme",
+      "input_types": [
+        "i4",
+        "u4",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "bf16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [],
+      "operations": [
+        "mac"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            397,
+            406
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        }
+      ],
+      "notes": [
+        "VME computes 8-bit operands into 32-bit tiles; 32-bit tile moves do not make other input types native matrix operations."
+      ]
+    },
+    {
+      "id": "hart2.scalar.narrow-integers",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "promoted_arithmetic"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "8/16-bit storage and sign/zero extension; arithmetic uses 32/64-bit registers, not native narrow ALUs."
+      ]
+    },
+    {
+      "id": "hart2.scalar.native-integers",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare",
+        "amo_lrsc"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            71,
+            130
+          ]
+        },
+        {
+          "source": "int-decode",
+          "lines": [
+            214,
+            305
+          ]
+        }
+      ],
+      "notes": [
+        "RV64 word operations and extension/truncation rules apply; unsigned 32-bit values may need zero extension."
+      ]
+    },
+    {
+      "id": "hart2.scalar.ieee-floating",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "load_store",
+        "convert",
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "classify"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "rocket-big",
+          "lines": [
+            62,
+            81
+          ]
+        },
+        {
+          "source": "rocket-core",
+          "lines": [
+            56,
+            56
+          ]
+        },
+        {
+          "source": "rocket-vec",
+          "lines": [
+            44,
+            49
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            17,
+            24
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "Full H/S/D decode, including half arithmetic; this is stronger than Zfhmin-only support. Conversion pairs follow the individual instructions, not an arbitrary Cartesian product."
+      ]
+    },
+    {
+      "id": "hart2.scalar.minifloat-storage",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Bit transport through integer loads/stores does not imply floating arithmetic."
+      ]
+    },
+    {
+      "id": "hart2.scalar.bf16-convert",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "dts",
+          "lines": [
+            74,
+            103
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        },
+        {
+          "source": "scalar-instructions",
+          "lines": [
+            12,
+            818
+          ]
+        },
+        {
+          "source": "custom-instructions",
+          "lines": [
+            8,
+            38
+          ]
+        },
+        {
+          "source": "shuttle-exec",
+          "lines": [
+            243,
+            263
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "No Zfbfmin advertisement; both scalar BF16 encodings miss all 835 normal/custom scalar decoder patterns. Vector BF16/FP8 storage does not establish scalar conversion support."
+      ]
+    },
+    {
+      "id": "hart2.scalar.bf16-arithmetic",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "div",
+        "sqrt"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "No native BF16 scalar arithmetic path in the reviewed FPU."
+      ]
+    },
+    {
+      "id": "hart2.scalar.fp8-arithmetic",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        }
+      ],
+      "notes": [
+        "FP8 hardware is in vector/VME units, not the scalar FPU."
+      ]
+    },
+    {
+      "id": "hart2.scalar.int4",
+      "hart": 2,
+      "unit": "scalar",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "int-decode",
+          "lines": [
+            40,
+            130
+          ]
+        }
+      ],
+      "notes": [
+        "Packed int4 can be manipulated in software; no native 4-bit scalar arithmetic is claimed."
+      ]
+    },
+    {
+      "id": "hart2.vector.integer-arithmetic",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "load_store",
+        "add",
+        "sub",
+        "mul",
+        "mac",
+        "div",
+        "rem",
+        "shift",
+        "bitwise",
+        "compare"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            39
+          ]
+        },
+        {
+          "source": "int-alu",
+          "lines": [
+            177,
+            210
+          ]
+        },
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "Hart 2 uses iterative integer multiply/divide; its zero-depth execute queue bypasses storage and does not remove arithmetic."
+      ]
+    },
+    {
+      "id": "hart2.vector.integer-widen",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "i8",
+        "u8",
+        "i16",
+        "u16",
+        "i32",
+        "u32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64"
+      ],
+      "operations": [
+        "widen_mul",
+        "widen_mac"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "int-mul",
+          "lines": [
+            12,
+            28
+          ]
+        },
+        {
+          "source": "int-div",
+          "lines": [
+            13,
+            28
+          ]
+        }
+      ],
+      "notes": [
+        "Input widths 8/16/32 widen to 16/32/64; no 64-to-128 widening operation."
+      ]
+    },
+    {
+      "id": "hart2.vector.int4",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "i4",
+        "u4"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i4",
+        "u4"
+      ],
+      "operations": [
+        "arithmetic"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "csr",
+          "lines": [
+            383,
+            390
+          ]
+        }
+      ],
+      "notes": [
+        "Minimum vector element width is 8 bits; packed 4-bit values require software unpacking."
+      ]
+    },
+    {
+      "id": "hart2.vector.ieee-fma",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            12,
+            14
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            55,
+            56
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            74,
+            106
+          ]
+        }
+      ],
+      "notes": [
+        "Shared scalar FPU executes vector FP16/32/64 elementwise despite the dmaParams memcpy-only comment."
+      ]
+    },
+    {
+      "id": "hart2.vector.ieee-misc",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "recip_estimate",
+        "rsqrt_estimate",
+        "classify",
+        "compare",
+        "minmax",
+        "sign_inject"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            240
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        }
+      ],
+      "notes": [
+        "Divide/sqrt are elementwise iterative; compare/minmax have H/S/D formats only."
+      ]
+    },
+    {
+      "id": "hart2.vector.ieee-convert",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            13,
+            19
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        }
+      ],
+      "notes": [
+        "Adjacent IEEE widths: FP16\u2194FP32 and FP32\u2194FP64; no claim of arbitrary direct width conversion."
+      ]
+    },
+    {
+      "id": "hart2.vector.ieee-integer-convert",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "f32",
+        "f64"
+      ],
+      "operations": [
+        "integer_float_convert"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        16,
+        32,
+        64
+      ],
+      "evidence": [
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            147
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            250,
+            274
+          ]
+        }
+      ],
+      "notes": [
+        "Width, signedness, widening/narrowing and rounding restrictions follow each individual conversion; no BF16/FP8-to-integer conversion is claimed."
+      ]
+    },
+    {
+      "id": "hart2.vector.widen-f16",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "f16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            12,
+            14
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            55,
+            56
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            74,
+            106
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vector.widen-f32",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "f32"
+      ],
+      "accumulator_type": "f64",
+      "output_types": [
+        "f64"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        64
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            161,
+            192
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            53,
+            72
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            12,
+            14
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            55,
+            56
+          ]
+        },
+        {
+          "source": "shared-fma",
+          "lines": [
+            74,
+            106
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vector.minifloat-storage",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "load_store_bits"
+      ],
+      "status": "configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ],
+      "notes": [
+        "Storage of bit patterns is available independent of Mx arithmetic."
+      ]
+    },
+    {
+      "id": "hart2.vector.bf16-fma",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            185,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            368
+          ]
+        }
+      ],
+      "notes": [
+        "Requires the compute Mx FMA path and altfmt=1 at SEW16; does not imply BF16 divide/compare."
+      ]
+    },
+    {
+      "id": "hart2.vector.bf16-widen-fma",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "bf16"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            174
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vector.bf16-convert",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "f32"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        16,
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            275,
+            307
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            324,
+            352
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vector.fp8-fma",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "add",
+        "sub",
+        "mul",
+        "fma",
+        "reduce_sum"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        8
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            188,
+            204
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            245,
+            259
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            349,
+            355
+          ]
+        },
+        {
+          "source": "fp8-narrow",
+          "lines": [
+            41,
+            46
+          ]
+        }
+      ],
+      "notes": [
+        "FMA decode may match SEW8, but shared scalar datapath has only H/S/D; do not equate decode acceptance with FP8 arithmetic."
+      ]
+    },
+    {
+      "id": "hart2.vector.fp8-widen-fma",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "bf16",
+      "output_types": [
+        "bf16"
+      ],
+      "operations": [
+        "widen_add",
+        "widen_sub",
+        "widen_mul",
+        "widen_fma"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            164,
+            190
+          ]
+        },
+        {
+          "source": "fma",
+          "lines": [
+            237,
+            259
+          ]
+        }
+      ],
+      "notes": [
+        "Widening SEW8 output is BF16, not a direct FP32 VME-style accumulator."
+      ]
+    },
+    {
+      "id": "hart2.vector.fp8-bf16-convert",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2",
+        "bf16"
+      ],
+      "operations": [
+        "convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        8,
+        16
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            150,
+            159
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            289,
+            312
+          ]
+        },
+        {
+          "source": "fp8-expand",
+          "lines": [
+            8,
+            29
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vector.minifloat-misc",
+      "hart": 2,
+      "unit": "vector",
+      "input_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "bf16",
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "operations": [
+        "div",
+        "sqrt",
+        "compare",
+        "minmax",
+        "integer_float_convert"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            238
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            12,
+            20
+          ]
+        },
+        {
+          "source": "fp-comp",
+          "lines": [
+            41,
+            50
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            95
+          ]
+        }
+      ],
+      "notes": [
+        "Reviewed non-FMA units interpret H/S/D only; accepted encodings at an altfmt are not proof of BF16 semantics."
+      ]
+    },
+    {
+      "id": "hart2.vme.int8-mac",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "i8",
+        "u8"
+      ],
+      "accumulator_type": "i32",
+      "output_types": [
+        "i32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            71,
+            78
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        }
+      ],
+      "notes": [
+        "32-bit accumulator bit pattern wraps modulo 2^32; A signedness is rd bit0, B signedness is altfmt."
+      ],
+      "input_type_pairs": [
+        [
+          "i8",
+          "i8"
+        ],
+        [
+          "i8",
+          "u8"
+        ],
+        [
+          "u8",
+          "i8"
+        ],
+        [
+          "u8",
+          "u8"
+        ]
+      ]
+    },
+    {
+      "id": "hart2.vme.fp8-mac",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "ofp8_e4m3",
+        "ofp8_e5m2"
+      ],
+      "accumulator_type": "f32",
+      "output_types": [
+        "f32"
+      ],
+      "operations": [
+        "mac"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            277,
+            301
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            71,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            358,
+            395
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            84,
+            110
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            136,
+            145
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        },
+        {
+          "source": "hardfloat-round",
+          "lines": [
+            235,
+            288
+          ]
+        },
+        {
+          "source": "hardfloat-convert",
+          "lines": [
+            58,
+            86
+          ]
+        },
+        {
+          "source": "hardfloat-fma",
+          "lines": [
+            264,
+            292
+          ]
+        }
+      ],
+      "notes": [
+        "Separate A/B formats; exact input expansion, then sequential FP32 FMA using frm and tininess-after-rounding. OPU exceptionFlags are not connected to architectural fflags. No FPGA/RTL bit-exact certification yet."
+      ],
+      "input_type_pairs": [
+        [
+          "ofp8_e4m3",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e4m3",
+          "ofp8_e5m2"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e4m3"
+        ],
+        [
+          "ofp8_e5m2",
+          "ofp8_e5m2"
+        ]
+      ]
+    },
+    {
+      "id": "hart2.vme.tile-row-transport",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_row_read",
+        "tile_row_write",
+        "tile_zero"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            207
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        }
+      ],
+      "notes": [
+        "Raw 32-bit transport, not a conversion or FP32 matrix multiply."
+      ]
+    },
+    {
+      "id": "hart2.vme.tile-column-write",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_write"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "opu",
+          "lines": [
+            195,
+            199
+          ]
+        },
+        {
+          "source": "opu-seq",
+          "lines": [
+            303,
+            308
+          ]
+        }
+      ],
+      "notes": []
+    },
+    {
+      "id": "hart2.vme.tile-column-read",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "accumulator_type": null,
+      "output_types": [
+        "i32",
+        "u32",
+        "f32"
+      ],
+      "operations": [
+        "tile_column_read"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [
+        32
+      ],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            371,
+            373
+          ]
+        },
+        {
+          "source": "shuttle-vec",
+          "lines": [
+            24,
+            28
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            209,
+            215
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        }
+      ],
+      "notes": [
+        "No column readout ports in elaborated OPU. The instruction may decode but cannot be certified as a column read. Do not invent an illegal-instruction trap for this missing datapath."
+      ]
+    },
+    {
+      "id": "hart2.vme.other-native-matmul",
+      "hart": 2,
+      "unit": "vme",
+      "input_types": [
+        "i4",
+        "u4",
+        "i16",
+        "u16",
+        "i32",
+        "u32",
+        "i64",
+        "u64",
+        "f16",
+        "bf16",
+        "f32",
+        "f64"
+      ],
+      "accumulator_type": null,
+      "output_types": [],
+      "operations": [
+        "mac"
+      ],
+      "status": "not_configured",
+      "execution_width_bits": [],
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            397,
+            406
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            43,
+            55
+          ]
+        },
+        {
+          "source": "opu",
+          "lines": [
+            19,
+            24
+          ]
+        }
+      ],
+      "notes": [
+        "VME computes 8-bit operands into 32-bit tiles; 32-bit tile moves do not make other input types native matrix operations."
+      ]
+    }
+  ],
+  "formats": {
+    "ofp8_e4m3": {
+      "bits": 8,
+      "exponent_bits": 4,
+      "fraction_bits": 3,
+      "max_finite": 448,
+      "min_positive_subnormal_power_of_two": -9,
+      "infinity": false,
+      "nan_bit_patterns": [
+        "0x7f",
+        "0xff"
+      ],
+      "signed_zero": true,
+      "evidence": [
+        {
+          "source": "fp8-expand",
+          "lines": [
+            8,
+            29
+          ]
+        }
+      ]
+    },
+    "ofp8_e5m2": {
+      "bits": 8,
+      "exponent_bits": 5,
+      "fraction_bits": 2,
+      "max_finite": 57344,
+      "min_positive_subnormal_power_of_two": -16,
+      "infinity": true,
+      "signed_zero": true,
+      "evidence": [
+        {
+          "source": "mx-types",
+          "lines": [
+            6,
+            10
+          ]
+        },
+        {
+          "source": "fp8-expand",
+          "lines": [
+            8,
+            10
+          ]
+        }
+      ]
+    }
+  },
+  "discrepancies": [
+    {
+      "id": "dma-comment-vs-units",
+      "description": "dmaParams comment says memcpy only, but actual Unified execution unit factories instantiate integer and shared-scalar FP arithmetic; zero-depth queue is bypass.",
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            97,
+            110
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            203,
+            216
+          ]
+        },
+        {
+          "source": "issue-queue",
+          "lines": [
+            20,
+            46
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scalar-zfbfmin-advertisement",
+      "description": "Compute DTS advertises Zfbfmin, but neither scalar BF16 conversion encoding intersects any of the 835 normal/custom scalar instruction definitions. The source decoder has no execution entry; image association and RTL execution certification remain separate.",
+      "evidence": [
+        {
+          "source": "dts",
+          "lines": [
+            36,
+            36
+          ]
+        },
+        {
+          "source": "scalar-instructions",
+          "lines": [
+            12,
+            818
+          ]
+        },
+        {
+          "source": "custom-instructions",
+          "lines": [
+            8,
+            38
+          ]
+        },
+        {
+          "source": "fpu",
+          "lines": [
+            64,
+            173
+          ]
+        },
+        {
+          "source": "shuttle-exec",
+          "lines": [
+            243,
+            263
+          ]
+        },
+        {
+          "source": "early-decode",
+          "lines": [
+            36,
+            70
+          ]
+        }
+      ]
+    },
+    {
+      "id": "column-readout-absent",
+      "description": "Column-read opcode can decode while useOpuColReadout=false; elaborated OPU has no out_col. Reference Spike column-read tests do not certify this hardware behavior.",
+      "evidence": [
+        {
+          "source": "saturn-params",
+          "lines": [
+            371,
+            373
+          ]
+        },
+        {
+          "source": "backend",
+          "lines": [
+            441,
+            450
+          ]
+        },
+        {
+          "source": "fir-opu-ports",
+          "lines": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vector-minifloat-operation-subsets",
+      "description": "Mx FMA and conversions support additional formats, but compare/divide/conversion-to-integer do not thereby gain matching minifloat semantics.",
+      "evidence": [
+        {
+          "source": "fp-comp",
+          "lines": [
+            41,
+            50
+          ]
+        },
+        {
+          "source": "fp-div",
+          "lines": [
+            230,
+            238
+          ]
+        },
+        {
+          "source": "fp-conv",
+          "lines": [
+            84,
+            95
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Configured source paths are not an execution certification or deployed bitstream identity.",
+    "No cycle latency, throughput, utilization peak, or accuracy parameter is inferred from this matrix.",
+    "Not-configured dtype semantics do not necessarily imply the RTL traps on every corresponding broad decode."
+  ]
+}

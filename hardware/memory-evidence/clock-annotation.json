@@ -1,0 +1,58 @@
+{
+  "class": "firesim.lib.bridgeutils.BridgeAnnotation",
+  "target": "~FireSim|RationalClockBridge",
+  "bridgeChannels": [
+    {
+      "class": "firesim.lib.bridgeutils.ClockBridgeChannel",
+      "name": "clocks",
+      "sinks": [
+        "~FireSim|RationalClockBridge>clocks[0]",
+        "~FireSim|RationalClockBridge>clocks[1]",
+        "~FireSim|RationalClockBridge>clocks[2]"
+      ],
+      "clocks": [
+        {
+          "name": "uart_clock,clock_500.0MHz",
+          "multiplier": 1,
+          "divisor": 2
+        },
+        {
+          "name": "clock_1000.0MHz,reference",
+          "multiplier": 1,
+          "divisor": 1
+        },
+        {
+          "name": "clock_100.0MHz,harnessbinder_clock",
+          "multiplier": 1,
+          "divisor": 10
+        }
+      ],
+      "clockMFMRs": [
+        2,
+        1,
+        10
+      ]
+    }
+  ],
+  "widgetClass": "midas.widgets.ClockBridgeModule",
+  "widgetConstructorKey": {
+    "class": "firesim.lib.bridges.ClockParameters",
+    "clocks": [
+      {
+        "name": "uart_clock,clock_500.0MHz",
+        "multiplier": 1,
+        "divisor": 2
+      },
+      {
+        "name": "clock_1000.0MHz,reference",
+        "multiplier": 1,
+        "divisor": 1
+      },
+      {
+        "name": "clock_100.0MHz,harnessbinder_clock",
+        "multiplier": 1,
+        "divisor": 10
+      }
+    ]
+  }
+}

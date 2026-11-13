@@ -1,0 +1,356 @@
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 29c1bcff..46d53e37 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -22,6 +22,16 @@ config RISCV_VECTOR_MAX_LEN
+ 	help
+ 	  Maximum length of a vector register in bits.
+ 
++config RISCV_IRIS_VME_CONTEXT
++	bool "Iris explicit VME thread ownership and context switching"
++	depends on BOARD_IRIS && RISCV_ISA_EXT_V && FPU_SHARING && SCHED_CPU_MASK
++	depends on 64BIT
++	help
++	  Preserve all four Iris matrix tiles and matrix configuration for threads
++	  that explicitly call iris_vme_enable(). Such threads must remain on
++	  compute harts 0/1. The API initializes all tiles at first use; ordinary
++	  vector threads and hart 2 never access matrix state.
++
+ choice RISCV_GP_PURPOSE
+ 	prompt "Purpose of the global pointer (GP) register"
+ 	default RISCV_GP if RISCV_SOC_HAS_GP_RELATIVE_ADDRESSING
+diff --git a/arch/riscv/core/CMakeLists.txt b/arch/riscv/core/CMakeLists.txt
+index 52a748c3..b91fc669 100644
+--- a/arch/riscv/core/CMakeLists.txt
++++ b/arch/riscv/core/CMakeLists.txt
+@@ -24,6 +24,7 @@ if (CONFIG_SMP)
+ endif()
+ 
+ zephyr_library_sources_ifdef(CONFIG_FPU_SHARING fpu.c fpu.S)
++zephyr_library_sources_ifdef(CONFIG_RISCV_IRIS_VME_CONTEXT iris_vme.c iris_vme_tiles.S)
+ zephyr_library_sources_ifdef(CONFIG_DEBUG_COREDUMP coredump.c)
+ zephyr_library_sources_ifdef(CONFIG_IRQ_OFFLOAD irq_offload.c)
+ zephyr_library_sources_ifdef(CONFIG_GEN_SW_ISR_TABLE isr.S)
+diff --git a/arch/riscv/core/fpu.c b/arch/riscv/core/fpu.c
+index a6b28f3a..f1583ff1 100644
+--- a/arch/riscv/core/fpu.c
++++ b/arch/riscv/core/fpu.c
+@@ -64,8 +64,20 @@ static inline void DBG(char *msg, struct k_thread *t)
+ 
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++extern void z_iris_vme_tiles_save(void *tiles);
++extern void z_iris_vme_tiles_restore(const void *tiles);
++#endif
++
+ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
+ {
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	/* vsetvl used for the vector-file copy would clear matrix geometry. */
++	if (dest->iris_vme_initialized) {
++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
++		__asm__ volatile("csrr %0,0xc23" : "=r"(dest->iris_mtype));
++	}
++#endif
+ 	__asm volatile("csrr	%0, vstart\n\t"
+ 		       "csrr	%1, vtype\n\t"
+ 		       "csrr	%2, vl\n\t"
+@@ -79,6 +91,24 @@ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
+ 
+ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
+ {
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (src->iris_vme_initialized && (src->iris_mtype & 7U)) {
++		unsigned long widen = src->iris_mtype & 7U;
++		unsigned long code = widen == 4 ? 3 : widen;
++		unsigned long tm = src->iris_mtype >> 10;
++		unsigned long tk = (src->iris_mtype >> 5) & 7U;
++		__ASSERT(widen == 1 || widen == 4, "Unsupported Iris tile width");
++		__asm__ volatile(".insn r 0x57,7,0x42,x0,%0,%1\n\t"
++				 ".insn r 0x57,7,0x44,x0,%2,x0\n\t"
++				 ".insn r 0x57,7,0x44,x0,%3,x1\n\t"
++				 ".insn r 0x57,7,0x44,x0,%4,x2\n\t"
++				 "csrw vstart,%5\n\tcsrw vcsr,%6"
++				 :: "r"(code), "r"(src->vtype), "r"(src->vl),
++				 "r"(tm), "r"(tk), "r"(src->vstart), "r"(src->vcsr)
++				 : "memory");
++		return;
++	}
++#endif
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+ 		       "vsetvl	 x0, %2, %1\n\t"
+@@ -93,6 +123,7 @@ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
+ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ {
+ 	unsigned long vl;
++	void *cursor = save_to->vreg;
+ 
+ 	z_riscv_vstate_csr_save(save_to);
+ 	__asm volatile(".option push\n\t"
+@@ -106,14 +137,29 @@ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vse8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(save_to->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (save_to->iris_vme_initialized) {
++		z_iris_vme_tiles_save(save_to->iris_tiles);
++		save_to->iris_vme_saves++;
++	}
++#endif
+ }
+ 
+ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ {
+ 	unsigned long vl;
++	void *cursor = restore_from->vreg;
++
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (restore_from->iris_vme_initialized) {
++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
++		z_iris_vme_tiles_restore(restore_from->iris_tiles);
++		restore_from->iris_vme_restores++;
++	}
++#endif
+ 
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+@@ -126,8 +172,8 @@ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vle8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(restore_from->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
+ 	z_riscv_vstate_csr_restore(restore_from);
+ }
+@@ -196,6 +242,10 @@ void arch_flush_local_fpu(void)
+ 
+ 		bool dirty = (_current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY) ||
+ 			     (_current_cpu->arch.vpu_state == MSTATUS_VS_DIRTY);
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++		/* OP-VE only updates tiles: FS/VS dirty alone is insufficient. */
++		dirty = dirty || owner->arch.saved_v_context.iris_vme_initialized;
++#endif
+ #else
+ 		bool dirty = _current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY;
+ #endif
+diff --git a/arch/riscv/core/iris_vme.c b/arch/riscv/core/iris_vme.c
+new file mode 100644
+index 00000000..43007b9b
+--- /dev/null
++++ b/arch/riscv/core/iris_vme.c
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++#include <zephyr/kernel.h>
++#include <zephyr/kernel_structs.h>
++#include <zephyr/arch/riscv/iris_vme.h>
++#include <errno.h>
++
++extern void z_iris_vme_tiles_zero(void);
++
++int iris_vme_enable(void)
++{
++	if (k_is_in_isr() || csr_read(mhartid) > 1 ||
++	    !_current->base.cpu_mask || (_current->base.cpu_mask & ~3U)) {
++		return -ENOTSUP;
++	}
++	unsigned int key = irq_lock();
++	struct z_riscv_v_context *context = &_current->arch.saved_v_context;
++	if (context->iris_vme_initialized) {
++		irq_unlock(key);
++		return -EALREADY;
++	}
++	/* Claim the existing Zephyr lazy FP/RVV owner before modifying tiles. */
++	__asm__ volatile(".option push\n\t.option arch,+v\n\t"
++			 "vsetvli zero,zero,e8,m1,ta,ma\n\t.option pop" ::: "memory");
++	z_iris_vme_tiles_zero();
++	context->iris_vme_initialized = true;
++	irq_unlock(key);
++	return 0;
++}
++
++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores)
++{
++	*saves = _current->arch.saved_v_context.iris_vme_saves;
++	*restores = _current->arch.saved_v_context.iris_vme_restores;
++}
+diff --git a/arch/riscv/core/iris_vme_tiles.S b/arch/riscv/core/iris_vme_tiles.S
+new file mode 100644
+index 00000000..1f9c09b3
+--- /dev/null
++++ b/arch/riscv/core/iris_vme_tiles.S
+@@ -0,0 +1,62 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++/* All register names/encodings follow pinned Matrix.scala and Saturn vme.h.
++ * Serialize 4 tiles x 32 rows x 32 raw 32-bit cells. These leaf functions
++ * clobber matrix configuration and v24-v27; fpu.c saves/restores RVV around
++ * them. Row moves are bit copies, including FP NaNs and integer payloads.
++ */
++.text
++.option push
++.option arch,+v
++.macro full_tile_config
++	li t0,1
++	li t1,16
++	.insn r 0x57,7,0x42,zero,t0,t1
++	li t0,32
++	.insn r 0x57,7,0x44,zero,t0,x0
++	.insn r 0x57,7,0x44,zero,t0,x1
++	li t0,1
++	.insn r 0x57,7,0x44,zero,t0,x2
++.endm
++.global z_iris_vme_tiles_zero
++.type z_iris_vme_tiles_zero,@function
++z_iris_vme_tiles_zero:
++	full_tile_config
++	.insn r 0x57,6,0x21,x0,x0,x30
++	.insn r 0x57,6,0x21,x8,x0,x30
++	.insn r 0x57,6,0x21,x16,x0,x30
++	.insn r 0x57,6,0x21,x24,x0,x30
++	ret
++.size z_iris_vme_tiles_zero,.-z_iris_vme_tiles_zero
++
++.macro transfer name,load
++.global \name
++.type \name,@function
++\name:
++	full_tile_config
++	li t0,0
++	li t4,4
++	li t5,0x20000000
++1:
++	li t1,0
++2:
++	or t3,t0,t1
++.if \load
++	vle32.v v24,(a0)
++	.insn r 0x57,6,0x2f,x0,t3,x24
++.else
++	.insn r 0x57,6,0x21,x24,t3,x31
++	vse32.v v24,(a0)
++.endif
++	addi a0,a0,128
++	addi t1,t1,1
++	li t2,32
++	bne t1,t2,2b
++	add t0,t0,t5
++	addi t4,t4,-1
++	bnez t4,1b
++	ret
++.size \name,.-\name
++.endm
++transfer z_iris_vme_tiles_save,0
++transfer z_iris_vme_tiles_restore,1
++.option pop
+diff --git a/arch/riscv/core/isr.S b/arch/riscv/core/isr.S
+index b4d27df4..303f60fd 100644
+--- a/arch/riscv/core/isr.S
++++ b/arch/riscv/core/isr.S
+@@ -257,6 +257,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 	xori t1, t0, 0x57	/* VECTOR */
+ 	beqz t1, is_fp
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	xori t1, t0, 0x77	/* Iris OP-VE matrix arithmetic */
++	beqz t1, is_fp
++#endif
+ #endif
+ 	/*
+ 	 * The FRCSR, FSCSR, FRRM, FSRM, FSRMI, FRFLAGS, FSFLAGS and FSFLAGSI
+@@ -291,6 +295,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
+ 	beq t0, t1, is_fp
+ 	li t1, 0xc22	// vlenb
+ 	beq t0, t1, is_fp
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	li t1, 0xc23	/* mtype */
++	beq t0, t1, is_fp
++#endif
+ #endif /* CONFIG_RISCV_ISA_EXT_V */
+ 2:	/* remaining non RVC (0b11) and RVC with 0b01 are not FP instructions */
+ 	andi t1, t2, 1
+diff --git a/arch/riscv/core/thread.c b/arch/riscv/core/thread.c
+index d8de60ad..e1ec881d 100644
+--- a/arch/riscv/core/thread.c
++++ b/arch/riscv/core/thread.c
+@@ -68,6 +68,11 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
+ #if defined(CONFIG_FPU_SHARING)
+ 	/* thread birth happens through the exception return path */
+ 	thread->arch.exception_depth = 1;
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	thread->arch.saved_v_context.iris_vme_initialized = false;
++	thread->arch.saved_v_context.iris_vme_saves = 0;
++	thread->arch.saved_v_context.iris_vme_restores = 0;
++#endif
+ #elif defined(CONFIG_FPU)
+ 	/* Unshared FP mode: enable FPU of each thread. */
+ 	stack_init->mstatus |= MSTATUS_FS_INIT;
+diff --git a/include/zephyr/arch/riscv/iris_vme.h b/include/zephyr/arch/riscv/iris_vme.h
+new file mode 100644
+index 00000000..2fb964bf
+--- /dev/null
++++ b/include/zephyr/arch/riscv/iris_vme.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++#ifndef ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
++#define ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
++#include <stdint.h>
++
++/*
++ * Call once from thread context, before any VME instruction. The thread must
++ * already have a nonempty affinity mask containing only harts 0/1. Returns
++ * -ENOTSUP on hart 2 or with incompatible affinity; -EALREADY if enabled.
++ * This explicit first-use ABI zeroes ALL four 32x32 tiles and clobbers vector
++ * configuration. Call before establishing any live vector/matrix values.
++ * Afterwards FP, RVV, matrix geometry/format and all tiles survive ordinary
++ * Zephyr preemption, blocking and migration between the compute harts.
++ * Do not use VME from interrupt handlers or without this ownership API.
++ */
++int iris_vme_enable(void);
++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores);
++#endif
+diff --git a/include/zephyr/arch/riscv/thread.h b/include/zephyr/arch/riscv/thread.h
+index 48dc694b..ed9dd6be 100644
+--- a/include/zephyr/arch/riscv/thread.h
++++ b/include/zephyr/arch/riscv/thread.h
+@@ -70,6 +70,13 @@ struct z_riscv_v_context {
+ 	unsigned long vcsr;
+ 	unsigned long vlenb;
+ 	char vreg[32][CONFIG_RISCV_VECTOR_MAX_LEN];
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	unsigned long iris_mtype;
++	bool iris_vme_initialized;
++	uint32_t iris_vme_saves;
++	uint32_t iris_vme_restores;
++	uint32_t iris_tiles[4][32][32];
++#endif
+ };
+ typedef struct z_riscv_v_context z_riscv_v_context_t;
+ #endif
+diff --git a/kernel/cpu_mask.c b/kernel/cpu_mask.c
+index e7c16511..b3ad9e17 100644
+--- a/kernel/cpu_mask.c
++++ b/kernel/cpu_mask.c
+@@ -20,6 +20,14 @@ static int cpu_mask_mod(k_tid_t thread, uint32_t enable_mask, uint32_t disable_m
+ {
+ 	int ret = 0;
+ 
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	/* A matrix context cannot execute on the Rocket DMA hart. */
++	if (thread->arch.saved_v_context.iris_vme_initialized &&
++	    (((thread->base.cpu_mask | enable_mask) & ~disable_mask) & ~3U)) {
++		return -ENOTSUP;
++	}
++#endif
++
+ #ifdef CONFIG_SCHED_CPU_MASK_PIN_ONLY
+ 	__ASSERT(z_is_thread_prevented_from_running(thread),
+ 		 "Running threads cannot change CPU pin");

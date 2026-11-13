@@ -1,0 +1,2 @@
+IRIS_FPCOMP {"hart0_cases":4224,"hart1_cases":4224,"hart2_cases":4224,"illegal_cases":132}
+PASSED FPCOMP 8448 oracle cases 12672 all3-hart executions 22 forms H/S/D altfmt ignored all3 source flags signed-zero masks/tails FS

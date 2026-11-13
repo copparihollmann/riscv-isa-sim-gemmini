@@ -1,0 +1,577 @@
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 29c1bcff..46d53e37 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -22,6 +22,16 @@ config RISCV_VECTOR_MAX_LEN
+ 	help
+ 	  Maximum length of a vector register in bits.
+ 
++config RISCV_IRIS_VME_CONTEXT
++	bool "Iris explicit VME thread ownership and context switching"
++	depends on BOARD_IRIS && RISCV_ISA_EXT_V && FPU_SHARING && SCHED_CPU_MASK
++	depends on 64BIT
++	help
++	  Preserve all four Iris matrix tiles and matrix configuration for threads
++	  that explicitly call iris_vme_enable(). Such threads must remain on
++	  compute harts 0/1. The API initializes all tiles at first use; ordinary
++	  vector threads and hart 2 never access matrix state.
++
+ choice RISCV_GP_PURPOSE
+ 	prompt "Purpose of the global pointer (GP) register"
+ 	default RISCV_GP if RISCV_SOC_HAS_GP_RELATIVE_ADDRESSING
+diff --git a/arch/riscv/core/CMakeLists.txt b/arch/riscv/core/CMakeLists.txt
+index 52a748c3..4b3c7b43 100644
+--- a/arch/riscv/core/CMakeLists.txt
++++ b/arch/riscv/core/CMakeLists.txt
+@@ -24,6 +24,7 @@ if (CONFIG_SMP)
+ endif()
+ 
+ zephyr_library_sources_ifdef(CONFIG_FPU_SHARING fpu.c fpu.S)
++zephyr_library_sources_ifdef(CONFIG_RISCV_IRIS_VME_CONTEXT iris_vme.c iris_vme_tiles.S)
+ zephyr_library_sources_ifdef(CONFIG_DEBUG_COREDUMP coredump.c)
+ zephyr_library_sources_ifdef(CONFIG_IRQ_OFFLOAD irq_offload.c)
+ zephyr_library_sources_ifdef(CONFIG_GEN_SW_ISR_TABLE isr.S)
+@@ -34,3 +35,5 @@ zephyr_library_sources_ifdef(CONFIG_SEMIHOST semihost.c)
+ zephyr_library_sources_ifdef(CONFIG_ARCH_STACKWALK stacktrace.c)
+ zephyr_linker_sources(ROM_START SORT_KEY 0x0vectors vector_table.ld)
+ zephyr_library_sources_ifdef(CONFIG_LLEXT elf.c)
++
++zephyr_sources(iris_flush_frontier.c)
+diff --git a/arch/riscv/core/fpu.c b/arch/riscv/core/fpu.c
+index a6b28f3a..c1273239 100644
+--- a/arch/riscv/core/fpu.c
++++ b/arch/riscv/core/fpu.c
+@@ -1,3 +1,4 @@
++#include <zephyr/arch/riscv/iris_flush_frontier.h>
+ /*
+  * Copyright (c) 2023 BayLibre SAS
+  * Written by: Nicolas Pitre
+@@ -64,8 +65,20 @@ static inline void DBG(char *msg, struct k_thread *t)
+ 
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++extern void z_iris_vme_tiles_save(void *tiles);
++extern void z_iris_vme_tiles_restore(const void *tiles);
++#endif
++
+ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
+ {
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	/* vsetvl used for the vector-file copy would clear matrix geometry. */
++	if (dest->iris_vme_initialized) {
++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
++		__asm__ volatile("csrr %0,0xc23" : "=r"(dest->iris_mtype));
++	}
++#endif
+ 	__asm volatile("csrr	%0, vstart\n\t"
+ 		       "csrr	%1, vtype\n\t"
+ 		       "csrr	%2, vl\n\t"
+@@ -79,6 +92,24 @@ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
+ 
+ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
+ {
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (src->iris_vme_initialized && (src->iris_mtype & 7U)) {
++		unsigned long widen = src->iris_mtype & 7U;
++		unsigned long code = widen == 4 ? 3 : widen;
++		unsigned long tm = src->iris_mtype >> 10;
++		unsigned long tk = (src->iris_mtype >> 5) & 7U;
++		__ASSERT(widen == 1 || widen == 4, "Unsupported Iris tile width");
++		__asm__ volatile(".insn r 0x57,7,0x42,x0,%0,%1\n\t"
++				 ".insn r 0x57,7,0x44,x0,%2,x0\n\t"
++				 ".insn r 0x57,7,0x44,x0,%3,x1\n\t"
++				 ".insn r 0x57,7,0x44,x0,%4,x2\n\t"
++				 "csrw vstart,%5\n\tcsrw vcsr,%6"
++				 :: "r"(code), "r"(src->vtype), "r"(src->vl),
++				 "r"(tm), "r"(tk), "r"(src->vstart), "r"(src->vcsr)
++				 : "memory");
++		return;
++	}
++#endif
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+ 		       "vsetvl	 x0, %2, %1\n\t"
+@@ -92,9 +123,12 @@ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
+ 
+ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ {
++	iris_frontier_stamp(300,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(save_to));
+ 	unsigned long vl;
++	void *cursor = save_to->vreg;
+ 
+ 	z_riscv_vstate_csr_save(save_to);
++	iris_frontier_stamp(301,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(save_to));
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+ 		       "vsetvli	%0, x0, e8, m8, ta, ma\n\t"
+@@ -106,14 +140,31 @@ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vse8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(save_to->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
++	iris_frontier_stamp(302,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(save_to));
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (save_to->iris_vme_initialized) {
++		z_iris_vme_tiles_save(save_to->iris_tiles);
++		save_to->iris_vme_saves++;
++	}
++#endif
+ }
+ 
+ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ {
++	iris_frontier_stamp(310,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(restore_from));
+ 	unsigned long vl;
++	void *cursor = restore_from->vreg;
++
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	if (restore_from->iris_vme_initialized) {
++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
++		z_iris_vme_tiles_restore(restore_from->iris_tiles);
++		restore_from->iris_vme_restores++;
++	}
++#endif
+ 
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+@@ -126,10 +177,12 @@ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vle8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(restore_from->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
++	iris_frontier_stamp(311,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(restore_from));
+ 	z_riscv_vstate_csr_restore(restore_from);
++	iris_frontier_stamp(312,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(restore_from));
+ }
+ 
+ #endif /* CONFIG_RISCV_ISA_EXT_V */
+@@ -168,7 +221,9 @@ static void z_riscv_fpu_load(void)
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 	csr_set(mstatus, MSTATUS_VS_INIT);
+ #endif
++	iris_frontier_stamp(120,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(0));
+ 	z_riscv_fpu_restore(&_current->arch.saved_fp_context);
++	iris_frontier_stamp(121,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(0));
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 	z_riscv_vstate_restore(&_current->arch.saved_v_context);
+ #endif
+@@ -185,6 +240,7 @@ static void z_riscv_fpu_load(void)
+  */
+ void arch_flush_local_fpu(void)
+ {
++	iris_frontier_stamp(100,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(0));
+ 	__ASSERT((csr_read(mstatus) & MSTATUS_IEN) == 0, "must be called with IRQs disabled");
+ 	__ASSERT((csr_read(mstatus) & MSTATUS_FS) == 0, "must be called with FPU access disabled");
+ 	__ASSERT((csr_read(mstatus) & MSTATUS_VS) == 0, "must be called with VPU access disabled");
+@@ -196,6 +252,10 @@ void arch_flush_local_fpu(void)
+ 
+ 		bool dirty = (_current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY) ||
+ 			     (_current_cpu->arch.vpu_state == MSTATUS_VS_DIRTY);
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++		/* OP-VE only updates tiles: FS/VS dirty alone is insufficient. */
++		dirty = dirty || owner->arch.saved_v_context.iris_vme_initialized;
++#endif
+ #else
+ 		bool dirty = _current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY;
+ #endif
+@@ -207,7 +267,9 @@ void arch_flush_local_fpu(void)
+ 			csr_set(mstatus, MSTATUS_VS_CLEAN);
+ #endif
+ 			/* save current owner's content */
++			iris_frontier_stamp(102,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(owner));
+ 			z_riscv_fpu_save(&owner->arch.saved_fp_context);
++			iris_frontier_stamp(103,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(owner));
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 			z_riscv_vstate_save(&owner->arch.saved_v_context);
+ #endif
+@@ -223,7 +285,9 @@ void arch_flush_local_fpu(void)
+ #endif
+ 
+ 		/* release ownership */
++		iris_frontier_stamp(106,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(owner));
+ 		atomic_ptr_clear(&_current_cpu->arch.fpu_owner);
++		iris_frontier_stamp(107,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(owner));
+ 		DBG("disable", owner);
+ 	}
+ }
+@@ -251,7 +315,9 @@ static void flush_owned_fpu(struct k_thread *thread)
+ 			break;
+ 		}
+ 		/* the FPU context is live on another CPU */
++		iris_frontier_stamp(201,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(i));
+ 		arch_flush_fpu_ipi(i);
++		iris_frontier_stamp(202,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(i));
+ 
+ 		/*
+ 		 * Wait for it only if this is about the thread
+@@ -273,6 +339,7 @@ static void flush_owned_fpu(struct k_thread *thread)
+ 				arch_nop();
+ 				owner = atomic_ptr_get(&_kernel.cpus[i].arch.fpu_owner);
+ 			} while (owner == thread);
++			iris_frontier_stamp(203,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(i));
+ 		}
+ 		break;
+ 	}
+diff --git a/arch/riscv/core/ipi_clint.c b/arch/riscv/core/ipi_clint.c
+index e5f12566..302b2afd 100644
+--- a/arch/riscv/core/ipi_clint.c
++++ b/arch/riscv/core/ipi_clint.c
+@@ -1,3 +1,4 @@
++#include <zephyr/arch/riscv/iris_flush_frontier.h>
+ /*
+  * Copyright (c) 2021 Intel Corporation
+  *
+@@ -39,6 +40,7 @@ void arch_sched_directed_ipi(uint32_t cpu_bitmap)
+ #ifdef CONFIG_FPU_SHARING
+ void arch_flush_fpu_ipi(unsigned int cpu)
+ {
++	iris_frontier_stamp(200,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(cpu));
+ 	atomic_set_bit(&cpu_pending_ipi[cpu], IPI_FPU_FLUSH);
+ 	MSIP(_kernel.cpus[cpu].arch.hartid) = 1;
+ }
+@@ -51,6 +53,7 @@ static void sched_ipi_handler(const void *unused)
+ 	MSIP(csr_read(mhartid)) = 0;
+ 
+ 	atomic_val_t pending_ipi = atomic_clear(&cpu_pending_ipi[_current_cpu->id]);
++	iris_frontier_stamp(400,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(pending_ipi));
+ 
+ 	if (pending_ipi & ATOMIC_MASK(IPI_SCHED)) {
+ 		z_sched_ipi();
+@@ -60,7 +63,9 @@ static void sched_ipi_handler(const void *unused)
+ 		/* disable IRQs */
+ 		csr_clear(mstatus, MSTATUS_IEN);
+ 		/* perform the flush */
++		iris_frontier_stamp(401,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(pending_ipi));
+ 		arch_flush_local_fpu();
++		iris_frontier_stamp(402,(uintptr_t)_current_cpu->arch.fpu_owner,(uintptr_t)_current,(uintptr_t)(pending_ipi));
+ 		/*
+ 		 * No need to re-enable IRQs here as long as
+ 		 * this remains the last case.
+diff --git a/arch/riscv/core/iris_flush_frontier.c b/arch/riscv/core/iris_flush_frontier.c
+new file mode 100644
+index 00000000..631890d7
+--- /dev/null
++++ b/arch/riscv/core/iris_flush_frontier.c
+@@ -0,0 +1,59 @@
++#include <zephyr/kernel.h>
++#include <zephyr/kernel_structs.h>
++#include <zephyr/arch/riscv/iris_flush_frontier.h>
++#include <zephyr/drivers/htif.h>
++#include <stdint.h>
++#define BASE 0x58001e000UL
++#define UART 0x10020000UL
++#define MTIME (*(volatile uint64_t *)0x0200bff8UL)
++#define CMP1 (*(volatile uint64_t *)0x02004008UL)
++#define CONTROL ((volatile uint64_t *)(BASE+0x1c00))
++struct frontier {uint64_t begin,stage,owner,current,peer,status,mie,mip,cycle,time,end,pad[5];};
++static volatile unsigned ready;
++static unsigned long hart(void){unsigned long h;__asm__ volatile("csrr %0,mhartid":"=r"(h));return h;}
++/* MSCRATCH is established per-hart by source SMP init; no mobile-CPU assertion or new IRQ lock. Metadata is best-effort if preempted. */
++static struct _cpu *raw_cpu(void){struct _cpu*c;__asm__ volatile("csrr %0,mscratch":"=r"(c));return c;}
++static uint64_t read_status(void){uint64_t x;__asm__ volatile("csrr %0,mstatus":"=r"(x));return x;}
++static uint64_t read_mie(void){uint64_t x;__asm__ volatile("csrr %0,mie":"=r"(x));return x;}
++static uint64_t read_mip(void){uint64_t x;__asm__ volatile("csrr %0,mip":"=r"(x));return x;}
++static uint64_t read_cycle(void){uint64_t x;__asm__ volatile("csrr %0,mcycle":"=r"(x));return x;}
++static volatile struct frontier *slot(unsigned i){return(volatile struct frontier *)(BASE+(uintptr_t)i*256);}
++/* NO hardware fence/AMO/FP/vector here: metadata can race or be observed incompletely. */
++static __attribute__((noinline,optimize("no-tree-vectorize","no-tree-slp-vectorize"))) void record(unsigned i,uint64_t stage,uintptr_t owner,uintptr_t current,uintptr_t peer){
++ volatile struct frontier*p=slot(i);uint64_t seq=(p->end+2)&~1ULL;p->begin=seq|1;__asm__ volatile("":::"memory");
++ p->stage=stage;p->owner=owner;p->current=current;p->peer=peer;p->status=read_status();p->mie=read_mie();p->mip=read_mip();p->cycle=read_cycle();p->time=MTIME;
++ __asm__ volatile("":::"memory");p->end=seq;p->begin=seq;
++}
++void iris_frontier_stamp(uint64_t stage,uintptr_t owner,uintptr_t current,uintptr_t peer){if(ready){unsigned h=hart();if(h<3)record(h,stage,owner,current,peer);}}
++void iris_frontier_app_stamp(unsigned channel,uint64_t stage){if(ready&&channel<3)record(channel+3,stage,(uintptr_t)raw_cpu()->arch.fpu_owner,(uintptr_t)raw_cpu()->current,0);}
++void iris_frontier_init(void){
++ ready=0;for(unsigned i=0;i<0x2000/8;++i)((volatile uint64_t*)BASE)[i]=0;__asm__ volatile("fence rw,rw":::"memory");ready=1;
++}
++static void ch(char c){volatile uint32_t *u=(volatile uint32_t*)UART;while(u[0]&0x80000000u){}u[0]=(unsigned char)c;}
++static void text(const char*s){while(*s)ch(*s++);}
++static void number(uint64_t v){char b[21];unsigned n=0;do{b[n++]=(char)('0'+v%10);v/=10;}while(v);while(n)ch(b[--n]);}
++static void field(const char*k,uint64_t v){text(k);number(v);}
++int iris_frontier_arm(unsigned milliseconds,unsigned enabled){
++ if(hart()!=1||milliseconds<2000||milliseconds>5000)return-1;
++ if(enabled){
++  unsigned long key=arch_irq_lock();(void)key;uint64_t begin=MTIME;CMP1=begin+(uint64_t)milliseconds*500;
++  unsigned spin;for(spin=0;spin<10000&&(read_mip()&(1UL<<7));++spin)__asm__ volatile("");
++  if(spin==10000){arch_irq_unlock(key);return-2;}
++  CONTROL[1]=begin;CONTROL[2]=begin+(uint64_t)milliseconds*500;__asm__ volatile("fence rw,rw":::"memory");CONTROL[0]=1;
++  __asm__ volatile("csrs mie,%0\n\tcsrs mstatus,%1"::"r"(1UL<<7),"r"(8UL):"memory");
++ }
++ iris_frontier_stamp(enabled?600:610,(uintptr_t)raw_cpu()->arch.fpu_owner,(uintptr_t)raw_cpu()->current,0);
++ text("IRIS_FLUSH_ARM {\"hart\":1,\"enabled\":");text(enabled?"true":"false");field(",\"delay_ms\":",milliseconds);field(",\"armed_mtime\":",CONTROL[1]);field(",\"deadline_mtime\":",CONTROL[2]);field(",\"last_recorded_mstatus\":",read_status());field(",\"last_recorded_mie\":",read_mie());text("}\n");return 0;
++}
++void iris_frontier_cancel(void){if(ready&&CONTROL[0]){CONTROL[0]=0;__asm__ volatile("fence rw,rw":::"memory");CMP1=UINT64_MAX;}}
++int iris_frontier_preserve_hart1_cmp(void){return ready&&hart()==1&&CONTROL[0];}
++void iris_frontier_timer_entry(void){
++ if(!ready||hart()!=1||!CONTROL[0]||MTIME<CONTROL[2])return;
++ uint64_t entry_time=MTIME,entry_status=read_status(),entry_mie=read_mie(),entry_mip=read_mip();CONTROL[0]=0;CMP1=UINT64_MAX;
++ volatile struct frontier*snap=(volatile struct frontier*)(BASE+0x1000);uint64_t stable[6];
++ /* First copy every slot, before console/clock announcement/scheduler. Stable sequence is best-effort, not coherence proof. */
++ for(unsigned i=0;i<6;++i){volatile uint64_t*src=(volatile uint64_t*)slot(i);volatile uint64_t*dst=(volatile uint64_t*)&snap[i];for(unsigned k=0;k<16;++k)dst[k]=src[k];stable[i]=snap[i].begin==snap[i].end&&!(snap[i].begin&1);}
++ text("IRIS_FLUSH_ONESHOT {\"hart\":1,\"normal_completion\":false,\"exit_code\":1");field(",\"armed_mtime\":",CONTROL[1]);field(",\"deadline_mtime\":",CONTROL[2]);field(",\"entry_mtime\":",entry_time);field(",\"entry_mstatus\":",entry_status);field(",\"entry_mie\":",entry_mie);field(",\"entry_mip\":",entry_mip);text(",\"before_timer_spinlock_and_announce\":true}\n");
++ for(unsigned i=0;i<6;++i){volatile struct frontier*p=&snap[i];text("IRIS_FLUSH_SNAPSHOT {");field("\"slot\":",i);text(",\"stable_sequence_observed\":");text(stable[i]?"true":"false");text(",\"metadata_race_possible\":true,\"current_PC_or_state_claimed\":false");field(",\"begin\":",p->begin);field(",\"stage\":",p->stage);field(",\"owner_thread_id\":",p->owner);field(",\"current_thread_id\":",p->current);field(",\"peer\":",p->peer);field(",\"last_recorded_mstatus\":",p->status);field(",\"last_recorded_mie\":",p->mie);field(",\"last_recorded_mip\":",p->mip);field(",\"last_recorded_mcycle\":",p->cycle);field(",\"last_recorded_mtime\":",p->time);field(",\"end\":",p->end);text("}\n");}
++ volatile uint32_t*u=(volatile uint32_t*)UART;u[2]=(u[2]&~(0x1ffu<<16))|(1u<<16);while(!(u[5]&1)){}uint64_t edges=65536ULL+11ULL*((u[6]&65535)+1),ticks=(edges+999)/1000+1,begin=MTIME;while(MTIME-begin<ticks){}__asm__ volatile("fence rw,rw":::"memory");tohost=3;__asm__ volatile("fence rw,rw":::"memory");for(;;)__asm__ volatile("wfi");
++}
+diff --git a/arch/riscv/core/iris_vme.c b/arch/riscv/core/iris_vme.c
+new file mode 100644
+index 00000000..43007b9b
+--- /dev/null
++++ b/arch/riscv/core/iris_vme.c
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++#include <zephyr/kernel.h>
++#include <zephyr/kernel_structs.h>
++#include <zephyr/arch/riscv/iris_vme.h>
++#include <errno.h>
++
++extern void z_iris_vme_tiles_zero(void);
++
++int iris_vme_enable(void)
++{
++	if (k_is_in_isr() || csr_read(mhartid) > 1 ||
++	    !_current->base.cpu_mask || (_current->base.cpu_mask & ~3U)) {
++		return -ENOTSUP;
++	}
++	unsigned int key = irq_lock();
++	struct z_riscv_v_context *context = &_current->arch.saved_v_context;
++	if (context->iris_vme_initialized) {
++		irq_unlock(key);
++		return -EALREADY;
++	}
++	/* Claim the existing Zephyr lazy FP/RVV owner before modifying tiles. */
++	__asm__ volatile(".option push\n\t.option arch,+v\n\t"
++			 "vsetvli zero,zero,e8,m1,ta,ma\n\t.option pop" ::: "memory");
++	z_iris_vme_tiles_zero();
++	context->iris_vme_initialized = true;
++	irq_unlock(key);
++	return 0;
++}
++
++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores)
++{
++	*saves = _current->arch.saved_v_context.iris_vme_saves;
++	*restores = _current->arch.saved_v_context.iris_vme_restores;
++}
+diff --git a/arch/riscv/core/iris_vme_tiles.S b/arch/riscv/core/iris_vme_tiles.S
+new file mode 100644
+index 00000000..1f9c09b3
+--- /dev/null
++++ b/arch/riscv/core/iris_vme_tiles.S
+@@ -0,0 +1,62 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++/* All register names/encodings follow pinned Matrix.scala and Saturn vme.h.
++ * Serialize 4 tiles x 32 rows x 32 raw 32-bit cells. These leaf functions
++ * clobber matrix configuration and v24-v27; fpu.c saves/restores RVV around
++ * them. Row moves are bit copies, including FP NaNs and integer payloads.
++ */
++.text
++.option push
++.option arch,+v
++.macro full_tile_config
++	li t0,1
++	li t1,16
++	.insn r 0x57,7,0x42,zero,t0,t1
++	li t0,32
++	.insn r 0x57,7,0x44,zero,t0,x0
++	.insn r 0x57,7,0x44,zero,t0,x1
++	li t0,1
++	.insn r 0x57,7,0x44,zero,t0,x2
++.endm
++.global z_iris_vme_tiles_zero
++.type z_iris_vme_tiles_zero,@function
++z_iris_vme_tiles_zero:
++	full_tile_config
++	.insn r 0x57,6,0x21,x0,x0,x30
++	.insn r 0x57,6,0x21,x8,x0,x30
++	.insn r 0x57,6,0x21,x16,x0,x30
++	.insn r 0x57,6,0x21,x24,x0,x30
++	ret
++.size z_iris_vme_tiles_zero,.-z_iris_vme_tiles_zero
++
++.macro transfer name,load
++.global \name
++.type \name,@function
++\name:
++	full_tile_config
++	li t0,0
++	li t4,4
++	li t5,0x20000000
++1:
++	li t1,0
++2:
++	or t3,t0,t1
++.if \load
++	vle32.v v24,(a0)
++	.insn r 0x57,6,0x2f,x0,t3,x24
++.else
++	.insn r 0x57,6,0x21,x24,t3,x31
++	vse32.v v24,(a0)
++.endif
++	addi a0,a0,128
++	addi t1,t1,1
++	li t2,32
++	bne t1,t2,2b
++	add t0,t0,t5
++	addi t4,t4,-1
++	bnez t4,1b
++	ret
++.size \name,.-\name
++.endm
++transfer z_iris_vme_tiles_save,0
++transfer z_iris_vme_tiles_restore,1
++.option pop
+diff --git a/arch/riscv/core/isr.S b/arch/riscv/core/isr.S
+index b4d27df4..303f60fd 100644
+--- a/arch/riscv/core/isr.S
++++ b/arch/riscv/core/isr.S
+@@ -257,6 +257,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
+ #ifdef CONFIG_RISCV_ISA_EXT_V
+ 	xori t1, t0, 0x57	/* VECTOR */
+ 	beqz t1, is_fp
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	xori t1, t0, 0x77	/* Iris OP-VE matrix arithmetic */
++	beqz t1, is_fp
++#endif
+ #endif
+ 	/*
+ 	 * The FRCSR, FSCSR, FRRM, FSRM, FSRMI, FRFLAGS, FSFLAGS and FSFLAGSI
+@@ -291,6 +295,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
+ 	beq t0, t1, is_fp
+ 	li t1, 0xc22	// vlenb
+ 	beq t0, t1, is_fp
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	li t1, 0xc23	/* mtype */
++	beq t0, t1, is_fp
++#endif
+ #endif /* CONFIG_RISCV_ISA_EXT_V */
+ 2:	/* remaining non RVC (0b11) and RVC with 0b01 are not FP instructions */
+ 	andi t1, t2, 1
+diff --git a/arch/riscv/core/thread.c b/arch/riscv/core/thread.c
+index d8de60ad..e1ec881d 100644
+--- a/arch/riscv/core/thread.c
++++ b/arch/riscv/core/thread.c
+@@ -68,6 +68,11 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
+ #if defined(CONFIG_FPU_SHARING)
+ 	/* thread birth happens through the exception return path */
+ 	thread->arch.exception_depth = 1;
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	thread->arch.saved_v_context.iris_vme_initialized = false;
++	thread->arch.saved_v_context.iris_vme_saves = 0;
++	thread->arch.saved_v_context.iris_vme_restores = 0;
++#endif
+ #elif defined(CONFIG_FPU)
+ 	/* Unshared FP mode: enable FPU of each thread. */
+ 	stack_init->mstatus |= MSTATUS_FS_INIT;
+diff --git a/drivers/timer/riscv_machine_timer.c b/drivers/timer/riscv_machine_timer.c
+index 2d0f0703..bd6b5030 100644
+--- a/drivers/timer/riscv_machine_timer.c
++++ b/drivers/timer/riscv_machine_timer.c
+@@ -1,3 +1,4 @@
++#include <zephyr/arch/riscv/iris_flush_frontier.h>
+ /*
+  * Copyright (c) 2024 MASSDRIVER EI (massdriver.space)
+  * Copyright (c) 2018-2023 Intel Corporation
+@@ -67,6 +68,7 @@ static uintptr_t get_hart_mtimecmp(void)
+ 
+ static void set_mtimecmp(uint64_t time)
+ {
++	if (iris_frontier_preserve_hart1_cmp()) return;
+ #ifdef CONFIG_64BIT
+ 	*(volatile uint64_t *)get_hart_mtimecmp() = time;
+ #else
+@@ -104,6 +106,7 @@ static uint64_t mtime(void)
+ 
+ static void timer_isr(const void *arg)
+ {
++	iris_frontier_timer_entry(); /* BEFORE lock, accounting, announcement and scheduler. */
+ 	ARG_UNUSED(arg);
+ 
+ 	k_spinlock_key_t key = k_spin_lock(&lock);
+diff --git a/include/zephyr/arch/riscv/iris_flush_frontier.h b/include/zephyr/arch/riscv/iris_flush_frontier.h
+new file mode 100644
+index 00000000..2add17ca
+--- /dev/null
++++ b/include/zephyr/arch/riscv/iris_flush_frontier.h
+@@ -0,0 +1,12 @@
++#ifndef IRIS_FLUSH_FRONTIER_H
++#define IRIS_FLUSH_FRONTIER_H
++#include <stdint.h>
++/* Diagnostic scalar observations only; no completion, current-PC, or coherent-state claim. */
++void iris_frontier_init(void);
++void iris_frontier_stamp(uint64_t stage,uintptr_t owner,uintptr_t current,uintptr_t peer);
++void iris_frontier_app_stamp(unsigned channel,uint64_t stage);
++int iris_frontier_arm(unsigned milliseconds,unsigned enabled);
++void iris_frontier_cancel(void);
++int iris_frontier_preserve_hart1_cmp(void);
++void iris_frontier_timer_entry(void);
++#endif
+diff --git a/include/zephyr/arch/riscv/iris_vme.h b/include/zephyr/arch/riscv/iris_vme.h
+new file mode 100644
+index 00000000..2fb964bf
+--- /dev/null
++++ b/include/zephyr/arch/riscv/iris_vme.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++#ifndef ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
++#define ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
++#include <stdint.h>
++
++/*
++ * Call once from thread context, before any VME instruction. The thread must
++ * already have a nonempty affinity mask containing only harts 0/1. Returns
++ * -ENOTSUP on hart 2 or with incompatible affinity; -EALREADY if enabled.
++ * This explicit first-use ABI zeroes ALL four 32x32 tiles and clobbers vector
++ * configuration. Call before establishing any live vector/matrix values.
++ * Afterwards FP, RVV, matrix geometry/format and all tiles survive ordinary
++ * Zephyr preemption, blocking and migration between the compute harts.
++ * Do not use VME from interrupt handlers or without this ownership API.
++ */
++int iris_vme_enable(void);
++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores);
++#endif
+diff --git a/include/zephyr/arch/riscv/thread.h b/include/zephyr/arch/riscv/thread.h
+index 48dc694b..ed9dd6be 100644
+--- a/include/zephyr/arch/riscv/thread.h
++++ b/include/zephyr/arch/riscv/thread.h
+@@ -70,6 +70,13 @@ struct z_riscv_v_context {
+ 	unsigned long vcsr;
+ 	unsigned long vlenb;
+ 	char vreg[32][CONFIG_RISCV_VECTOR_MAX_LEN];
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	unsigned long iris_mtype;
++	bool iris_vme_initialized;
++	uint32_t iris_vme_saves;
++	uint32_t iris_vme_restores;
++	uint32_t iris_tiles[4][32][32];
++#endif
+ };
+ typedef struct z_riscv_v_context z_riscv_v_context_t;
+ #endif
+diff --git a/kernel/cpu_mask.c b/kernel/cpu_mask.c
+index e7c16511..b3ad9e17 100644
+--- a/kernel/cpu_mask.c
++++ b/kernel/cpu_mask.c
+@@ -20,6 +20,14 @@ static int cpu_mask_mod(k_tid_t thread, uint32_t enable_mask, uint32_t disable_m
+ {
+ 	int ret = 0;
+ 
++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
++	/* A matrix context cannot execute on the Rocket DMA hart. */
++	if (thread->arch.saved_v_context.iris_vme_initialized &&
++	    (((thread->base.cpu_mask | enable_mask) & ~disable_mask) & ~3U)) {
++		return -ENOTSUP;
++	}
++#endif
++
+ #ifdef CONFIG_SCHED_CPU_MASK_PIN_ONLY
+ 	__ASSERT(z_is_thread_prevented_from_running(thread),
+ 		 "Running threads cannot change CPU pin");

@@ -1,0 +1,10 @@
+description: Rocket RISC-V CPU, as emitted by the pinned Iris elaboration
+compatible: "sifive,rocket0"
+include: riscv,cpus.yaml
+properties:
+  riscv,pmpgranularity:
+    type: int
+    const: 4
+  riscv,pmpregions:
+    type: int
+    const: 8

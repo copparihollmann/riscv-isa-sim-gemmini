@@ -1,0 +1,2878 @@
+diff --git a/README.md b/README.md
+index 7531a6c..fbf8fea 100644
+--- a/README.md
++++ b/README.md
+@@ -1,72 +1,169 @@
+-# iris-mlir
++# Iris compiler support and experimental simulator integration
+ 
+-Merlin support for **Iris** (chipyard `iris-cy`, `IrisConfig`). This repository is a layer on top of
+-[`rvv-mlir`](https://github.com/ucb-bar/rvv-mlir). It inherits all of RVV and adds Iris's configuration,
+-its boards, and its **VME/Xsfmm matrix unit**.
++This package targets Chipyard `b4542facf6cc9457f6e358e8f80a8b3a0ff5df19`,
++Saturn `536774bd4c5e3bcd7813a4a0dc72fc87e5818532` and Rocket
++`fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0`. Source hashes, local patches and
++elaboration evidence are retained in `source-identity.json`. Deployed bitstream
++association and RTL timing certification remain unverified.
+ 
+-```
+-rvv-mlir   (RVV contract, schedules)
+- ├── kodiak-mlir   (+ BME OPU, + Kodiak boards)
+- └── iris-mlir     (+ VME matrix unit, + Iris boards)    <- this repo
++The implementation baseline is Iris OOT
++`8447703ae5805271911e8ef232d8fd1aa7b6947d`, layered over RVV support
++`a80eea3eb749e5fd4cb822779a08d0d8ca09e5d5`. The companion Merlin baseline is
++`d56133b168bbee3d73cb8b4304d3622d4191fc6a`. The local integration requires its
++recorded patch; current upstream Merlin does not implement this OOT revision's
++originally advertised helper APIs.
++
++| Physical hart | Core | VLEN | DLEN | Operations |
++|---|---|---:|---:|---|
++| 0, 1 | Shuttle + Saturn | 256 | 128 | RVV integer, IEEE FP16/32/64, configured FP8/BF16 conversion/FMA subset, VME int8 and FP8 matrix |
++| 2 | Rocket + Saturn | 256 | 256 | RVV integer and IEEE FP16/32/64; no VME or MX FP8/BF16 arithmetic |
++
++The compiler kernel route implemented here is signed int8 to int32. Hardware FP8
++support does not imply a compiler FP8 lowering. The advertised scalar BF16 FCVT
++extension is absent from the actual scalar decoder; the model rejects those
++instructions. Consult the datatype audit for operation-specific format rules.
++
++The scalar twin accumulates through unsigned 32-bit arithmetic and converts the
++result back to signed int32 without an out-of-range cast. This matches VME's
++modulo-2^32 accumulation even when the bias or a long dot product overflows.
++Independent Python integer goldens and optimized builds with `-ftrapv` cover
++both overflow directions, long reductions, tile boundaries and tails.
++
++## Source-derived kernel gate
++
++`source_facts.py` reads the enabled `opuInsns`, Saturn decode keys and whole
++Rocket matrix configuration BitPats. Every emitted instruction is independently
++cross-checked against the named declaration in the pinned `vme.h`. Receipt
++entries retain file SHA256 and source lines. Unread or unsupported syntax refuses
++emission. VLEN/DLEN are read from the OPU-enabled Shuttle configuration, and
++matrix types/kmax from their actual declarations. No instruction words are
++copied from the legacy simulator pin.
++
++`examples/iris/run.sh` is the concrete equivalent of the previously requested
++but absent Merlin `examples/iris/run.sh`. It builds the real OOT VME kernel and
++its scalar twin through Merlin's explicit caller-workspace pointer ABI. It
++compares every int32 accumulator and every W8A8 result with independent host
++semantics, and audits actual executable instructions. The fixture shapes are
++explicit: GEMM M=64,N=64,K=64; convolution NHWC[1,10,10,8] with HWIO[3,3,8,64],
++valid stride 1, yielding M=64,N=64,K=72. Guest im2col is included in convolution
++regions. GEMM `--shape M,N,K` permits independent edge/tail cases within the
++full-value output budget. These are newly declared source fixtures: no missing
++historical example's dimensions are silently assumed.
++
++From an iris-model checkout with this patched companion Merlin installed:
++
++```sh
++uv venv --python 3.12 build/merlin-venv
++uv pip install --python build/merlin-venv/bin/python -e 'integration/merlin[xdsl,targetgen]' pytest
++export PATH=/scratch/eygao/iris-cy/.conda-env/bin:$PATH
++export MERLIN_PYTHON=$PWD/build/merlin-venv/bin/python
++export MERLIN_CHIPYARD_IRIS=/scratch/eygao/iris-cy
++export MERLIN_PROVIDER_BASE_PATH=$PWD/third_party/rvv-mlir
++$MERLIN_PYTHON integration/iris-mlir/configure_model.py --model-root "$PWD" --output build/merlin-simulator-current
++export MERLIN_IRIS_MODEL_MANIFEST=$PWD/build/merlin-simulator-current/manifest.json
++export MERLIN_IRIS_ALLOW_EXPERIMENTAL_FUNCTIONAL=1
++integration/iris-mlir/examples/iris/run.sh op gemm --harts 2 --model-root "$PWD" \
++  --compiler /scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/riscv64-unknown-elf-gcc \
++  --output build/merlin-gates/gemm-h2
++integration/iris-mlir/examples/iris/run.sh op conv2d --harts 1 --model-root "$PWD" \
++  --compiler /scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/riscv64-unknown-elf-gcc \
++  --output build/merlin-gates/conv2d-h1
+ ```
+ 
+-| Iris (from `IrisConfigs.scala`) | |
+-|---|---|
+-| harts 0–1 | Shuttle + Saturn, VLEN 256 / DLEN 128, `opuMxParams` (VME/Xsfmm matrix unit incl. MX/FP8), 128 KiB TCM each |
+-| hart 2 | Rocket + Saturn DMA vector unit, VLEN 256 / DLEN 256, **no matrix unit** |
+-| memory | 512 KiB L2, 128 KiB SBUS scratchpad @ `0x580000000`, serial-TL DRAM @ `0x80000000` |
++`--harts 1|2` selects compute workers. Both images retain all **three physical
++harts**, per-hart ISA overrides, the Iris ROM/DTB and memory map. Inactive harts
++join startup/completion synchronization and park. A matrix worker on hart 2 is
++refused. Each caller owns an aligned workspace, so concurrent kernels do not
++race through hidden shared scratch. The full `OUT` payload is capped at 4096
++values; larger output shapes are refused instead of silently sampled.
+ 
+-## The VME route
++The simulator is the verified Iris overlay on upstream Spike
++`72958551566a30f19444bd7e354552824e4d0a98`. The provider checks the actual
++binary, source overlay, selftests and evidence closure through iris-model's
++real provider. `configure_model.py` also runs a fresh 12-region three-hart smoke
++through the physical boot path. Any changed model input invalidates the selected
++manifest: regenerate it after a new verified model package. Legacy
++`MERLIN_SPIKE_ZVT` / `f90d5af...` never overrides this identity.
+ 
+-int8 contractions `A(M,K)·B(K,N)` with a zero-initialised int32 accumulator, at least one tile in M and N,
+-are rewritten by Merlin into calls to `merlin_vme_gemm_i8_<n>`. This package supplies what those resolve to:
++Execution is an explicit experimental functional opt-in. `MERLIN_IRIS_TIMING=on`
++is refused because no calibrated Iris timing model is available. Guest counters
++in these runs measure Spike instruction progress, not Iris cycle predictions.
++A successful gate establishes these concrete numerical kernel executions only.
+ 
+-| file | |
+-|---|---|
+-| `contracts/matrix_units.yaml` | where the unit's facts are read from: saturn's decode table (`opuInsns`, `Instructions.scala`), the host core's `BitPat`s and `kmax` table (rocket-chip `Matrix.scala`), the config, the cross-check header (`vme.h`), and the simulator. Declaration names only, plus the register-operand layouts with their sources |
+-| `vme_kernel.py` | the GEMM microkernel, modeled on Miles Rusch's `vme_gemm.h` / `vme-fused-lm2-gemm-transpose`: a 2×2 super-tile of four TE×TE int32 tiles (`sf.vtzero.t`), `kmax` reduction rows per `sf.mm.s.s` (`altfmt` = B signed, `rd[0]` = A signed), readout with `sf.vtmv.v.t`, optional fused bias. Edge tiles run TE×TE with `sf.msettm`/`sf.msettn` clamped; a short last reduction step sets `sf.msettk`. No shape is refused |
+-| `vme_shim.py` | reads the contract, derives encodings (`merlin.targetgen.rtl.matrix_isa`), geometry (TE = VLMAX at e8 of the vector unit whose params set `useOpu`; alignment = DLEN/8), wraps the kernel in Merlin's generic shim (`merlin.kernels.matrix_shim`), compiles it, records provenance; declares the simulator |
+-| `matrix_lowering.py` | the plugin Merlin's `MatrixRouting` loads (`--matrix-support-target iris --matrix-unit saturn_vme --matrix-config IrisConfig`) |
++## Zephyr
+ 
+-Every instruction word is derived from the RTL and cross-checked against `vme.h`; with the simulator's
+-source present also against its `riscv/encoding.h` (all ten instructions agree on every bit both state).
+-The kernel reads TE and `kmax` from the hardware at run time and takes a scalar path if they are not what
+-its register layout was generated for.
++The supplied board has three CPU nodes, the actual UART and a 500-kHz CLINT
++mtime. `zephyr/context-support.json` names the exact kernel base and cumulative
++context patch, config requirements, API and source-model evidence. The copied
++patch is byte-identical to the tested iris-model extension; the clean Zephyr
++baseline is never overwritten.
+ 
+-Facts derived from the pinned sources (Merlin's `merlin/contract/hardware_pins.yaml`: `chipyard_iris`,
+-`saturn_vme`, `rocket_chip_iris`, `spike_zvt`): TE = 32, operand alignment 16 B, matrix configurations
+-(e8, w4) and (e32, w1), `kmax(8, 4) = 4`.
++A VME thread must first have a nonempty affinity wholly within harts 0/1 and
++call `iris_vme_enable()` once from thread context. That call explicitly zeros all
++four tiles and clobbers vector configuration. Registered tasks preserve FP/RVV,
++matrix configuration and all 16 KiB tile state across scheduling and 0/1
++migration. Hart 2 is available for CPU/RVV producer work and refuses VME
++ownership. VME in ISRs or without registration is unsupported. Later affinity
++changes including hart 2 are rejected. All three OS harts remain active.
+ 
+-### What runs where
++The explicit patched-kernel context stress and mixed three-hart application
++passed source-model functional checks. These do not establish RTL/FPGA Zephyr
++qualification. The explicit compiled-operation workflow below invokes the target setup hook.
++The generic Merlin whole-model worker pool still lacks that hook.
+ 
+-* **Shipped image**: the kernel's `.insn` words. Audited by Merlin: the unit's instructions present.
+-* **Stand-in twin** (`-DMERLIN_MATRIX_SCALAR_TILE`): same lowering, same tiling loop, scalar tile body,
+-  none of the unit's instructions; gated on stock spike.
+-* **Shipped image on spike with Zvt**: upstream riscv-isa-sim implements the Zvt draft the RTL follows.
+-  Build it (≈2 min on 32 cores) and point Merlin at it:
++## Actual MLIR to Zephyr workflow
+ 
+-  ```sh
+-  git clone https://github.com/riscv-software-src/riscv-isa-sim && cd riscv-isa-sim
+-  git checkout f90d5af53f50b0feec7a7cbcb4411e1e0410c465 && git submodule update --init
+-  mkdir build && cd build && ../configure --prefix=$PWD/../install && make -j32 install
+-  export MERLIN_SPIKE_ZVT=$PWD/../install/bin/spike MERLIN_SPIKE_ZVT_SRC=$PWD/..
+-  ```
++The matching toolchain is now built locally: LLVM source
++`a47bddccec30255619bb8c37fa59700e661d4e66`, `clang-23`, `mlir-opt` and
++`mlir-translate`. The exact Python pass-runner wheel is `torch-mlir==20260531.828`
++from Merlin's compiler lock. Tool hashes/settings are recorded in
++`build/llvm23-toolchain.json` in the companion iris-model checkout.
+ 
+-  It runs as `--isa=rv64gcv_zfh_zvfh_zvl256b_zvt32t_zvt8e_zvti8i32mm`. The kernel sets `mstatus.MS` first,
+-  as saturn's `crt.S` does; Iris's RTL has no such field and ignores the write. A spike verdict is a
+-  functional one under the Zvt draft's semantics, not an RTL one, and its counts are not Iris cycles.
+-* Matrix images use **harts 0–1 only** (`boards.yaml` `matrix_hart_ids`); a 3-hart matrix image is refused.
++`compile_model.py` consumes ordinary linalg-on-tensors MLIR, invokes Merlin's
++actual contraction rewrite through this OOT, lowers through the LLVM23 Python
++runner, and compiles real RV64 objects. The generic descriptor bridge is emitted
++in LLVM IR, so its flattened memref arguments and aggregate return exactly match
++the upstream external function type instead of assuming a C struct/sret ABI.
++Rank2 and rank3 upstream/native ABI tests pass. Each call allocates/frees its own
++packing workspace. `_mlir_ciface_forward` fills the caller's output buffer and
++keeps intermediate allocation ownership inside the lowered program.
+ 
+-## Use
++The same front door runs the complete compiled operation through registered
++Zephyr tasks and a concurrent hart2 RVV producer:
+ 
+ ```sh
+-cd merlin
+-export MERLIN_CHIPYARD_IRIS=/path/to/chipyard-iris   # iris-cy, with generators/saturn and generators/rocket-chip
+-export MERLIN_BOARD_CATALOG=examples/board-catalog.yaml:/path/to/iris-mlir
+-merlin-compile --workload <model> --dtype int8 --target rvv --board iris_rtl --harts 2 --run spike --verify \
+-    --matrix-unit saturn_vme --matrix-config IrisConfig --matrix-support-target iris
++export MERLIN_PYTHON=$PWD/build/merlin-venv/bin/python
++export MERLIN_CHIPYARD_IRIS=/scratch/eygao/iris-cy
++export PATH=/scratch/eygao/iris-cy/.conda-env/bin:$PATH
++integration/iris-mlir/examples/iris/run.sh op gemm --harts 2 --zephyr-mlir \
++  --uart-profile ethan-firesim \
++  --model-root "$PWD" --clang build/llvm23/bin/clang-23 \
++  --llvm-source third_party/llvm-project \
++  --binary build/zephyr-primary-0c0fd778/spike \
++  --uart build/zephyr-primary-0c0fd778/libsifive_uart.so \
++  --output build/merlin-workflow/gemm-h2 --timeout 120
+ ```
+ 
+-`merlin-target-compose --check .` (run by `tests/`) fails when the rvv base this layer pins has moved.
+-`tests/test_matrix_lowering.py` checks the adapter, the contract, the kernel's refusals and the stand-in's
+-tiling against a reference on the host; with `MERLIN_CHIPYARD_IRIS` set it also runs the derivation.
++Use `op conv2d` and `--harts 1` for the other gates. The compiler input for
++convolution is explicitly its im2col contraction endpoint; the target-owned
++Zephyr producer compiles and executes the convolution indexing/packing. The
++whole convolution pipeline is checked against a direct independent convolution
++golden. No claim is made that the compiler captured a full framework convolution
++or an entire language model.
++
++All four GEMM/conv2d by one/two worker gates passed with three physical harts,
++three changing-input jobs, the real shipped VME kernel and scalar twin. Each
++image matched all 12,288 int32 values and 12,288 W8A8 values. The hart2 producer
++also passed its independent RVV checksum and overlapped computation. Final
++receipts are under `build/zephyr-mlir-final/` and bind the retained simulator
++`0c0fd7785d3e7ba2785e2e9eabc0d0af719037ab2fa761b71bab33fe24a5f257`.
++The end-to-end entrypoint is demonstrated separately by
++`build/merlin-workflow/gemm-h2/results.json`.
++
++The supported multicore compiler path is this explicit registered-task pipeline.
++Merlin's general OpenMP worker pool does not invoke the target ownership API;
++`parallel_tiles=True` therefore fails early. Ordinary whole-model generation,
++model-wide numerical qualification, calibrated timing, +/-2% held-out accuracy,
++RTL/FPGA equivalence and full model residency remain separate unmet gates.
++
++The current verified experimental-functional memory package was also tested through the full front door: binary `db964603d91ffb19f7e63dde0e14397635b879559011f1da8acaf5ecd06319a8`, manifest `build/merlin-simulator-current-memory/manifest.json`, workflow receipt `build/merlin-workflow/current-memory-gemm-h2/results.json`. Historical0c0 compiler evidence and its58-object input closure remain retained. The quantized output rule is the public Merlin integer epilogue `Tensor.requant(10).to_i8()` (half-up arithmetic shift then signed8 saturation), independently cross-checked in `build/merlin-epilogue-crosscheck.json`; it is distinct from float-scale/RNE and model-quality validation.
+diff --git a/boards.yaml b/boards.yaml
+index 5a43285..d7a49e4 100644
+--- a/boards.yaml
++++ b/boards.yaml
+@@ -1,38 +1,93 @@
+-# Iris boards. Merlin's board schema (merlin.runtime.boards.Board); select with
+-#   MERLIN_BOARD_CATALOG=<this repo>
+-#
+-# Facts from ucb-bar/chipyard@iris-cy b4542fa, generators/chipyard/src/main/scala/config/IrisConfigs.scala.
+-# Only the RTL-simulation elaboration is described: no Iris silicon or bitstream facts are known here, and a
+-# board is never declared on a guess.
++# Iris facts: full revisions and source hashes in source-identity.json.
+ schema_version: 1
+-
+ boards:
+-  # IrisConfig as Verilator elaborates it. Tile ids: the two Shuttle tiles are harts 0-1 (each a Saturn
+-  # vLen=256/dLen=128 with the VME unit), the Rocket tile is hart 2 (Saturn DMA vector unit,
+-  # vLen=256/dLen=256), so all three harts carry V at the same VLEN. DRAM is the serial-TL manager's RAM
+-  # (ManagerRAMParams address 0x80000000, size 0x100000000). The in-sim TSI link loads the image.
+   iris_rtl:
+-    zephyr_board: chipyard_riscv64
+-    dt_cpu_nodes: 8
++    zephyr_board: iris
++    dt_cpu_nodes: 3
+     dram_bytes: 4 GiB
+-    dram_base: 0x80000000
++    dram_base: 2147483648
+     zephyr_default_ram_bytes: 256 MiB
+     zephyr_link_limit_bytes: 1900 MiB
+     harts: 3
+     vector_harts: 3
+-    # Only the Shuttle tiles' vector units carry the VME unit (their params are VectorParams.opuMxParams;
+-    # the Rocket DMA unit's dmaParams leave useOpu false), so a matrix image runs on harts 0-1 only.
+-    matrix_hart_ids: [0, 1]
++    matrix_hart_ids:
++    - 0
++    - 1
+     vlen: 256
+-    console: htif
++    console: uart
+     flow: zephyr
+     loader: uart_tsi
+     loader_baud: 921600
+     ram_label: ram0
+-    fpu_sharing: false
++    fpu_sharing: true
+     zephyr_vector_ext: true
+     target: iris
+     rtl_sim_config: IrisConfig
+-    notes: >-
+-      RTL simulation of IrisConfig: 2 Shuttle+Saturn(VME) harts and 1 Rocket+Saturn(DMA) hart, all
+-      VLEN=256. RVV images may use all three harts; VME-routed images at most harts 0-1.
++    notes: Source-audited three-hart IrisConfig; target board requires the explicitly
++      patched Zephyr kernel declared in zephyr/context-support.json. All3 harts RVV
++      integer and IEEEFP16/32/64; VME and configured FP8/BF16 operations on Shuttle0/1
++      only. Scalar BF16 FCVT absent despite source ISA advertisement. VME context
++      requires iris_vme_enable() and affinity0/1 before first use. UART console and
++      mtime500kHz. Target-owned Zephyr compiler workflow selects ethan-firesim UART
++      profile (DIV135 at500MHz; zephyr/uart-profiles.json); physical115200 uses
++      DIV4339 and is incompatible with the inspected fixed FireSim decoder. No
++      deployed Zephyr image or UART_TSI upload path is qualified. Source-model functional evidence only; timing/RTL/deployed-image
++      association unqualified.
++    uart_label: uart0
++    mtime_hz: 500000
++    vector_hart_ids:
++    - 0
++    - 1
++    - 2
++    per_hart:
++    - hart_id: 0
++      core_type: ucb-bar,shuttle
++      isa: rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t
++      vlen: 256
++      dlen: 128
++      elen: 64
++      matrix: true
++      dtypes:
++      - int8
++      - int16
++      - int32
++      - int64
++      - fp16
++      - fp32
++      - fp64
++      - fp8_e4m3
++      - fp8_e5m2
++      - bf16
++    - hart_id: 1
++      core_type: ucb-bar,shuttle
++      isa: rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t
++      vlen: 256
++      dlen: 128
++      elen: 64
++      matrix: true
++      dtypes:
++      - int8
++      - int16
++      - int32
++      - int64
++      - fp16
++      - fp32
++      - fp64
++      - fp8_e4m3
++      - fp8_e5m2
++      - bf16
++    - hart_id: 2
++      core_type: sifive,rocket0
++      isa: rv64imafdcvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zvbb_xrocket
++      vlen: 256
++      dlen: 256
++      elen: 64
++      matrix: false
++      dtypes:
++      - int8
++      - int16
++      - int32
++      - int64
++      - fp16
++      - fp32
++      - fp64
+diff --git a/compile_model.py b/compile_model.py
+new file mode 100644
+index 0000000..f80ab13
+--- /dev/null
++++ b/compile_model.py
+@@ -0,0 +1,84 @@
++#!/usr/bin/env python3
++"""Actual Merlin MLIR routing/lowering and byte-bound RV64 compiler artifacts.
++
++The input is ordinary linalg-on-tensors MLIR. This stage does not select goldens,
++workload-specific kernels, thread placement or numerical policies.
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import importlib.metadata
++import json
++import os
++from pathlib import Path
++import subprocess
++
++
++OOT=Path(__file__).resolve().parent
++
++
++def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def main():
++    p=argparse.ArgumentParser(__doc__)
++    p.add_argument("--input",type=Path,required=True)
++    p.add_argument("--op",choices=["gemm","conv2d"],required=True,help="Execution fixture identity, never selects lowering")
++    p.add_argument("--output",type=Path,required=True)
++    p.add_argument("--clang",type=Path,required=True)
++    p.add_argument("--llvm-source",type=Path,required=True)
++    args=p.parse_args()
++    llvm_source=args.llvm_source.resolve()
++    llvm_sha=subprocess.check_output(["git","-C",str(llvm_source),"rev-parse","HEAD"],text=True).strip()
++    if llvm_sha!="a47bddccec30255619bb8c37fa59700e661d4e66" or subprocess.check_output(["git","-C",str(llvm_source),"diff","--binary","HEAD"]):
++        raise RuntimeError("LLVM source must match the clean exact Merlin toolchain pin")
++    os.environ["MERLIN_TARGET_PATH"]=str(OOT)
++    from merlin.runtime.backends.zephyr_model import MatrixRouting
++    from merlin.llvmlower import pipeline
++    from merlin.kernels import matrix_shim
++    root=args.output.resolve();root.mkdir(parents=True,exist_ok=True)
++    receipt=root/"artifacts.json";receipt.unlink(missing_ok=True)
++    source=args.input.resolve();source_bytes=source.read_bytes();source_hash=sha(source)
++    original=root/"original.mlir";original.write_bytes(source_bytes)
++    prepared=root/"prepared.mlir";prepared.write_bytes(source_bytes)
++    route=MatrixRouting(support_target="iris",unit="saturn_vme",config="IrisConfig")
++    provider=route.provider()
++    rewrite=provider.rewrite_prepared_file(prepared,root,select=route.selector(),tile_edge=route.tile_edge())
++    if rewrite.count!=1 or len(rewrite.signatures)!=1:
++        raise RuntimeError("this execution manifest requires exactly one routed contraction")
++    symbol,shape=next(iter(rewrite.signatures.items()))
++    if len(shape)!=3:
++        raise RuntimeError("this Zephyr execution manifest currently supports rank2 contractions")
++    model_ir=pipeline.lower_to_llvm_ir(prepared.read_text(),workdir=root/"lowering",timeout=300)
++    model_ll=root/"model.ll";model_ll.write_text(model_ir)
++    clang=args.clang.resolve()
++    flags=["--target=riscv64-unknown-elf","-O2","-g","-march=rv64gcv_zfh_zvfh","-mabi=lp64d","-mcmodel=medany","-ffreestanding","-fno-builtin"]
++    model_o=root/"model.o"
++    command=[str(clang),*flags,"-c",str(model_ll),"-o",str(model_o)]
++    completed=subprocess.run(command,capture_output=True)
++    (root/"model.build.log").write_bytes(completed.stdout+completed.stderr)
++    if completed.returncode:raise RuntimeError(completed.stderr.decode())
++    built=provider.build_object(rewrite.signatures,root/"matrix",unit=route.unit,config=route.config,
++                                cc=clang,cflags=flags,parallel_tiles=False)
++    bridge=root/"matrix/merlin_vme_descriptor.o"
++    sources=[source,original,prepared,model_ll,root/"matrix/merlin_vme_descriptor.ll",built.source_path,
++             OOT/"compile_model.py",OOT/"matrix_lowering.py",OOT/"vme_shim.py",OOT/"vme_kernel.py",OOT/"source_facts.py",
++             Path(pipeline.__file__),Path(matrix_shim.__file__),clang]
++    if sha(source)!=source_hash:raise RuntimeError("original compiler input changed during invocation")
++    proof={"schema":"iris.mlir.zephyr_artifacts.v1","op":args.op,"local_shape_mnk":list(shape),
++           "pointer_symbol":symbol+"_pointers","ciface_symbol":"_mlir_ciface_forward",
++           "artifacts":{"model_object":{"path":str(model_o),"sha256":sha(model_o)},
++                        "bridge_object":{"path":str(bridge),"sha256":sha(bridge)}},
++           "source_sha256":{str(f):sha(f) for f in sources},"model_compile_argv":command,
++           "kernel":built.to_dict(),"routing":rewrite.to_dict(),
++           "compiler":{"version":subprocess.check_output([str(clang),"--version"],text=True).splitlines()[0],
++                       "llvm_source_commit":llvm_sha,"llvm_source_path":str(llvm_source),
++                       "torch_mlir_version":importlib.metadata.version("torch-mlir"),"clang_sha256":sha(clang)},
++           "output_abi":"_mlir_ciface_forward fills caller-owned output descriptor buffer; intermediates own malloc/free",
++           "scope":"Actual Merlin int8 routing + LLVM23 lowering + target-owned VME backend. Thread/whole-model/hardware qualification belongs to executing gate.",
++           "rtl_certified":False,"timing_calibrated":False}
++    receipt.write_text(json.dumps(proof,indent=2)+"\n");print(receipt)
++
++
++if __name__=="__main__":main()
+diff --git a/configure_model.py b/configure_model.py
+new file mode 100644
+index 0000000..32ef67b
+--- /dev/null
++++ b/configure_model.py
+@@ -0,0 +1,81 @@
++#!/usr/bin/env python3
++"""Bind a verified iris-model provider and a fresh three-hart smoke to this OOT."""
++import argparse
++import hashlib
++import importlib.util
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++
++def sha(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def main():
++    p = argparse.ArgumentParser(__doc__)
++    p.add_argument("--model-root", type=Path, required=True)
++    p.add_argument("--output", type=Path, required=True)
++    args = p.parse_args()
++    root, out = args.model_root.resolve(), args.output.resolve()
++    out.mkdir(parents=True, exist_ok=True)
++    receipt_path = out / "manifest.json"
++    receipt_path.unlink(missing_ok=True)
++    provider_path = root / "spike/provider.py"
++    spec = importlib.util.spec_from_file_location("iris_selected_provider", provider_path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    verified = module.experimental_functional_simulator()
++    if verified.get("available") is not True:
++        raise RuntimeError(verified.get("reason"))
++    prov_path = root / "spike/provenance.json"
++    provenance = json.loads(prov_path.read_text())
++    sys.path.insert(0, str(root))
++    from spike.run_functional import command
++    binary = Path(verified["binary"])
++    native = Path(verified.get("native_binary", binary))
++    native_sha = verified.get("native_binary_sha256", verified["binary_sha256"])
++    if sha(native) != native_sha:
++        raise ValueError("Verified native simulator changed")
++    elf = root / "benchmarks/build/smoke.elf"
++    argv = command(binary, elf)
++    rom, dtb = root / "board/evidence/bootrom.rv64.img", root / "board/build/iris.dtb"
++    argv = argv[:-1] + ["--iris-bootrom=" + str(rom), "--dtb=" + str(dtb)] + argv[-1:]
++    got = subprocess.run(argv, capture_output=True, timeout=30)
++    (out / "selftest.stdout").write_bytes(got.stdout)
++    (out / "selftest.stderr").write_bytes(got.stderr)
++    rows = [json.loads(line.partition("IRIS_REGION ")[2]) for line in got.stdout.decode().splitlines()
++            if line.startswith("IRIS_REGION ")]
++    passed = (got.returncode == 0 and len(rows) == 12 and all(r.get("pass") is True for r in rows)
++              and {r["hart"] for r in rows} == {0, 1, 2})
++    test = {"pass": passed, "binary_sha256": sha(binary), "native_binary_sha256": native_sha, "argv": argv,
++            "region_count": len(rows), "regions": rows, "scope": "three-hart-int8-smoke",
++            "returncode": got.returncode, "rtl_certified": False, "timing_calibrated": False}
++    test_path = out / "selftest.json"
++    test_path.write_text(json.dumps(test, indent=2) + "\n")
++    if not passed:
++        raise RuntimeError("fresh model smoke did not pass; no provider manifest published")
++    uart = root / "spike/bin/libsifive_uart.so"
++    inputs = [provider_path, prov_path, binary, native, uart, elf, rom, dtb, test_path, out / "selftest.stdout", out / "selftest.stderr"]
++    manifest = {"schema": "iris.experimental_simulator.v1", "binary": str(binary),
++                "binary_sha256": sha(binary), "native_binary": str(native), "native_binary_sha256": native_sha,
++                "model_provider": str(provider_path),
++                "source_identity": {"spike_base": provenance["upstream_spike_sha"],
++                                    "patch_sha256": provenance["target_patch_sha256"],
++                                    "hardware_manifest_sha256": provenance["hardware_manifest_sha256"]},
++                "isa_extensions": ["zvt32t", "zvti8i32mm"], "per_hart_isa": provenance["launch_isa"],
++                "launch_args": ["--iris-vme", "--extlib=" + str(uart), "--device=sifive_uart,0x10020000",
++                                "--iris-bootrom=" + str(rom), "--dtb=" + str(dtb)],
++                "memory_regions": [[0x70000000,0x40000],[0x80000000,0x100000000],[0x580000000,0x20000]],
++                "selftest": {"pass": True, "binary_sha256": sha(binary), "scope": test["scope"],
++                             "receipt": str(test_path)},
++                "input_sha256": {str(f): sha(f) for f in inputs}, "rtl_certified": False,
++                "timing_calibrated": False, "zephyr_smp_certified": False}
++    receipt_path.write_text(json.dumps(manifest, indent=2) + "\n")
++    print(receipt_path)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/examples/iris/fixtures/conv2d-im2col.mlir b/examples/iris/fixtures/conv2d-im2col.mlir
+new file mode 100644
+index 0000000..6a89f03
+--- /dev/null
++++ b/examples/iris/fixtures/conv2d-im2col.mlir
+@@ -0,0 +1,10 @@
++// Source contraction endpoint. Conv2d im2col is generated by the declared Zephyr frontend.
++module {
++  func.func @forward(%a: tensor<32x72xi8>, %b: tensor<72x64xi8>) -> tensor<32x64xi32> attributes {llvm.emit_c_interface} {
++    %z = arith.constant 0 : i32
++    %e = tensor.empty() : tensor<32x64xi32>
++    %f = linalg.fill ins(%z : i32) outs(%e : tensor<32x64xi32>) -> tensor<32x64xi32>
++    %v = linalg.matmul ins(%a, %b : tensor<32x72xi8>, tensor<72x64xi8>) outs(%f : tensor<32x64xi32>) -> tensor<32x64xi32>
++    return %v : tensor<32x64xi32>
++  }
++}
+diff --git a/examples/iris/fixtures/gemm.mlir b/examples/iris/fixtures/gemm.mlir
+new file mode 100644
+index 0000000..db499c8
+--- /dev/null
++++ b/examples/iris/fixtures/gemm.mlir
+@@ -0,0 +1,10 @@
++// Source contraction endpoint. Conv2d im2col is generated by the declared Zephyr frontend.
++module {
++  func.func @forward(%a: tensor<32x64xi8>, %b: tensor<64x64xi8>) -> tensor<32x64xi32> attributes {llvm.emit_c_interface} {
++    %z = arith.constant 0 : i32
++    %e = tensor.empty() : tensor<32x64xi32>
++    %f = linalg.fill ins(%z : i32) outs(%e : tensor<32x64xi32>) -> tensor<32x64xi32>
++    %v = linalg.matmul ins(%a, %b : tensor<32x64xi8>, tensor<64x64xi8>) outs(%f : tensor<32x64xi32>) -> tensor<32x64xi32>
++    return %v : tensor<32x64xi32>
++  }
++}
+diff --git a/examples/iris/run.py b/examples/iris/run.py
+new file mode 100644
+index 0000000..616104e
+--- /dev/null
++++ b/examples/iris/run.py
+@@ -0,0 +1,294 @@
++#!/usr/bin/env python3
++"""Build and compare the actual OOT VME kernel, its scalar twin and W8A8 golden.
++
++This concrete kernel-support gate uses an explicit pointer/workspace ABI. It does
++not claim the unavailable LLVM23 whole-model external ABI or RTL cycle accuracy.
++"""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import struct
++import subprocess
++import sys
++import time
++
++
++OOT = Path(__file__).resolve().parents[2]
++
++
++def sha(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def s8(value):
++    return (value & 255) - (256 if value & 128 else 0)
++
++
++def inputs_and_golden(op, m, n, k):
++    """Independent software semantics; no generated kernel or tile schedule here."""
++    b = [[s8(q*13+j*7+5) for j in range(n)] for q in range(k)]
++    if op == "gemm":
++        a = [[s8(i*17+q*11+3) for q in range(k)] for i in range(m)]
++        acc = [sum(a[i][q]*b[q][j] for q in range(k)) for i in range(m) for j in range(n)]
++    else:
++        # Explicit source fixture: NHWC[1,10,10,8] * HWIO[3,3,8,64], valid stride1.
++        # Golden traverses the convolution directly, independently of guest im2col.
++        acc = []
++        for oy in range(8):
++            for ox in range(8):
++                for j in range(n):
++                    total = 0
++                    for fy in range(3):
++                        for fx in range(3):
++                            for c in range(8):
++                                image_index = ((oy+fy)*10+ox+fx)*8+c
++                                weight_index = (fy*3+fx)*8+c
++                                total += s8(image_index*17+3)*b[weight_index][j]
++                    acc.append(total)
++    raw = [v & 0xffffffff for v in acc]
++    w8a8 = [max(-128, min(127, (v+512)//1024)) for v in acc]
++    words = [struct.unpack("<I", struct.pack("<f", v))[0] for v in w8a8]
++    return raw, words
++
++
++def guest(op, m, n, k, harts, signatures, workspace):
++    switches = []
++    for h, (start, rows, symbol) in enumerate(signatures):
++        switches.append(f"case {h}: errors[h]={symbol}_pointers(output+{start*n},a[h],b,{k},1,{n},1,{n},1,0,0,0,workspace[h],sizeof workspace[h]);break;")
++    maximum_rows = max(rows for _, rows, _ in signatures)
++    prepare = ("for(unsigned i=0;i<rows;++i) for(unsigned q=0;q<K;++q) a[h][i*K+q]=(int8_t)((first+i)*17+q*11+3);"
++               if op == "gemm" else
++               "for(unsigned i=0;i<rows;++i) {unsigned pos=first+i,oy=pos/8,ox=pos%8; for(unsigned fy=0;fy<3;++fy) for(unsigned fx=0;fx<3;++fx) for(unsigned c=0;c<8;++c) a[h][i*K+(fy*3+fx)*8+c]=(int8_t)((((oy+fy)*10+ox+fx)*8+c)*17+3);}")
++    return f'''#include "runtime.h"
++#include "kernel.c"
++#define M {m}
++#define N {n}
++#define K {k}
++#define WORKERS {harts}
++static int8_t a[IRIS_HARTS][{maximum_rows}*K] __attribute__((aligned(16)));
++static int8_t b[K*N] __attribute__((aligned(16)));
++static int32_t output[M*N] __attribute__((aligned(16)));
++static unsigned char workspace[IRIS_HARTS][{(workspace+15)//16*16}] __attribute__((aligned(16)));
++static int errors[IRIS_HARTS];
++static uint64_t starts[IRIS_HARTS], ends[IRIS_HARTS], instrets[IRIS_HARTS];
++void benchmark_main(unsigned h) {{
++  if(h==0) for(unsigned q=0;q<K;++q) for(unsigned j=0;j<N;++j) b[q*N+j]=(int8_t)(q*13+j*7+5);
++  barrier();
++  unsigned first=h<WORKERS?M*h/WORKERS:0,rows=h<WORKERS?M*(h+1)/WORKERS-first:0;
++  uint64_t initial_instret=retired();starts[h]=cycles();
++  {prepare}
++  switch(h){{{''.join(switches)}}}
++  ends[h]=cycles();instrets[h]=retired()-initial_instret;
++  barrier();
++  if(h!=0) for(;;) __asm__ volatile("wfi");
++  for(unsigned t=0;t<IRIS_HARTS;++t) if(errors[t]) finish(1);
++  putstr("ACC_I32 ");putuint(M*N);
++  for(unsigned i=0;i<M*N;++i){{putstr(" ");putuint((uint32_t)output[i]);}}putstr("\\n");
++  putstr("OUT ");putuint(M*N);
++  for(unsigned i=0;i<M*N;++i){{int64_t q=((int64_t)output[i]+512)>>10; if(q>127)q=127;if(q< -128)q=-128;union{{float f;uint32_t u;}}v;v.f=(float)q;putstr(" ");putuint(v.u);}}putstr("\\n");
++  for(unsigned t=0;t<WORKERS;++t){{putstr("REGION ");putuint(t);putstr(" ");putuint(starts[t]);putstr(" ");putuint(ends[t]);putstr(" ");putuint(instrets[t]);putstr("\\n");}}
++  putstr("METRIC cycles ");putuint(ends[0]-starts[0]);putstr("\\nDONE\\n");finish(0);
++}}
++'''
++
++
++def parse(console, count):
++    parsed = {}
++    for key in ("ACC_I32", "OUT"):
++        rows = [line.split() for line in console.splitlines() if line.startswith(key + " ")]
++        if len(rows) != 1 or len(rows[0]) != count+2 or int(rows[0][1]) != count:
++            raise RuntimeError("missing, duplicated or incomplete full-value " + key)
++        values = [int(word) for word in rows[0][2:]]
++        if any(word < 0 or word > 0xffffffff for word in values):
++            raise RuntimeError("invalid output container word")
++        parsed[key] = values
++    if console.splitlines().count("DONE") != 1:
++        raise RuntimeError("missing or duplicated terminal DONE")
++    return parsed
++
++
++def main():
++    p = argparse.ArgumentParser(__doc__)
++    p.add_argument("command", choices=["op"])
++    p.add_argument("op", choices=["gemm", "conv2d"])
++    p.add_argument("--harts", type=int, choices=[1, 2], default=1)
++    p.add_argument("--shape", help="GEMM M,N,K; defaults to64,64,64")
++    p.add_argument("--model-root", type=Path, required=True)
++    p.add_argument("--compiler", type=Path)
++    p.add_argument("--zephyr-mlir", action="store_true", help="Compile real Merlin MLIR and execute registered Zephyr tasks")
++    p.add_argument("--clang", type=Path)
++    p.add_argument("--llvm-source", type=Path)
++    p.add_argument("--binary", type=Path)
++    p.add_argument("--uart", type=Path)
++    p.add_argument("--uart-profile",choices=['physical','ethan-firesim'],default='ethan-firesim',help='Explicit target-owned Zephyr console deployment profile')
++    p.add_argument("--output", type=Path, required=True)
++    p.add_argument("--timeout", type=int, default=60)
++    args = p.parse_args()
++    if args.zephyr_mlir:
++        if args.shape or not all((args.clang,args.llvm_source,args.binary,args.uart)):
++            p.error("--zephyr-mlir requires --clang, --llvm-source, --binary, --uart and the declared source fixture")
++        root,out=args.model_root.resolve(),args.output.resolve()
++        out.mkdir(parents=True,exist_ok=True)
++        receipt=out/"results.json";receipt.unlink(missing_ok=True)
++        source=OOT/"examples/iris/fixtures"/("gemm.mlir" if args.op=="gemm" else "conv2d-im2col.mlir")
++        env=dict(os.environ,MERLIN_COMPILER_PYTHON=sys.executable)
++        compile_command=[sys.executable,str(OOT/"compile_model.py"),"--input",str(source),"--op",args.op,
++                         "--output",str(out/"compiled"),"--clang",str(args.clang.resolve()),
++                         "--llvm-source",str(args.llvm_source.resolve())]
++        subprocess.run(compile_command,env=env,check=True)
++        execute_command=[sys.executable,str(root/"zephyr/compiler_pipeline.py"),"--op",args.op,
++                         "--harts",str(args.harts),"--output",str(out/"execution"),
++                         "--mlir-receipt",str(out/"compiled/artifacts.json"),
++                         "--binary",str(args.binary.resolve()),"--uart",str(args.uart.resolve()),
++                         "--uart-profile",args.uart_profile,
++                         "--timeout",str(args.timeout)]
++        subprocess.run(execute_command,env=env,check=True)
++        actual=json.loads((out/"execution/results.json").read_text())
++        if actual.get("pass") is not True or actual.get("real_merlin_mlir_executed") is not True:
++            raise RuntimeError("compiled Zephyr pipeline did not qualify its actual MLIR execution")
++        proof={"schema":"iris.compiler_workflow.v1","pass":True,"op":args.op,"workers":args.harts,
++               "uart_profile":actual['uart_profile'],"runner_sha256":sha(Path(__file__)),
++               "uart_profile_metadata_sha256":sha(OOT/"zephyr/uart-profiles.json"),
++               "physical_harts":3,"compile_argv":compile_command,"execute_argv":execute_command,
++               "artifacts_receipt_sha256":sha(out/"compiled/artifacts.json"),
++               "execution_receipt_sha256":sha(out/"execution/results.json"),
++               "binary_sha256":actual["binary_sha256"],"whole_model_qualified":False,
++               "rtl_certified":False,"timing_calibrated":False}
++        receipt.write_text(json.dumps(proof,indent=2)+"\n")
++        print(receipt)
++        return
++    if not args.compiler:
++        p.error("the baremetal kernel gate requires --compiler")
++    if args.shape and args.op != "gemm":
++        p.error("conv2d uses its explicit source fixture; --shape applies to GEMM")
++    m, n, k = tuple(int(v) for v in args.shape.split(",")) if args.shape else ((64,64,64) if args.op=="gemm" else (64,64,72))
++    if min(m,n,k) < 1 or m*n > 4096 or m*k+k*n > 1000000 or m < args.harts:
++        p.error("shape exceeds full OUT/workspace bound or has empty worker partition")
++    os.environ["MERLIN_TARGET_PATH"] = str(OOT)
++    from merlin.runtime.backends.zephyr_model import MatrixRouting
++    from merlin.runtime.backends import device_simulator
++    from merlin.kernels import matrix_shim
++    from merlin.runtime.boards import load_boards
++    route = MatrixRouting(support_target="iris", unit="saturn_vme", config="IrisConfig")
++    board = load_boards(OOT / "boards.yaml")["iris_rtl"]
++    board.check_matrix_image(args.harts)
++    provider = route.provider()
++    shim = provider.vme_shim
++    contract = shim.load_contract(route.unit)
++    root, out = args.model_root.resolve(), args.output.resolve()
++    empirical = os.environ.get('MERLIN_IRIS_TIMING') == 'empirical'
++    if empirical and out.exists() and any(out.iterdir()):
++        raise RuntimeError('empirical runs require a fresh output directory to preserve profiles and receipts')
++    out.mkdir(parents=True, exist_ok=True)
++    receipt_path = out / "results.json"
++    receipt_path.unlink(missing_ok=True)
++    signatures = []
++    for h in range(args.harts):
++        first, end = m*h//args.harts, m*(h+1)//args.harts
++        signatures.append((first, end-first, "gate_h"+str(h)))
++    unit, enc = shim.emit_translation_unit({symbol:(rows,n,k) for _,rows,symbol in signatures},
++                                           contract,alignment_bytes=contract.geometry(route.config)[1])
++    (out / "kernel.c").write_text(str(unit))
++    (out / "guest.c").write_text(guest(args.op,m,n,k,args.harts,signatures,unit.scratch_bytes))
++    (out / "encodings.json").write_text(json.dumps(enc.to_dict(),indent=2)+"\n")
++    raw, words = inputs_and_golden(args.op,m,n,k)
++    (out / "golden.json").write_text(json.dumps({"accumulator_u32":raw,"w8a8_f32_words":words})+"\n")
++    compiler = args.compiler.resolve()
++    baseline = [str(compiler),"-O2","-g","-Wall","-Wextra","-Werror","-ffreestanding","-fno-builtin",
++                "-fno-tree-vectorize","-fno-tree-slp-vectorize","-mcmodel=medany","-mabi=lp64d",
++                "-march=rv64gcv_zicsr_zifencei","-nostdlib","-static","-Wl,--build-id=none,--gc-sections",
++                "-DIRIS_HARTS="+str(board.harts),"-I"+str(root/"benchmarks"),"-I"+str(out),
++                "-T",str(root/"benchmarks/link.ld"),str(root/"benchmarks/start.S"),
++                str(root/"benchmarks/runtime.c"),str(out/"guest.c"),"-lgcc"]
++    runs = []
++    inputs = [compiler,root/"benchmarks/start.S",root/"benchmarks/runtime.c",root/"benchmarks/runtime.h",root/"benchmarks/link.ld",
++              out/"guest.c",out/"kernel.c",out/"golden.json",Path(__file__),OOT/"source_facts.py",OOT/"vme_kernel.py",OOT/"vme_shim.py"]
++    inputs.extend(Path(path) for path in enc.sources)
++    inputs.extend([OOT/"boards.yaml", OOT/"simulator.py", OOT/"contracts/matrix_units.yaml"])
++    inputs.extend([Path(device_simulator.__file__), Path(matrix_shim.__file__), OOT/"matrix_lowering.py"])
++    original_inputs={str(f):sha(f) for f in inputs}
++    for name, flags in (("shipped",[]),("twin",["-DMERLIN_MATRIX_SCALAR_TILE","-DMERLIN_MATRIX_TILE_EDGE="+str(route.tile_edge())])):
++        elf=out/(name+".elf")
++        argv=[*baseline,*flags,"-o",str(elf)]
++        compiled=subprocess.run(argv,capture_output=True)
++        (out/(name+".build.log")).write_bytes(compiled.stdout+compiled.stderr)
++        if compiled.returncode:
++            raise RuntimeError((compiled.stdout+compiled.stderr).decode()[-4000:])
++        started=time.monotonic()
++        prefix=out/(name+'.features.jsonl') if empirical else None
++        previous_prefix=os.environ.get('IRIS_EMPIRICAL_FEATURES')
++        if prefix is not None:os.environ['IRIS_EMPIRICAL_FEATURES']=str(prefix)
++        try:
++            result=device_simulator.run(route,elf,harts=board.harts,active_hart_ids=tuple(range(args.harts)),isa="rv64gcv_zfh_zvfh_zvl256b_zvbb",memory=(board.dram_base,board.dram_bytes),timeout=args.timeout)
++        finally:
++            if previous_prefix is None:os.environ.pop('IRIS_EMPIRICAL_FEATURES',None)
++            else:os.environ['IRIS_EMPIRICAL_FEATURES']=previous_prefix
++        elapsed=time.monotonic()-started
++        stdout,stderr=result.pop("stdout"),result.pop("stderr")
++        (out/(name+".stdout")).write_bytes(stdout)
++        (out/(name+".stderr")).write_bytes(stderr)
++        if result["returncode"]:
++            raise RuntimeError(name+" exited nonzero: "+stderr.decode(errors="replace")[-2000:])
++        parsed=parse(stdout.decode(),m*n)
++        if parsed["ACC_I32"] != raw or parsed["OUT"] != words:
++            mismatch=next(i for i,(a,b) in enumerate(zip(parsed["ACC_I32"],raw)) if a!=b) if parsed["ACC_I32"]!=raw else None
++            raise RuntimeError(f"{name} differs from independent integer/W8A8 golden at {mismatch}")
++        regions=[tuple(int(x) for x in line.split()[1:]) for line in stdout.decode().splitlines() if line.startswith("REGION ")]
++        if sorted(r[0] for r in regions)!=list(range(args.harts)) or any(len(r)!=4 or r[2]<=r[1] or r[3]<=0 for r in regions):
++            raise RuntimeError("missing physical hart counter region")
++        # Audit actual executable instruction words, with a real disassembler (not data-byte scanning).
++        objdump=compiler.with_name(compiler.name.removesuffix("gcc")+"objdump")
++        listing=subprocess.check_output([str(objdump),"-d",str(elf)],text=True)
++        (out/(name+".disassembly")).write_text(listing)
++        hits={role:0 for role in contract.kernel_roles}
++        for line in listing.splitlines():
++            fields=line.split()
++            if len(fields)<2 or not fields[0].endswith(":") or len(fields[1])!=8:
++                continue
++            try: instruction=int(fields[1],16)
++            except ValueError: continue
++            for role,key in contract.kernel_roles.items():
++                e=enc.encodings[key]
++                if instruction&e.mask==e.match:hits[role]+=1
++        if name=="shipped" and any(v==0 for v in hits.values()):
++            raise RuntimeError("shipped image lacks a required source-derived matrix instruction: "+str(hits))
++        if name=="twin" and any(hits.values()):
++            raise RuntimeError("scalar twin unexpectedly contains matrix instructions")
++        profile_evidence={}
++        if prefix is not None:
++            if not prefix.is_file() or not prefix.stat().st_size:
++                raise RuntimeError('actual empirical CSR-prefix profile missing')
++            profile_evidence={'feature_prefix':str(prefix),'feature_prefix_sha256':sha(prefix),
++                              'profile_environment':{'IRIS_EMPIRICAL_FEATURES':str(prefix)}}
++        runs.append({**result,"kind":name,"compile_argv":argv,"host_elapsed_seconds":elapsed,
++                     "regions":regions,"instruction_audit":hits,"full_accumulator_elements":len(raw),
++                     "full_w8a8_elements":len(words),"correct":True,"timing_calibrated":False,
++                     "stdout_sha256":sha(out/(name+".stdout")),"stderr_sha256":sha(out/(name+".stderr")),
++                     "input_sha256":{**result['execution_input_sha256'],str(elf):sha(elf)},
++                     **profile_evidence})
++    modeled=[run['simulator'].get('timing_available') is True for run in runs]
++    counter_semantics=("Program-visible experimental Iris modeled cycles; consult the selected model's measured accuracy and scope"
++                       if all(modeled) else
++                       "Mixed simulator counter modes; see each run's simulator descriptor" if any(modeled) else
++                       "Spike functional instruction-progress counters; not Iris cycle predictions")
++    # Reopen exact original inputs before publishing success.
++    if any(sha(file)!=expected for file,expected in original_inputs.items()):
++        raise RuntimeError("kernel-support inputs changed during invocation; success receipt withheld")
++    proof={"schema":"iris.compiler_kernel_gate.v1","pass":True,"op":args.op,"shape_mnk":[m,n,k],
++           "workers":args.harts,"physical_harts":board.harts,"active_hart_ids":list(range(args.harts)),
++           "partitions":[list(v) for v in signatures],"runs":runs,
++           "input_sha256":original_inputs,"source_identity":shim.source_facts.source_identity(contract),
++           "qualification":{"scope":"OOT pointer/workspace kernel support + full numerical outputs",
++                            "whole_model_compiler":False,"zephyr":False,"rtl":False,"timing_calibrated":False},
++           "counter_semantics":counter_semantics,
++           "toolchain_closure":"Compiler driver and explicit sources bound; transitive headers/libraries not fully enumerated",
++           "abi":"explicit caller-workspace pointer ABI v1; MLIR23 external ABI unqualified"}
++    receipt_path.write_text(json.dumps(proof,indent=2)+"\n")
++    print(f"{args.op} harts={args.harts}: shipped == scalar twin == independent W8A8; {m*n} full outputs per image")
++
++
++if __name__=="__main__":main()
+diff --git a/examples/iris/run.sh b/examples/iris/run.sh
+new file mode 100755
+index 0000000..51e6bc3
+--- /dev/null
++++ b/examples/iris/run.sh
+@@ -0,0 +1,4 @@
++#!/usr/bin/env bash
++set -euo pipefail
++script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
++exec "${MERLIN_PYTHON:-python3}" "$script_dir/run.py" "$@"
+diff --git a/provenance.json b/provenance.json
+index 7f844b8..cfa723a 100644
+--- a/provenance.json
++++ b/provenance.json
+@@ -4,50 +4,184 @@
+   "upstream": {
+     "url": "https://github.com/ucb-bar/chipyard.git",
+     "base_ref": "iris-cy",
+-    "base_commit": "b4542fa",
++    "base_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+     "root_role": "support",
+     "note": "Facts transcribed from generators/chipyard/src/main/scala/config/IrisConfigs.scala; saturn submodule at the vme branch 536774b; rocket-chip at fc745a8 (Matrix.scala). VME encodings are derived at build time, not transcribed."
+   },
+   "qualification": {
+-    "level": "metadata_schema_checked_snapshot",
++    "level": "experimental_mlir_registered_zephyr_operation_gates",
+     "schema_valid": true,
+     "schema_diagnostics": [],
+     "hardware_executed": false,
+-    "candidate_certification": false
++    "candidate_certification": false,
++    "whole_model_certification": false,
++    "rtl_certified": false,
++    "timing_calibrated": false,
++    "sdk4_publication_candidate": true,
++    "note": "Functional selector remains byte-bound to its own primary selftests. Explicit empirical timing selector and publication tooling are added; availability requires an independently frozen fit/runtime/source/selftest package. Whole-model, RTL and held-out accuracy certifications remain false."
+   },
+   "files": [
++    {
++      "path": ".gitignore",
++      "sha256": "f76e0cc89e965a3ff67ee028d7273b29255ddfba1a6b5efebd180a26d6c19e8c"
++    },
++    {
++      "path": "LICENSE",
++      "sha256": "8d65baa281b26632034e504257cd0640d4c14dbe0a8f3c54ebb046e0721855c3"
++    },
++    {
++      "path": "README.md",
++      "sha256": "4e1dcfb887f15f76da87c51284568f4f970602b85e3b6b397386923525a4f31a"
++    },
+     {
+       "path": "boards.yaml",
+-      "source": "chipyard@iris-cy b4542fa: IrisConfigs.scala",
+-      "change": "board facts read from the config",
+-      "sha256": "4da1b7d5951f8b3d5b641df4827802226cac18ede24e6acd1cfab66ad71a83b3"
++      "sha256": "a18a72375283211ca6eaf4e1bb9c59905ce1b83860ab3d0716b04e6f5eb96c75"
++    },
++    {
++      "path": "compile_model.py",
++      "sha256": "750c63f9d7babde00e6c7cc235c369fd2e7531e02f0c9c3c65d29d7dde6518ff"
++    },
++    {
++      "path": "configure_empirical.py",
++      "sha256": "e05217ff00360fcf4118a6f99233f437bcf481c0cdcb10ef25eeddca76c5ee24"
++    },
++    {
++      "path": "configure_model.py",
++      "sha256": "46912a5e216a4733552d6c2bd7dc067d35450b27476016bd90c29a0f51001c47"
++    },
++    {
++      "path": "contracts/composed.lock.yaml",
++      "sha256": "5ea9a9a628c65f51ea3c1e1545de40ebc769acfe247e3b051f271919a8a8c5de"
+     },
+     {
+       "path": "contracts/matrix_units.yaml",
+-      "source": "saturn@vme 536774b, rocket-chip@fc745a8, riscv-isa-sim@f90d5af",
+-      "change": "derivation entry points (declaration names) and register-operand layouts with their sources",
+       "sha256": "fe5f040ec447f1a439b90b6a889c8cd93389fc0baf539e9df26afa8a7fdf06ad"
+     },
+     {
+-      "path": "vme_kernel.py",
+-      "source": "saturn@vme 536774b benchmarks/common/vme_gemm.h, vme-fused-lm2-gemm-transpose",
+-      "change": "int8 GEMM microkernel emitter modeled on the reference kernels; words from the derived table",
+-      "sha256": "7fa03e05eec8bcd4e9289b1a71c7fc5320b9f1676061624279538cb7a2f9cd27"
++      "path": "contracts/overlay.yaml",
++      "sha256": "b3fd3afe4d758ab9c9719bfa74727bb87cfda730c5ae1f771c7477608e0a89e9"
+     },
+     {
+-      "path": "vme_shim.py",
+-      "source": "this package",
+-      "change": "unit contract reader, geometry, kernel spec, build and simulator declaration",
+-      "sha256": "e356679a102aec5eb628607a2436eb1eb21f6e6a83f81f7e14833cd447b268dd"
++      "path": "contracts/target_contract.yaml",
++      "sha256": "31e8f82bc9a8066e2c83bd76217d8062a767ed03f0097fa6dbe47531c7381525"
++    },
++    {
++      "path": "examples/iris/fixtures/conv2d-im2col.mlir",
++      "sha256": "86ddece98ce1f4b477c4297458c50139f35f196951a5a6829056bed86d43ad93"
++    },
++    {
++      "path": "examples/iris/fixtures/gemm.mlir",
++      "sha256": "7ff9e8952fff1dd9858cff158808a3b94ff16811d5c0e3886d83c1f1449a7781"
++    },
++    {
++      "path": "examples/iris/run.py",
++      "sha256": "c0b5768d300612cb79d3221df6adca4ef9fdc4b0f4d8a35fe269d975ea43bc79"
++    },
++    {
++      "path": "examples/iris/run.sh",
++      "sha256": "09f94626bf1c3a212d7a9cc2f419ddd8cd1a199bf51f791818d15dccfe055317"
+     },
+     {
+       "path": "matrix_lowering.py",
+-      "source": "this package",
+-      "change": "plugin adapter for merlin's MatrixRouting",
+       "sha256": "e81d262e6ea6740e2a7aad55afa1792d68e30c404aa774d3812de59271215584"
++    },
++    {
++      "path": "provider.yaml",
++      "sha256": "dbf4b936fe861159b3a96764304dd65d869f389c801c0c7794b430d1ac720fe2"
++    },
++    {
++      "path": "simulator.py",
++      "sha256": "d3e6770f6069328b9686e4583c5a5dc5a2b393ec861ab4109be1e48e7d9a8328"
++    },
++    {
++      "path": "source-identity.json",
++      "sha256": "d3f61edea2833cf7d95e7dfe9dada04a12ba4f32f76830bc232ea8adff1cba8f"
++    },
++    {
++      "path": "source_facts.py",
++      "sha256": "11bc7df4efc22eb20d43ec03045a990ef975b45c92e68fde0e6d8a68b4279cc0"
++    },
++    {
++      "path": "tests/test_matrix_lowering.py",
++      "sha256": "70ae92c941a34c22b9f786604445a109e7890c22079cb39c4c0d97c92961091b"
++    },
++    {
++      "path": "tests/test_simulator_integration.py",
++      "sha256": "e529efccad1b068aee176d8c8377e907504e81aa07b4e8f05c41af08d47ae532"
++    },
++    {
++      "path": "tests/test_support_contract.py",
++      "sha256": "10f6acc1b964cb7889da0167c4e70d6c3d0c5d06e19b592946342943e78f24aa"
++    },
++    {
++      "path": "vme_kernel.py",
++      "sha256": "60911a5756bf1a13bb5f5aeb41aceb229bbfa33cc34e0fd67d155b71cd1edeff"
++    },
++    {
++      "path": "vme_shim.py",
++      "sha256": "9c18d69402cf5e97105128f3b36a31c75cc0348d2cd97399917be0cebaa24a4a"
++    },
++    {
++      "path": "zephyr/CONTEXT.md",
++      "sha256": "28e636d14589809563da59952da6381679fe179b66ff971877c827a696750d33"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/Kconfig.defconfig",
++      "sha256": "defb17640d25293b1458996b6a6585140c941229ef413706bfb9fac5e13af0a1"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/Kconfig.iris",
++      "sha256": "a576c19125c23b6ca8795c1c151bfa504c51dc8167e7971e966159beb32f8525"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/board.yml",
++      "sha256": "648612f017d1973bf9fa0eaf5933995342cae5461665d42447ece25fbf42d65b"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/iris.dts",
++      "sha256": "be3db1708a3e8c76da6a33fd27bf4f88d35c521163ccba7af43875fbf17c9342"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/iris.yaml",
++      "sha256": "a2a0abb1fd4ec6eac23c05fde9d35f25a710007345c38ac78ebae18fdb134066"
++    },
++    {
++      "path": "zephyr/boards/chipyard/iris/iris_defconfig",
++      "sha256": "bc5036c6911ca5d0a07ced311e600a9498bd1335f64cea87754072b513136621"
++    },
++    {
++      "path": "zephyr/context-support.json",
++      "sha256": "3a2ea7a7203508f0f553e5dccd4429448d5d3781cebda25285e09d73c5283953"
++    },
++    {
++      "path": "zephyr/dts/bindings/cpu/sifive,rocket0.yaml",
++      "sha256": "d2c702ab14972e3b4c305f1d53c99e97fcad9fa1eaae49d287859f59b3657924"
++    },
++    {
++      "path": "zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml",
++      "sha256": "71397a360aafa56f8b099638a0cb8f9116b1c81b1bab033ee198864bcc23173b"
++    },
++    {
++      "path": "zephyr/dts/bindings/vendor-prefixes.txt",
++      "sha256": "c1672eab002cf7802c13791781318db34469511b29811d0cb7c0411d6d969e0f"
++    },
++    {
++      "path": "zephyr/patches/0002-iris-vme-context.patch",
++      "sha256": "558cefc2f57225774cc891e1df0d2f7149f6e834a7012b4c0735f0fba0d1aa1b"
++    },
++    {
++      "path": "zephyr/task_setup.h",
++      "sha256": "bccccc400828f7cf5785bccd58b6d8bc37aa5be1041614f129ce324d6ea36693"
+     }
+   ],
+   "generated": {
+     "contracts/target_contract.yaml": "merlin-target-compose; inputs and digests in contracts/composed.lock.yaml"
++  },
++  "integration_baselines": {
++    "merlin": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
++    "iris-mlir": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
++    "rvv-mlir": "a80eea3eb749e5fd4cb822779a08d0d8ca09e5d5",
++    "llvm": "a47bddccec30255619bb8c37fa59700e661d4e66",
++    "torch-mlir": "20260531.828"
+   }
+ }
+diff --git a/simulator.py b/simulator.py
+new file mode 100644
+index 0000000..aabeb9b
+--- /dev/null
++++ b/simulator.py
+@@ -0,0 +1,91 @@
++"""Explicit experimental Iris simulator provider with byte-bound input closure."""
++from __future__ import annotations
++
++import hashlib
++import importlib.util
++import json
++import os
++from pathlib import Path
++
++
++def sha(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def device_simulator(*, unit, config):
++    try:
++        if unit != "saturn_vme" or config != "IrisConfig":
++            raise ValueError("only saturn_vme / IrisConfig is source-audited")
++        selected = os.environ.get("MERLIN_IRIS_MODEL_MANIFEST")
++        if not selected:
++            raise ValueError("select the exact model with MERLIN_IRIS_MODEL_MANIFEST")
++        path = Path(selected).resolve()
++        manifest = json.loads(path.read_text())
++        if manifest.get("schema") == "iris.empirical_simulator.v1":
++            if os.environ.get("MERLIN_IRIS_TIMING") != "empirical":
++                raise ValueError("select empirical modeled time with MERLIN_IRIS_TIMING=empirical")
++            if os.environ.get("MERLIN_IRIS_ALLOW_EXPERIMENTAL_TIMING") != "1":
++                raise ValueError("experimental empirical timing requires MERLIN_IRIS_ALLOW_EXPERIMENTAL_TIMING=1")
++            provider_path = Path(manifest["model_provider"])
++            if manifest["input_sha256"].get(str(provider_path)) != sha(provider_path):
++                raise ValueError("empirical provider changed or is outside the input closure")
++            spec = importlib.util.spec_from_file_location("iris_empirical_provider", provider_path)
++            provider = importlib.util.module_from_spec(spec)
++            spec.loader.exec_module(provider)
++            return provider.experimental_empirical_simulator(path)
++        if manifest.get("schema") != "iris.experimental_simulator.v1":
++            raise ValueError("unrecognized Iris model manifest")
++        for file, expected in manifest["input_sha256"].items():
++            if sha(file) != expected:
++                raise ValueError("model input changed: " + file)
++        provider_path = Path(manifest["model_provider"])
++        if manifest["input_sha256"].get(str(provider_path)) != sha(provider_path):
++            raise ValueError("model provider is not bound into the manifest input closure")
++        spec = importlib.util.spec_from_file_location("iris_explicit_model_provider", provider_path)
++        provider = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(provider)
++        verified = provider.experimental_functional_simulator()
++        if verified.get("available") is not True or verified.get("binary_sha256") != manifest["binary_sha256"]:
++            raise ValueError("model provider refused its complete source/selftest closure: " + str(verified.get("reason")))
++        if manifest["per_hart_isa"] != verified["per_hart_isa"]:
++            raise ValueError("manifest per-hart ISA differs from the verified model")
++        if not set(manifest["isa_extensions"]).issubset(verified["isa_extensions"]):
++            raise ValueError("manifest advertises ISA extensions absent from the verified model")
++        binary = manifest["binary"]
++        native = verified.get("native_binary", binary)
++        native_sha = verified.get("native_binary_sha256", manifest["binary_sha256"])
++        if sha(native) != native_sha:
++            raise ValueError("native simulator binary changed")
++        if manifest.get("native_binary_sha256", native_sha) != native_sha or manifest.get("native_binary", native) != native:
++            raise ValueError("manifest native identity differs from verified model")
++        if sha(binary) != manifest["binary_sha256"]:
++            raise ValueError("simulator binary changed")
++        tests = manifest["selftest"]
++        if tests["receipt"] not in manifest["input_sha256"]:
++            raise ValueError("selftest receipt is outside the manifest input closure")
++        if (tests.get("pass") is not True or tests.get("binary_sha256") != manifest["binary_sha256"]
++                or tests.get("scope") != "three-hart-int8-smoke"):
++            raise ValueError("missing successful byte-bound three-hart int8 smoke selftest")
++        receipt = json.loads(Path(tests["receipt"]).read_text())
++        if (receipt.get("pass") is not True or receipt.get("binary_sha256") != manifest["binary_sha256"]
++                or receipt.get("region_count") != 12):
++            raise ValueError("selftest receipt disagrees with model")
++        if os.environ.get("MERLIN_IRIS_TIMING") not in (None, "", "0", "off"):
++            raise ValueError("Iris timing is uncalibrated; this provider offers functional execution only")
++        if os.environ.get("MERLIN_IRIS_ALLOW_EXPERIMENTAL_FUNCTIONAL") != "1":
++            raise ValueError("experimental subset requires MERLIN_IRIS_ALLOW_EXPERIMENTAL_FUNCTIONAL=1")
++        return {"available": True, "binary": binary, "binary_sha256": manifest["binary_sha256"],
++                "isa_extensions": manifest["isa_extensions"], "per_hart_isa": manifest["per_hart_isa"],
++                "native_binary": native, "native_binary_sha256": native_sha,
++                "native_device_abi": verified.get("native_device_abi"),
++                "execution_input_sha256": dict(manifest["input_sha256"], **{str(native): native_sha}),
++                "matrix_hart_ids": [0, 1], "launch_args": manifest["launch_args"],
++                "memory_regions": manifest["memory_regions"],
++                "provenance": {"manifest": str(path), "manifest_sha256": sha(path), "model": verified["provenance"],
++                               "source_identity": manifest["source_identity"], "selftest": tests},
++                "functional_scope": tests["scope"], "timing_available": False,
++                "timing_calibrated": False, "rtl_certified": False, "zephyr_smp_certified": False,
++                "zephyr_vme_context_certified": False}
++    except (OSError, KeyError, TypeError, ValueError) as exc:
++        return {"available": False, "reason": str(exc), "timing_available": False,
++                "rtl_certified": False, "zephyr_smp_certified": False}
+diff --git a/source-identity.json b/source-identity.json
+new file mode 100644
+index 0000000..d6f1801
+--- /dev/null
++++ b/source-identity.json
+@@ -0,0 +1,220 @@
++{
++  "repositories": {
++    "chipyard": {
++      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "tracked_modified": true,
++      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd"
++    },
++    "saturn": {
++      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++      "tracked_modified": true,
++      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b"
++    },
++    "rocket-chip": {
++      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
++      "tracked_modified": false,
++      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    "shuttle": {
++      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
++      "tracked_modified": false,
++      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    "testchipip": {
++      "commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
++      "tracked_modified": false,
++      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    "spike_chipyard_pin": {
++      "commit": "9c190a07c6838f6392bafa4ad83acea462c7f759",
++      "tracked_modified": false,
++      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    "firesim": {
++      "commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
++      "tracked_modified": true,
++      "tracked_diff_sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0"
++    }
++  },
++  "evidence_sources": {
++    "iris-config": {
++      "path": "generators/chipyard/src/main/scala/config/IrisConfigs.scala",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/iris-config.scala"
++    },
++    "firesim-target-config": {
++      "path": "generators/firechip/chip/src/main/scala/TargetConfigs.scala",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/firesim-target-config.scala"
++    },
++    "matrix-config-decode": {
++      "path": "generators/rocket-chip/src/main/scala/rocket/Matrix.scala",
++      "repository": "rocket-chip",
++      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
++      "sha256": "ae61b49059dfa45b0812d5ab684c07ad54eee4959f5cdd2752de8cc13a0538d7",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/matrix-config-decode.scala"
++    },
++    "saturn-decode": {
++      "path": "generators/saturn/src/main/scala/insns/Instructions.scala",
++      "repository": "saturn",
++      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++      "sha256": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/saturn-decode.scala"
++    },
++    "saturn-parameters": {
++      "path": "generators/saturn/src/main/scala/common/Parameters.scala",
++      "repository": "saturn",
++      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/saturn-parameters.scala"
++    },
++    "outer-product-unit": {
++      "path": "generators/saturn/src/main/scala/exu/OuterProductUnit.scala",
++      "repository": "saturn",
++      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++      "sha256": "be2f6842fc72538ef7b458e22e0f3a3668a58ae3038d03a5deea47f629adf3ff",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/outer-product-unit.scala"
++    },
++    "outer-product-sequencer": {
++      "path": "generators/saturn/src/main/scala/backend/OuterProductSequencer.scala",
++      "repository": "saturn",
++      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++      "sha256": "59dd5e0c462272ab0aca03516ab5516af62c1609029c0fdf8ebad8f04bff3580",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/outer-product-sequencer.scala"
++    },
++    "shuttle-parameters": {
++      "path": "generators/shuttle/src/main/scala/common/Parameters.scala",
++      "repository": "shuttle",
++      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
++      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/shuttle-parameters.scala"
++    },
++    "shuttle-config": {
++      "path": "generators/shuttle/src/main/scala/common/Configs.scala",
++      "repository": "shuttle",
++      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
++      "sha256": "04d646dc789044b8b4402bc783f0cca61be7f39c7d89ea9dcdf279e25bc7e89e",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/shuttle-config.scala"
++    },
++    "boot-config": {
++      "path": "generators/chipyard/src/main/scala/config/fragments/PeripheralFragments.scala",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "65f495f847c5ffd09ed96b25890643123556a6ff324c9ba7c7389744777be53d",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/boot-config.scala"
++    },
++    "boot-address-register": {
++      "path": "generators/testchipip/src/main/scala/boot/BootAddrReg.scala",
++      "repository": "testchipip",
++      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
++      "sha256": "cb69e7997221ad6a9b6de097dfd8066f4d761d56f9a284be97b3766f22f4c9b9",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/boot-address-register.scala"
++    },
++    "boot-rom": {
++      "path": "generators/testchipip/bootrom/bootrom.S",
++      "repository": "testchipip",
++      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
++      "sha256": "0741269bb151f738f141362d733c4687310a0f2f9a638d8aa9c537860bd3d923",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/boot-rom.S"
++    },
++    "boot-rom-disassembly": {
++      "path": "generators/testchipip/bootrom/bootrom.rv64.dump",
++      "repository": "testchipip",
++      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
++      "sha256": "0d9ef874143f09deb33cd1af828c381663b0ef69c7a49aab3165ac63d5a705e8",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/boot-rom-disassembly.dump"
++    },
++    "memmap-permissions": {
++      "path": "generators/rocket-chip/src/main/scala/tilelink/Parameters.scala",
++      "repository": "rocket-chip",
++      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
++      "sha256": "7d9e843dbd267389824692ee6861c79ebe336aabb64312d7267673439b604702",
++      "source_state": "tracked-clean-repository-or-generated-artifact",
++      "snapshot": "evidence/memmap-permissions.scala"
++    },
++    "firesim-dts": {
++      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.dts",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/firesim-dts.dts"
++    },
++    "firesim-memmap": {
++      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.memmap.json",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "1ac5e83588fc89417f42d1dbc8e6da605f283ff2fe5d52ed35843ba30359c0dd",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/firesim-memmap.json"
++    },
++    "firesim-l2": {
++      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.l2.json",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "b96975453b4f25d51305200d769accdb25690ee3cef288bd567fe9d38365d401",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/firesim-l2.json"
++    },
++    "firesim-clocks": {
++      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.firesimRationalClockBridge.freq-summary",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
++      "source_state": "local-working-tree",
++      "snapshot": "evidence/firesim-clocks.freq-summary"
++    },
++    "firesim-fir": {
++      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
++      "repository": "chipyard",
++      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++      "sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
++      "artifact_build_revision": null,
++      "excerpt": "    connect bootROMResetVectorSourceNodeOut, UInt<17>(0h10000) @[generators/rocket-chip/src/main/scala/devices/tilelink/BootROM.scala 113:45]"
++    }
++  },
++  "hardware_manifest_sha256": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
++  "hardware_source_association": "unverified: elaboration files are local evidence, not proven build inputs for deployed image",
++  "rtl_certified": false,
++  "timing_calibrated": false,
++  "datatype_limitations": [
++    "Hart2 has no VME/MX FP8/BF16 arithmetic",
++    "Scalar BF16 FCVT is not decoded on any hart",
++    "FP8 represents configured formats and operations; no blanket all-FP8 capability"
++  ],
++  "compiler_repositories": {
++    "merlin": {
++      "baseline": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
++      "url": "https://github.com/ucb-bar/merlin.git"
++    },
++    "iris-mlir": {
++      "baseline": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
++      "url": "https://github.com/ucb-bar/iris-mlir.git"
++    },
++    "rvv-mlir": {
++      "commit": "a80eea3eb749e5fd4cb822779a08d0d8ca09e5d5",
++      "url": "https://github.com/ucb-bar/rvv-mlir.git"
++    },
++    "spike": {
++      "upstream_commit": "72958551566a30f19444bd7e354552824e4d0a98",
++      "actual_overlay_provenance": "selected simulator manifest; never inferred from a branch name"
++    }
++  }
++}
+diff --git a/source_facts.py b/source_facts.py
+new file mode 100644
+index 0000000..44c0dab
+--- /dev/null
++++ b/source_facts.py
+@@ -0,0 +1,228 @@
++"""Iris-owned readers for the pinned Scala and independent assembly header.
++
++These deliberately narrow source forms refuse unfamiliar syntax. Decoder masks
++retain every bit read by RTL; whole configuration BitPats are kept intact.
++"""
++from __future__ import annotations
++
++import hashlib
++import re
++import subprocess
++from dataclasses import dataclass, field
++from pathlib import Path
++
++
++def digest(path):
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def line_span(text, start, end):
++    return [text.count("\n",0,start)+1,text.count("\n",0,end)+1]
++
++
++@dataclass(frozen=True)
++class MaskedEncoding:
++    mnemonic: str
++    match: int
++    mask: int
++    origin: str
++    emit_word: int | None = None
++
++    @property
++    def fill_mask(self):
++        return 0 if self.emit_word is None else (self.emit_word ^ self.match) & ~self.mask
++
++    @property
++    def fill_source(self):
++        return "independently cross-checked vme.h .insn; see encoding receipt"
++
++    def insn_r(self, rd, rs1, rs2):
++        word = self.match if self.emit_word is None else self.emit_word
++        operands = []
++        for name, arg, shift in (("rd", rd, 7), ("rs1", rs1, 15), ("rs2", rs2, 20)):
++            if arg is None:
++                if ((self.mask >> shift) & 31) != 31:
++                    # Unused variable register bits must be deliberately zero.
++                    arg = "x0"
++                else:
++                    arg = "x" + str((word >> shift) & 31)
++            operands.append(arg)
++        return f".insn r {word & 127:#x}, {(word >> 12) & 7}, {(word >> 25) & 127:#x}, " + ", ".join(operands)
++
++
++@dataclass
++class Derived:
++    encodings: dict[str, MaskedEncoding]
++    sources: dict[str, str]
++    crosschecks: list[dict] = field(default_factory=list)
++    gaps: tuple[str, ...] = ()
++
++    @property
++    def ok(self):
++        return not self.gaps and bool(self.crosschecks) and all(c["agrees"] for c in self.crosschecks)
++
++    def to_dict(self):
++        return {"encodings": {k: vars(v) for k, v in self.encodings.items()}, "sources": self.sources,
++                "crosschecks": self.crosschecks, "gaps": list(self.gaps), "ok": self.ok,
++                "rtl_certified": False}
++
++
++def _body(text, kind, name):
++    found = re.search(r"\b" + kind + r"\s+" + re.escape(name) + r"\b[^\{]*\{", text)
++    if not found:
++        raise ValueError(f"missing {kind} {name}")
++    pos, depth = found.end(), 1
++    start = pos
++    while depth and pos < len(text):
++        depth += (text[pos] == "{") - (text[pos] == "}")
++        pos += 1
++    if depth:
++        raise ValueError("unterminated Scala declaration")
++    return text[start:pos-1]
++
++
++def derive(contract):
++    instructions = contract.source("instructions")
++    consts = contract.source("consts")
++    core = contract.core_source()
++    header = contract.source("crosscheck_header")
++    texts = {p: p.read_text() for p in (instructions, consts, core, header)}
++    constants = texts[consts]
++    d = contract.declarations
++    params = contract.source("params")
++    texts[params] = params.read_text()
++    members = re.search(r"def " + re.escape(d["insn_seq"]) + r"\s*=\s*Seq\((.*?)\)", texts[params], re.S)
++    if not members:
++        raise ValueError("cannot identify the enabled matrix instruction sequence")
++    enabled = {name.strip().rsplit(".",1)[-1] for name in members.group(1).split(",") if name.strip()}
++    enum = {}
++    index = 0
++    for names, explicit in re.findall(r"val ([\w, ]+) = Value(?:\((0x[0-9a-f]+|\d+)\.U\))?",
++                                      _body(constants, "object", d["funct6_enum"])):
++        if explicit:
++            index = int(explicit, 0)
++        for name in names.split(","):
++            enum[name.strip()] = index
++            index += 1
++    values = {name: int(bits, 2) for name, bits in re.findall(r'def (\w+) = "b([01]+)"\.U', constants)}
++    encodings = {}
++    rows = re.finditer(r"object (SF_\w+)\s+extends VectorInstruction \{ val props = Seq\((.*?)\) \}",
++                      texts[instructions], re.S)
++    for row in rows:
++        name, body = row.groups()
++        if name not in enabled:
++            continue
++        opcode = d["opcode_name"]
++        for flag, selected in d.get("opcode_flags", {}).items():
++            if flag + ".Y" in body:
++                opcode = selected
++        match, mask = values[opcode], 127
++        literal = re.search(r'F6\(BitPat\("b([01?]+)"\)\)', body)
++        if literal:
++            for i, bit in enumerate(reversed(literal.group(1))):
++                if bit != "?":
++                    mask |= 1 << (26+i)
++                    match |= int(bit) << (26+i)
++        else:
++            selected = re.search(r"F6\(" + re.escape(d["funct6_enum"]) + r"\.(\w+)\)", body)
++            if not selected:
++                raise ValueError(f"unsupported funct6 source: {name}")
++            mask |= 63 << 26
++            match |= enum[selected.group(1)] << 26
++        group = re.search(r"F3\(VectorConsts\.(\w+)\)", body)
++        if not group:
++            raise ValueError(f"unsupported funct3 source: {name}")
++        mask |= 7 << 12
++        match |= values[group.group(1)] << 12
++        for key, shift in (("RS1", 15), ("RS2", 20)):
++            fixed = re.search(key + r"\(\s*(\d+)\.U\(5.W\)\)", body)
++            if fixed:
++                mask |= 31 << shift
++                match |= int(fixed.group(1)) << shift
++        encodings[name] = MaskedEncoding(name, match, mask, str(instructions)+":"+str(line_span(texts[instructions],row.start(),row.end())[0]))
++    if set(encodings) != enabled:
++        raise ValueError("enabled matrix instruction sequence contains an unparsed declaration")
++    for name in contract.core["instructions"]:
++        pattern = re.search(r"def " + re.escape(name) + r' = BitPat\("b([01?_]+)"\)', texts[core])
++        if not pattern:
++            raise ValueError(f"configuration instruction absent: {name}")
++        bits = pattern.group(1).replace("_", "")
++        if len(bits) != 32:
++            raise ValueError("configuration BitPat must contain all 32 bits")
++        mask = int("".join("0" if b == "?" else "1" for b in bits), 2)
++        match = int(bits.replace("?", "0"), 2)
++        encodings[name] = MaskedEncoding(name, match, mask, str(core)+":"+str(line_span(texts[core],pattern.start(),pattern.end())[0]))
++    checks = []
++    for name, declaration in d["crosscheck_pairs"].items():
++        # Limit lookup to the named macro/function's own declaration body.
++        source = re.search(r"(?:#define\s+" + re.escape(declaration) + r"\([^\n]*|static inline[^\n]*\b" +
++                           re.escape(declaration) + r"\([^\{]*\{[^\}]*\})", texts[header], re.S)
++        insn = re.search(r'\.insn r\s+(0x[0-9a-f]+|\d+),\s*(\d+),\s*(0x[0-9a-f]+|\d+)',
++                         source.group(0) if source else "")
++        if not insn:
++            raise ValueError(f"no independent .insn in header declaration {declaration}")
++        opcode, f3, f7 = (int(s, 0) for s in insn.groups())
++        enc = encodings[name]
++        word = opcode | (f3 << 12) | (f7 << 25)
++        # Read fixed register fields independently from the HEADER, never fill
++        # them from RTL before comparing (which would make a false cross-check).
++        asm_fields = source.group(0)[insn.start():].split(",",5)
++        for shift, field in zip((7,15,20),asm_fields[3:6]):
++            fixed = re.search(r"\bx(\d+)\b", field)
++            if ((enc.mask >> shift)&31) == 31 and not fixed:
++                raise ValueError(f"header does not independently spell fixed register field for {name}")
++            if fixed:
++                word |= int(fixed.group(1)) << shift
++        agrees = word & enc.mask == enc.match
++        checks.append({"name": name, "declaration": declaration, "agrees": agrees, "word": word,
++                       "source": str(header), "lines": line_span(texts[header],source.start(),source.end()),
++                       "sha256": digest(header)})
++        encodings[name] = MaskedEncoding(name, enc.match, enc.mask, enc.origin, word)
++    return Derived(encodings, {str(p): digest(p) for p in texts}, checks)
++
++
++def matrix_types(contract):
++    text = contract.source("params").read_text()
++    found = re.search(r"def " + re.escape(contract.declarations["matrix_types"]) + r"[^\n]*Seq\(([^\n]*)\) else Nil", text)
++    if not found:
++        raise ValueError("unrecognized matrix-types declaration")
++    return [(int(a), int(b)) for a, b in re.findall(r"\((\d+),\s*(\d+)\)", found.group(1))]
++
++
++def kmax(contract, sew, widen):
++    text = contract.core_source().read_text()
++    start = text.index("def " + contract.core["kmax_def"])
++    table = re.findall(r"case \((\d+),\s*(\d+)\)\s*=>\s*(\d+)", text[start:text.index("case _", start)])
++    return {(int(a), int(b)): int(v) for a, b, v in table}[(sew, widen)]
++
++
++def vector_params(contract, config):
++    if config != "IrisConfig":
++        raise ValueError("only the source-audited IrisConfig is supported")
++    params = contract.source("params").read_text()
++    enabled = re.search(r"def opuMxParams =[^\n]*\.copy\((.*?)\n\s*\)", params, re.S)
++    if not enabled or not re.search(r"\b"+re.escape(contract.declarations["enable_flag"])+r"\s*=\s*true\b", enabled.group(1)):
++        raise ValueError("selected vector parameters do not explicitly enable the matrix unit")
++    text = "\n".join(p.read_text() for p in contract.config_scala())
++    # Select the call that actually enables OPU, not Rocket's preceding DMA call.
++    found = re.search(r"WithShuttleVectorUnit\(\s*(\d+),\s*(\d+),\s*VectorParams\.opuMxParams", text)
++    if not found:
++        raise ValueError("cannot identify the OPU-enabled Shuttle vector unit")
++    return {"vLen": int(found.group(1)), "dLen": int(found.group(2))}
++
++
++def source_identity(contract):
++    expected = {"chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
++                "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
++                "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"}
++    paths = {"chipyard": contract.root(), "saturn": contract.checkout(), "rocket-chip": contract.core_checkout()}
++    result = {}
++    for name, path in paths.items():
++        argv = ["git", "-c", "safe.directory=" + str(path), "-C", str(path)]
++        commit = subprocess.check_output([*argv, "rev-parse", "HEAD"], text=True).strip()
++        diff = subprocess.check_output([*argv, "diff", "--binary", "HEAD", "--"])
++        if commit != expected[name]:
++            raise ValueError(f"{name} pin drift: {commit}, expected {expected[name]}")
++        result[name] = {"commit": commit, "tracked_diff_sha256": hashlib.sha256(diff).hexdigest(),
++                        "tracked_modified": bool(diff), "path": str(path)}
++    return result
+diff --git a/tests/test_matrix_lowering.py b/tests/test_matrix_lowering.py
+index fd1551d..9f2b88a 100644
+--- a/tests/test_matrix_lowering.py
++++ b/tests/test_matrix_lowering.py
+@@ -27,7 +27,8 @@ def adapter(monkeypatch):
+ 
+ def _fake_encodings(spec_roles):
+     """A synthetic table with distinct words per role. Test data only: the real one is derived."""
+-    from merlin.targetgen.rtl.matrix_isa import MaskedEncoding
++    from merlin.targetgen.plugins import load_module
++    MaskedEncoding = load_module(ROOT, "source_facts.py", package_name="iris_test_facts").MaskedEncoding
+ 
+     out = {}
+     for i, name in enumerate(sorted(spec_roles.values())):
+@@ -194,6 +195,60 @@ int main(void) {
+         assert got.returncode == 0, (edge, got.stdout, got.stderr)
+ 
+ 
++@pytest.mark.skipif(shutil.which("cc") is None, reason="no host C compiler")
++def test_stand_in_wraps_int32_without_signed_overflow(tmp_path):
++    """Python integer goldens cover bias and repeated accumulator wrapping.
++
++    -ftrapv reproduces the old signed-accumulator abort without depending on an
++    optional sanitizer runtime. The expected words never use C accumulation.
++    """
++    k, spec = _spec()
++    (tmp_path / "kernel.h").write_text(k.emit_kernel(_fake_encodings(spec.roles), spec, derivation_ok=True))
++    cases = [(1, 1, 1, 0, 2147483647), (1, 1, 1, 1, -2147483648),
++             (1, 1, 262145, 2, None), (1, 1, 524289, 1, None),
++             (64, 64, 5, 3, 2147483647), (33, 5, 7, 3, -2147483648)]
++    functions = []
++    for case, (m, n, reduction, pattern, bias) in enumerate(cases):
++        def a_value(i):
++            return 127 if pattern == 0 else -128 if pattern in (1, 2) else (i*17+case) % 256-128
++        def b_value(i):
++            return -128 if pattern == 2 else 127 if pattern in (0, 1) else (i*31+case*7) % 256-128
++        expected = []
++        for i in range(m):
++            for j in range(n):
++                initial = 0 if bias is None else bias + (-(j % 19) if bias > 0 else j % 19)
++                expected.append((initial + sum(a_value(q*m+i)*b_value(q*n+j) for q in range(reduction))) & 0xffffffff)
++        a_expr = "127" if pattern == 0 else "-128" if pattern in (1, 2) else f"(int)((p*17+{case})%256)-128"
++        b_expr = "-128" if pattern == 2 else "127" if pattern in (0, 1) else f"(int)((p*31+{case*7})%256)-128"
++        bias_init = "0" if bias is None else f"{bias}LL {'-' if bias > 0 else '+'} (int)(j%19)"
++        functions.append(f"""
++static int run_{case}(void) {{
++  const size_t m={m}, n={n}, k={reduction};
++  int8_t *a=malloc(m*k), *b=malloc(n*k);
++  int32_t *c=malloc(4*m*n), *bias=malloc(4*n);
++  if(!a || !b || !c || !bias) return 1;
++  for(size_t p=0;p<m*k;++p) a[p]=(int8_t)({a_expr});
++  for(size_t p=0;p<n*k;++p) b[p]=(int8_t)({b_expr});
++  for(size_t j=0;j<n;++j) bias[j]=(int32_t)({bias_init});
++  static const uint32_t expected[]={{{','.join(str(v)+'u' for v in expected)}}};
++  merlin_vme_gemm_i8(c,a,b,{"0" if bias is None else "bias"},m,n,k);
++  int bad=0;
++  for(size_t p=0;p<m*n;++p) bad += (uint32_t)c[p]!=expected[p];
++  free(a);free(b);free(c);free(bias);return bad;
++}}
++""")
++    source = "#include <stdint.h>\n#include <stdlib.h>\n#include <stdio.h>\n#include \"kernel.h\"\n" + "\n".join(functions)
++    source += "int main(void){int bad=" + "+".join(f"run_{i}()" for i in range(len(cases))) + ';printf("bad=%d\\n",bad);return bad!=0;}\n'
++    (tmp_path / "main.c").write_text(source)
++    for edge in (4, 8, 32):
++        binary = tmp_path / f"wrap{edge}"
++        subprocess.run(["cc", "-O3", "-ftrapv", "-DMERLIN_MATRIX_SCALAR_TILE",
++                        f"-DMERLIN_MATRIX_TILE_EDGE={edge}", "-I", str(tmp_path),
++                        str(tmp_path / "main.c"), "-o", str(binary)], check=True, capture_output=True)
++        result = subprocess.run([str(binary)], capture_output=True, text=True)
++        assert result.returncode == 0 and result.stdout == "bad=0\n", (edge, result.stdout, result.stderr)
++
++
+ @pytest.fixture
+ def pinned_sources():
+     from merlin.common.paths import env
+@@ -218,3 +273,19 @@ def test_derivation_cross_checks_and_geometry_follow_the_enabled_unit(pinned_sou
+     assert contract.kmax(8, 4) >= 1
+     src = shim.vme_kernel.emit_kernel(derived.encodings, contract.kernel_spec(), derivation_ok=True)
+     assert src.count(".insn r") >= len(contract.kernel_roles)
++
++
++def test_header_fixed_register_disagreement_is_rejected(pinned_sources, tmp_path):
++    from merlin.targetgen.plugins import load_module
++
++    shim=load_module(ROOT,"vme_shim.py",package_name="iris_test_header_refusal")
++    contract=shim.load_contract("saturn_vme")
++    header=tmp_path/"vme.h"
++    original=contract.source("crosscheck_header").read_text()
++    header.write_text(original.replace("x0, x0, x28", "x0, x0, x31"))
++    class ChangedHeader:
++        def __getattr__(self,name):return getattr(contract,name)
++        def source(self,name):return header if name=="crosscheck_header" else contract.source(name)
++    derived=shim.source_facts.derive(ChangedHeader())
++    assert not derived.ok
++    assert any(c["name"]=="SF_VTDISCARD" and not c["agrees"] for c in derived.crosschecks)
+diff --git a/tests/test_simulator_integration.py b/tests/test_simulator_integration.py
+new file mode 100644
+index 0000000..e13e686
+--- /dev/null
++++ b/tests/test_simulator_integration.py
+@@ -0,0 +1,58 @@
++"""Real explicit provider selection, timing refusal and input tamper checks."""
++import importlib.util
++import json
++import os
++from pathlib import Path
++
++import pytest
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def adapter():
++    spec = importlib.util.spec_from_file_location("iris_test_simulator", ROOT / "simulator.py")
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def test_provider_requires_explicit_manifest(monkeypatch):
++    monkeypatch.delenv("MERLIN_IRIS_MODEL_MANIFEST", raising=False)
++    result = adapter().device_simulator(unit="saturn_vme", config="IrisConfig")
++    assert not result["available"] and "MANIFEST" in result["reason"]
++
++
++def test_empirical_selection_requires_explicit_mode_and_opt_in(monkeypatch, tmp_path):
++    selected = tmp_path / "empirical.json"
++    selected.write_text(json.dumps({"schema": "iris.empirical_simulator.v1"}))
++    monkeypatch.setenv("MERLIN_IRIS_MODEL_MANIFEST", str(selected))
++    monkeypatch.delenv("MERLIN_IRIS_TIMING", raising=False)
++    monkeypatch.delenv("MERLIN_IRIS_ALLOW_EXPERIMENTAL_TIMING", raising=False)
++    result = adapter().device_simulator(unit="saturn_vme", config="IrisConfig")
++    assert not result["available"] and "TIMING=empirical" in result["reason"]
++    monkeypatch.setenv("MERLIN_IRIS_TIMING", "empirical")
++    result = adapter().device_simulator(unit="saturn_vme", config="IrisConfig")
++    assert not result["available"] and "ALLOW_EXPERIMENTAL_TIMING=1" in result["reason"]
++
++
++@pytest.mark.skipif(not os.environ.get("MERLIN_IRIS_MODEL_MANIFEST"), reason="real byte-bound model not selected")
++def test_real_model_opt_in_timing_and_tamper(monkeypatch, tmp_path):
++    module = adapter()
++    monkeypatch.setenv("MERLIN_IRIS_ALLOW_EXPERIMENTAL_FUNCTIONAL", "1")
++    monkeypatch.delenv("MERLIN_IRIS_TIMING", raising=False)
++    result = module.device_simulator(unit="saturn_vme", config="IrisConfig")
++    assert result["available"], result
++    assert result["matrix_hart_ids"] == [0,1]
++    assert not result["timing_available"] and not result["rtl_certified"]
++    assert set(result["per_hart_isa"]) == {"0","1","2"}
++    assert "zvti8i32mm" not in result["per_hart_isa"]["2"]
++    monkeypatch.setenv("MERLIN_IRIS_TIMING", "on")
++    assert "uncalibrated" in module.device_simulator(unit="saturn_vme",config="IrisConfig")["reason"]
++    monkeypatch.delenv("MERLIN_IRIS_TIMING")
++    manifest = json.loads(Path(os.environ["MERLIN_IRIS_MODEL_MANIFEST"]).read_text())
++    manifest["binary_sha256"] = "0"*64
++    selected = tmp_path / "tampered.json"
++    selected.write_text(json.dumps(manifest))
++    monkeypatch.setenv("MERLIN_IRIS_MODEL_MANIFEST", str(selected))
++    assert not module.device_simulator(unit="saturn_vme",config="IrisConfig")["available"]
+diff --git a/tests/test_support_contract.py b/tests/test_support_contract.py
+index e506dc0..009fdf7 100644
+--- a/tests/test_support_contract.py
++++ b/tests/test_support_contract.py
+@@ -37,7 +37,7 @@ def test_effective_contract_is_fresh_against_the_pinned_base():
+ 
+ 
+ def test_boards_describe_irisconfig():
+-    rtl = boards.load_boards(str(ROOT))["iris_rtl"]
++    rtl = boards.load_boards(ROOT / "boards.yaml")["iris_rtl"]
+     assert (rtl.harts, rtl.vector_harts, rtl.vlen) == (3, 3, 256)
+     assert (rtl.dram_base, rtl.dram_bytes) == (0x80000000, 4 << 30)
+     # The Rocket DMA hart has a vector unit and no matrix unit.
+diff --git a/vme_kernel.py b/vme_kernel.py
+index 2f36a73..8233744 100644
+--- a/vme_kernel.py
++++ b/vme_kernel.py
+@@ -272,10 +272,15 @@ static void merlin_vme_scalar(int32_t *c, const int8_t *at, const int8_t *b, con
+ {{
+   for (size_t i = i0; i < i0 + tm; ++i)
+     for (size_t j = j0; j < j0 + tn; ++j) {{
+-      int32_t sum = bias ? bias[j] : 0;
++      /* The matrix array and vector bias add wrap modulo 2^32. Signed C
++       * overflow is undefined, including in the stand-in and fallback. */
++      uint32_t sum = bias ? (uint32_t)bias[j] : 0;
+       for (size_t kk = 0; kk < k; ++kk)
+-        sum += (int32_t)at[kk * m + i] * (int32_t)b[kk * n + j];
+-      c[i * n + j] = sum;
++        sum += (uint32_t)((int32_t)at[kk * m + i] * (int32_t)b[kk * n + j]);
++      /* Convert the bit pattern without an out-of-range unsigned-to-signed
++       * conversion or a signed overflow at INT32_MIN. */
++      c[i * n + j] = sum <= INT32_MAX ? (int32_t)sum
++                      : -1 - (int32_t)(UINT32_MAX - sum);
+     }}
+ }}
+ 
+diff --git a/vme_shim.py b/vme_shim.py
+index 8206df2..f9878f3 100644
+--- a/vme_shim.py
++++ b/vme_shim.py
+@@ -17,13 +17,14 @@ from __future__ import annotations
+ 
+ import hashlib
+ import json
++import shutil
+ import subprocess
+ from collections.abc import Mapping, Sequence
+ from dataclasses import dataclass, field
+ from pathlib import Path
+ from typing import Any
+ 
+-from . import vme_kernel
++from . import source_facts, vme_kernel
+ 
+ SIDECAR_NAME = "vme_signatures.json"
+ SYMBOL_PREFIX = "merlin_vme_gemm_i8"
+@@ -92,49 +93,20 @@ class UnitContract:
+ 
+     def vector_params(self, config: str) -> dict[str, int]:
+         """``{vLen, dLen}`` of the vector unit in ``config`` whose params ENABLE this unit."""
+-        from merlin.targetgen.rtl import matrix_isa
+-
+-        d = self.declarations
+-        cfg_text = "\n".join(p.read_text(encoding="utf-8") for p in self.config_scala())
+-        got, notes = matrix_isa.matrix_unit_params(
+-            cfg_text,
+-            config,
+-            mixin_text="\n".join(p.read_text(encoding="utf-8") for p in self.mixin_scala()),
+-            params_text=self.source("params").read_text(encoding="utf-8"),
+-            params_object=str(d["params_object"]),
+-            enable_flag=str(d["enable_flag"]),
+-        )
+-        if "vLen" not in got or "dLen" not in got:
+-            raise ValueError(f"cannot derive {self.unit!r} geometry for {config!r}: {notes}")
+-        return got
++        return source_facts.vector_params(self, config)
+ 
+     def geometry(self, config: str) -> tuple[int, int]:
+         """``(tile_edge, operand_alignment_bytes)``: VLMAX at the operand width, and the datapath width."""
+-        from merlin.kernels.opu_cert import logical_tile_edge
+-
+         p = self.vector_params(config)
+-        return logical_tile_edge(int(p["vLen"]), sew_bits=OPERAND_BITS), max(1, int(p["dLen"]) // 8)
++        return int(p["vLen"]) // OPERAND_BITS, int(p["dLen"]) // 8
+ 
+     def matrix_types(self) -> list[tuple[int, int]]:
+         """``[(sew, widen)]`` the RTL accepts as matrix configurations (e.g. ``def opuMatrixTypes``)."""
+-        from merlin.targetgen.rtl.matrix_isa import seq_int_tuples
+-
+-        name = str(self.declarations["matrix_types"])
+-        out = [t for t in seq_int_tuples(self.source("params").read_text(encoding="utf-8"), name) if len(t) == 2]
+-        if not out:
+-            raise ValueError(f"`def {name}` in {self.source('params')} declares no (sew, widen) pairs")
+-        return out
++        return source_facts.matrix_types(self)
+ 
+     def kmax(self, sew: int, widen: int) -> int:
+         """The reduction depth one matmul takes at ``(sew, widen)``, from the host core's ``kmax`` table."""
+-        from merlin.targetgen.rtl.matrix_isa import match_case_table
+-
+-        table = match_case_table(
+-            self.core_source().read_text(encoding="utf-8"), str(self.core["config_object"]), str(self.core["kmax_def"])
+-        )
+-        if (sew, widen) not in table:
+-            raise ValueError(f"kmax({sew}, {widen}) is not in the RTL's table {self.core_source()}")
+-        return table[(sew, widen)]
++        return source_facts.kmax(self, sew, widen)
+ 
+     def kernel_spec(self) -> vme_kernel.VmeKernelSpec:
+         types = self.matrix_types()
+@@ -186,75 +158,17 @@ def derive_encodings(contract: UnitContract):
+     Always against the unit author's ``vme.h``; also against the declared simulator's opcode table when its
+     source checkout is present (a third source, and the one that says the simulator decodes the same words).
+     """
+-    from merlin.targetgen.rtl import matrix_isa
+-
+-    d = contract.declarations
+-    isa = matrix_isa.derive(
+-        consts=contract.source("consts"),
+-        instructions=contract.source("instructions"),
+-        params=contract.source("params"),
+-        insn_seq=str(d["insn_seq"]),
+-        consts_container=str(d["consts_container"]),
+-        funct6_enum=str(d["funct6_enum"]),
+-        opcode_name=str(d["opcode_name"]),
+-        opcode_flags={str(k): str(v) for k, v in (d.get("opcode_flags") or {}).items()},
+-        decode_fields={str(k): str(v) for k, v in d["decode_fields"].items()},
+-        form_funct3={str(k): str(v) for k, v in (d.get("form_funct3") or {}).items()},
+-        vtype_fields=tuple(str(v) for v in d.get("vtype_fields") or ()),
+-        core_source=contract.core_source(),
+-        core_container=str(contract.core["container"]),
+-        core_insns=[str(n) for n in contract.core["instructions"]],
+-    )
+-    isa = matrix_isa.crosscheck_header(
+-        isa, contract.source("crosscheck_header"), pairs={str(k): str(v) for k, v in d["crosscheck_pairs"].items()}
+-    )
+-    sim = contract.simulator
+-    src = _env(str(sim.get("source_env") or "")) if sim.get("source_env") else None
+-    if src and sim.get("opcode_table"):
+-        isa = matrix_isa.crosscheck_opcode_table(
+-            isa, Path(src) / str(sim["opcode_table"]), pairs={str(k): str(v) for k, v in sim["opcode_pairs"].items()}
+-        )
+-    return isa
++    source_facts.source_identity(contract)
++    return source_facts.derive(contract)
+ 
+ 
+ def device_simulator(*, unit: str, config: str, contract_path: str | Path | None = None) -> dict[str, Any]:
+-    """The functional simulator that implements this unit, as the contract declares it.
++    """Use the exact verified Iris provider; the legacy draft-Zvt pin is not a substitute."""
++    from . import simulator
+ 
+-    ``available`` is False (with the reason) when its binary is not configured or not present; a caller
+-    must not substitute another simulator, which would trap on the unit's words or decode them as
+-    something else. ``isa_extensions`` are spelled with this configuration's derived tile edge.
+-    """
+-    from merlin.common import provenance as PROV
+-
+-    contract = load_contract(unit, path=contract_path)
+-    sim = contract.simulator
+-    if not sim:
+-        return {"available": False, "reason": f"{unit!r} declares no simulator"}
+-    env_name = str(sim["binary_env"])
+-    binary = _env(env_name)
+-    if not binary or not Path(binary).is_file():
+-        return {
+-            "available": False,
+-            "reason": (
+-                f"${env_name} is {'unset' if not binary else f'{binary!r}, which is not a file'}: build the "
+-                f"simulator pinned as {sim.get('pin')!r} (see the iris package README) and point ${env_name} at it"
+-            ),
+-        }
+-    tile_edge, _align = contract.geometry(config)
+-    exts = [str(e).format(tile_edge=tile_edge) for e in sim.get("isa_extensions") or ()]
+-    out: dict[str, Any] = {
+-        "available": True,
+-        "binary": str(binary),
+-        "binary_sha256": hashlib.sha256(Path(binary).read_bytes()).hexdigest(),
+-        "isa_extensions": exts,
+-    }
+-    src = _env(str(sim.get("source_env") or "")) if sim.get("source_env") else None
+-    if sim.get("pin") and src:
+-        ver = PROV.verify(str(sim["pin"]), checkout=src)
+-        out["provenance"] = {"pin": str(sim["pin"]), "ok": bool(ver.ok), "drift": list(ver.drift)}
+-    else:
+-        out["provenance"] = {"pin": sim.get("pin"), "ok": None, "note": "simulator source checkout not configured"}
+-    return out
++    if contract_path is not None and Path(contract_path).resolve() != CONTRACT_PATH:
++        return {"available": False, "reason": "custom contracts lack Iris model qualification"}
++    return simulator.device_simulator(unit=unit, config=config)
+ 
+ 
+ @dataclass(frozen=True)
+@@ -284,6 +198,8 @@ class VmeBuild:
+             "parallel_tiles": self.parallel_tiles,
+             "provenance": self.provenance,
+             "gaps": list(self.gaps),
++            "abi": self.provenance.get("abi", "caller-workspace-pointer-v1"),
++            "compiler_abi_qualified": self.provenance.get("compiler_abi_qualified", False),
+         }
+ 
+ 
+@@ -321,23 +237,17 @@ def build_object(
+     parallel_tiles: bool = False,
+     scratch_bytes: int | None = None,
+     contract_path: str | Path | None = None,
++    pointer_abi: bool = False,
+ ) -> VmeBuild:
+     """Derive the unit's facts, emit the translation unit, compile it, record what it came from."""
+-    from merlin.common import provenance as PROV
+-
++    if parallel_tiles:
++        raise RuntimeError("generic Merlin OpenMP workers do not yet invoke the Iris VME ownership API; "
++                           "use the explicitly registered Zephyr task pipeline for multicore VME")
+     work = Path(work)
+     work.mkdir(parents=True, exist_ok=True)
+     contract = load_contract(unit, path=contract_path)
+     gaps: list[str] = []
+-    reads = [*contract.sources.values(), *(str(m) for m in contract.configs.get("mixin_scala", ()))]
+-    pins = {contract.pin: PROV.verify(contract.pin, checkout=contract.checkout(), reads=reads)}
+-    if contract.core.get("pin"):
+-        pins[str(contract.core["pin"])] = PROV.verify(
+-            str(contract.core["pin"]), checkout=contract.core_checkout(), reads=[str(contract.core["source"])]
+-        )
+-    for name, ver in pins.items():
+-        if not ver.ok:
+-            gaps.append(f"pin {name} drifted: {'; '.join([*ver.drift, *map(str, ver.missing_paths)])}")
++    pins = source_facts.source_identity(contract)
+ 
+     tile_edge, alignment = contract.geometry(config)
+     unit_src, derived = emit_translation_unit(
+@@ -355,11 +265,31 @@ def build_object(
+     if got.returncode != 0 or not obj.is_file():
+         raise RuntimeError(f"the emitted VME shim did not compile:\ncmd: {' '.join(cmd)}\n{got.stderr[-3000:]}")
+     (work / "encodings.json").write_text(json.dumps(derived.to_dict(), indent=2), encoding="utf-8")
+-    prov = PROV.record(
+-        pins=pins,
+-        sources=[contract.source(k) for k in sorted(contract.sources)] + [contract.core_source()],
+-        artifacts={"shim_object": obj, "shim_source": src},
+-    )
++    prov = {"repositories": pins, "sources": derived.sources,
++            "artifacts": {str(p): source_facts.digest(p) for p in (src, obj)},
++            "compile_argv": cmd, "compiler_sha256": source_facts.digest(cc), "rtl_certified": False}
++    if not pointer_abi:
++        from merlin.kernels.matrix_shim import emit_llvm_descriptor_bridge
++
++        version = subprocess.check_output([str(cc), "--version"], text=True).splitlines()[0]
++        if "clang version 23." not in version:
++            raise RuntimeError("the observed MLIR descriptor ABI requires the explicitly pinned LLVM23 compiler")
++        llvm = work / "merlin_vme_descriptor.ll"
++        llvm.write_text(emit_llvm_descriptor_bridge(signatures, alignment_bytes=alignment))
++        bridge = work / "merlin_vme_descriptor.o"
++        command = [str(cc), *cflags, "-c", str(llvm), "-o", str(bridge)]
++        subprocess.run(command, check=True, capture_output=True)
++        archive = work / "merlin_vme_shim.a"
++        ar = shutil.which("ar")
++        if not ar:
++            raise RuntimeError("a selected archive tool is required for the descriptor bridge")
++        subprocess.run([ar, "rcs", str(archive), str(bridge), str(obj)], check=True, capture_output=True)
++        prov.update(abi="upstream-mlir-flattened-memref-aggregate-return-v1", compiler_abi_qualified=False,
++                    compiler_version=version, bridge_compile_argv=command,
++                    archive_argv=[ar, "rcs", str(archive), str(bridge), str(obj)],
++                    archive_tool_sha256=source_facts.digest(ar))
++        prov["artifacts"].update({str(p): source_facts.digest(p) for p in (llvm, bridge, archive)})
++        obj = archive
+     return VmeBuild(
+         object_path=obj,
+         source_path=src,
+diff --git a/zephyr/CONTEXT.md b/zephyr/CONTEXT.md
+new file mode 100644
+index 0000000..67fe61d
+--- /dev/null
++++ b/zephyr/CONTEXT.md
+@@ -0,0 +1,113 @@
++# Zephyr FP/RVV/VME contexts
++
++The clean base is Zephyr `cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0`.
++`patches/0002-iris-vme-context.patch` is cumulative from that pin and includes
++the cursor-only `0001` fix. Apply either patch to the base, not both in sequence.
++
++```sh
++python3 zephyr/prepare_context_tree.py
++python3 zephyr/context_build.py --source third_party/zephyr-iris \
++  --patch zephyr/patches/0002-iris-vme-context.patch \
++  --extra-conf zephyr/configs/vme-context.conf \
++  --output build/zephyr-context-example
++python3 zephyr/context_run.py \
++  --elf build/zephyr-context-example/zephyr/zephyr.elf \
++  --output build/zephyr-context-example-run
++python3 zephyr/context_build.py --source third_party/zephyr-iris \
++  --patch zephyr/patches/0002-iris-vme-context.patch \
++  --app zephyr/vme-context-stress --output build/zephyr-vme-example
++python3 zephyr/vme_context_run.py \
++  --elf build/zephyr-vme-example/zephyr/zephyr.elf \
++  --output build/zephyr-vme-example-run
++```
++
++The derived worktree stays at the full base commit plus a byte-matched explicit
++patch. The base clone remains clean. Builds archive source inputs and bind
++their hashes, compiler, ELF and patch. Runs bind the physical ROM/DTB, stable
++private Spike/UART snapshot, runner source, console and independent host goldens.
++Both context runners accept explicit `--binary` and `--uart` paths for testing
++another immutable simulator build; their default is the preserved snapshot.
++
++Use the explicit API before establishing live vector/matrix values:
++
++```c
++#include <zephyr/arch/riscv/iris_vme.h>
++/* Create this thread blocked; restrict its CPU mask to harts 0/1 first. */
++int err = iris_vme_enable();
++```
++
++Enable `CONFIG_RISCV_ISA_EXT_V`, `CONFIG_FPU_SHARING`,
++`CONFIG_SCHED_CPU_MASK`, and `CONFIG_RISCV_IRIS_VME_CONTEXT`. Call from thread
++context on hart 0/1 with nonempty affinity restricted to these harts. The API
++returns zero once, `-EALREADY` if repeated and `-ENOTSUP` for incompatible
++affinity, interrupt context or hart 2. Later CPU-mask changes cannot place an
++initialized VME task on hart 2. First ownership explicitly zeroes all four
++32×32 tiles and clobbers vector configuration. Hardware tiles are uninitialized
++at reset; the model refuses undefined reads. This initialization belongs to
++the software ABI, not Spike. Unregistered VME use and VME in interrupt handlers
++are unsupported. Privileged code can bypass an API, so compiler/runtime setup
++must invoke target-owned initialization.
++
++The extension uses the existing lazy FP/RVV owner and SMP remote-flush IPI.
++Before vector-copy configuration changes, it captures mtype (widen/TK/TM),
++vtype (including format), VL/TN, vstart and vcsr. After saving the vector file,
++it serializes all 16 KiB of tiles through supported e32w1 row moves. Restore
++writes tiles, vector data, matrix configuration via msetmtype/TN/TM/TK, and
++vstart/vcsr. Existing hooks preserve FP registers/fcsr. Registered VME owners
++force a save even when OP-VE does not dirty FS/VS. Lazy recognition includes
++opcode 0x77 and mtype reads. Ordinary RVV tasks, including hart 2, never access
++matrix state. Tests disable C vector auto-generation, including kernel C;
++applications must still obey the function-call ABI for caller-clobbered registers.
++
++| Actual ELF test | Result |
++| --- | --- |
++| Clean-base six FP/RVV tasks, two per hart | 72 full-register checks, timer ticks and IEEE16/32/64 arithmetic pass |
++| VME-aware kernel, six ordinary FP/RVV tasks | Same 72 independent goldens pass on all three harts |
++| Four competing VME tasks, eight rounds each | All FP/RVV/mtype/16 KiB tile contents preserved; each task visits harts 0 and 1 |
++| INT8 and exact E4M3/E5M2 MACs after handoff | Independent bitwise goldens pass; producer operands vary by round |
++| Raw special tile values | Signed zeros, infinities, quiet/signaling NaN payloads and all-one cells preserved |
++| Concurrent Rocket producer | Ordinary RVV, VME refusal and producer/completion synchronization pass |
++| Mixed app, worker mask 7 | Nine scalar/VME/vector-copy regions pass independent checksums |
++| Omitted ownership on a fresh compute hart | Nonzero undefined-tile-read failure; no simulator auto-initialization |
++
++Receipts are under `build/zephyr-context-base-certified-run`,
++`build/zephyr-context-vme-aware-certified-run`,
++`build/zephyr-vme-context-certified-run`,
++`build/zephyr-mixed-vme-mask7-final-run`, and
++`build/zephyr-vme-ownership-negative-run`. The baseline disassembly keeps the
++original CSR context pointer separately, and the baseline stress passes. The
++invalid input-only cursor constraint is fixed without claiming an observed
++GCC16 miscompile.
++
++```sh
++python3 zephyr/build.py --source third_party/zephyr-iris \
++  --patch zephyr/patches/0002-iris-vme-context.patch \
++  --saturn third_party/saturn --conf zephyr/configs/mixed-vme-mask7.conf \
++  --output build/zephyr-mixed-example
++python3 zephyr/run.py --build build/zephyr-mixed-example \
++  --binary build/zephyr-binary-snapshot/spike \
++  --uart build/zephyr-binary-snapshot/libsifive_uart.so \
++  --output build/zephyr-mixed-example-run
++```
++
++The mixed app initializes ownership before its measured VME region, excluding
++that one-time cost. Its one-worker-per-hart case is supplemented by the same-hart
++stress. Historical scalar/placement/live outputs remain intact; matching build
++inputs were archived before the optional app changed.
++
++RTL/FPGA context validation, deployed image association, asynchronous OPU drain
++behavior on hardware and calibrated performance remain pending. Exact FP8
++examples here certify those context cases, not every FP8 arithmetic edge.
++Functional-mode mcycle is instruction-based; these results make no +/-2%
++timing claim. Saving 16 KiB per initialized task may be expensive and must be
++measured on the real design before performance conclusions.
++
++For Ethan's inspected FireSim deployment, select
++`zephyr/boards/chipyard/iris/ethan-firesim.overlay` (the target-owned compiler
++front door defaults to `--uart-profile ethan-firesim`). It programs DIV135 at
++500MHz, matching fixed UARTKey135, by requesting3676470baud under the pinned
++Zephyr driver's clock/baud-1 formula. The source nominal init baud3686400 would
++instead make that driver program134. The physical115200 board profile programs
++DIV4339 and must not be described as console compatible with the fixed FireSim
++bridge. `uart-profiles.json` contains frozen source evidence and qualifications.
++No deployed Zephyr FPGA test or loaded-image association is implied.
+diff --git a/zephyr/boards/chipyard/iris/Kconfig.defconfig b/zephyr/boards/chipyard/iris/Kconfig.defconfig
+new file mode 100644
+index 0000000..131bdc6
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/Kconfig.defconfig
+@@ -0,0 +1,18 @@
++if BOARD_IRIS
++
++config SYS_CLOCK_HW_CYCLES_PER_SEC
++	default 500000
++
++config RTC_CLOCK_DIVIDER_VALUE
++	default 1000
++
++config MP_MAX_NUM_CPUS
++	default 3
++
++config NUM_IRQS
++	default 14
++
++config MAX_IRQ_PER_AGGREGATOR
++	default 2
++
++endif
+diff --git a/zephyr/boards/chipyard/iris/Kconfig.iris b/zephyr/boards/chipyard/iris/Kconfig.iris
+new file mode 100644
+index 0000000..7da3ad6
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/Kconfig.iris
+@@ -0,0 +1,2 @@
++config BOARD_IRIS
++	select SOC_ROCKETCHIP_VIRT_RISCV64
+diff --git a/zephyr/boards/chipyard/iris/board.yml b/zephyr/boards/chipyard/iris/board.yml
+new file mode 100644
+index 0000000..f1fdaf5
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/board.yml
+@@ -0,0 +1,6 @@
++board:
++  name: iris
++  full_name: Iris heterogeneous three-hart SoC
++  vendor: chipyard
++  socs:
++    - name: rocketchip_virt_riscv64
+diff --git a/zephyr/boards/chipyard/iris/iris.dts b/zephyr/boards/chipyard/iris/iris.dts
+new file mode 100644
+index 0000000..bf75ff5
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/iris.dts
+@@ -0,0 +1,122 @@
++/dts-v1/;
++
++/* Derived from board/evidence/firesim-dts.dts at the audited Iris source pins.
++ * Zephyr's PLIC binding carries a second IRQ cell for software priority; the
++ * physical source ID remains 1. The machine-timer node describes CLINT fields.
++ */
++/ {
++	#address-cells = <2>;
++	#size-cells = <2>;
++	model = "ucb-bar,iris";
++	compatible = "ucb-bar,chipyard-dev";
++	chosen {
++		zephyr,console = &uart0;
++		zephyr,shell-uart = &uart0;
++		zephyr,sram = &dram;
++	};
++	aliases { serial0 = &uart0; };
++	cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		timebase-frequency = <500000>;
++		cpu0: cpu@0 {
++			device_type = "cpu";
++			compatible = "ucb-bar,shuttle", "riscv";
++			reg = <0>;
++			status = "okay";
++			clock-frequency = <500000000>;
++			riscv,isa = "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t";
++			mmu-type = "riscv,sv39";
++			hlic0: interrupt-controller {
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++				#interrupt-cells = <1>;
++			};
++		};
++		cpu1: cpu@1 {
++			device_type = "cpu";
++			compatible = "ucb-bar,shuttle", "riscv";
++			reg = <1>;
++			status = "okay";
++			clock-frequency = <500000000>;
++			riscv,isa = "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t";
++			mmu-type = "riscv,sv39";
++			hlic1: interrupt-controller {
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++				#interrupt-cells = <1>;
++			};
++		};
++		cpu2: cpu@2 {
++			device_type = "cpu";
++			compatible = "sifive,rocket0", "riscv";
++			reg = <2>;
++			status = "okay";
++			clock-frequency = <500000000>;
++			riscv,isa = "rv64imafdcvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zvbb_xrocket";
++			mmu-type = "riscv,sv39";
++			riscv,pmpgranularity = <4>;
++			riscv,pmpregions = <8>;
++			hlic2: interrupt-controller {
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++				#interrupt-cells = <1>;
++			};
++		};
++	};
++	dram: memory@80000000 {
++		device_type = "memory";
++		reg = <0 0x80000000 1 0>;
++	};
++	tcm0: memory@70000000 {
++		device_type = "memory";
++		reg = <0 0x70000000 0 0x20000>;
++		status = "disabled";
++	};
++	tcm1: memory@70020000 {
++		device_type = "memory";
++		reg = <0 0x70020000 0 0x20000>;
++		status = "disabled";
++	};
++	scratchpad: memory@580000000 {
++		device_type = "memory";
++		reg = <5 0x80000000 0 0x20000>;
++		status = "disabled";
++	};
++	htif: uart-htif { compatible = "ucb,htif"; label = "HTIF_UART"; status = "okay"; };
++	soc {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		compatible = "simple-bus";
++		ranges;
++		plic: interrupt-controller@c000000 {
++			compatible = "sifive,plic-1.0.0";
++			reg = <0 0x0c000000 0 0x04000000>;
++			riscv,ndev = <1>;
++			riscv,max-priority = <1>;
++			interrupt-controller;
++			#address-cells = <0>;
++			#interrupt-cells = <2>;
++			interrupts-extended = <&hlic0 11 &hlic0 9 &hlic1 11 &hlic1 9 &hlic2 11 &hlic2 9>;
++		};
++		clint: clint@2000000 {
++			compatible = "sifive,clint0";
++			reg = <0 0x02000000 0 0x10000>;
++			interrupts-extended = <&hlic0 3 &hlic0 7 &hlic1 3 &hlic1 7 &hlic2 3 &hlic2 7>;
++		};
++		mtimer: timer@200bff8 {
++			compatible = "riscv,machine-timer";
++			reg = <0 0x0200bff8 0 8>, <0 0x02004000 0 24>;
++			reg-names = "mtime", "mtimecmp";
++			interrupts-extended = <&hlic0 7 &hlic1 7 &hlic2 7>;
++		};
++		uart0: serial@10020000 {
++			compatible = "sifive,uart0";
++			reg = <0 0x10020000 0 0x1000>;
++			interrupt-parent = <&plic>;
++			interrupts = <1 1>;
++			current-speed = <115200>;
++			status = "okay";
++		};
++	};
++};
+diff --git a/zephyr/boards/chipyard/iris/iris.yaml b/zephyr/boards/chipyard/iris/iris.yaml
+new file mode 100644
+index 0000000..db5d9e6
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/iris.yaml
+@@ -0,0 +1,11 @@
++identifier: iris
++name: Iris heterogeneous three-hart SoC
++type: mcu
++arch: riscv
++toolchain:
++  - cross-compile
++ram: 4194304
++supported:
++  - smp
++  - uart
++  - counter
+diff --git a/zephyr/boards/chipyard/iris/iris_defconfig b/zephyr/boards/chipyard/iris/iris_defconfig
+new file mode 100644
+index 0000000..eb1b2ec
+--- /dev/null
++++ b/zephyr/boards/chipyard/iris/iris_defconfig
+@@ -0,0 +1,21 @@
++CONFIG_SMP=y
++CONFIG_MP_MAX_NUM_CPUS=3
++CONFIG_RISCV_PMP=n
++CONFIG_FPU=y
++CONFIG_FPU_SHARING=y
++CONFIG_FLOAT_HARD=y
++CONFIG_CONSOLE=y
++CONFIG_UART_CONSOLE=y
++CONFIG_SERIAL=y
++CONFIG_UART_SIFIVE=y
++CONFIG_UART_SIFIVE_PORT_0=y
++CONFIG_UART_INTERRUPT_DRIVEN=n
++CONFIG_UART_HTIF=y
++CONFIG_PRINTK=y
++CONFIG_REBOOT=y
++CONFIG_XIP=n
++CONFIG_MINIMAL_LIBC=y
++CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC=500000
++CONFIG_SYS_CLOCK_TICKS_PER_SEC=1000
++CONFIG_SPEED_OPTIMIZATIONS=y
++CONFIG_IDLE_STACK_SIZE=2048
+diff --git a/zephyr/context-support.json b/zephyr/context-support.json
+new file mode 100644
+index 0000000..b27a205
+--- /dev/null
++++ b/zephyr/context-support.json
+@@ -0,0 +1,56 @@
++{
++  "schema": "iris.zephyr_context_support.v1",
++  "base_commit": "cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0",
++  "patch": "patches/0002-iris-vme-context.patch",
++  "patch_sha256": "558cefc2f57225774cc891e1df0d2f7149f6e834a7012b4c0735f0fba0d1aa1b",
++  "requires_configs": [
++    "CONFIG_RISCV_ISA_EXT_V=y",
++    "CONFIG_FPU_SHARING=y",
++    "CONFIG_RISCV_IRIS_VME_CONTEXT=y",
++    "CONFIG_SCHED_CPU_MASK=y"
++  ],
++  "setup_api": "iris_vme_enable()",
++  "setup_header": "zephyr/arch/riscv/iris_vme.h",
++  "allowed_vme_hart_ids": [
++    0,
++    1
++  ],
++  "setup_contract": "Set nonempty affinity wholly within harts0/1 before first VME operation, call once from thread context. Setup explicitly zeroes4tiles and clobbers vector configuration. Registered thread context only; no VME from ISR. Later affinity change including hart2 is refused. All3 physical harts remain present.",
++  "evidence": {
++    "zephyr-vme-context-certified-run": {
++      "path": "/scratch/copparihollmann/iris-model/build/zephyr-vme-context-certified-run/results.json",
++      "sha256": "5458e312886532560436b68e00a12f9eed2e07dd044d901b297e03a2c8e5a754",
++      "status": "passed",
++      "simulator_binary_sha256": "42119583e490f74a8dae670155757c9d54f12d6b01a766aeca660273a59cb949"
++    },
++    "zephyr-context-vme-aware-certified-run": {
++      "path": "/scratch/copparihollmann/iris-model/build/zephyr-context-vme-aware-certified-run/results.json",
++      "sha256": "8836080f3138d0f6f6b1bf24d30372d4047ca65acb74a626dfde9317b4dfd756",
++      "status": "passed",
++      "simulator_binary_sha256": "42119583e490f74a8dae670155757c9d54f12d6b01a766aeca660273a59cb949"
++    },
++    "zephyr-mixed-vme-mask7-final-run": {
++      "path": "/scratch/copparihollmann/iris-model/build/zephyr-mixed-vme-mask7-final-run/results.json",
++      "sha256": "8c79d7c4dca1aaa421f653b0747b45e3524709e70d2b86a71a3613127f1e6189",
++      "status": "passed_mixed_zephyr_smp",
++      "simulator_binary_sha256": "42119583e490f74a8dae670155757c9d54f12d6b01a766aeca660273a59cb949"
++    }
++  },
++  "qualification": {
++    "source_model_functional": true,
++    "rtl": false,
++    "timing_calibrated": false,
++    "deployed_image": false,
++    "explicit_registered_task_pipeline": true,
++    "generic_merlin_worker_pool": false
++  },
++  "context_document": "CONTEXT.md",
++  "context_document_sha256": "6413e729cb517312d7cc187426e74b67f48e999c55cd353ad9521244b5d5e98b",
++  "compiled_operation_gate": {
++    "receipt_roster": "zephyr/compiler-acceptance.json in iris-model",
++    "binary_sha256": "0c0fd7785d3e7ba2785e2e9eabc0d0af719037ab2fa761b71bab33fe24a5f257",
++    "full_int32_values": 98304,
++    "full_w8a8_values": 98304,
++    "whole_model_qualified": false
++  }
++}
+diff --git a/zephyr/dts/bindings/cpu/sifive,rocket0.yaml b/zephyr/dts/bindings/cpu/sifive,rocket0.yaml
+new file mode 100644
+index 0000000..316bc37
+--- /dev/null
++++ b/zephyr/dts/bindings/cpu/sifive,rocket0.yaml
+@@ -0,0 +1,10 @@
++description: Rocket RISC-V CPU, as emitted by the pinned Iris elaboration
++compatible: "sifive,rocket0"
++include: riscv,cpus.yaml
++properties:
++  riscv,pmpgranularity:
++    type: int
++    const: 4
++  riscv,pmpregions:
++    type: int
++    const: 8
+diff --git a/zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml b/zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml
+new file mode 100644
+index 0000000..57da749
+--- /dev/null
++++ b/zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml
+@@ -0,0 +1,3 @@
++description: UCB Shuttle RISC-V CPU, as emitted by the pinned Iris elaboration
++compatible: "ucb-bar,shuttle"
++include: riscv,cpus.yaml
+diff --git a/zephyr/dts/bindings/vendor-prefixes.txt b/zephyr/dts/bindings/vendor-prefixes.txt
+new file mode 100644
+index 0000000..59dd274
+--- /dev/null
++++ b/zephyr/dts/bindings/vendor-prefixes.txt
+@@ -0,0 +1,2 @@
++ucb	University of California, Berkeley
++ucb-bar	University of California, Berkeley Architecture Research
+diff --git a/zephyr/patches/0002-iris-vme-context.patch b/zephyr/patches/0002-iris-vme-context.patch
+new file mode 100644
+index 0000000..0a6a1d4
+--- /dev/null
++++ b/zephyr/patches/0002-iris-vme-context.patch
+@@ -0,0 +1,356 @@
++diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
++index 29c1bcff..46d53e37 100644
++--- a/arch/riscv/Kconfig
+++++ b/arch/riscv/Kconfig
++@@ -22,6 +22,16 @@ config RISCV_VECTOR_MAX_LEN
++ 	help
++ 	  Maximum length of a vector register in bits.
++ 
+++config RISCV_IRIS_VME_CONTEXT
+++	bool "Iris explicit VME thread ownership and context switching"
+++	depends on BOARD_IRIS && RISCV_ISA_EXT_V && FPU_SHARING && SCHED_CPU_MASK
+++	depends on 64BIT
+++	help
+++	  Preserve all four Iris matrix tiles and matrix configuration for threads
+++	  that explicitly call iris_vme_enable(). Such threads must remain on
+++	  compute harts 0/1. The API initializes all tiles at first use; ordinary
+++	  vector threads and hart 2 never access matrix state.
+++
++ choice RISCV_GP_PURPOSE
++ 	prompt "Purpose of the global pointer (GP) register"
++ 	default RISCV_GP if RISCV_SOC_HAS_GP_RELATIVE_ADDRESSING
++diff --git a/arch/riscv/core/CMakeLists.txt b/arch/riscv/core/CMakeLists.txt
++index 52a748c3..b91fc669 100644
++--- a/arch/riscv/core/CMakeLists.txt
+++++ b/arch/riscv/core/CMakeLists.txt
++@@ -24,6 +24,7 @@ if (CONFIG_SMP)
++ endif()
++ 
++ zephyr_library_sources_ifdef(CONFIG_FPU_SHARING fpu.c fpu.S)
+++zephyr_library_sources_ifdef(CONFIG_RISCV_IRIS_VME_CONTEXT iris_vme.c iris_vme_tiles.S)
++ zephyr_library_sources_ifdef(CONFIG_DEBUG_COREDUMP coredump.c)
++ zephyr_library_sources_ifdef(CONFIG_IRQ_OFFLOAD irq_offload.c)
++ zephyr_library_sources_ifdef(CONFIG_GEN_SW_ISR_TABLE isr.S)
++diff --git a/arch/riscv/core/fpu.c b/arch/riscv/core/fpu.c
++index a6b28f3a..f1583ff1 100644
++--- a/arch/riscv/core/fpu.c
+++++ b/arch/riscv/core/fpu.c
++@@ -64,8 +64,20 @@ static inline void DBG(char *msg, struct k_thread *t)
++ 
++ #ifdef CONFIG_RISCV_ISA_EXT_V
++ 
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++extern void z_iris_vme_tiles_save(void *tiles);
+++extern void z_iris_vme_tiles_restore(const void *tiles);
+++#endif
+++
++ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
++ {
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	/* vsetvl used for the vector-file copy would clear matrix geometry. */
+++	if (dest->iris_vme_initialized) {
+++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
+++		__asm__ volatile("csrr %0,0xc23" : "=r"(dest->iris_mtype));
+++	}
+++#endif
++ 	__asm volatile("csrr	%0, vstart\n\t"
++ 		       "csrr	%1, vtype\n\t"
++ 		       "csrr	%2, vl\n\t"
++@@ -79,6 +91,24 @@ void z_riscv_vstate_csr_save(struct z_riscv_v_context *dest)
++ 
++ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
++ {
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	if (src->iris_vme_initialized && (src->iris_mtype & 7U)) {
+++		unsigned long widen = src->iris_mtype & 7U;
+++		unsigned long code = widen == 4 ? 3 : widen;
+++		unsigned long tm = src->iris_mtype >> 10;
+++		unsigned long tk = (src->iris_mtype >> 5) & 7U;
+++		__ASSERT(widen == 1 || widen == 4, "Unsupported Iris tile width");
+++		__asm__ volatile(".insn r 0x57,7,0x42,x0,%0,%1\n\t"
+++				 ".insn r 0x57,7,0x44,x0,%2,x0\n\t"
+++				 ".insn r 0x57,7,0x44,x0,%3,x1\n\t"
+++				 ".insn r 0x57,7,0x44,x0,%4,x2\n\t"
+++				 "csrw vstart,%5\n\tcsrw vcsr,%6"
+++				 :: "r"(code), "r"(src->vtype), "r"(src->vl),
+++				 "r"(tm), "r"(tk), "r"(src->vstart), "r"(src->vcsr)
+++				 : "memory");
+++		return;
+++	}
+++#endif
++ 	__asm volatile(".option push\n\t"
++ 		       ".option arch, +v\n\t"
++ 		       "vsetvl	 x0, %2, %1\n\t"
++@@ -93,6 +123,7 @@ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
++ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
++ {
++ 	unsigned long vl;
+++	void *cursor = save_to->vreg;
++ 
++ 	z_riscv_vstate_csr_save(save_to);
++ 	__asm volatile(".option push\n\t"
++@@ -106,14 +137,29 @@ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
++ 		       "add		%1, %1, %0\n\t"
++ 		       "vse8.v		v24, (%1)\n\t"
++ 		       ".option pop\n\t"
++-		       : "=&r"(vl)
++-		       : "r"(save_to->vreg)
+++		       : "=&r"(vl), "+&r"(cursor)
+++		       :
++ 		       : "memory");
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	if (save_to->iris_vme_initialized) {
+++		z_iris_vme_tiles_save(save_to->iris_tiles);
+++		save_to->iris_vme_saves++;
+++	}
+++#endif
++ }
++ 
++ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
++ {
++ 	unsigned long vl;
+++	void *cursor = restore_from->vreg;
+++
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	if (restore_from->iris_vme_initialized) {
+++		__ASSERT(csr_read(mhartid) < 2, "VME owner scheduled on DMA hart");
+++		z_iris_vme_tiles_restore(restore_from->iris_tiles);
+++		restore_from->iris_vme_restores++;
+++	}
+++#endif
++ 
++ 	__asm volatile(".option push\n\t"
++ 		       ".option arch, +v\n\t"
++@@ -126,8 +172,8 @@ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
++ 		       "add		%1, %1, %0\n\t"
++ 		       "vle8.v		v24, (%1)\n\t"
++ 		       ".option pop\n\t"
++-		       : "=&r"(vl)
++-		       : "r"(restore_from->vreg)
+++		       : "=&r"(vl), "+&r"(cursor)
+++		       :
++ 		       : "memory");
++ 	z_riscv_vstate_csr_restore(restore_from);
++ }
++@@ -196,6 +242,10 @@ void arch_flush_local_fpu(void)
++ 
++ 		bool dirty = (_current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY) ||
++ 			     (_current_cpu->arch.vpu_state == MSTATUS_VS_DIRTY);
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++		/* OP-VE only updates tiles: FS/VS dirty alone is insufficient. */
+++		dirty = dirty || owner->arch.saved_v_context.iris_vme_initialized;
+++#endif
++ #else
++ 		bool dirty = _current_cpu->arch.fpu_state == MSTATUS_FS_DIRTY;
++ #endif
++diff --git a/arch/riscv/core/iris_vme.c b/arch/riscv/core/iris_vme.c
++new file mode 100644
++index 00000000..43007b9b
++--- /dev/null
+++++ b/arch/riscv/core/iris_vme.c
++@@ -0,0 +1,34 @@
+++/* SPDX-License-Identifier: Apache-2.0 */
+++#include <zephyr/kernel.h>
+++#include <zephyr/kernel_structs.h>
+++#include <zephyr/arch/riscv/iris_vme.h>
+++#include <errno.h>
+++
+++extern void z_iris_vme_tiles_zero(void);
+++
+++int iris_vme_enable(void)
+++{
+++	if (k_is_in_isr() || csr_read(mhartid) > 1 ||
+++	    !_current->base.cpu_mask || (_current->base.cpu_mask & ~3U)) {
+++		return -ENOTSUP;
+++	}
+++	unsigned int key = irq_lock();
+++	struct z_riscv_v_context *context = &_current->arch.saved_v_context;
+++	if (context->iris_vme_initialized) {
+++		irq_unlock(key);
+++		return -EALREADY;
+++	}
+++	/* Claim the existing Zephyr lazy FP/RVV owner before modifying tiles. */
+++	__asm__ volatile(".option push\n\t.option arch,+v\n\t"
+++			 "vsetvli zero,zero,e8,m1,ta,ma\n\t.option pop" ::: "memory");
+++	z_iris_vme_tiles_zero();
+++	context->iris_vme_initialized = true;
+++	irq_unlock(key);
+++	return 0;
+++}
+++
+++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores)
+++{
+++	*saves = _current->arch.saved_v_context.iris_vme_saves;
+++	*restores = _current->arch.saved_v_context.iris_vme_restores;
+++}
++diff --git a/arch/riscv/core/iris_vme_tiles.S b/arch/riscv/core/iris_vme_tiles.S
++new file mode 100644
++index 00000000..1f9c09b3
++--- /dev/null
+++++ b/arch/riscv/core/iris_vme_tiles.S
++@@ -0,0 +1,62 @@
+++/* SPDX-License-Identifier: Apache-2.0 */
+++/* All register names/encodings follow pinned Matrix.scala and Saturn vme.h.
+++ * Serialize 4 tiles x 32 rows x 32 raw 32-bit cells. These leaf functions
+++ * clobber matrix configuration and v24-v27; fpu.c saves/restores RVV around
+++ * them. Row moves are bit copies, including FP NaNs and integer payloads.
+++ */
+++.text
+++.option push
+++.option arch,+v
+++.macro full_tile_config
+++	li t0,1
+++	li t1,16
+++	.insn r 0x57,7,0x42,zero,t0,t1
+++	li t0,32
+++	.insn r 0x57,7,0x44,zero,t0,x0
+++	.insn r 0x57,7,0x44,zero,t0,x1
+++	li t0,1
+++	.insn r 0x57,7,0x44,zero,t0,x2
+++.endm
+++.global z_iris_vme_tiles_zero
+++.type z_iris_vme_tiles_zero,@function
+++z_iris_vme_tiles_zero:
+++	full_tile_config
+++	.insn r 0x57,6,0x21,x0,x0,x30
+++	.insn r 0x57,6,0x21,x8,x0,x30
+++	.insn r 0x57,6,0x21,x16,x0,x30
+++	.insn r 0x57,6,0x21,x24,x0,x30
+++	ret
+++.size z_iris_vme_tiles_zero,.-z_iris_vme_tiles_zero
+++
+++.macro transfer name,load
+++.global \name
+++.type \name,@function
+++\name:
+++	full_tile_config
+++	li t0,0
+++	li t4,4
+++	li t5,0x20000000
+++1:
+++	li t1,0
+++2:
+++	or t3,t0,t1
+++.if \load
+++	vle32.v v24,(a0)
+++	.insn r 0x57,6,0x2f,x0,t3,x24
+++.else
+++	.insn r 0x57,6,0x21,x24,t3,x31
+++	vse32.v v24,(a0)
+++.endif
+++	addi a0,a0,128
+++	addi t1,t1,1
+++	li t2,32
+++	bne t1,t2,2b
+++	add t0,t0,t5
+++	addi t4,t4,-1
+++	bnez t4,1b
+++	ret
+++.size \name,.-\name
+++.endm
+++transfer z_iris_vme_tiles_save,0
+++transfer z_iris_vme_tiles_restore,1
+++.option pop
++diff --git a/arch/riscv/core/isr.S b/arch/riscv/core/isr.S
++index b4d27df4..303f60fd 100644
++--- a/arch/riscv/core/isr.S
+++++ b/arch/riscv/core/isr.S
++@@ -257,6 +257,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
++ #ifdef CONFIG_RISCV_ISA_EXT_V
++ 	xori t1, t0, 0x57	/* VECTOR */
++ 	beqz t1, is_fp
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	xori t1, t0, 0x77	/* Iris OP-VE matrix arithmetic */
+++	beqz t1, is_fp
+++#endif
++ #endif
++ 	/*
++ 	 * The FRCSR, FSCSR, FRRM, FSRM, FSRMI, FRFLAGS, FSFLAGS and FSFLAGSI
++@@ -291,6 +295,10 @@ SECTION_FUNC(exception.entry, _isr_wrapper)
++ 	beq t0, t1, is_fp
++ 	li t1, 0xc22	// vlenb
++ 	beq t0, t1, is_fp
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	li t1, 0xc23	/* mtype */
+++	beq t0, t1, is_fp
+++#endif
++ #endif /* CONFIG_RISCV_ISA_EXT_V */
++ 2:	/* remaining non RVC (0b11) and RVC with 0b01 are not FP instructions */
++ 	andi t1, t2, 1
++diff --git a/arch/riscv/core/thread.c b/arch/riscv/core/thread.c
++index d8de60ad..e1ec881d 100644
++--- a/arch/riscv/core/thread.c
+++++ b/arch/riscv/core/thread.c
++@@ -68,6 +68,11 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
++ #if defined(CONFIG_FPU_SHARING)
++ 	/* thread birth happens through the exception return path */
++ 	thread->arch.exception_depth = 1;
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	thread->arch.saved_v_context.iris_vme_initialized = false;
+++	thread->arch.saved_v_context.iris_vme_saves = 0;
+++	thread->arch.saved_v_context.iris_vme_restores = 0;
+++#endif
++ #elif defined(CONFIG_FPU)
++ 	/* Unshared FP mode: enable FPU of each thread. */
++ 	stack_init->mstatus |= MSTATUS_FS_INIT;
++diff --git a/include/zephyr/arch/riscv/iris_vme.h b/include/zephyr/arch/riscv/iris_vme.h
++new file mode 100644
++index 00000000..2fb964bf
++--- /dev/null
+++++ b/include/zephyr/arch/riscv/iris_vme.h
++@@ -0,0 +1,18 @@
+++/* SPDX-License-Identifier: Apache-2.0 */
+++#ifndef ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
+++#define ZEPHYR_INCLUDE_ARCH_RISCV_IRIS_VME_H_
+++#include <stdint.h>
+++
+++/*
+++ * Call once from thread context, before any VME instruction. The thread must
+++ * already have a nonempty affinity mask containing only harts 0/1. Returns
+++ * -ENOTSUP on hart 2 or with incompatible affinity; -EALREADY if enabled.
+++ * This explicit first-use ABI zeroes ALL four 32x32 tiles and clobbers vector
+++ * configuration. Call before establishing any live vector/matrix values.
+++ * Afterwards FP, RVV, matrix geometry/format and all tiles survive ordinary
+++ * Zephyr preemption, blocking and migration between the compute harts.
+++ * Do not use VME from interrupt handlers or without this ownership API.
+++ */
+++int iris_vme_enable(void);
+++void iris_vme_switch_counts(uint32_t *saves, uint32_t *restores);
+++#endif
++diff --git a/include/zephyr/arch/riscv/thread.h b/include/zephyr/arch/riscv/thread.h
++index 48dc694b..ed9dd6be 100644
++--- a/include/zephyr/arch/riscv/thread.h
+++++ b/include/zephyr/arch/riscv/thread.h
++@@ -70,6 +70,13 @@ struct z_riscv_v_context {
++ 	unsigned long vcsr;
++ 	unsigned long vlenb;
++ 	char vreg[32][CONFIG_RISCV_VECTOR_MAX_LEN];
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	unsigned long iris_mtype;
+++	bool iris_vme_initialized;
+++	uint32_t iris_vme_saves;
+++	uint32_t iris_vme_restores;
+++	uint32_t iris_tiles[4][32][32];
+++#endif
++ };
++ typedef struct z_riscv_v_context z_riscv_v_context_t;
++ #endif
++diff --git a/kernel/cpu_mask.c b/kernel/cpu_mask.c
++index e7c16511..b3ad9e17 100644
++--- a/kernel/cpu_mask.c
+++++ b/kernel/cpu_mask.c
++@@ -20,6 +20,14 @@ static int cpu_mask_mod(k_tid_t thread, uint32_t enable_mask, uint32_t disable_m
++ {
++ 	int ret = 0;
++ 
+++#ifdef CONFIG_RISCV_IRIS_VME_CONTEXT
+++	/* A matrix context cannot execute on the Rocket DMA hart. */
+++	if (thread->arch.saved_v_context.iris_vme_initialized &&
+++	    (((thread->base.cpu_mask | enable_mask) & ~disable_mask) & ~3U)) {
+++		return -ENOTSUP;
+++	}
+++#endif
+++
++ #ifdef CONFIG_SCHED_CPU_MASK_PIN_ONLY
++ 	__ASSERT(z_is_thread_prevented_from_running(thread),
++ 		 "Running threads cannot change CPU pin");
+diff --git a/zephyr/task_setup.h b/zephyr/task_setup.h
+new file mode 100644
+index 0000000..d498f6f
+--- /dev/null
++++ b/zephyr/task_setup.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: Apache-2.0 */
++#ifndef MERLIN_IRIS_ZEPHYR_TASK_SETUP_H
++#define MERLIN_IRIS_ZEPHYR_TASK_SETUP_H
++#include <zephyr/kernel.h>
++#include <zephyr/arch/riscv/iris_vme.h>
++#include <errno.h>
++/* Target-owned setup hook: the caller sets affinity before starting tasks.
++ * Must run before any generated kernel or live vector values. */
++static inline int merlin_target_compute_task_setup(void)
++{
++#ifdef MERLIN_MATRIX_SCALAR_TILE
++  return 0;
++#else
++  return iris_vme_enable();
++#endif
++}
++static inline int merlin_target_cpu_producer_setup(void)
++{
++  /* The Iris producer must remain an ordinary CPU/RVV task. */
++  return iris_vme_enable() == -ENOTSUP ? 0 : -EINVAL;
++}
++#endif

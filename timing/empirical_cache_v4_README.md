@@ -1,0 +1,9 @@
+V4 retains v3 and adds `begin_vector(Access)` for direct Saturn ATL Get/Put traffic. Cacheable DRAM vector requests use shared L2 timing tags and the SAME pending-owner ledger, with no private L1D allocation or hit/miss credit. Scalar and instruction methods remain separate.
+
+A vector read probes dirty private D owners, including its own hart, and retains clean shared copies. A vector write preserves dirty-owner work and invalidates ALL matching private D copies, including its own hart. Get-only instruction tags remain valid until explicit FENCE.I. This fixes the timing-model error where a vector store warmed its own scalar cache and made the following checksum read a private hit.
+
+`Delta.l1_hits/l1_misses` are zero for DRAM vector requests: bypass is not a miss. `l2_hits/l2_misses` and `lines` describe64B line coverage. Actual Saturn internal requests are32B, with computeATL256-bit and RocketATL64-bit external beats. The CPU adapter must report packet/bus beats independently from DLEN-derived compute work and choose its explicit service model. The helper adds no bus delay, uses no observed hardware state, and does not collapse those widths into one value.
+
+L2 write allocation and LRU/inclusive data coherence remain explicit approximations, not a certification of the source controller's every uncached-Put policy. One helper transaction may cover a whole vector instruction; it does not claim per-beat functional interleaving. Functional bytes and definedness remain owned by the real callback and accepted actor dependencies. TCM/scratch retain their uncached route classification; no L1/L2 tags are invented there.
+
+The new proof checks vector/no-private-cache behavior, own/peer dirty probes, own and peer D invalidation, instruction-cache preservation, pending dependencies and20,000 streaming accesses. Every v1/v2/v3 data/instruction/query test also replays. Source geometry remains bound; source/image and ±2% certification remain false.

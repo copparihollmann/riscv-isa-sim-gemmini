@@ -1,0 +1,166 @@
+{
+  "pass": true,
+  "schema": "iris.rvv_identify_actual_zero_adjustment_fixture.v1",
+  "only_eligible_setup_work_zeroed": [
+    {
+      "hart": 0,
+      "family": "memory.vector.load",
+      "old_setup": "502.076666621",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "memory.vector.store",
+      "old_setup": "104.295829143",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "rvv.fadd.fp16",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "rvv.fadd.fp32",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "rvv.fadd.fp64",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "rvv.integer",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vector0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 0,
+      "family": "vme.row_move",
+      "old_setup": "2",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vme0",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "memory.vector.load",
+      "old_setup": "502.076666621",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "memory.vector.store",
+      "old_setup": "104.295829143",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "rvv.fadd.fp16",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "rvv.fadd.fp32",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "rvv.fadd.fp64",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vectorFP1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "rvv.integer",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vector1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 1,
+      "family": "vme.row_move",
+      "old_setup": "2",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.vme1",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 2,
+      "family": "memory.vector.load",
+      "old_setup": "807.356467253",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory2",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 2,
+      "family": "memory.vector.store",
+      "old_setup": "95.0650808227",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.memory2",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 2,
+      "family": "rvv.fadd.fp16",
+      "old_setup": "3",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.sharedFPU2",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 2,
+      "family": "rvv.fadd.fp32",
+      "old_setup": "3",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.sharedFPU2",
+      "interval_unchanged": "1"
+    },
+    {
+      "hart": 2,
+      "family": "rvv.fadd.fp64",
+      "old_setup": "1",
+      "old_work": "0",
+      "resource_unchanged": "fit.hybrid.sharedFPU2",
+      "interval_unchanged": "1"
+    }
+  ],
+  "all_other_directives_and_resource_intervals_unchanged": true,
+  "missing_eligible_rules_remain_default_no_extra_cost": true,
+  "new_fixture_sha256": "ca87dd6210fed3b977a13f1c13c975a9bfb71410fe9f9a1a7d86a071906498f8",
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/warm-OPU-inputs-v2/baseline.fixture": "99a768e7517cae291ad797173131815126da1aaa564f1f226dc42bfcd4871d69",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-identify-TK-fit-plan-v1/plan.json": "782508a8518b72aa97063c3fd3f5a88f84a5f9420ae0b2796633a00177fda3c9"
+  },
+  "no_timings_or_labels_used": true
+}

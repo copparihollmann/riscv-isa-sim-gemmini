@@ -1,0 +1,4005 @@
+{
+  "actual_parameter_fit_performed": true,
+  "empirical_quality_accepted": false,
+  "feature_schema_sha256": "72a8841aab64697a9d7279f3c41a834041422d6c5cf4ea0e9261ebfd8cc18314",
+  "fit_policy": {
+    "case_id_pc_or_trial_number_runtime_feature": false,
+    "fixed_cpu_baseline_cpi": {
+      "rocket": 1.0,
+      "shuttle": 0.6
+    },
+    "intercept_policy": "Region intercepts are audit nuisance terms, NEVER charged at every instruction.",
+    "objective": "nonnegative relative-error IRLS; no validation labels used",
+    "target": "median_all_five_trials_per_semantic_hart_group"
+  },
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "calibration/empirical-v1/observations.jsonl": "2f859f5f7ee2a5ebd13f39a02b6cb4d5381bbdb6b9db8cd8fc8f672bddfa50b3",
+    "calibration/empirical-v1/split.json": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c",
+    "timing/empirical_fit.py": "72a8841aab64697a9d7279f3c41a834041422d6c5cf4ea0e9261ebfd8cc18314"
+  },
+  "native_fixture_sha256": null,
+  "native_model_implementation_sha256": null,
+  "reference": {
+    "actual_parameter_fit_performed": false,
+    "calibration_usable": false,
+    "counter_interpretation": "Program-visible mcycle deltas per hart. Hart counters need not have a shared absolute origin and can stop during WFI; do not use them as one cross-hart wall clock.",
+    "end_to_end_accuracy_qualified": false,
+    "files": {
+      "regions.csv": "581d27afc22c377fb4df73691143dd1e0fa61276c82c4c86511267c9c9306a5c",
+      "repetitions.json": "7e8cd7500c0e8230dbc73b7901d6bf8101f70417d39b511c7532d23c150d0eda"
+    },
+    "heldout_timing_consumed": false,
+    "overhead_subtracted": false,
+    "regions": 6750,
+    "schema": "iris.raw_fpga_fitting_observations.v1",
+    "source_analysis": {
+      "path": "build/fpga-v12-broad-archive-analysis-v2/report.json",
+      "sha256": "15c0f2beb6cff63359c349a679ac15a0ffe7ef60ae4788485b76b76411ca5a5b"
+    },
+    "source_archive_sha256": "ac4445271bf781b10e4b09e1bafa86ded73470279a63f4ac3ef898ad641fcaeb",
+    "source_image_association_verified": false,
+    "source_run_manifest_sha256": "b849cba5da6b6b5e01fbc0898cdb4534cbb5d8a7bd845dbd94ded786029ccf01",
+    "source_uart": {
+      "identical_cleanup_copies": [
+        {
+          "member": "job/optional-observability/uartlog",
+          "sha256": "6eef3d236652bb3004a865b8a0eaa2012c39151349246d5e75d3cdb2103d3341"
+        }
+      ],
+      "member": "job/manager/results-workload/2026-11-06--09-44-29-iris-batch/iris-batch0/uartlog",
+      "sha256": "6eef3d236652bb3004a865b8a0eaa2012c39151349246d5e75d3cdb2103d3341"
+    },
+    "status": "6750_independently_verified_regions",
+    "trial_groups": 1350,
+    "trial_interpretation": "Five within-ELF trials preserve evolving cache/shared-memory/timer histories. Model those histories; do not infer an irreducible noise floor from this variance."
+  },
+  "region_models": {
+    "cpu/rocket": {
+      "coefficients": {
+        "dependent_alu_ops": 0.0,
+        "instructions": 0.999106852333572,
+        "region_intercept_cycles": 22.024606463309418
+      },
+      "feature_columns": 3,
+      "feature_rank": 3,
+      "fixed_cpu_cycles_per_retired_instruction": 0.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_alu_ops": {
+          "max": 16384.0,
+          "min": 0.0
+        },
+        "instructions": {
+          "max": 20514.0,
+          "min": 1299.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.scalar.dependent.mask4",
+        "v2.placement.scalar.dependent.mask5",
+        "v2.placement.scalar.dependent.mask6",
+        "v2.placement.scalar.independent.mask4",
+        "v2.placement.scalar.independent.mask5",
+        "v2.placement.scalar.independent.mask6",
+        "v2.scalar.dependent.2048",
+        "v2.scalar.dependent.512",
+        "v2.scalar.independent8.128",
+        "v2.scalar.independent8.2048",
+        "v2.scalar.independent8.512"
+      ],
+      "training_semantic_hart_groups": 11
+    },
+    "cpu/shuttle": {
+      "coefficients": {
+        "dependent_alu_ops": 0.2607105291093586,
+        "instructions": 0.5958378743492118,
+        "region_intercept_cycles": 48.177035664293896
+      },
+      "feature_columns": 3,
+      "feature_rank": 3,
+      "fixed_cpu_cycles_per_retired_instruction": 0.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_alu_ops": {
+          "max": 16384.0,
+          "min": 0.0
+        },
+        "instructions": {
+          "max": 20513.0,
+          "min": 1298.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.scalar.dependent.mask2",
+        "v2.placement.scalar.dependent.mask5",
+        "v2.placement.scalar.dependent.mask6",
+        "v2.placement.scalar.independent.mask2",
+        "v2.placement.scalar.independent.mask3",
+        "v2.placement.scalar.independent.mask5",
+        "v2.placement.scalar.independent.mask6",
+        "v2.scalar.dependent.2048",
+        "v2.scalar.dependent.512",
+        "v2.scalar.independent8.128",
+        "v2.scalar.independent8.2048",
+        "v2.scalar.independent8.512"
+      ],
+      "training_semantic_hart_groups": 18
+    },
+    "memory/rocket/dram/chase": {
+      "coefficients": {
+        "accesses": 0.09174576806147036,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.07637752430437063,
+        "region_intercept_cycles": 39.144275167523936,
+        "same_bank_peer_accesses": 0.011569775219486546
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.chase.257.mask4",
+        "memroute.dram.alternating.chase.257.mask6",
+        "memroute.dram.alternating.chase.257.mask7",
+        "memroute.dram.alternating.chase.33.mask4",
+        "memroute.dram.alternating.chase.33.mask5",
+        "memroute.dram.alternating.chase.33.mask6",
+        "memroute.dram.alternating.chase.33.mask7",
+        "memroute.dram.bank0.chase.257.mask4",
+        "memroute.dram.bank0.chase.257.mask5",
+        "memroute.dram.bank0.chase.257.mask6",
+        "memroute.dram.bank0.chase.257.mask7",
+        "memroute.dram.bank0.chase.33.mask4",
+        "memroute.dram.bank0.chase.33.mask6",
+        "memroute.dram.hart-banks.chase.257.mask4",
+        "memroute.dram.hart-banks.chase.257.mask5",
+        "memroute.dram.hart-banks.chase.257.mask6",
+        "memroute.dram.hart-banks.chase.257.mask7",
+        "memroute.dram.hart-banks.chase.33.mask4",
+        "memroute.dram.hart-banks.chase.33.mask5",
+        "memroute.dram.hart-banks.chase.33.mask6",
+        "memroute.dram.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 21
+    },
+    "memory/rocket/dram/read": {
+      "coefficients": {
+        "accesses": 0.06789095113039868,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.11014942495201038,
+        "region_intercept_cycles": 58.62421858181092,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.read.1.mask5",
+        "memroute.dram.alternating.read.16.mask4",
+        "memroute.dram.alternating.read.16.mask5",
+        "memroute.dram.alternating.read.16.mask6",
+        "memroute.dram.bank0.read.1.mask5",
+        "memroute.dram.bank0.read.1.mask6",
+        "memroute.dram.bank0.read.1.mask7",
+        "memroute.dram.bank0.read.16.mask4",
+        "memroute.dram.bank0.read.16.mask5",
+        "memroute.dram.bank0.read.16.mask7",
+        "memroute.dram.hart-banks.read.1.mask4",
+        "memroute.dram.hart-banks.read.1.mask5",
+        "memroute.dram.hart-banks.read.1.mask6",
+        "memroute.dram.hart-banks.read.1.mask7",
+        "memroute.dram.hart-banks.read.16.mask5",
+        "memroute.dram.hart-banks.read.16.mask6",
+        "memroute.dram.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 17
+    },
+    "memory/rocket/dram/write": {
+      "coefficients": {
+        "accesses": 0.0,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.19720299152842743,
+        "region_intercept_cycles": 39.483418233836716,
+        "same_bank_peer_accesses": 0.13662071919166643
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.write.1.mask4",
+        "memroute.dram.alternating.write.1.mask5",
+        "memroute.dram.alternating.write.1.mask7",
+        "memroute.dram.alternating.write.16.mask4",
+        "memroute.dram.alternating.write.16.mask6",
+        "memroute.dram.alternating.write.16.mask7",
+        "memroute.dram.bank0.write.1.mask5",
+        "memroute.dram.bank0.write.1.mask6",
+        "memroute.dram.bank0.write.1.mask7",
+        "memroute.dram.bank0.write.16.mask4",
+        "memroute.dram.bank0.write.16.mask5",
+        "memroute.dram.bank0.write.16.mask7",
+        "memroute.dram.hart-banks.write.1.mask4",
+        "memroute.dram.hart-banks.write.1.mask5",
+        "memroute.dram.hart-banks.write.1.mask7",
+        "memroute.dram.hart-banks.write.16.mask5",
+        "memroute.dram.hart-banks.write.16.mask6",
+        "memroute.dram.hart-banks.write.16.mask7"
+      ],
+      "training_semantic_hart_groups": 18
+    },
+    "memory/rocket/remote_tcm/chase": {
+      "coefficients": {
+        "accesses": 28.190169518010258,
+        "multi_bank_accesses": 0.09976336988382573,
+        "other_bank_peer_accesses": 0.7244630611051343,
+        "region_intercept_cycles": 4.399055892599725,
+        "same_bank_peer_accesses": 0.4331339520404837
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 5,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.chase.257.mask4",
+        "memroute.tcm0.alternating.chase.257.mask6",
+        "memroute.tcm0.alternating.chase.257.mask7",
+        "memroute.tcm0.alternating.chase.33.mask4",
+        "memroute.tcm0.alternating.chase.33.mask6",
+        "memroute.tcm0.alternating.chase.33.mask7",
+        "memroute.tcm0.bank0.chase.257.mask4",
+        "memroute.tcm0.bank0.chase.257.mask5",
+        "memroute.tcm0.bank0.chase.33.mask4",
+        "memroute.tcm0.bank0.chase.33.mask5",
+        "memroute.tcm0.bank0.chase.33.mask6",
+        "memroute.tcm0.hart-banks.chase.257.mask4",
+        "memroute.tcm0.hart-banks.chase.257.mask5",
+        "memroute.tcm0.hart-banks.chase.257.mask6",
+        "memroute.tcm0.hart-banks.chase.257.mask7",
+        "memroute.tcm0.hart-banks.chase.33.mask4",
+        "memroute.tcm0.hart-banks.chase.33.mask5",
+        "memroute.tcm0.hart-banks.chase.33.mask7",
+        "memroute.tcm1.alternating.chase.257.mask4",
+        "memroute.tcm1.alternating.chase.257.mask6",
+        "memroute.tcm1.alternating.chase.33.mask5",
+        "memroute.tcm1.alternating.chase.33.mask6",
+        "memroute.tcm1.alternating.chase.33.mask7",
+        "memroute.tcm1.bank0.chase.257.mask4",
+        "memroute.tcm1.bank0.chase.257.mask5",
+        "memroute.tcm1.bank0.chase.257.mask6",
+        "memroute.tcm1.bank0.chase.257.mask7",
+        "memroute.tcm1.bank0.chase.33.mask4",
+        "memroute.tcm1.bank0.chase.33.mask5",
+        "memroute.tcm1.bank0.chase.33.mask7",
+        "memroute.tcm1.hart-banks.chase.257.mask4",
+        "memroute.tcm1.hart-banks.chase.257.mask6",
+        "memroute.tcm1.hart-banks.chase.257.mask7",
+        "memroute.tcm1.hart-banks.chase.33.mask4",
+        "memroute.tcm1.hart-banks.chase.33.mask5",
+        "memroute.tcm1.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 36
+    },
+    "memory/rocket/remote_tcm/read": {
+      "coefficients": {
+        "accesses": 29.140516316675964,
+        "multi_bank_accesses": 0.03723247365680446,
+        "other_bank_peer_accesses": 0.1750201280433578,
+        "region_intercept_cycles": 15.247588216309996,
+        "same_bank_peer_accesses": 0.27432679430239415
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 5,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.read.1.mask5",
+        "memroute.tcm0.alternating.read.1.mask6",
+        "memroute.tcm0.alternating.read.16.mask5",
+        "memroute.tcm0.alternating.read.16.mask6",
+        "memroute.tcm0.alternating.read.16.mask7",
+        "memroute.tcm0.bank0.read.1.mask4",
+        "memroute.tcm0.bank0.read.1.mask5",
+        "memroute.tcm0.bank0.read.1.mask6",
+        "memroute.tcm0.bank0.read.16.mask4",
+        "memroute.tcm0.bank0.read.16.mask5",
+        "memroute.tcm0.bank0.read.16.mask7",
+        "memroute.tcm0.hart-banks.read.1.mask4",
+        "memroute.tcm0.hart-banks.read.1.mask5",
+        "memroute.tcm0.hart-banks.read.1.mask6",
+        "memroute.tcm0.hart-banks.read.16.mask4",
+        "memroute.tcm0.hart-banks.read.16.mask5",
+        "memroute.tcm0.hart-banks.read.16.mask6",
+        "memroute.tcm0.hart-banks.read.16.mask7",
+        "memroute.tcm1.alternating.read.1.mask4",
+        "memroute.tcm1.alternating.read.1.mask5",
+        "memroute.tcm1.alternating.read.1.mask6",
+        "memroute.tcm1.alternating.read.16.mask4",
+        "memroute.tcm1.alternating.read.16.mask5",
+        "memroute.tcm1.alternating.read.16.mask6",
+        "memroute.tcm1.bank0.read.1.mask4",
+        "memroute.tcm1.bank0.read.1.mask5",
+        "memroute.tcm1.bank0.read.16.mask4",
+        "memroute.tcm1.bank0.read.16.mask5",
+        "memroute.tcm1.bank0.read.16.mask7",
+        "memroute.tcm1.hart-banks.read.1.mask4",
+        "memroute.tcm1.hart-banks.read.1.mask5",
+        "memroute.tcm1.hart-banks.read.1.mask6",
+        "memroute.tcm1.hart-banks.read.1.mask7",
+        "memroute.tcm1.hart-banks.read.16.mask4",
+        "memroute.tcm1.hart-banks.read.16.mask5",
+        "memroute.tcm1.hart-banks.read.16.mask6",
+        "memroute.tcm1.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 37
+    },
+    "memory/rocket/remote_tcm/write": {
+      "coefficients": {
+        "accesses": 24.87324007478667,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0026127921855193534,
+        "region_intercept_cycles": 0.0,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.write.1.mask5",
+        "memroute.tcm0.alternating.write.1.mask6",
+        "memroute.tcm0.alternating.write.1.mask7",
+        "memroute.tcm0.alternating.write.16.mask5",
+        "memroute.tcm0.alternating.write.16.mask6",
+        "memroute.tcm0.bank0.write.1.mask5",
+        "memroute.tcm0.bank0.write.1.mask6",
+        "memroute.tcm0.bank0.write.1.mask7",
+        "memroute.tcm0.bank0.write.16.mask4",
+        "memroute.tcm0.bank0.write.16.mask6",
+        "memroute.tcm0.bank0.write.16.mask7",
+        "memroute.tcm0.hart-banks.write.1.mask4",
+        "memroute.tcm0.hart-banks.write.1.mask5",
+        "memroute.tcm0.hart-banks.write.1.mask6",
+        "memroute.tcm0.hart-banks.write.1.mask7",
+        "memroute.tcm0.hart-banks.write.16.mask4",
+        "memroute.tcm0.hart-banks.write.16.mask5",
+        "memroute.tcm0.hart-banks.write.16.mask6",
+        "memroute.tcm0.hart-banks.write.16.mask7",
+        "memroute.tcm1.alternating.write.1.mask4",
+        "memroute.tcm1.alternating.write.1.mask5",
+        "memroute.tcm1.alternating.write.1.mask7",
+        "memroute.tcm1.alternating.write.16.mask4",
+        "memroute.tcm1.alternating.write.16.mask5",
+        "memroute.tcm1.alternating.write.16.mask6",
+        "memroute.tcm1.alternating.write.16.mask7",
+        "memroute.tcm1.bank0.write.1.mask4",
+        "memroute.tcm1.bank0.write.1.mask6",
+        "memroute.tcm1.bank0.write.1.mask7",
+        "memroute.tcm1.bank0.write.16.mask4",
+        "memroute.tcm1.bank0.write.16.mask5",
+        "memroute.tcm1.bank0.write.16.mask6",
+        "memroute.tcm1.bank0.write.16.mask7",
+        "memroute.tcm1.hart-banks.write.1.mask4",
+        "memroute.tcm1.hart-banks.write.1.mask6",
+        "memroute.tcm1.hart-banks.write.1.mask7",
+        "memroute.tcm1.hart-banks.write.16.mask4",
+        "memroute.tcm1.hart-banks.write.16.mask5",
+        "memroute.tcm1.hart-banks.write.16.mask6",
+        "memroute.tcm1.hart-banks.write.16.mask7"
+      ],
+      "training_semantic_hart_groups": 40
+    },
+    "memory/rocket/scratchpad/chase": {
+      "coefficients": {
+        "accesses": 32.01394361483572,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 8.105345430237128,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.chase.257.mask5",
+        "memroute.scratchpad.alternating.chase.257.mask6",
+        "memroute.scratchpad.alternating.chase.257.mask7",
+        "memroute.scratchpad.alternating.chase.33.mask6",
+        "memroute.scratchpad.alternating.chase.33.mask7",
+        "memroute.scratchpad.bank0.chase.257.mask4",
+        "memroute.scratchpad.bank0.chase.257.mask5",
+        "memroute.scratchpad.bank0.chase.257.mask6",
+        "memroute.scratchpad.bank0.chase.33.mask4",
+        "memroute.scratchpad.bank0.chase.33.mask5",
+        "memroute.scratchpad.bank0.chase.33.mask6",
+        "memroute.scratchpad.bank0.chase.33.mask7",
+        "memroute.scratchpad.hart-banks.chase.257.mask4",
+        "memroute.scratchpad.hart-banks.chase.257.mask5",
+        "memroute.scratchpad.hart-banks.chase.257.mask6",
+        "memroute.scratchpad.hart-banks.chase.257.mask7",
+        "memroute.scratchpad.hart-banks.chase.33.mask4",
+        "memroute.scratchpad.hart-banks.chase.33.mask5",
+        "memroute.scratchpad.hart-banks.chase.33.mask6",
+        "memroute.scratchpad.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 20
+    },
+    "memory/rocket/scratchpad/read": {
+      "coefficients": {
+        "accesses": 33.10334906690912,
+        "multi_bank_accesses": 0.046234027564570304,
+        "other_bank_peer_accesses": 0.06964809901805694,
+        "region_intercept_cycles": 21.088258320820565,
+        "same_bank_peer_accesses": 0.08904893733395856
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 5,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.read.1.mask4",
+        "memroute.scratchpad.alternating.read.1.mask6",
+        "memroute.scratchpad.alternating.read.1.mask7",
+        "memroute.scratchpad.alternating.read.16.mask4",
+        "memroute.scratchpad.alternating.read.16.mask5",
+        "memroute.scratchpad.alternating.read.16.mask6",
+        "memroute.scratchpad.alternating.read.16.mask7",
+        "memroute.scratchpad.bank0.read.1.mask4",
+        "memroute.scratchpad.bank0.read.1.mask5",
+        "memroute.scratchpad.bank0.read.1.mask6",
+        "memroute.scratchpad.bank0.read.1.mask7",
+        "memroute.scratchpad.bank0.read.16.mask4",
+        "memroute.scratchpad.bank0.read.16.mask5",
+        "memroute.scratchpad.hart-banks.read.1.mask4",
+        "memroute.scratchpad.hart-banks.read.1.mask6",
+        "memroute.scratchpad.hart-banks.read.16.mask4",
+        "memroute.scratchpad.hart-banks.read.16.mask5",
+        "memroute.scratchpad.hart-banks.read.16.mask6",
+        "memroute.scratchpad.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 19
+    },
+    "memory/rocket/scratchpad/write": {
+      "coefficients": {
+        "accesses": 29.802295765157425,
+        "multi_bank_accesses": 0.018349289691991736,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 1.898701723374737,
+        "same_bank_peer_accesses": 0.01125640980735013
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.write.1.mask4",
+        "memroute.scratchpad.alternating.write.1.mask5",
+        "memroute.scratchpad.alternating.write.1.mask6",
+        "memroute.scratchpad.alternating.write.1.mask7",
+        "memroute.scratchpad.alternating.write.16.mask4",
+        "memroute.scratchpad.alternating.write.16.mask5",
+        "memroute.scratchpad.alternating.write.16.mask6",
+        "memroute.scratchpad.alternating.write.16.mask7",
+        "memroute.scratchpad.bank0.write.1.mask4",
+        "memroute.scratchpad.bank0.write.1.mask5",
+        "memroute.scratchpad.bank0.write.1.mask6",
+        "memroute.scratchpad.bank0.write.1.mask7",
+        "memroute.scratchpad.bank0.write.16.mask5",
+        "memroute.scratchpad.bank0.write.16.mask6",
+        "memroute.scratchpad.hart-banks.write.1.mask4",
+        "memroute.scratchpad.hart-banks.write.1.mask5",
+        "memroute.scratchpad.hart-banks.write.1.mask6",
+        "memroute.scratchpad.hart-banks.write.16.mask4",
+        "memroute.scratchpad.hart-banks.write.16.mask6"
+      ],
+      "training_semantic_hart_groups": 19
+    },
+    "memory/shuttle/dram/chase": {
+      "coefficients": {
+        "accesses": 2.6462050562292063,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.048302341640474575,
+        "region_intercept_cycles": 104.6885697729452,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.chase.257.mask2",
+        "memroute.dram.alternating.chase.257.mask3",
+        "memroute.dram.alternating.chase.257.mask6",
+        "memroute.dram.alternating.chase.257.mask7",
+        "memroute.dram.alternating.chase.33.mask1",
+        "memroute.dram.alternating.chase.33.mask3",
+        "memroute.dram.alternating.chase.33.mask5",
+        "memroute.dram.alternating.chase.33.mask6",
+        "memroute.dram.alternating.chase.33.mask7",
+        "memroute.dram.bank0.chase.257.mask1",
+        "memroute.dram.bank0.chase.257.mask2",
+        "memroute.dram.bank0.chase.257.mask3",
+        "memroute.dram.bank0.chase.257.mask5",
+        "memroute.dram.bank0.chase.257.mask6",
+        "memroute.dram.bank0.chase.257.mask7",
+        "memroute.dram.bank0.chase.33.mask1",
+        "memroute.dram.bank0.chase.33.mask2",
+        "memroute.dram.bank0.chase.33.mask6",
+        "memroute.dram.hart-banks.chase.257.mask1",
+        "memroute.dram.hart-banks.chase.257.mask2",
+        "memroute.dram.hart-banks.chase.257.mask5",
+        "memroute.dram.hart-banks.chase.257.mask6",
+        "memroute.dram.hart-banks.chase.257.mask7",
+        "memroute.dram.hart-banks.chase.33.mask1",
+        "memroute.dram.hart-banks.chase.33.mask2",
+        "memroute.dram.hart-banks.chase.33.mask5",
+        "memroute.dram.hart-banks.chase.33.mask6",
+        "memroute.dram.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 36
+    },
+    "memory/shuttle/dram/read": {
+      "coefficients": {
+        "accesses": 2.288234039798668,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 296.8813004379108,
+        "same_bank_peer_accesses": 0.19633340956792553
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.read.1.mask2",
+        "memroute.dram.alternating.read.1.mask3",
+        "memroute.dram.alternating.read.1.mask5",
+        "memroute.dram.alternating.read.16.mask1",
+        "memroute.dram.alternating.read.16.mask2",
+        "memroute.dram.alternating.read.16.mask3",
+        "memroute.dram.alternating.read.16.mask5",
+        "memroute.dram.alternating.read.16.mask6",
+        "memroute.dram.bank0.read.1.mask1",
+        "memroute.dram.bank0.read.1.mask3",
+        "memroute.dram.bank0.read.1.mask5",
+        "memroute.dram.bank0.read.1.mask6",
+        "memroute.dram.bank0.read.1.mask7",
+        "memroute.dram.bank0.read.16.mask2",
+        "memroute.dram.bank0.read.16.mask3",
+        "memroute.dram.bank0.read.16.mask5",
+        "memroute.dram.bank0.read.16.mask7",
+        "memroute.dram.hart-banks.read.1.mask2",
+        "memroute.dram.hart-banks.read.1.mask5",
+        "memroute.dram.hart-banks.read.1.mask6",
+        "memroute.dram.hart-banks.read.1.mask7",
+        "memroute.dram.hart-banks.read.16.mask1",
+        "memroute.dram.hart-banks.read.16.mask2",
+        "memroute.dram.hart-banks.read.16.mask3",
+        "memroute.dram.hart-banks.read.16.mask5",
+        "memroute.dram.hart-banks.read.16.mask6",
+        "memroute.dram.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 36
+    },
+    "memory/shuttle/dram/write": {
+      "coefficients": {
+        "accesses": 0.8626398234012906,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.01603841200931576,
+        "region_intercept_cycles": 49.33927111020581,
+        "same_bank_peer_accesses": 0.03703545142704967
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.dram.alternating.write.1.mask1",
+        "memroute.dram.alternating.write.1.mask2",
+        "memroute.dram.alternating.write.1.mask5",
+        "memroute.dram.alternating.write.1.mask7",
+        "memroute.dram.alternating.write.16.mask1",
+        "memroute.dram.alternating.write.16.mask2",
+        "memroute.dram.alternating.write.16.mask3",
+        "memroute.dram.alternating.write.16.mask6",
+        "memroute.dram.alternating.write.16.mask7",
+        "memroute.dram.bank0.write.1.mask2",
+        "memroute.dram.bank0.write.1.mask3",
+        "memroute.dram.bank0.write.1.mask5",
+        "memroute.dram.bank0.write.1.mask6",
+        "memroute.dram.bank0.write.1.mask7",
+        "memroute.dram.bank0.write.16.mask1",
+        "memroute.dram.bank0.write.16.mask2",
+        "memroute.dram.bank0.write.16.mask3",
+        "memroute.dram.bank0.write.16.mask5",
+        "memroute.dram.bank0.write.16.mask7",
+        "memroute.dram.hart-banks.write.1.mask1",
+        "memroute.dram.hart-banks.write.1.mask2",
+        "memroute.dram.hart-banks.write.1.mask5",
+        "memroute.dram.hart-banks.write.1.mask7",
+        "memroute.dram.hart-banks.write.16.mask2",
+        "memroute.dram.hart-banks.write.16.mask3",
+        "memroute.dram.hart-banks.write.16.mask5",
+        "memroute.dram.hart-banks.write.16.mask6",
+        "memroute.dram.hart-banks.write.16.mask7"
+      ],
+      "training_semantic_hart_groups": 38
+    },
+    "memory/shuttle/local_tcm/chase": {
+      "coefficients": {
+        "accesses": 8.64883053101443,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 19.980076215231943,
+        "same_bank_peer_accesses": 0.1031087407018238
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.chase.257.mask1",
+        "memroute.tcm0.alternating.chase.257.mask3",
+        "memroute.tcm0.alternating.chase.257.mask7",
+        "memroute.tcm0.alternating.chase.33.mask1",
+        "memroute.tcm0.alternating.chase.33.mask3",
+        "memroute.tcm0.alternating.chase.33.mask7",
+        "memroute.tcm0.bank0.chase.257.mask1",
+        "memroute.tcm0.bank0.chase.257.mask3",
+        "memroute.tcm0.bank0.chase.257.mask5",
+        "memroute.tcm0.bank0.chase.33.mask3",
+        "memroute.tcm0.bank0.chase.33.mask5",
+        "memroute.tcm0.hart-banks.chase.257.mask3",
+        "memroute.tcm0.hart-banks.chase.257.mask5",
+        "memroute.tcm0.hart-banks.chase.257.mask7",
+        "memroute.tcm0.hart-banks.chase.33.mask3",
+        "memroute.tcm0.hart-banks.chase.33.mask5",
+        "memroute.tcm0.hart-banks.chase.33.mask7",
+        "memroute.tcm1.alternating.chase.257.mask3",
+        "memroute.tcm1.alternating.chase.257.mask6",
+        "memroute.tcm1.alternating.chase.33.mask2",
+        "memroute.tcm1.alternating.chase.33.mask3",
+        "memroute.tcm1.alternating.chase.33.mask6",
+        "memroute.tcm1.alternating.chase.33.mask7",
+        "memroute.tcm1.bank0.chase.257.mask2",
+        "memroute.tcm1.bank0.chase.257.mask3",
+        "memroute.tcm1.bank0.chase.257.mask6",
+        "memroute.tcm1.bank0.chase.257.mask7",
+        "memroute.tcm1.bank0.chase.33.mask2",
+        "memroute.tcm1.bank0.chase.33.mask3",
+        "memroute.tcm1.bank0.chase.33.mask7",
+        "memroute.tcm1.hart-banks.chase.257.mask3",
+        "memroute.tcm1.hart-banks.chase.257.mask6",
+        "memroute.tcm1.hart-banks.chase.257.mask7",
+        "memroute.tcm1.hart-banks.chase.33.mask2",
+        "memroute.tcm1.hart-banks.chase.33.mask3",
+        "memroute.tcm1.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 36
+    },
+    "memory/shuttle/local_tcm/read": {
+      "coefficients": {
+        "accesses": 10.275219406320328,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 44.47224497223112,
+        "same_bank_peer_accesses": 0.08799891985713361
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.read.1.mask5",
+        "memroute.tcm0.alternating.read.16.mask1",
+        "memroute.tcm0.alternating.read.16.mask3",
+        "memroute.tcm0.alternating.read.16.mask5",
+        "memroute.tcm0.alternating.read.16.mask7",
+        "memroute.tcm0.bank0.read.1.mask1",
+        "memroute.tcm0.bank0.read.1.mask3",
+        "memroute.tcm0.bank0.read.1.mask5",
+        "memroute.tcm0.bank0.read.16.mask1",
+        "memroute.tcm0.bank0.read.16.mask3",
+        "memroute.tcm0.bank0.read.16.mask5",
+        "memroute.tcm0.bank0.read.16.mask7",
+        "memroute.tcm0.hart-banks.read.1.mask1",
+        "memroute.tcm0.hart-banks.read.1.mask3",
+        "memroute.tcm0.hart-banks.read.1.mask5",
+        "memroute.tcm0.hart-banks.read.16.mask1",
+        "memroute.tcm0.hart-banks.read.16.mask3",
+        "memroute.tcm0.hart-banks.read.16.mask5",
+        "memroute.tcm0.hart-banks.read.16.mask7",
+        "memroute.tcm1.alternating.read.1.mask2",
+        "memroute.tcm1.alternating.read.1.mask3",
+        "memroute.tcm1.alternating.read.1.mask6",
+        "memroute.tcm1.alternating.read.16.mask2",
+        "memroute.tcm1.alternating.read.16.mask3",
+        "memroute.tcm1.alternating.read.16.mask6",
+        "memroute.tcm1.bank0.read.1.mask2",
+        "memroute.tcm1.bank0.read.1.mask3",
+        "memroute.tcm1.bank0.read.16.mask2",
+        "memroute.tcm1.bank0.read.16.mask7",
+        "memroute.tcm1.hart-banks.read.1.mask2",
+        "memroute.tcm1.hart-banks.read.1.mask6",
+        "memroute.tcm1.hart-banks.read.1.mask7",
+        "memroute.tcm1.hart-banks.read.16.mask2",
+        "memroute.tcm1.hart-banks.read.16.mask3",
+        "memroute.tcm1.hart-banks.read.16.mask6",
+        "memroute.tcm1.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 36
+    },
+    "memory/shuttle/local_tcm/write": {
+      "coefficients": {
+        "accesses": 6.6920033322027175,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 21.239487362160965,
+        "same_bank_peer_accesses": 0.0019588902740099376
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.write.1.mask3",
+        "memroute.tcm0.alternating.write.1.mask5",
+        "memroute.tcm0.alternating.write.1.mask7",
+        "memroute.tcm0.alternating.write.16.mask1",
+        "memroute.tcm0.alternating.write.16.mask5",
+        "memroute.tcm0.bank0.write.1.mask1",
+        "memroute.tcm0.bank0.write.1.mask3",
+        "memroute.tcm0.bank0.write.1.mask5",
+        "memroute.tcm0.bank0.write.1.mask7",
+        "memroute.tcm0.bank0.write.16.mask1",
+        "memroute.tcm0.bank0.write.16.mask3",
+        "memroute.tcm0.bank0.write.16.mask7",
+        "memroute.tcm0.hart-banks.write.1.mask1",
+        "memroute.tcm0.hart-banks.write.1.mask5",
+        "memroute.tcm0.hart-banks.write.1.mask7",
+        "memroute.tcm0.hart-banks.write.16.mask1",
+        "memroute.tcm0.hart-banks.write.16.mask5",
+        "memroute.tcm0.hart-banks.write.16.mask7",
+        "memroute.tcm1.alternating.write.1.mask3",
+        "memroute.tcm1.alternating.write.1.mask7",
+        "memroute.tcm1.alternating.write.16.mask2",
+        "memroute.tcm1.alternating.write.16.mask3",
+        "memroute.tcm1.alternating.write.16.mask6",
+        "memroute.tcm1.alternating.write.16.mask7",
+        "memroute.tcm1.bank0.write.1.mask2",
+        "memroute.tcm1.bank0.write.1.mask3",
+        "memroute.tcm1.bank0.write.1.mask6",
+        "memroute.tcm1.bank0.write.1.mask7",
+        "memroute.tcm1.bank0.write.16.mask2",
+        "memroute.tcm1.bank0.write.16.mask3",
+        "memroute.tcm1.bank0.write.16.mask6",
+        "memroute.tcm1.bank0.write.16.mask7",
+        "memroute.tcm1.hart-banks.write.1.mask3",
+        "memroute.tcm1.hart-banks.write.1.mask6",
+        "memroute.tcm1.hart-banks.write.1.mask7",
+        "memroute.tcm1.hart-banks.write.16.mask2",
+        "memroute.tcm1.hart-banks.write.16.mask3",
+        "memroute.tcm1.hart-banks.write.16.mask6",
+        "memroute.tcm1.hart-banks.write.16.mask7"
+      ],
+      "training_semantic_hart_groups": 39
+    },
+    "memory/shuttle/remote_tcm/chase": {
+      "coefficients": {
+        "accesses": 31.549345945590158,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.05049191532606947,
+        "region_intercept_cycles": 26.741497007115278,
+        "same_bank_peer_accesses": 0.04936678713622217
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.chase.257.mask3",
+        "memroute.tcm0.alternating.chase.257.mask6",
+        "memroute.tcm0.alternating.chase.257.mask7",
+        "memroute.tcm0.alternating.chase.33.mask2",
+        "memroute.tcm0.alternating.chase.33.mask3",
+        "memroute.tcm0.alternating.chase.33.mask6",
+        "memroute.tcm0.alternating.chase.33.mask7",
+        "memroute.tcm0.bank0.chase.257.mask2",
+        "memroute.tcm0.bank0.chase.257.mask3",
+        "memroute.tcm0.bank0.chase.33.mask2",
+        "memroute.tcm0.bank0.chase.33.mask3",
+        "memroute.tcm0.bank0.chase.33.mask6",
+        "memroute.tcm0.hart-banks.chase.257.mask2",
+        "memroute.tcm0.hart-banks.chase.257.mask3",
+        "memroute.tcm0.hart-banks.chase.257.mask6",
+        "memroute.tcm0.hart-banks.chase.257.mask7",
+        "memroute.tcm0.hart-banks.chase.33.mask2",
+        "memroute.tcm0.hart-banks.chase.33.mask3",
+        "memroute.tcm0.hart-banks.chase.33.mask7",
+        "memroute.tcm1.alternating.chase.257.mask1",
+        "memroute.tcm1.alternating.chase.257.mask3",
+        "memroute.tcm1.alternating.chase.33.mask3",
+        "memroute.tcm1.alternating.chase.33.mask5",
+        "memroute.tcm1.alternating.chase.33.mask7",
+        "memroute.tcm1.bank0.chase.257.mask1",
+        "memroute.tcm1.bank0.chase.257.mask3",
+        "memroute.tcm1.bank0.chase.257.mask5",
+        "memroute.tcm1.bank0.chase.257.mask7",
+        "memroute.tcm1.bank0.chase.33.mask3",
+        "memroute.tcm1.bank0.chase.33.mask5",
+        "memroute.tcm1.bank0.chase.33.mask7",
+        "memroute.tcm1.hart-banks.chase.257.mask1",
+        "memroute.tcm1.hart-banks.chase.257.mask3",
+        "memroute.tcm1.hart-banks.chase.257.mask7",
+        "memroute.tcm1.hart-banks.chase.33.mask3",
+        "memroute.tcm1.hart-banks.chase.33.mask5",
+        "memroute.tcm1.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 37
+    },
+    "memory/shuttle/remote_tcm/read": {
+      "coefficients": {
+        "accesses": 33.243005867394636,
+        "multi_bank_accesses": 0.04466752380878837,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 61.4362524559593,
+        "same_bank_peer_accesses": 0.06428164075670205
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.read.1.mask2",
+        "memroute.tcm0.alternating.read.1.mask6",
+        "memroute.tcm0.alternating.read.16.mask2",
+        "memroute.tcm0.alternating.read.16.mask3",
+        "memroute.tcm0.alternating.read.16.mask6",
+        "memroute.tcm0.alternating.read.16.mask7",
+        "memroute.tcm0.bank0.read.1.mask2",
+        "memroute.tcm0.bank0.read.1.mask3",
+        "memroute.tcm0.bank0.read.1.mask6",
+        "memroute.tcm0.bank0.read.16.mask2",
+        "memroute.tcm0.bank0.read.16.mask3",
+        "memroute.tcm0.bank0.read.16.mask7",
+        "memroute.tcm0.hart-banks.read.1.mask2",
+        "memroute.tcm0.hart-banks.read.1.mask3",
+        "memroute.tcm0.hart-banks.read.1.mask6",
+        "memroute.tcm0.hart-banks.read.16.mask2",
+        "memroute.tcm0.hart-banks.read.16.mask3",
+        "memroute.tcm0.hart-banks.read.16.mask6",
+        "memroute.tcm0.hart-banks.read.16.mask7",
+        "memroute.tcm1.alternating.read.1.mask1",
+        "memroute.tcm1.alternating.read.1.mask3",
+        "memroute.tcm1.alternating.read.1.mask5",
+        "memroute.tcm1.alternating.read.16.mask1",
+        "memroute.tcm1.alternating.read.16.mask3",
+        "memroute.tcm1.alternating.read.16.mask5",
+        "memroute.tcm1.bank0.read.1.mask1",
+        "memroute.tcm1.bank0.read.1.mask3",
+        "memroute.tcm1.bank0.read.1.mask5",
+        "memroute.tcm1.bank0.read.16.mask1",
+        "memroute.tcm1.bank0.read.16.mask5",
+        "memroute.tcm1.bank0.read.16.mask7",
+        "memroute.tcm1.hart-banks.read.1.mask1",
+        "memroute.tcm1.hart-banks.read.1.mask5",
+        "memroute.tcm1.hart-banks.read.1.mask7",
+        "memroute.tcm1.hart-banks.read.16.mask1",
+        "memroute.tcm1.hart-banks.read.16.mask3",
+        "memroute.tcm1.hart-banks.read.16.mask5",
+        "memroute.tcm1.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 38
+    },
+    "memory/shuttle/remote_tcm/write": {
+      "coefficients": {
+        "accesses": 30.699055308847015,
+        "multi_bank_accesses": 0.0,
+        "other_bank_peer_accesses": 0.0,
+        "region_intercept_cycles": 23.285863686235604,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.tcm0.alternating.write.1.mask2",
+        "memroute.tcm0.alternating.write.1.mask3",
+        "memroute.tcm0.alternating.write.1.mask6",
+        "memroute.tcm0.alternating.write.1.mask7",
+        "memroute.tcm0.alternating.write.16.mask2",
+        "memroute.tcm0.alternating.write.16.mask6",
+        "memroute.tcm0.bank0.write.1.mask2",
+        "memroute.tcm0.bank0.write.1.mask3",
+        "memroute.tcm0.bank0.write.1.mask6",
+        "memroute.tcm0.bank0.write.1.mask7",
+        "memroute.tcm0.bank0.write.16.mask2",
+        "memroute.tcm0.bank0.write.16.mask3",
+        "memroute.tcm0.bank0.write.16.mask6",
+        "memroute.tcm0.bank0.write.16.mask7",
+        "memroute.tcm0.hart-banks.write.1.mask2",
+        "memroute.tcm0.hart-banks.write.1.mask6",
+        "memroute.tcm0.hart-banks.write.1.mask7",
+        "memroute.tcm0.hart-banks.write.16.mask2",
+        "memroute.tcm0.hart-banks.write.16.mask6",
+        "memroute.tcm0.hart-banks.write.16.mask7",
+        "memroute.tcm1.alternating.write.1.mask1",
+        "memroute.tcm1.alternating.write.1.mask3",
+        "memroute.tcm1.alternating.write.1.mask5",
+        "memroute.tcm1.alternating.write.1.mask7",
+        "memroute.tcm1.alternating.write.16.mask1",
+        "memroute.tcm1.alternating.write.16.mask3",
+        "memroute.tcm1.alternating.write.16.mask5",
+        "memroute.tcm1.alternating.write.16.mask7",
+        "memroute.tcm1.bank0.write.1.mask1",
+        "memroute.tcm1.bank0.write.1.mask3",
+        "memroute.tcm1.bank0.write.1.mask7",
+        "memroute.tcm1.bank0.write.16.mask3",
+        "memroute.tcm1.bank0.write.16.mask5",
+        "memroute.tcm1.bank0.write.16.mask7",
+        "memroute.tcm1.hart-banks.write.1.mask1",
+        "memroute.tcm1.hart-banks.write.1.mask3",
+        "memroute.tcm1.hart-banks.write.1.mask7",
+        "memroute.tcm1.hart-banks.write.16.mask1",
+        "memroute.tcm1.hart-banks.write.16.mask3",
+        "memroute.tcm1.hart-banks.write.16.mask5",
+        "memroute.tcm1.hart-banks.write.16.mask7"
+      ],
+      "training_semantic_hart_groups": 41
+    },
+    "memory/shuttle/scratchpad/chase": {
+      "coefficients": {
+        "accesses": 24.788432811054804,
+        "multi_bank_accesses": 0.5234034006918877,
+        "other_bank_peer_accesses": 0.7869667343294776,
+        "region_intercept_cycles": 38.50442986765156,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 257.0,
+          "min": 33.0
+        },
+        "multi_bank_accesses": {
+          "max": 257.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 514.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.chase.257.mask1",
+        "memroute.scratchpad.alternating.chase.257.mask2",
+        "memroute.scratchpad.alternating.chase.257.mask3",
+        "memroute.scratchpad.alternating.chase.257.mask5",
+        "memroute.scratchpad.alternating.chase.257.mask6",
+        "memroute.scratchpad.alternating.chase.257.mask7",
+        "memroute.scratchpad.alternating.chase.33.mask1",
+        "memroute.scratchpad.alternating.chase.33.mask2",
+        "memroute.scratchpad.alternating.chase.33.mask3",
+        "memroute.scratchpad.alternating.chase.33.mask6",
+        "memroute.scratchpad.alternating.chase.33.mask7",
+        "memroute.scratchpad.bank0.chase.257.mask1",
+        "memroute.scratchpad.bank0.chase.257.mask5",
+        "memroute.scratchpad.bank0.chase.257.mask6",
+        "memroute.scratchpad.bank0.chase.33.mask2",
+        "memroute.scratchpad.bank0.chase.33.mask3",
+        "memroute.scratchpad.bank0.chase.33.mask5",
+        "memroute.scratchpad.bank0.chase.33.mask6",
+        "memroute.scratchpad.bank0.chase.33.mask7",
+        "memroute.scratchpad.hart-banks.chase.257.mask1",
+        "memroute.scratchpad.hart-banks.chase.257.mask2",
+        "memroute.scratchpad.hart-banks.chase.257.mask3",
+        "memroute.scratchpad.hart-banks.chase.257.mask5",
+        "memroute.scratchpad.hart-banks.chase.257.mask6",
+        "memroute.scratchpad.hart-banks.chase.257.mask7",
+        "memroute.scratchpad.hart-banks.chase.33.mask1",
+        "memroute.scratchpad.hart-banks.chase.33.mask2",
+        "memroute.scratchpad.hart-banks.chase.33.mask3",
+        "memroute.scratchpad.hart-banks.chase.33.mask5",
+        "memroute.scratchpad.hart-banks.chase.33.mask6",
+        "memroute.scratchpad.hart-banks.chase.33.mask7"
+      ],
+      "training_semantic_hart_groups": 41
+    },
+    "memory/shuttle/scratchpad/read": {
+      "coefficients": {
+        "accesses": 26.475417602984596,
+        "multi_bank_accesses": 0.5156700470907776,
+        "other_bank_peer_accesses": 0.857220163887794,
+        "region_intercept_cycles": 87.99245955603567,
+        "same_bank_peer_accesses": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.read.1.mask3",
+        "memroute.scratchpad.alternating.read.1.mask6",
+        "memroute.scratchpad.alternating.read.1.mask7",
+        "memroute.scratchpad.alternating.read.16.mask1",
+        "memroute.scratchpad.alternating.read.16.mask2",
+        "memroute.scratchpad.alternating.read.16.mask5",
+        "memroute.scratchpad.alternating.read.16.mask6",
+        "memroute.scratchpad.alternating.read.16.mask7",
+        "memroute.scratchpad.bank0.read.1.mask3",
+        "memroute.scratchpad.bank0.read.1.mask5",
+        "memroute.scratchpad.bank0.read.1.mask6",
+        "memroute.scratchpad.bank0.read.1.mask7",
+        "memroute.scratchpad.bank0.read.16.mask1",
+        "memroute.scratchpad.bank0.read.16.mask3",
+        "memroute.scratchpad.bank0.read.16.mask5",
+        "memroute.scratchpad.hart-banks.read.1.mask1",
+        "memroute.scratchpad.hart-banks.read.1.mask2",
+        "memroute.scratchpad.hart-banks.read.1.mask3",
+        "memroute.scratchpad.hart-banks.read.1.mask6",
+        "memroute.scratchpad.hart-banks.read.16.mask2",
+        "memroute.scratchpad.hart-banks.read.16.mask3",
+        "memroute.scratchpad.hart-banks.read.16.mask5",
+        "memroute.scratchpad.hart-banks.read.16.mask6",
+        "memroute.scratchpad.hart-banks.read.16.mask7"
+      ],
+      "training_semantic_hart_groups": 33
+    },
+    "memory/shuttle/scratchpad/write": {
+      "coefficients": {
+        "accesses": 21.075440952995596,
+        "multi_bank_accesses": 0.2826966805911872,
+        "other_bank_peer_accesses": 3.3577079888259806,
+        "region_intercept_cycles": 15.28296313835593,
+        "same_bank_peer_accesses": 1.127663020554723
+      },
+      "feature_columns": 5,
+      "feature_rank": 5,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 5,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "accesses": {
+          "max": 1024.0,
+          "min": 64.0
+        },
+        "multi_bank_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "other_bank_peer_accesses": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "same_bank_peer_accesses": {
+          "max": 2048.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "memroute.scratchpad.alternating.write.1.mask1",
+        "memroute.scratchpad.alternating.write.1.mask2",
+        "memroute.scratchpad.alternating.write.1.mask3",
+        "memroute.scratchpad.alternating.write.1.mask5",
+        "memroute.scratchpad.alternating.write.1.mask6",
+        "memroute.scratchpad.alternating.write.1.mask7",
+        "memroute.scratchpad.alternating.write.16.mask1",
+        "memroute.scratchpad.alternating.write.16.mask3",
+        "memroute.scratchpad.alternating.write.16.mask5",
+        "memroute.scratchpad.alternating.write.16.mask6",
+        "memroute.scratchpad.alternating.write.16.mask7",
+        "memroute.scratchpad.bank0.write.1.mask1",
+        "memroute.scratchpad.bank0.write.1.mask2",
+        "memroute.scratchpad.bank0.write.1.mask5",
+        "memroute.scratchpad.bank0.write.1.mask6",
+        "memroute.scratchpad.bank0.write.1.mask7",
+        "memroute.scratchpad.bank0.write.16.mask2",
+        "memroute.scratchpad.bank0.write.16.mask5",
+        "memroute.scratchpad.bank0.write.16.mask6",
+        "memroute.scratchpad.hart-banks.write.1.mask1",
+        "memroute.scratchpad.hart-banks.write.1.mask2",
+        "memroute.scratchpad.hart-banks.write.1.mask3",
+        "memroute.scratchpad.hart-banks.write.1.mask5",
+        "memroute.scratchpad.hart-banks.write.1.mask6",
+        "memroute.scratchpad.hart-banks.write.16.mask1",
+        "memroute.scratchpad.hart-banks.write.16.mask2",
+        "memroute.scratchpad.hart-banks.write.16.mask3",
+        "memroute.scratchpad.hart-banks.write.16.mask6"
+      ],
+      "training_semantic_hart_groups": 35
+    },
+    "scalar_fp/rocket/e16": {
+      "coefficients": {
+        "operations": 0.0,
+        "region_intercept_cycles": 81.0
+      },
+      "feature_columns": 2,
+      "feature_rank": 1,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 1,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 64.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.scalar.fp16.add.64"
+      ],
+      "training_semantic_hart_groups": 1
+    },
+    "scalar_fp/rocket/e64": {
+      "coefficients": {
+        "operations": 0.7291666660148438,
+        "region_intercept_cycles": 27.333333355641038
+      },
+      "feature_columns": 2,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.scalar.fp64.add.16",
+        "v2.scalar.fp64.add.64"
+      ],
+      "training_semantic_hart_groups": 2
+    },
+    "scalar_fp/shuttle/e16": {
+      "coefficients": {
+        "operations": 4.155712417885814e-16,
+        "region_intercept_cycles": 255.02999005321365
+      },
+      "feature_columns": 2,
+      "feature_rank": 1,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 1,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 64.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.scalar.fp16.add.64"
+      ],
+      "training_semantic_hart_groups": 2
+    },
+    "scalar_fp/shuttle/e64": {
+      "coefficients": {
+        "operations": 3.043996797742837,
+        "region_intercept_cycles": 39.76234764248558
+      },
+      "feature_columns": 2,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.scalar.fp64.add.16",
+        "v2.scalar.fp64.add.64"
+      ],
+      "training_semantic_hart_groups": 4
+    },
+    "vector/rocket/fp16": {
+      "coefficients": {
+        "dependent_operations": 13.468750026317881,
+        "dlen_beats": 6.78124998346598,
+        "drain_bytes": 0.0,
+        "operations": 0.0,
+        "region_intercept_cycles": 0.0
+      },
+      "feature_columns": 5,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 128.0,
+          "min": 16.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vector.fp16.m1.add.16",
+        "v2.vector.fp16.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 2
+    },
+    "vector/rocket/fp32": {
+      "coefficients": {
+        "dependent_operations": 1.8768156398809834,
+        "dlen_beats": 4.015778931928641,
+        "drain_bytes": 0.0,
+        "operations": 0.0,
+        "region_intercept_cycles": 83.79302954450388
+      },
+      "feature_columns": 5,
+      "feature_rank": 4,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 128.0,
+          "min": 16.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vector.fp32.mask5",
+        "v2.placement.vector.fp32.mask6",
+        "v2.vector.fp32.m1.add.16",
+        "v2.vector.fp32.m1.add.64",
+        "v2.vector.fp32.m2.add.16",
+        "v2.vector.fp32.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 6
+    },
+    "vector/rocket/fp64": {
+      "coefficients": {
+        "dependent_operations": 1.7500000464099572,
+        "dlen_beats": 0.1249999707072734,
+        "drain_bytes": 2.5860248303989088e-08,
+        "operations": 0.0,
+        "region_intercept_cycles": 98.9999986761024
+      },
+      "feature_columns": 5,
+      "feature_rank": 4,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 128.0,
+          "min": 16.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vector.fp64.m1.add.16",
+        "v2.vector.fp64.m1.add.64",
+        "v2.vector.fp64.m2.add.16",
+        "v2.vector.fp64.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 4
+    },
+    "vector/rocket/integer": {
+      "coefficients": {
+        "dependent_operations": 0.05550866283381522,
+        "dlen_beats": 0.08780292111132361,
+        "drain_bytes": 2.9092521887390606e-18,
+        "operations": 0.0,
+        "region_intercept_cycles": 243.1064768437881
+      },
+      "feature_columns": 5,
+      "feature_rank": 3,
+      "fixed_cpu_cycles_per_retired_instruction": 1.0,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 0.0
+        },
+        "dlen_beats": {
+          "max": 512.0,
+          "min": 64.0
+        },
+        "drain_bytes": {
+          "max": 256.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 128.0,
+          "min": 64.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vector.i32.mask4",
+        "v2.placement.vector.i32.mask5",
+        "v2.vector.i16.m1.dependent",
+        "v2.vector.i16.m1.independent2",
+        "v2.vector.i16.m2.independent2",
+        "v2.vector.i16.m4.dependent",
+        "v2.vector.i32.m1.independent2",
+        "v2.vector.i32.m2.independent2",
+        "v2.vector.i32.m4.dependent",
+        "v2.vector.i32.m4.independent2",
+        "v2.vector.i64.m1.dependent",
+        "v2.vector.i64.m1.independent2",
+        "v2.vector.i64.m2.dependent",
+        "v2.vector.i64.m2.independent2",
+        "v2.vector.i64.m4.dependent",
+        "v2.vector.i64.m4.independent2",
+        "v2.vector.i8.m1.dependent",
+        "v2.vector.i8.m1.independent2",
+        "v2.vector.i8.m2.dependent",
+        "v2.vector.i8.m2.independent2",
+        "v2.vector.i8.m4.dependent",
+        "v2.vector.i8.m4.independent2"
+      ],
+      "training_semantic_hart_groups": 22
+    },
+    "vector/shuttle/fp16": {
+      "coefficients": {
+        "dependent_operations": 2.0853822126425143,
+        "dlen_beats": 0.17800102832488543,
+        "drain_bytes": 0.0,
+        "operations": 0.0,
+        "region_intercept_cycles": 142.32358125763201
+      },
+      "feature_columns": 5,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 256.0,
+          "min": 32.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vector.fp16.m1.add.16",
+        "v2.vector.fp16.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 4
+    },
+    "vector/shuttle/fp32": {
+      "coefficients": {
+        "dependent_operations": 3.4528721362045114,
+        "dlen_beats": 0.0,
+        "drain_bytes": 0.07549718344049597,
+        "operations": 0.0,
+        "region_intercept_cycles": 98.98477210917754
+      },
+      "feature_columns": 5,
+      "feature_rank": 4,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 256.0,
+          "min": 32.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vector.fp32.mask1",
+        "v2.placement.vector.fp32.mask2",
+        "v2.placement.vector.fp32.mask3",
+        "v2.placement.vector.fp32.mask5",
+        "v2.placement.vector.fp32.mask6",
+        "v2.vector.fp32.m1.add.16",
+        "v2.vector.fp32.m1.add.64",
+        "v2.vector.fp32.m2.add.16",
+        "v2.vector.fp32.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 14
+    },
+    "vector/shuttle/fp64": {
+      "coefficients": {
+        "dependent_operations": 3.403942402545958,
+        "dlen_beats": 0.0,
+        "drain_bytes": 0.11686918710468085,
+        "operations": 0.0,
+        "region_intercept_cycles": 95.66534524855065
+      },
+      "feature_columns": 5,
+      "feature_rank": 4,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 16.0
+        },
+        "dlen_beats": {
+          "max": 256.0,
+          "min": 32.0
+        },
+        "drain_bytes": {
+          "max": 64.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vector.fp64.m1.add.16",
+        "v2.vector.fp64.m1.add.64",
+        "v2.vector.fp64.m2.add.16",
+        "v2.vector.fp64.m2.add.64"
+      ],
+      "training_semantic_hart_groups": 8
+    },
+    "vector/shuttle/integer": {
+      "coefficients": {
+        "dependent_operations": 0.0,
+        "dlen_beats": 0.2640464638610702,
+        "drain_bytes": 6.350196407251491e-16,
+        "operations": 1.5728446143579442,
+        "region_intercept_cycles": 285.9459177489821
+      },
+      "feature_columns": 5,
+      "feature_rank": 3,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 3,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "dependent_operations": {
+          "max": 64.0,
+          "min": 0.0
+        },
+        "dlen_beats": {
+          "max": 1024.0,
+          "min": 128.0
+        },
+        "drain_bytes": {
+          "max": 256.0,
+          "min": 32.0
+        },
+        "operations": {
+          "max": 128.0,
+          "min": 64.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vector.i32.mask1",
+        "v2.placement.vector.i32.mask2",
+        "v2.placement.vector.i32.mask3",
+        "v2.placement.vector.i32.mask5",
+        "v2.vector.i16.m1.dependent",
+        "v2.vector.i16.m1.independent2",
+        "v2.vector.i16.m2.independent2",
+        "v2.vector.i16.m4.dependent",
+        "v2.vector.i32.m1.independent2",
+        "v2.vector.i32.m2.independent2",
+        "v2.vector.i32.m4.dependent",
+        "v2.vector.i32.m4.independent2",
+        "v2.vector.i64.m1.dependent",
+        "v2.vector.i64.m1.independent2",
+        "v2.vector.i64.m2.dependent",
+        "v2.vector.i64.m2.independent2",
+        "v2.vector.i64.m4.dependent",
+        "v2.vector.i64.m4.independent2",
+        "v2.vector.i8.m1.dependent",
+        "v2.vector.i8.m1.independent2",
+        "v2.vector.i8.m2.dependent",
+        "v2.vector.i8.m2.independent2",
+        "v2.vector.i8.m4.dependent",
+        "v2.vector.i8.m4.independent2"
+      ],
+      "training_semantic_hart_groups": 45
+    },
+    "vme/fp8": {
+      "coefficients": {
+        "drain_tiles": 1.27418000190014e-13,
+        "k_steps": 1.3788744145658414,
+        "operations": 9.244109378288753e-17,
+        "region_intercept_cycles": 249.235231469098
+      },
+      "feature_columns": 4,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "drain_tiles": {
+          "max": 1.0,
+          "min": 1.0
+        },
+        "k_steps": {
+          "max": 256.0,
+          "min": 64.0
+        },
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vme.fp8.e4m3.e4m3.mask2",
+        "v2.placement.vme.fp8.e4m3.e5m2.mask1",
+        "v2.placement.vme.fp8.e4m3.e5m2.mask2",
+        "v2.placement.vme.fp8.e5m2.e4m3.mask1",
+        "v2.placement.vme.fp8.e5m2.e4m3.mask2",
+        "v2.placement.vme.fp8.e5m2.e5m2.mask2",
+        "v2.vme.fp8.e4m3.e4m3.16",
+        "v2.vme.fp8.e4m3.e4m3.64",
+        "v2.vme.fp8.e4m3.e5m2.16",
+        "v2.vme.fp8.e4m3.e5m2.64",
+        "v2.vme.fp8.e5m2.e4m3.16",
+        "v2.vme.fp8.e5m2.e5m2.16"
+      ],
+      "training_semantic_hart_groups": 18
+    },
+    "vme/int8": {
+      "coefficients": {
+        "drain_tiles": 48.17936925501776,
+        "k_steps": 0.6523478906952028,
+        "operations": 5.82529516518451,
+        "region_intercept_cycles": 130.49242168145287
+      },
+      "feature_columns": 4,
+      "feature_rank": 4,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 4,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "drain_tiles": {
+          "max": 4.0,
+          "min": 1.0
+        },
+        "k_steps": {
+          "max": 1024.0,
+          "min": 0.0
+        },
+        "operations": {
+          "max": 256.0,
+          "min": 0.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.placement.vme.int8.16.mask1",
+        "v2.placement.vme.int8.16.mask2",
+        "v2.placement.vme.int8.64.mask1",
+        "v2.placement.vme.int8.64.mask2",
+        "v2.vme.int8.tk1.0",
+        "v2.vme.int8.tk1.16",
+        "v2.vme.int8.tk1.64",
+        "v2.vme.int8.tk4.0",
+        "v2.vme.int8.tk4.64",
+        "v2.vme.tile-hazards.tiles1.256",
+        "v2.vme.tile-hazards.tiles4.0",
+        "v2.vme.tile-hazards.tiles4.64"
+      ],
+      "training_semantic_hart_groups": 20
+    },
+    "vme/row_read": {
+      "coefficients": {
+        "operations": 1.3439707999604592e-15,
+        "region_intercept_cycles": 883.9174169649184
+      },
+      "feature_columns": 2,
+      "feature_rank": 1,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": false,
+      "positive_coefficients": 1,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 16.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vme.row_read.16"
+      ],
+      "training_semantic_hart_groups": 2
+    },
+    "vme/row_write": {
+      "coefficients": {
+        "operations": 0.0,
+        "region_intercept_cycles": 539.7323492479111
+      },
+      "feature_columns": 2,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 1,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vme.row_write.16",
+        "v2.vme.row_write.64"
+      ],
+      "training_semantic_hart_groups": 4
+    },
+    "vme/tile_zero": {
+      "coefficients": {
+        "operations": 2.1885647363346576,
+        "region_intercept_cycles": 245.02568825034874
+      },
+      "feature_columns": 2,
+      "feature_rank": 2,
+      "fixed_cpu_cycles_per_retired_instruction": 0.6,
+      "individual_coefficients_identifiable": true,
+      "positive_coefficients": 2,
+      "status": "effective_region_fit_not_physical_pipeline_identification",
+      "support": {
+        "operations": {
+          "max": 64.0,
+          "min": 16.0
+        }
+      },
+      "training_parent_ids": [
+        "v2.vme.tile_zero.16",
+        "v2.vme.tile_zero.64"
+      ],
+      "training_semantic_hart_groups": 4
+    }
+  },
+  "rtl_certified": false,
+  "runtime_parameters": {
+    "cpu": {
+      "rocket": {
+        "branch_mispredict_penalty_cycles": {
+          "identified_from": null,
+          "status": "not_identifiable",
+          "unknowns": [
+            "Hardware miss counts unavailable; outcome distributions do not identify miss penalty separately."
+          ],
+          "value": null
+        },
+        "dependent_alu_extra_cycles": {
+          "identified_from": "cpu/rocket",
+          "status": "aggregate_critical_chain_excess",
+          "unknowns": [],
+          "value": 0.0
+        },
+        "integer_alu_latency_cycles": {
+          "identified_from": "cpu/rocket",
+          "status": "source_policy_unchanged",
+          "unknowns": [],
+          "value": 1.0
+        },
+        "integer_issue_interval_cycles": {
+          "identified_from": "cpu/rocket",
+          "status": "aggregate_effective_cpi",
+          "unknowns": [
+            "Actual per-cycle pairing remains source pipeline policy."
+          ],
+          "value": 0.999106852333572
+        }
+      },
+      "shuttle": {
+        "branch_mispredict_penalty_cycles": {
+          "identified_from": null,
+          "status": "not_identifiable",
+          "unknowns": [
+            "Hardware miss counts unavailable; outcome distributions do not identify miss penalty separately."
+          ],
+          "value": null
+        },
+        "dependent_alu_extra_cycles": {
+          "identified_from": "cpu/shuttle",
+          "status": "aggregate_critical_chain_excess",
+          "unknowns": [],
+          "value": 0.2607105291093586
+        },
+        "integer_alu_latency_cycles": {
+          "identified_from": "cpu/shuttle",
+          "status": "source_policy_unchanged",
+          "unknowns": [],
+          "value": 1.0
+        },
+        "integer_issue_interval_cycles": {
+          "identified_from": "cpu/shuttle",
+          "status": "aggregate_effective_cpi",
+          "unknowns": [
+            "Actual per-cycle pairing remains source pipeline policy."
+          ],
+          "value": 0.5958378743492118
+        }
+      }
+    },
+    "memory": {
+      "rocket": {
+        "dram": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 0.09174576806147036
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.07637752430437063
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.011569775219486546
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 0.06789095113039868
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.11014942495201038
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.19720299152842743
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.13662071919166643
+            }
+          }
+        },
+        "remote_tcm": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 28.190169518010258
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.09976336988382573
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.7244630611051343
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.4331339520404837
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 29.140516316675964
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.03723247365680446
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.1750201280433578
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.27432679430239415
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 24.87324007478667
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0026127921855193534
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          }
+        },
+        "scratchpad": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 32.01394361483572
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 33.10334906690912
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.046234027564570304
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.06964809901805694
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.08904893733395856
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 29.802295765157425
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.018349289691991736
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/rocket/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.01125640980735013
+            }
+          }
+        }
+      },
+      "shuttle": {
+        "dram": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 2.6462050562292063
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.048302341640474575
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 2.288234039798668
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.19633340956792553
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 0.8626398234012906
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.01603841200931576
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/dram/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.03703545142704967
+            }
+          }
+        },
+        "local_tcm": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 8.64883053101443
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.1031087407018238
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 10.275219406320328
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.08799891985713361
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 6.6920033322027175
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/local_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0019588902740099376
+            }
+          }
+        },
+        "remote_tcm": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 31.549345945590158
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.05049191532606947
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.04936678713622217
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 33.243005867394636
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.04466752380878837
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.06428164075670205
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 30.699055308847015
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/remote_tcm/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          }
+        },
+        "scratchpad": {
+          "chase": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 24.788432811054804
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.5234034006918877
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.7869667343294776
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/chase",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          },
+          "read": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/read",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 26.475417602984596
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.5156700470907776
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.857220163887794
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/read",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/read",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 0.0
+            }
+          },
+          "write": {
+            "extra_cycles_per_access": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/write",
+                "rank": 5
+              },
+              "status": "warm_effective_roi_residual",
+              "unknowns": [],
+              "value": 21.075440952995596
+            },
+            "multi_bank_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_pattern_residual",
+              "unknowns": [],
+              "value": 0.2826966805911872
+            },
+            "other_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 3.3577079888259806
+            },
+            "physical_miss_latency_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/write",
+                "rank": 5
+              },
+              "status": "not_identifiable",
+              "unknowns": [
+                "Warm cache, NoC, L2, serial-TL and DRAM contributions not separately observed."
+              ],
+              "value": null
+            },
+            "same_bank_peer_extra_cycles": {
+              "identified_from": {
+                "columns": 5,
+                "model": "memory/shuttle/scratchpad/write",
+                "rank": 5
+              },
+              "status": "aggregate_contention_residual",
+              "unknowns": [],
+              "value": 1.127663020554723
+            }
+          }
+        }
+      }
+    },
+    "scalar_fp": {
+      "rocket": {
+        "e16": {
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 2,
+              "model": "scalar_fp/rocket/e16",
+              "rank": 1
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "e64": {
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 2,
+              "model": "scalar_fp/rocket/e64",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.7291666660148438
+          }
+        }
+      },
+      "shuttle": {
+        "e16": {
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 2,
+              "model": "scalar_fp/shuttle/e16",
+              "rank": 1
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 4.155712417885814e-16
+          }
+        },
+        "e64": {
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 2,
+              "model": "scalar_fp/shuttle/e64",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 3.043996797742837
+          }
+        }
+      }
+    },
+    "vector": {
+      "rocket": {
+        "fp16": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 6.78124998346598
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 13.468750026317881
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp16",
+              "rank": 2
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "fp32": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 4.015778931928641
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 1.8768156398809834
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp32",
+              "rank": 4
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "fp64": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.1249999707072734
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 1.7500000464099572
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 2.5860248303989088e-08
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/fp64",
+              "rank": 4
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "integer": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.08780292111132361
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.05550866283381522
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 2.9092521887390606e-18
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/rocket/integer",
+              "rank": 3
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        }
+      },
+      "shuttle": {
+        "fp16": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.17800102832488543
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 2.0853822126425143
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp16",
+              "rank": 2
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "fp32": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 3.4528721362045114
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.07549718344049597
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp32",
+              "rank": 4
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "fp64": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 3.403942402545958
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.11686918710468085
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/fp64",
+              "rank": 4
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        },
+        "integer": {
+          "cycles_per_dlen_beat": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.2640464638610702
+          },
+          "dependent_extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 0.0
+          },
+          "drain_cycles_per_byte": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 6.350196407251491e-16
+          },
+          "extra_cycles_per_operation": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "effective_roi_residual",
+            "unknowns": [],
+            "value": 1.5728446143579442
+          },
+          "physical_issue_interval_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "not_separately_identified",
+            "unknowns": [],
+            "value": null
+          },
+          "setup_cycles": {
+            "identified_from": {
+              "columns": 5,
+              "model": "vector/shuttle/integer",
+              "rank": 3
+            },
+            "status": "unidentified_not_charged",
+            "unknowns": [],
+            "value": 0.0
+          }
+        }
+      }
+    },
+    "vme": {
+      "fp8": {
+        "drain_tiles": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/fp8",
+            "rank": 2
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 1.27418000190014e-13
+        },
+        "k_steps": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/fp8",
+            "rank": 2
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 1.3788744145658414
+        },
+        "operations": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/fp8",
+            "rank": 2
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 9.244109378288753e-17
+        }
+      },
+      "int8": {
+        "drain_tiles": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/int8",
+            "rank": 4
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 48.17936925501776
+        },
+        "k_steps": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/int8",
+            "rank": 4
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 0.6523478906952028
+        },
+        "operations": {
+          "identified_from": {
+            "columns": 4,
+            "model": "vme/int8",
+            "rank": 4
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 5.82529516518451
+        }
+      },
+      "row_read": {
+        "operations": {
+          "identified_from": {
+            "columns": 2,
+            "model": "vme/row_read",
+            "rank": 1
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 1.3439707999604592e-15
+        }
+      },
+      "row_write": {
+        "operations": {
+          "identified_from": {
+            "columns": 2,
+            "model": "vme/row_write",
+            "rank": 2
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 0.0
+        }
+      },
+      "tile_zero": {
+        "operations": {
+          "identified_from": {
+            "columns": 2,
+            "model": "vme/tile_zero",
+            "rank": 2
+          },
+          "status": "effective_roi_residual",
+          "unknowns": [],
+          "value": 2.1885647363346576
+        }
+      }
+    }
+  },
+  "schema": "iris.empirical_calibration.v1",
+  "source_image_association_verified": false,
+  "status": "fit_completed_internal_validation_not_yet_opened",
+  "units": "core_cycles_at_500MHz",
+  "unknowns": [
+    "No independently measured branch-mispredict counts.",
+    "Cold instruction/cache history not reproduced by region feature proxy.",
+    "Region fit uses physical instret as scalar-work proxy; live engine must emit corresponding functional/source-pipeline counts.",
+    "Individual coefficients of rank-deficient groups cannot be interpreted as physical unit latencies.",
+    "Streaming DRAM miss/service, atomics, IRQ, synchronization and pipeline interactions not fitted here.",
+    "Region model validation does not validate a live simulator timing implementation."
+  ]
+}

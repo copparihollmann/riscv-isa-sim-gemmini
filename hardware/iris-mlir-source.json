@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/ucb-bar/iris-mlir.git",
+  "commit": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
+  "observed_at_utc": "2026-11-06T00:54:53.443013+00:00",
+  "selection": "User-named repository implementation branch; default main contains only LICENSE. Baseline clean; integration uses isolated worktrees.",
+  "branch_observed": "handwritten-implementation",
+  "main_commit_observed": "53b73e3f5a250bce15e453c47053fccf1e30a981"
+}

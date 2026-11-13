@@ -1,0 +1,20 @@
+{
+  "vivado_version": "2021.1",
+  "installation": "/ecad/tools/xilinx/Vivado/2021.1",
+  "part": "xcu250-figd2104-2L-e",
+  "part_count": 1,
+  "board_part": "xilinx.com:au250:part0:1.3",
+  "board_part_count": 1,
+  "board_files": [
+    {
+      "path": "/ecad/tools/xilinx/Vivado/2021.1/data/xhub/boards/XilinxBoardStore/boards/Xilinx/au250/1.3/board.xml",
+      "sha256": "60bdaedeaa8859fd3c034d85e0c282cee90e828d21d3dceab085b2804ed799a1"
+    },
+    {
+      "path": "/ecad/tools/xilinx/Vivado/2021.1/data/xhub/boards/XilinxBoardStore/boards/Xilinx/au250/1.3/preset.xml",
+      "sha256": "699392215a8cb1e736dcd7f38e3cd9880760f667dadbd46bdf0c247d7ca796cc"
+    }
+  ],
+  "preflight_query_outputs_retained_in": "private-logs/vivado-preflight.log",
+  "preflight_process_exit": "initial wrapper timed out after successful part and board queries"
+}

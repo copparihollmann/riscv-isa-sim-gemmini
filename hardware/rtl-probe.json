@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "status": "dependency-blocked",
+  "command": [
+    "/scratch/copparihollmann/iris-model/build/rtl/simv-chipyard.harness-IrisConfig",
+    "-no_save",
+    "+permissive",
+    "+dramsim",
+    "+dramsim_ini_dir=/scratch/eygao/iris-cy/generators/testchipip/src/main/resources/dramsim2_ini",
+    "+max-cycles=5000000",
+    "+ntb_random_seed=1",
+    "+permissive-off",
+    "/scratch/copparihollmann/iris-model/benchmarks/build/smoke.elf"
+  ],
+  "working_directory": "/scratch/copparihollmann/iris-model/build/rtl",
+  "exit_status": 127,
+  "host_elapsed_seconds": 0.0018968642689287663,
+  "source_binary": "/scratch/eygao/iris-cy/sims/vcs/simv-chipyard.harness-IrisConfig",
+  "binary_sha256": "bb822b1d23c1a428a0335cb809af0f0654ab0e618845e8f4819c43a61b6cd6bd",
+  "elf_sha256": "2a79c9bace48236138d6885e5304651c5bd08502e50c79104b0d5d32fb8bee0b",
+  "vcs_design": {
+    "config": "chipyard.harness.TestHarness.IrisConfig",
+    "dts_sha256": "fdeadb550294806f46feeda92c9e7f8a84817dcad2e0d85709a9e5005528188f",
+    "exact_build_source_identity": null
+  },
+  "firesim_design": {
+    "config": "firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig",
+    "dts_sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+    "exact_build_source_identity": null
+  },
+  "same_design_certified": false,
+  "timing_data_collected": false,
+  "missing_dependencies": [
+    "libvirsim.so => not found",
+    "liberrorinf.so => not found",
+    "libsnpsmalloc.so => not found",
+    "libvfs.so => not found",
+    "libnuma_stubs.so => not found",
+    "libvcsnew.so => not found",
+    "libdistsimclient.so => not found",
+    "libsimprofile.so => not found",
+    "libuclinative.so => not found",
+    "libmemprof_init.so => not found",
+    "libvcsucli.so => not found"
+  ],
+  "expected_vcs_install_mounted": false,
+  "license_setup_mounted": false,
+  "stderr": "/scratch/copparihollmann/iris-model/build/rtl/simv-chipyard.harness-IrisConfig: error while loading shared libraries: libvirsim.so: cannot open shared object file: No such file or directory\n"
+}

@@ -1,0 +1,768 @@
+{
+ "note": "Embedded git repos are not tracked here. Spike variants: working trees (incl. uncommitted changes) snapshotted 2026-11-12 to the listed fork branches. Others: base HEAD + patch.",
+ "repos": [
+  {
+   "path": "integration/iris-mlir",
+   "head": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
+   "origin": "https://github.com/ucb-bar/iris-mlir.git",
+   "patch": "integration/embedded-patches/integration_iris-mlir.patch"
+  },
+  {
+   "path": "integration/merlin",
+   "head": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
+   "origin": "https://github.com/copparihollmann/Merlin.git",
+   "patch": "integration/embedded-patches/integration_merlin.patch"
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-VADD-EG-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-composite-v2",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-VADD-EG-v1",
+    "snapshot_commit": "a5a560edc2d1f8e44fda4ea10893366b9705edad",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-VADD-EG-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-VADD-EG-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-VADD-EG-v2",
+    "snapshot_commit": "6c24155dd0544fc624a1cf74583acef27ebec2da",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-async-RRD-wake-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-scheduler-diagnostic-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-async-RRD-wake-v1",
+    "snapshot_commit": "39a7b828f2b149ba09e5594a462a4e496dd79ea1",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-async-RRD-wake-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-async-RRD-wake-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-async-RRD-wake-v2",
+    "snapshot_commit": "ecfc8a97fed65227589e8b160e00a02340d8a09f",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-async-diagnostic-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-cpu-diagnostic-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-async-diagnostic-v1",
+    "snapshot_commit": "e3ec66f52d452f71f859726cfb889d61f5f037a0",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-composite-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-async-RRD-wake-v2",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-composite-v1",
+    "snapshot_commit": "ab3f5ac78ba2ed5ef16ed0e83decd05243740490",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-composite-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-composite-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-composite-v2",
+    "snapshot_commit": "d38dc46198e123635387df963fbf572f3880a4d9",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-cpu-diagnostic-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-warm-opu-tk124-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-cpu-diagnostic-v1",
+    "snapshot_commit": "68384f45f03e728f73a9c1e840d15d38165724ac",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-late-ALU-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-pending-base-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-late-ALU-v1",
+    "snapshot_commit": "9ab9ffa7f007769a6ff5fb99e42f36fde0f74c8b",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-pending-base-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-cpu-diagnostic-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-pending-base-v1",
+    "snapshot_commit": "93359975d8f0c0480557ea5fab1b741f4503128d",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-C12-scheduler-diagnostic-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-async-diagnostic-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-C12-scheduler-diagnostic-v1",
+    "snapshot_commit": "bf4891f2d4d9660f2c48dca2e020ab804f2689e2",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-FADD-EG-counterCSR-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-FADD-EG-v2",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-FADD-EG-counterCSR-v1",
+    "snapshot_commit": "54f3e4876a75cf8b8dc00b015e666310adb78bcc",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-FADD-EG-counterCSR-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-FADD-EG-counterCSR-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-FADD-EG-counterCSR-v2",
+    "snapshot_commit": "01d292f879e995ecbefe5c27a9348df69241da1c",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-FADD-EG-observer-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-FADD-EG-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-FADD-EG-observer-v1",
+    "snapshot_commit": "fa3ebed008313269605baed5d9b785b59ada4a75",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-FADD-EG-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-warm-opu-tk124-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-FADD-EG-v1",
+    "snapshot_commit": "0c3d12fcf15ab7c03b46f17b40135607ac30978b",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-FADD-EG-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-FADD-EG-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-FADD-EG-v2",
+    "snapshot_commit": "1878ce917299fe1b0c53d9ab00472590d8241e03",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-VSE-live-boundary-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-C12-VADD-EG-v2",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-VSE-live-boundary-v1",
+    "snapshot_commit": "ebff353fe3bf2aaa11a98b78dbea161cbc486542",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-VSE-source-storefront-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-VSE-live-boundary-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-VSE-source-storefront-v2",
+    "snapshot_commit": "310fbb9b1bb41afff3897518c82cb4a758b37d6f",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-counter-pipeline",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-counter-pipeline",
+    "snapshot_commit": "0adceb2eaca0253228467e159c61bf7088ad48f2",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-fast",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-fast",
+    "snapshot_commit": "03df3b26ab7e624a21b13cef40ade5485a9fdf55",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-frontend",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-frontend",
+    "snapshot_commit": "37b89453bade1d9f5ad2117f2734f9bde1fbc9fc",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-merlin-ras-diagnostic",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-merlin-ras-diagnostic",
+    "snapshot_commit": "dda9edaa81e39d91edfe5c8831028451086ee92f",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-optimized",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-optimized",
+    "snapshot_commit": "5a0f75a7e6e93f0a1d17284ae64786f20175c18a",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-rocket-packet-repairs",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-rocket-packet-repairs",
+    "snapshot_commit": "98b3ef7c6b7d591ddd83242e65a08a36907955ae",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-rocket-packets",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-rocket-packets",
+    "snapshot_commit": "a9bb159e1bd514219aa9d8dadfd1fd4d4da5ca3d",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-rocket-ras",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-rocket-ras",
+    "snapshot_commit": "90c3288d6d5438b6e11742f233bab5e001f7fc9c",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-store-front",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-store-front",
+    "snapshot_commit": "3dd8a42e9252f3fe3b2893ca58ab318ce06dbc33",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-empirical-vme-work",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-empirical-vme-work",
+    "snapshot_commit": "748238c6aea1309ed3a7f27c198c8f38470715bd",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-fadd-shape-store-fixed-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-fadd-shape-store-fixed-v1",
+    "snapshot_commit": "9e78c76242b78234732461c9c4a0845732e1270d",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-fadd-shape-store-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-fadd-shape-store-v1",
+    "snapshot_commit": "255637991b6f42cc0e5f5b4426814cd9cd34beb9",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-fadd-shape-store-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-fadd-shape-store-v2",
+    "snapshot_commit": "026f2cf93dd111077e339f47e9ac32dc2812ac3f",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-fadd-shape-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-fadd-shape-v1",
+    "snapshot_commit": "658bb29194d5833cb3bd675b245601defd7ba2e4",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-fadd-shape-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-fadd-shape-v2",
+    "snapshot_commit": "e21d7d36f9c4cdbf221ba77d5c91403e4a5b8286",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-frontend",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-frontend",
+    "snapshot_commit": "4e391ec24e9e0fc2d246f09bec636de910d45486",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-frontend-bounded",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-frontend-bounded",
+    "snapshot_commit": "dcf3f051912b195efc23bd969e2e815b03302095",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-frontend-live",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-frontend-live",
+    "snapshot_commit": "62ff23b9572a0979e85491c2ccf4734de5baf4cb",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-frontend-ras-diagnostic",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-frontend-ras-diagnostic",
+    "snapshot_commit": "da36c81c229d754bf1d5bbe9b8d9d05dc325da29",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-frontend-ras-fix",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-frontend-ras-fix",
+    "snapshot_commit": "540cc30fd6b43476f61191839267f09e05b25851",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-host-handoff-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-host-handoff-v1",
+    "snapshot_commit": "dc0a431592b491547ee21aa84d644c367975a41f",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-opu-entry-overlap-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-opu-entry-overlap-v1",
+    "snapshot_commit": "889230715977435ea04ca8588aac0f810f1e005a",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-opu-fence-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-opu-fence-v1",
+    "snapshot_commit": "2f8e390d50225b7c115d2672eb4294259a2d5bb8",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-owned-store-completion-fix",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-owned-store-completion-fix",
+    "snapshot_commit": "a71853232f45b97c8d493819700d11bd7b772b88",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-owned-store-squash-diagnostic",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-owned-store-squash-diagnostic",
+    "snapshot_commit": "7d0f37b8f3af1123dd932cd485b43beb4e4aa611",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-read-overlap-response-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-read-overlap-response-v2",
+    "snapshot_commit": "ca9ba431556d53b797d1f117f29369e75a8388f6",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-read-overlap-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-read-overlap-v1",
+    "snapshot_commit": "d78df03da1183c8e1a575188a02603d129e8acc3",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-rocket-fabric",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-rocket-fabric",
+    "snapshot_commit": "7ef5c9848d30fc221571b0402fec2d62223da774",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-rocket-pipeline",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-rocket-pipeline",
+    "snapshot_commit": "2412f51e9e80db506cca003a5bcd749e2b044cea",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-rocket-serial",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-rocket-serial",
+    "snapshot_commit": "3ad7b24715077fde472394ce2785263c1dfdba0b",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-rocket-source",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-rocket-source",
+    "snapshot_commit": "64b32476eb03aed1b80f34911a983113745b1cbd",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-saturn-live",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-saturn-live",
+    "snapshot_commit": "8e2b9e0c2d3f08ce80679f7ebd3091f3087e1398",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-scalar-L2hit-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-read-overlap-response-v2",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-scalar-L2hit-v1",
+    "snapshot_commit": "44f17d17278d8b64db91ead29ad232b6524a42ec",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-scalar-L2hit-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-scalar-L2hit-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-scalar-L2hit-v2",
+    "snapshot_commit": "a19182ddddb1dde3929dc7f8a4c16943c5304f1a",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-scalar-fadd",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-scalar-fadd",
+    "snapshot_commit": "66712e4999ddb7151a24c5c13b885bc7ee999237",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-shuttle-memory",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-shuttle-memory",
+    "snapshot_commit": "c90cf68c63b0871a466ddbad9024ca1bafcb1b68",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-shuttle-random-cache-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-shuttle-random-cache-v1",
+    "snapshot_commit": "1b7041cdaa9de1a1b37ccc31aacf58a2060c461b",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-source-frontends",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": null,
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-source-frontends",
+    "snapshot_commit": "822fff4f6acf350d6c395a6e58b037ad8bea2a63",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-vector-store-actor-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-vector-store-actor-v1",
+    "snapshot_commit": "2c0f32264c012f345cdd129fa68e37540a4ed3a8",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-vector-store-actor-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-vector-store-actor-v2",
+    "snapshot_commit": "5a20e68b7ecd123dd84910986f893752538c1076",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-vector-store-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-vector-store-v1",
+    "snapshot_commit": "067bedfae8657fd4ec98a2c940554cb2aa94712e",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-warm-load-v2",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/pipeline/riscv-isa-sim-scalar-L2hit-v1",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-warm-load-v2",
+    "snapshot_commit": "fdc45d0c113f6161dae45ceccb39fc3c09a1ac09",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-warm-opu-tk124-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-warm-opu-tk124-v1",
+    "snapshot_commit": "4f74cfbc8bd0e6e4906b6519b8d6e3369ca0cccd",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "pipeline/riscv-isa-sim-warm-opu-v1",
+   "head": "72958551566a30f19444bd7e354552824e4d0a98",
+   "origin": "/scratch/copparihollmann/iris-model/third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-pipeline/riscv-isa-sim-warm-opu-v1",
+    "snapshot_commit": "9f0cb0c4d234506e4a6582bf0fd1be44666959f9",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "workloads/iris-mlir-small-m",
+   "head": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
+   "origin": "https://github.com/ucb-bar/iris-mlir.git",
+   "patch": "integration/embedded-patches/workloads_iris-mlir-small-m.patch"
+  },
+  {
+   "path": "third_party/riscv-isa-sim",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/riscv-isa-sim",
+    "snapshot_commit": "8817a353b9f5e9e2f0d0162d0c9cfeb9bef49d6c",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/riscv-isa-sim-combined",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/riscv-isa-sim-combined",
+    "snapshot_commit": "17e77b767b47c927488f72431f69ad5b6608e571",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/riscv-isa-sim-current",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/riscv-isa-sim-current",
+    "snapshot_commit": "c18b4816ee58810ec90a8d335b7c8864623c462c",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/riscv-isa-sim-definedness",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/riscv-isa-sim-definedness",
+    "snapshot_commit": "d7fbf0bf890fe6ccc4b376288f890579554d3e9e",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/riscv-isa-sim-fpcomp",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/riscv-isa-sim-fpcomp",
+    "snapshot_commit": "a8e70967656431429d4fd31804da039fc5e92918",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/spike-memory-dev",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/spike-memory-dev",
+    "snapshot_commit": "eb5a6b01a479226e3123b85ac91330d33f2be004",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  },
+  {
+   "path": "third_party/spike-uart-dev",
+   "github": {
+    "repo": "copparihollmann/riscv-isa-sim-gemmini",
+    "branch": "iris-third_party/spike-uart-dev",
+    "snapshot_commit": "89f4866eb1b88f0a9b9443160d541271d5f99eef",
+    "base": "72958551566a30f19444bd7e354552824e4d0a98"
+   }
+  }
+ ]
+}

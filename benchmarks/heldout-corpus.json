@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "split_id": "iris-v1-heldout-2026-11-05",
+  "fitting_allowed": false,
+  "policy": "Correctness-only runs are allowed. Never fit timing parameters on these cases. If failures are used to tune, retire those cases and freeze replacement independent holdouts.",
+  "cases": [
+    {
+      "case_id": "miles.vme-fused-lm2-gemm-transpose",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "path": "benchmarks/vme-fused-lm2-gemm-transpose/main.c",
+      "source_sha256": "fc1a6da69ff16c958255f58252a5f87a5f5bd965c19d7316f945221fb7fe816c",
+      "shape_policy": "Use pinned benchmark defaults; record all compile-time overrides with each ELF",
+      "timing_measured": false
+    },
+    {
+      "case_id": "miles.vme-i8-gemm",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "path": "benchmarks/vme-i8-gemm/main.c",
+      "source_sha256": "44d747fb02b0a5a5a7497c4b67a8218a4c738b95b79c35d5dcf93bd00f06d61b",
+      "shape_policy": "Use pinned benchmark defaults; record all compile-time overrides with each ELF",
+      "timing_measured": false
+    },
+    {
+      "case_id": "merlin.zephyr.gemm.1compute",
+      "entrypoint": "examples/iris/run.sh op gemm",
+      "compute_harts": 1,
+      "shape": null,
+      "status": "blocked: Merlin source, exact shapes, Zephyr board and ELF not available",
+      "timing_measured": false
+    },
+    {
+      "case_id": "merlin.zephyr.gemm.2compute",
+      "entrypoint": "examples/iris/run.sh op gemm",
+      "compute_harts": 2,
+      "shape": null,
+      "status": "blocked: Merlin source, exact shapes, Zephyr board and ELF not available",
+      "timing_measured": false
+    },
+    {
+      "case_id": "merlin.zephyr.conv2d.1compute",
+      "entrypoint": "examples/iris/run.sh op conv2d",
+      "compute_harts": 1,
+      "shape": null,
+      "status": "blocked: Merlin source, exact shapes, Zephyr board and ELF not available",
+      "timing_measured": false
+    },
+    {
+      "case_id": "merlin.zephyr.conv2d.2compute",
+      "entrypoint": "examples/iris/run.sh op conv2d",
+      "compute_harts": 2,
+      "shape": null,
+      "status": "blocked: Merlin source, exact shapes, Zephyr board and ELF not available",
+      "timing_measured": false
+    }
+  ]
+}

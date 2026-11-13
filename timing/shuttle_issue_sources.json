@@ -1,0 +1,3815 @@
+{
+  "schema_version": 1,
+  "scope": "Iris source RRD issue selection and scalar control templates; not a complete timing model",
+  "sources": {
+    "iris-config": {
+      "snapshot": "shuttle-evidence/iris-config.scala",
+      "live_path": "third_party/chipyard/generators/chipyard/src/main/scala/config/IrisConfigs.scala",
+      "sha256": "0d850418f6d68849b048178657c6cbc1fc49766bea9ec79001eea5140661ab8b",
+      "repository": "chipyard",
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19"
+    },
+    "shuttle-config": {
+      "snapshot": "shuttle-evidence/shuttle-config.scala",
+      "live_path": "third_party/shuttle/src/main/scala/common/Configs.scala",
+      "sha256": "04d646dc789044b8b4402bc783f0cca61be7f39c7d89ea9dcdf279e25bc7e89e",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "shuttle-params": {
+      "snapshot": "shuttle-evidence/shuttle-params.scala",
+      "live_path": "third_party/shuttle/src/main/scala/common/Parameters.scala",
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "shuttle-core": {
+      "snapshot": "shuttle-evidence/shuttle-core.scala",
+      "live_path": "third_party/shuttle/src/main/scala/exu/Core.scala",
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "shuttle-uop": {
+      "snapshot": "shuttle-evidence/shuttle-uop.scala",
+      "live_path": "third_party/shuttle/src/main/scala/common/MicroOp.scala",
+      "sha256": "fe003405e5e4056b6cc9437842c5871f55b5efbc0f9042d144eb62f2911e93a5",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "shuttle-fetch": {
+      "snapshot": "shuttle-evidence/shuttle-fetch.scala",
+      "live_path": "third_party/shuttle/src/main/scala/ifu/FetchBuffer.scala",
+      "sha256": "bd381b1c33e65155bfa155c10a06747bdec474ed6a44361d9909ce020b0b9df4",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "shuttle-frontend": {
+      "snapshot": "shuttle-evidence/shuttle-frontend.scala",
+      "live_path": "third_party/shuttle/src/main/scala/ifu/Frontend.scala",
+      "sha256": "1ce6b6a23af0a8035fc8df3ea80b7a2601246092c67687a8b7f69d82886a50ab",
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "scalar-decode": {
+      "snapshot": "shuttle-evidence/scalar-decode.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/IDecode.scala",
+      "sha256": "56ff065ff7b6ed15283afe071f2e79b6f09d2848df6729f0fc4ba3bea9036ace",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "instructions": {
+      "snapshot": "shuttle-evidence/instructions.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/Instructions.scala",
+      "sha256": "9aeb6c05db25e5d026e6055ef3f2c9080832c2b28c404f127cdc44e726e1cf1a",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "custom-instructions": {
+      "snapshot": "shuttle-evidence/custom-instructions.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/CustomInstructions.scala",
+      "sha256": "6313d95d0fd760a092ae50f6b0dcb27a1bfbac42c7e1e841b008e893fdc72bb1",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "matrix-config": {
+      "snapshot": "shuttle-evidence/matrix-config.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/Matrix.scala",
+      "sha256": "ae61b49059dfa45b0812d5ab684c07ad54eee4959f5cdd2752de8cc13a0538d7",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "fpu-decode": {
+      "snapshot": "shuttle-evidence/fpu-decode.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/tile/FPU.scala",
+      "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "rocket-core": {
+      "snapshot": "shuttle-evidence/rocket-core.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala",
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "rocket-btb": {
+      "snapshot": "shuttle-evidence/rocket-btb.scala",
+      "live_path": "third_party/rocket-chip/src/main/scala/rocket/BTB.scala",
+      "sha256": "7235b7334e3da918d7a375dbd6d304cadd2ed01ad6df10ef4d35e39b49d5f1c5",
+      "repository": "rocket",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "saturn-integration": {
+      "snapshot": "shuttle-evidence/saturn-integration.scala",
+      "live_path": "third_party/saturn/src/main/scala/shuttle/Configs.scala",
+      "sha256": "74850fbda13a0ad1ed5a215cbfc28485a9dc4e782ecace3dccc336981a61abf8",
+      "repository": "saturn",
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    }
+  },
+  "generator_sha256": "15383ab370357d8c6dc9c8eb6d52c22e7c569ebf5df62d8537ca2d74f20b474e",
+  "scalar_classes": [
+    "MDecode",
+    "M64Decode",
+    "ADecode",
+    "A64Decode",
+    "FDecode",
+    "F64Decode",
+    "DDecode",
+    "D64Decode",
+    "HDecode",
+    "H64Decode",
+    "HDDecode",
+    "I64Decode",
+    "SVMDecode",
+    "DebugDecode",
+    "FenceIDecode",
+    "ZbaDecode",
+    "Zba64Decode",
+    "ZbbDecode",
+    "Zbb64Decode",
+    "ZbsDecode",
+    "IDecode",
+    "VCFGDecode",
+    "MatrixCFGDecode"
+  ],
+  "scalar_rows": 242,
+  "decoder_header_sha256": "64fdb2533b1a1caff30e5ecdecc95d1758fa84194fb717738d33f50e51e6f898",
+  "rows": [
+    {
+      "name": "MUL",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33554483,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MUL"
+      ],
+      "ignored_dont_cares": [],
+      "line": 249
+    },
+    {
+      "name": "MULH",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33558579,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MUL"
+      ],
+      "ignored_dont_cares": [],
+      "line": 250
+    },
+    {
+      "name": "MULHU",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33566771,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MUL"
+      ],
+      "ignored_dont_cares": [],
+      "line": 251
+    },
+    {
+      "name": "MULHSU",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33562675,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MUL"
+      ],
+      "ignored_dont_cares": [],
+      "line": 252
+    },
+    {
+      "name": "DIV",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33570867,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 254
+    },
+    {
+      "name": "DIVU",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33574963,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 255
+    },
+    {
+      "name": "REM",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33579059,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 256
+    },
+    {
+      "name": "REMU",
+      "class": "MDecode",
+      "mask": 4261441663,
+      "match": 33583155,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 257
+    },
+    {
+      "name": "MULW",
+      "class": "M64Decode",
+      "mask": 4261441663,
+      "match": 33554491,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MUL"
+      ],
+      "ignored_dont_cares": [],
+      "line": 265
+    },
+    {
+      "name": "DIVW",
+      "class": "M64Decode",
+      "mask": 4261441663,
+      "match": 33570875,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 267
+    },
+    {
+      "name": "DIVUW",
+      "class": "M64Decode",
+      "mask": 4261441663,
+      "match": 33574971,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 268
+    },
+    {
+      "name": "REMW",
+      "class": "M64Decode",
+      "mask": 4261441663,
+      "match": 33579067,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 269
+    },
+    {
+      "name": "REMUW",
+      "class": "M64Decode",
+      "mask": 4261441663,
+      "match": 33583163,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "DIV"
+      ],
+      "ignored_dont_cares": [],
+      "line": 270
+    },
+    {
+      "name": "AMOADD_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 8239,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 276
+    },
+    {
+      "name": "AMOXOR_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 536879151,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 277
+    },
+    {
+      "name": "AMOSWAP_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 134225967,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 278
+    },
+    {
+      "name": "AMOAND_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 1610620975,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 279
+    },
+    {
+      "name": "AMOOR_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 1073750063,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 280
+    },
+    {
+      "name": "AMOMIN_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 2147491887,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 281
+    },
+    {
+      "name": "AMOMINU_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 3221233711,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 282
+    },
+    {
+      "name": "AMOMAX_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 2684362799,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 283
+    },
+    {
+      "name": "AMOMAXU_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 3758104623,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 284
+    },
+    {
+      "name": "LR_W",
+      "class": "ADecode",
+      "mask": 4193284223,
+      "match": 268443695,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 286
+    },
+    {
+      "name": "SC_W",
+      "class": "ADecode",
+      "mask": 4160778367,
+      "match": 402661423,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 287
+    },
+    {
+      "name": "AMOADD_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 12335,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 293
+    },
+    {
+      "name": "AMOSWAP_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 134230063,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 294
+    },
+    {
+      "name": "AMOXOR_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 536883247,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 295
+    },
+    {
+      "name": "AMOAND_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 1610625071,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 296
+    },
+    {
+      "name": "AMOOR_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 1073754159,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 297
+    },
+    {
+      "name": "AMOMIN_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 2147495983,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 298
+    },
+    {
+      "name": "AMOMINU_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 3221237807,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 299
+    },
+    {
+      "name": "AMOMAX_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 2684366895,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 300
+    },
+    {
+      "name": "AMOMAXU_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 3758108719,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 301
+    },
+    {
+      "name": "LR_D",
+      "class": "A64Decode",
+      "mask": 4193284223,
+      "match": 268447791,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 303
+    },
+    {
+      "name": "SC_D",
+      "class": "A64Decode",
+      "mask": 4160778367,
+      "match": 402665519,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "MEM",
+        "AMO"
+      ],
+      "ignored_dont_cares": [],
+      "line": 304
+    },
+    {
+      "name": "FSGNJ_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 536870995,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 343
+    },
+    {
+      "name": "FSGNJX_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 536879187,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 344
+    },
+    {
+      "name": "FSGNJN_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 536875091,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 345
+    },
+    {
+      "name": "FMIN_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 671088723,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 346
+    },
+    {
+      "name": "FMAX_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 671092819,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 347
+    },
+    {
+      "name": "FADD_S",
+      "class": "FDecode",
+      "mask": 4261412991,
+      "match": 83,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 348
+    },
+    {
+      "name": "FSUB_S",
+      "class": "FDecode",
+      "mask": 4261412991,
+      "match": 134217811,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 349
+    },
+    {
+      "name": "FMUL_S",
+      "class": "FDecode",
+      "mask": 4261412991,
+      "match": 268435539,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 350
+    },
+    {
+      "name": "FMADD_S",
+      "class": "FDecode",
+      "mask": 100663423,
+      "match": 67,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 351
+    },
+    {
+      "name": "FMSUB_S",
+      "class": "FDecode",
+      "mask": 100663423,
+      "match": 71,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 352
+    },
+    {
+      "name": "FNMADD_S",
+      "class": "FDecode",
+      "mask": 100663423,
+      "match": 79,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 353
+    },
+    {
+      "name": "FNMSUB_S",
+      "class": "FDecode",
+      "mask": 100663423,
+      "match": 75,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 354
+    },
+    {
+      "name": "FCLASS_S",
+      "class": "FDecode",
+      "mask": 4293947519,
+      "match": 3758100563,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 355
+    },
+    {
+      "name": "FMV_X_W",
+      "class": "FDecode",
+      "mask": 4293947519,
+      "match": 3758096467,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 356
+    },
+    {
+      "name": "FCVT_W_S",
+      "class": "FDecode",
+      "mask": 4293918847,
+      "match": 3221225555,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 357
+    },
+    {
+      "name": "FCVT_WU_S",
+      "class": "FDecode",
+      "mask": 4293918847,
+      "match": 3222274131,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 358
+    },
+    {
+      "name": "FEQ_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 2684362835,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 359
+    },
+    {
+      "name": "FLT_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 2684358739,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 360
+    },
+    {
+      "name": "FLE_S",
+      "class": "FDecode",
+      "mask": 4261441663,
+      "match": 2684354643,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 361
+    },
+    {
+      "name": "FMV_W_X",
+      "class": "FDecode",
+      "mask": 4293947519,
+      "match": 4026531923,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 362
+    },
+    {
+      "name": "FCVT_S_W",
+      "class": "FDecode",
+      "mask": 4293918847,
+      "match": 3489661011,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 363
+    },
+    {
+      "name": "FCVT_S_WU",
+      "class": "FDecode",
+      "mask": 4293918847,
+      "match": 3490709587,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 364
+    },
+    {
+      "name": "FLW",
+      "class": "FDecode",
+      "mask": 28799,
+      "match": 8199,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "WFD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 365
+    },
+    {
+      "name": "FSW",
+      "class": "FDecode",
+      "mask": 28799,
+      "match": 8231,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 366
+    },
+    {
+      "name": "FDIV_S",
+      "class": "FDecode",
+      "mask": 4261412991,
+      "match": 402653267,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 367
+    },
+    {
+      "name": "FSQRT_S",
+      "class": "FDecode",
+      "mask": 4293918847,
+      "match": 1476395091,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 368
+    },
+    {
+      "name": "FCVT_L_S",
+      "class": "F64Decode",
+      "mask": 4293918847,
+      "match": 3223322707,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 421
+    },
+    {
+      "name": "FCVT_LU_S",
+      "class": "F64Decode",
+      "mask": 4293918847,
+      "match": 3224371283,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 422
+    },
+    {
+      "name": "FCVT_S_L",
+      "class": "F64Decode",
+      "mask": 4293918847,
+      "match": 3491758163,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 423
+    },
+    {
+      "name": "FCVT_S_LU",
+      "class": "F64Decode",
+      "mask": 4293918847,
+      "match": 3492806739,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 424
+    },
+    {
+      "name": "FCVT_S_D",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 1074790483,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 374
+    },
+    {
+      "name": "FCVT_D_S",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 1107296339,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 375
+    },
+    {
+      "name": "FSGNJ_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 570425427,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 376
+    },
+    {
+      "name": "FSGNJX_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 570433619,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 377
+    },
+    {
+      "name": "FSGNJN_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 570429523,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 378
+    },
+    {
+      "name": "FMIN_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 704643155,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 379
+    },
+    {
+      "name": "FMAX_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 704647251,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 380
+    },
+    {
+      "name": "FADD_D",
+      "class": "DDecode",
+      "mask": 4261412991,
+      "match": 33554515,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 381
+    },
+    {
+      "name": "FSUB_D",
+      "class": "DDecode",
+      "mask": 4261412991,
+      "match": 167772243,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 382
+    },
+    {
+      "name": "FMUL_D",
+      "class": "DDecode",
+      "mask": 4261412991,
+      "match": 301989971,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 383
+    },
+    {
+      "name": "FMADD_D",
+      "class": "DDecode",
+      "mask": 100663423,
+      "match": 33554499,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 384
+    },
+    {
+      "name": "FMSUB_D",
+      "class": "DDecode",
+      "mask": 100663423,
+      "match": 33554503,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 385
+    },
+    {
+      "name": "FNMADD_D",
+      "class": "DDecode",
+      "mask": 100663423,
+      "match": 33554511,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 386
+    },
+    {
+      "name": "FNMSUB_D",
+      "class": "DDecode",
+      "mask": 100663423,
+      "match": 33554507,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 387
+    },
+    {
+      "name": "FCLASS_D",
+      "class": "DDecode",
+      "mask": 4293947519,
+      "match": 3791654995,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 388
+    },
+    {
+      "name": "FCVT_W_D",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 3254779987,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 389
+    },
+    {
+      "name": "FCVT_WU_D",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 3255828563,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 390
+    },
+    {
+      "name": "FEQ_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 2717917267,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 391
+    },
+    {
+      "name": "FLT_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 2717913171,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 392
+    },
+    {
+      "name": "FLE_D",
+      "class": "DDecode",
+      "mask": 4261441663,
+      "match": 2717909075,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 393
+    },
+    {
+      "name": "FCVT_D_W",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 3523215443,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 394
+    },
+    {
+      "name": "FCVT_D_WU",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 3524264019,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 395
+    },
+    {
+      "name": "FLD",
+      "class": "DDecode",
+      "mask": 28799,
+      "match": 12295,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "WFD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 396
+    },
+    {
+      "name": "FSD",
+      "class": "DDecode",
+      "mask": 28799,
+      "match": 12327,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 397
+    },
+    {
+      "name": "FDIV_D",
+      "class": "DDecode",
+      "mask": 4261412991,
+      "match": 436207699,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 398
+    },
+    {
+      "name": "FSQRT_D",
+      "class": "DDecode",
+      "mask": 4293918847,
+      "match": 1509949523,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 399
+    },
+    {
+      "name": "FMV_X_D",
+      "class": "D64Decode",
+      "mask": 4293947519,
+      "match": 3791650899,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 430
+    },
+    {
+      "name": "FCVT_L_D",
+      "class": "D64Decode",
+      "mask": 4293918847,
+      "match": 3256877139,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 431
+    },
+    {
+      "name": "FCVT_LU_D",
+      "class": "D64Decode",
+      "mask": 4293918847,
+      "match": 3257925715,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 432
+    },
+    {
+      "name": "FMV_D_X",
+      "class": "D64Decode",
+      "mask": 4293947519,
+      "match": 4060086355,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 433
+    },
+    {
+      "name": "FCVT_D_L",
+      "class": "D64Decode",
+      "mask": 4293918847,
+      "match": 3525312595,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 434
+    },
+    {
+      "name": "FCVT_D_LU",
+      "class": "D64Decode",
+      "mask": 4293918847,
+      "match": 3526361171,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 435
+    },
+    {
+      "name": "FCVT_S_H",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 1075839059,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 310
+    },
+    {
+      "name": "FCVT_H_S",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 1140850771,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 311
+    },
+    {
+      "name": "FSGNJ_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 603979859,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 312
+    },
+    {
+      "name": "FSGNJX_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 603988051,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 313
+    },
+    {
+      "name": "FSGNJN_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 603983955,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 314
+    },
+    {
+      "name": "FMIN_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 738197587,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 315
+    },
+    {
+      "name": "FMAX_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 738201683,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 316
+    },
+    {
+      "name": "FADD_H",
+      "class": "HDecode",
+      "mask": 4261412991,
+      "match": 67108947,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 317
+    },
+    {
+      "name": "FSUB_H",
+      "class": "HDecode",
+      "mask": 4261412991,
+      "match": 201326675,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 318
+    },
+    {
+      "name": "FMUL_H",
+      "class": "HDecode",
+      "mask": 4261412991,
+      "match": 335544403,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 319
+    },
+    {
+      "name": "FMADD_H",
+      "class": "HDecode",
+      "mask": 100663423,
+      "match": 67108931,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 320
+    },
+    {
+      "name": "FMSUB_H",
+      "class": "HDecode",
+      "mask": 100663423,
+      "match": 67108935,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 321
+    },
+    {
+      "name": "FNMADD_H",
+      "class": "HDecode",
+      "mask": 100663423,
+      "match": 67108943,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 322
+    },
+    {
+      "name": "FNMSUB_H",
+      "class": "HDecode",
+      "mask": 100663423,
+      "match": 67108939,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "RFS3",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 323
+    },
+    {
+      "name": "FCLASS_H",
+      "class": "HDecode",
+      "mask": 4293947519,
+      "match": 3825209427,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 324
+    },
+    {
+      "name": "FMV_X_H",
+      "class": "HDecode",
+      "mask": 4293947519,
+      "match": 3825205331,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 325
+    },
+    {
+      "name": "FCVT_W_H",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 3288334419,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 326
+    },
+    {
+      "name": "FCVT_WU_H",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 3289382995,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 327
+    },
+    {
+      "name": "FEQ_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 2751471699,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 328
+    },
+    {
+      "name": "FLT_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 2751467603,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 329
+    },
+    {
+      "name": "FLE_H",
+      "class": "HDecode",
+      "mask": 4261441663,
+      "match": 2751463507,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 330
+    },
+    {
+      "name": "FMV_H_X",
+      "class": "HDecode",
+      "mask": 4293947519,
+      "match": 4093640787,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 331
+    },
+    {
+      "name": "FCVT_H_W",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 3556769875,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 332
+    },
+    {
+      "name": "FCVT_H_WU",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 3557818451,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 333
+    },
+    {
+      "name": "FLH",
+      "class": "HDecode",
+      "mask": 28799,
+      "match": 4103,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "WFD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 334
+    },
+    {
+      "name": "FSH",
+      "class": "HDecode",
+      "mask": 28799,
+      "match": 4135,
+      "flags": [
+        "FP",
+        "RXS1",
+        "MEM",
+        "RFS2",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 335
+    },
+    {
+      "name": "FDIV_H",
+      "class": "HDecode",
+      "mask": 4261412991,
+      "match": 469762131,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 336
+    },
+    {
+      "name": "FSQRT_H",
+      "class": "HDecode",
+      "mask": 4293918847,
+      "match": 1543503955,
+      "flags": [
+        "FP",
+        "RFS1",
+        "RFS2",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 337
+    },
+    {
+      "name": "FCVT_L_H",
+      "class": "H64Decode",
+      "mask": 4293918847,
+      "match": 3290431571,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 412
+    },
+    {
+      "name": "FCVT_LU_H",
+      "class": "H64Decode",
+      "mask": 4293918847,
+      "match": 3291480147,
+      "flags": [
+        "FP",
+        "WXD",
+        "RFS1",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 413
+    },
+    {
+      "name": "FCVT_H_L",
+      "class": "H64Decode",
+      "mask": 4293918847,
+      "match": 3558867027,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 414
+    },
+    {
+      "name": "FCVT_H_LU",
+      "class": "H64Decode",
+      "mask": 4293918847,
+      "match": 3559915603,
+      "flags": [
+        "FP",
+        "RXS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 415
+    },
+    {
+      "name": "FCVT_D_H",
+      "class": "HDDecode",
+      "mask": 4293918847,
+      "match": 1109393491,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 405
+    },
+    {
+      "name": "FCVT_H_D",
+      "class": "HDDecode",
+      "mask": 4293918847,
+      "match": 1141899347,
+      "flags": [
+        "FP",
+        "RFS1",
+        "WFD",
+        "USES_FP"
+      ],
+      "ignored_dont_cares": [],
+      "line": 406
+    },
+    {
+      "name": "LD",
+      "class": "I64Decode",
+      "mask": 28799,
+      "match": 12291,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 217
+    },
+    {
+      "name": "LWU",
+      "class": "I64Decode",
+      "mask": 28799,
+      "match": 24579,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 218
+    },
+    {
+      "name": "SD",
+      "class": "I64Decode",
+      "mask": 28799,
+      "match": 12323,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 219
+    },
+    {
+      "name": "SLLI",
+      "class": "I64Decode",
+      "mask": 4227887231,
+      "match": 4115,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 221
+    },
+    {
+      "name": "SRLI",
+      "class": "I64Decode",
+      "mask": 4227887231,
+      "match": 20499,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 222
+    },
+    {
+      "name": "SRAI",
+      "class": "I64Decode",
+      "mask": 4227887231,
+      "match": 1073762323,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 223
+    },
+    {
+      "name": "ADDIW",
+      "class": "I64Decode",
+      "mask": 28799,
+      "match": 27,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 225
+    },
+    {
+      "name": "SLLIW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 4123,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 226
+    },
+    {
+      "name": "SRLIW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 20507,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 227
+    },
+    {
+      "name": "SRAIW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 1073762331,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 228
+    },
+    {
+      "name": "ADDW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 59,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 229
+    },
+    {
+      "name": "SUBW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 1073741883,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 230
+    },
+    {
+      "name": "SLLW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 4155,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 231
+    },
+    {
+      "name": "SRLW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 20539,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 232
+    },
+    {
+      "name": "SRAW",
+      "class": "I64Decode",
+      "mask": 4261441663,
+      "match": 1073762363,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 233
+    },
+    {
+      "name": "SFENCE_VMA",
+      "class": "SVMDecode",
+      "mask": 4261445631,
+      "match": 301990003,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "MEM",
+        "CSR_ANY",
+        "SYSTEM",
+        "SFENCE"
+      ],
+      "ignored_dont_cares": [],
+      "line": 162
+    },
+    {
+      "name": "DRET",
+      "class": "DebugDecode",
+      "mask": 4294967295,
+      "match": 2065694835,
+      "flags": [
+        "CSR_ANY",
+        "SYSTEM"
+      ],
+      "ignored_dont_cares": [
+        "RXS1 masked by fixed rs1=x0"
+      ],
+      "line": 194
+    },
+    {
+      "name": "FENCE_I",
+      "class": "FenceIDecode",
+      "mask": 28799,
+      "match": 4111,
+      "flags": [
+        "FENCE",
+        "FENCE_I"
+      ],
+      "ignored_dont_cares": [],
+      "line": 138
+    },
+    {
+      "name": "SH1ADD",
+      "class": "ZbaDecode",
+      "mask": 4261441663,
+      "match": 536879155,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 464
+    },
+    {
+      "name": "SH2ADD",
+      "class": "ZbaDecode",
+      "mask": 4261441663,
+      "match": 536887347,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 465
+    },
+    {
+      "name": "SH3ADD",
+      "class": "ZbaDecode",
+      "mask": 4261441663,
+      "match": 536895539,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 466
+    },
+    {
+      "name": "SH1ADD_UW",
+      "class": "Zba64Decode",
+      "mask": 4261441663,
+      "match": 536879163,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 473
+    },
+    {
+      "name": "SH2ADD_UW",
+      "class": "Zba64Decode",
+      "mask": 4261441663,
+      "match": 536887355,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 474
+    },
+    {
+      "name": "SH3ADD_UW",
+      "class": "Zba64Decode",
+      "mask": 4261441663,
+      "match": 536895547,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 475
+    },
+    {
+      "name": "ADD_UW",
+      "class": "Zba64Decode",
+      "mask": 4261441663,
+      "match": 134217787,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 476
+    },
+    {
+      "name": "SLLI_UW",
+      "class": "Zba64Decode",
+      "mask": 4227887231,
+      "match": 134221851,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 477
+    },
+    {
+      "name": "ANDN",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 1073770547,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 484
+    },
+    {
+      "name": "ORN",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 1073766451,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 485
+    },
+    {
+      "name": "XNOR",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 1073758259,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 486
+    },
+    {
+      "name": "CLZ",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 1610616851,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 487
+    },
+    {
+      "name": "CPOP",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 1612714003,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 488
+    },
+    {
+      "name": "CTZ",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 1611665427,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 489
+    },
+    {
+      "name": "MAX",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 167796787,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 490
+    },
+    {
+      "name": "MAXU",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 167800883,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 491
+    },
+    {
+      "name": "MIN",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 167788595,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 492
+    },
+    {
+      "name": "MINU",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 167792691,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 493
+    },
+    {
+      "name": "ORC_B",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 678449171,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 494
+    },
+    {
+      "name": "ROL",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 1610616883,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 495
+    },
+    {
+      "name": "ROR",
+      "class": "ZbbDecode",
+      "mask": 4261441663,
+      "match": 1610633267,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 496
+    },
+    {
+      "name": "RORI",
+      "class": "ZbbDecode",
+      "mask": 4227887231,
+      "match": 1610633235,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 497
+    },
+    {
+      "name": "SEXT_B",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 1614811155,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 498
+    },
+    {
+      "name": "SEXT_H",
+      "class": "ZbbDecode",
+      "mask": 4293947519,
+      "match": 1615859731,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 499
+    },
+    {
+      "name": "REV8",
+      "class": "Zbb64Decode",
+      "mask": 4293947519,
+      "match": 1803571219,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 506
+    },
+    {
+      "name": "CTZW",
+      "class": "Zbb64Decode",
+      "mask": 4293947519,
+      "match": 1611665435,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 507
+    },
+    {
+      "name": "CLZW",
+      "class": "Zbb64Decode",
+      "mask": 4293947519,
+      "match": 1610616859,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 508
+    },
+    {
+      "name": "CPOPW",
+      "class": "Zbb64Decode",
+      "mask": 4293947519,
+      "match": 1612714011,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 509
+    },
+    {
+      "name": "ROLW",
+      "class": "Zbb64Decode",
+      "mask": 4261441663,
+      "match": 1610616891,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 510
+    },
+    {
+      "name": "RORW",
+      "class": "Zbb64Decode",
+      "mask": 4261441663,
+      "match": 1610633275,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 511
+    },
+    {
+      "name": "RORIW",
+      "class": "Zbb64Decode",
+      "mask": 4261441663,
+      "match": 1610633243,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 512
+    },
+    {
+      "name": "ZEXT_H",
+      "class": "Zbb64Decode",
+      "mask": 4293947519,
+      "match": 134234171,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 513
+    },
+    {
+      "name": "BCLR",
+      "class": "ZbsDecode",
+      "mask": 4261441663,
+      "match": 1207963699,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 530
+    },
+    {
+      "name": "BCLRI",
+      "class": "ZbsDecode",
+      "mask": 4227887231,
+      "match": 1207963667,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 531
+    },
+    {
+      "name": "BEXT",
+      "class": "ZbsDecode",
+      "mask": 4261441663,
+      "match": 1207980083,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 532
+    },
+    {
+      "name": "BEXTI",
+      "class": "ZbsDecode",
+      "mask": 4227887231,
+      "match": 1207980051,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 533
+    },
+    {
+      "name": "BINV",
+      "class": "ZbsDecode",
+      "mask": 4261441663,
+      "match": 1744834611,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 534
+    },
+    {
+      "name": "BINVI",
+      "class": "ZbsDecode",
+      "mask": 4227887231,
+      "match": 1744834579,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 535
+    },
+    {
+      "name": "BSET",
+      "class": "ZbsDecode",
+      "mask": 4261441663,
+      "match": 671092787,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 536
+    },
+    {
+      "name": "BSETI",
+      "class": "ZbsDecode",
+      "mask": 4227887231,
+      "match": 671092755,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 537
+    },
+    {
+      "name": "BNE",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 4195,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 74
+    },
+    {
+      "name": "BEQ",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 99,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 75
+    },
+    {
+      "name": "BLT",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 16483,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 76
+    },
+    {
+      "name": "BLTU",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 24675,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 77
+    },
+    {
+      "name": "BGE",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 20579,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 78
+    },
+    {
+      "name": "BGEU",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 28771,
+      "flags": [
+        "BRANCH",
+        "RXS1",
+        "RXS2"
+      ],
+      "ignored_dont_cares": [],
+      "line": 79
+    },
+    {
+      "name": "JAL",
+      "class": "IDecode",
+      "mask": 127,
+      "match": 111,
+      "flags": [
+        "JAL",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 81
+    },
+    {
+      "name": "JALR",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 103,
+      "flags": [
+        "JALR",
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 82
+    },
+    {
+      "name": "AUIPC",
+      "class": "IDecode",
+      "mask": 127,
+      "match": 23,
+      "flags": [
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 83
+    },
+    {
+      "name": "LB",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 3,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 85
+    },
+    {
+      "name": "LH",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 4099,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 86
+    },
+    {
+      "name": "LW",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 8195,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 87
+    },
+    {
+      "name": "LBU",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 16387,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 88
+    },
+    {
+      "name": "LHU",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 20483,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 89
+    },
+    {
+      "name": "SB",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 35,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 90
+    },
+    {
+      "name": "SH",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 4131,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 91
+    },
+    {
+      "name": "SW",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 8227,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "MEM"
+      ],
+      "ignored_dont_cares": [],
+      "line": 92
+    },
+    {
+      "name": "LUI",
+      "class": "IDecode",
+      "mask": 127,
+      "match": 55,
+      "flags": [
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 94
+    },
+    {
+      "name": "ADDI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 19,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 95
+    },
+    {
+      "name": "SLTI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 8211,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 96
+    },
+    {
+      "name": "SLTIU",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 12307,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 97
+    },
+    {
+      "name": "ANDI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 28691,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 98
+    },
+    {
+      "name": "ORI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 24595,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 99
+    },
+    {
+      "name": "XORI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 16403,
+      "flags": [
+        "RXS1",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 100
+    },
+    {
+      "name": "ADD",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 51,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 101
+    },
+    {
+      "name": "SUB",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 1073741875,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 102
+    },
+    {
+      "name": "SLT",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 8243,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 103
+    },
+    {
+      "name": "SLTU",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 12339,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 104
+    },
+    {
+      "name": "AND",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 28723,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 105
+    },
+    {
+      "name": "OR",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 24627,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 106
+    },
+    {
+      "name": "XOR",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 16435,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 107
+    },
+    {
+      "name": "SLL",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 4147,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 108
+    },
+    {
+      "name": "SRL",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 20531,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 109
+    },
+    {
+      "name": "SRA",
+      "class": "IDecode",
+      "mask": 4261441663,
+      "match": 1073762355,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD"
+      ],
+      "ignored_dont_cares": [],
+      "line": 110
+    },
+    {
+      "name": "FENCE",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 15,
+      "flags": [
+        "FENCE"
+      ],
+      "ignored_dont_cares": [],
+      "line": 112
+    },
+    {
+      "name": "ECALL",
+      "class": "IDecode",
+      "mask": 4294967295,
+      "match": 115,
+      "flags": [
+        "CSR_ANY",
+        "SYSTEM"
+      ],
+      "ignored_dont_cares": [
+        "RXS1 masked by fixed rs1=x0"
+      ],
+      "line": 114
+    },
+    {
+      "name": "EBREAK",
+      "class": "IDecode",
+      "mask": 4294967295,
+      "match": 1048691,
+      "flags": [
+        "CSR_ANY",
+        "SYSTEM"
+      ],
+      "ignored_dont_cares": [
+        "RXS1 masked by fixed rs1=x0"
+      ],
+      "line": 115
+    },
+    {
+      "name": "MRET",
+      "class": "IDecode",
+      "mask": 4294967295,
+      "match": 807403635,
+      "flags": [
+        "CSR_ANY",
+        "SYSTEM"
+      ],
+      "ignored_dont_cares": [
+        "RXS1 masked by fixed rs1=x0"
+      ],
+      "line": 116
+    },
+    {
+      "name": "WFI",
+      "class": "IDecode",
+      "mask": 4294967295,
+      "match": 273678451,
+      "flags": [
+        "CSR_ANY",
+        "SYSTEM"
+      ],
+      "ignored_dont_cares": [
+        "RXS1 masked by fixed rs1=x0"
+      ],
+      "line": 117
+    },
+    {
+      "name": "CSRRW",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 4211,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 118
+    },
+    {
+      "name": "CSRRS",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 8307,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 119
+    },
+    {
+      "name": "CSRRC",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 12403,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 120
+    },
+    {
+      "name": "CSRRWI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 20595,
+      "flags": [
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 121
+    },
+    {
+      "name": "CSRRSI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 24691,
+      "flags": [
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 122
+    },
+    {
+      "name": "CSRRCI",
+      "class": "IDecode",
+      "mask": 28799,
+      "match": 28787,
+      "flags": [
+        "WXD",
+        "CSR_ANY",
+        "CSR_EN"
+      ],
+      "ignored_dont_cares": [],
+      "line": 123
+    },
+    {
+      "name": "VSETVLI",
+      "class": "VCFGDecode",
+      "mask": 2147512447,
+      "match": 28759,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 441
+    },
+    {
+      "name": "VSETIVLI",
+      "class": "VCFGDecode",
+      "mask": 3221254271,
+      "match": 3221254231,
+      "flags": [
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 442
+    },
+    {
+      "name": "VSETVL",
+      "class": "VCFGDecode",
+      "mask": 4261441663,
+      "match": 2147512407,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 443
+    },
+    {
+      "name": "SF_MSETMTYPE",
+      "class": "MatrixCFGDecode",
+      "mask": 4261441663,
+      "match": 2214621271,
+      "flags": [
+        "RXS1",
+        "RXS2",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 454
+    },
+    {
+      "name": "SF_MSETMTYPEI",
+      "class": "MatrixCFGDecode",
+      "mask": 4001263743,
+      "match": 2285924439,
+      "flags": [
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 455
+    },
+    {
+      "name": "SF_VSETTN",
+      "class": "MatrixCFGDecode",
+      "mask": 4293947519,
+      "match": 2281730135,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 456
+    },
+    {
+      "name": "SF_VSETTM",
+      "class": "MatrixCFGDecode",
+      "mask": 4293947519,
+      "match": 2282778711,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 457
+    },
+    {
+      "name": "SF_VSETTK",
+      "class": "MatrixCFGDecode",
+      "mask": 4293947519,
+      "match": 2283827287,
+      "flags": [
+        "RXS1",
+        "WXD",
+        "SETS_VCFG"
+      ],
+      "ignored_dont_cares": [],
+      "line": 458
+    }
+  ],
+  "facts": {
+    "issue_widths": {
+      "value": {
+        "hart0": 2,
+        "hart1": 2,
+        "hart2": 1
+      },
+      "evidence": [
+        {
+          "source": "iris-config",
+          "lines": [
+            285,
+            300
+          ]
+        },
+        {
+          "source": "shuttle-config",
+          "lines": [
+            14,
+            39
+          ]
+        },
+        {
+          "source": "rocket-core",
+          "lines": [
+            66,
+            69
+          ]
+        }
+      ]
+    },
+    "shuttle_fetch": {
+      "value": {
+        "parcels_per_fetch": 4,
+        "bytes_per_parcel": 2,
+        "fetch_buffer_uops": 7
+      },
+      "evidence": [
+        {
+          "source": "shuttle-params",
+          "lines": [
+            29,
+            49
+          ]
+        },
+        {
+          "source": "shuttle-fetch",
+          "lines": [
+            16,
+            24
+          ]
+        }
+      ]
+    },
+    "retimed_alu": {
+      "value": {
+        "enabled_mem_alu": true,
+        "enabled_late_alu": true,
+        "ALU_consumer_of_lane0_ALU": "MEM",
+        "ALU_consumer_of_lane0_memory": "WB",
+        "ordinary_ALU": "EX"
+      },
+      "evidence": [
+        {
+          "source": "shuttle-params",
+          "lines": [
+            29,
+            30
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            315,
+            382
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            863,
+            908
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            1221,
+            1234
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            1273,
+            1280
+          ]
+        }
+      ]
+    },
+    "alu_uses": {
+      "description": "wxd excludes mem/div/mul/CSR/FP/RoCC/jalr/vector; JAL is not excluded",
+      "evidence": [
+        {
+          "source": "shuttle-uop",
+          "lines": [
+            71,
+            78
+          ]
+        }
+      ]
+    },
+    "integer_hazards": {
+      "description": "Older integer scoreboard/bypass hazards plus same-packet RAW/WAW. x0 suppresses final dependency hazards. X->M depends on MEM lane1 not already retaining a late ALU. Same-packet branch/config consumers cannot forward. Raw field hits can retime unused operands. ALU-producer WAW is permitted; memory-producer WAW needs LateALU.",
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            300,
+            382
+          ]
+        }
+      ]
+    },
+    "bypass_priority": {
+      "value": [
+        "long-latency",
+        "WB lanes0,1",
+        "COM lanes0,1",
+        "MEM lanes0,1",
+        "EX lanes0,1"
+      ],
+      "last_matching_entry_wins": true,
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            99,
+            111
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            300,
+            309
+          ]
+        }
+      ]
+    },
+    "packet_limits": {
+      "description": "Pipe0-only classes, one memory/branch/config per packet, in-order prefix, CSR/system/exception youngest, conditional fence drain. Fence need not be youngest.",
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            435,
+            484
+          ]
+        }
+      ]
+    },
+    "vector_config_issue": {
+      "value": {
+        "issueVConfig": false,
+        "inflight_state_required": true
+      },
+      "evidence": [
+        {
+          "source": "saturn-integration",
+          "lines": [
+            29,
+            43
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            414,
+            434
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            453,
+            475
+          ]
+        }
+      ]
+    },
+    "frontend_metadata": {
+      "description": "Predicted next-PC tags can reserve branch port even on non-CFI. Small-forward branch heuristic uses displacement4 for RVC or6 for full instruction, when prediction tag absent; only compressed ALU shadow can use lane1.",
+      "evidence": [
+        {
+          "source": "shuttle-fetch",
+          "lines": [
+            36,
+            54
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            326,
+            326
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            447,
+            481
+          ]
+        }
+      ]
+    },
+    "branch_resolution": {
+      "value": "MEM stage; misprediction flushes RRD/EX and may kill younger packet lanes",
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            696,
+            742
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            829,
+            850
+          ]
+        }
+      ]
+    },
+    "retirement": {
+      "description": "COM retire count is PopCount of nonexception/nonreplay/nonkilled lanes. LateALU result written in WB; miss requires replay. Interrupt/trap/CSR flush precision cannot be approximated by unconditional execution of both candidate handlers.",
+      "evidence": [
+        {
+          "source": "shuttle-core",
+          "lines": [
+            990,
+            1001
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            1187,
+            1206
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            1221,
+            1234
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            1273,
+            1285
+          ]
+        }
+      ]
+    },
+    "internal_latency_parameters": {
+      "value": {
+        "pipelined_multiplier_stages": 2,
+        "scalar_sfmaLatency": 4,
+        "scalar_dfmaLatency": 4
+      },
+      "interpretation": "Structural source parameters only; not total issue-to-retirement or calibrated cycles",
+      "evidence": [
+        {
+          "source": "shuttle-params",
+          "lines": [
+            44,
+            45
+          ]
+        },
+        {
+          "source": "shuttle-core",
+          "lines": [
+            581,
+            586
+          ]
+        }
+      ]
+    },
+    "branch_prediction_structure": {
+      "value": {
+        "BTB_entries": 32,
+        "BHT_entries": 512,
+        "BHT_counter_bits": 2,
+        "BHT_history_bits": 8,
+        "BHT_hash_history_bits": 3,
+        "RAS_entries": 6
+      },
+      "evidence": [
+        {
+          "source": "shuttle-config",
+          "lines": [
+            26,
+            27
+          ]
+        },
+        {
+          "source": "rocket-btb",
+          "lines": [
+            13,
+            24
+          ]
+        }
+      ]
+    }
+  },
+  "elaboration": {
+    "full_file": "/scratch/eygao/iris-cy/sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+    "full_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+    "excerpt": "shuttle-evidence/fir-issue-excerpt.txt",
+    "excerpt_sha256": "c99b6039bc29154cecac686f24919b35d12669143ed11bcb6f4504acb77abf97",
+    "image_build_association": "unverified"
+  },
+  "unknown_timing_parameters": {
+    "ALU_issue_to_commit_cycles": null,
+    "branch_mispredict_cycles": null,
+    "Icache_hit_miss_cycles": null,
+    "scalar_load_store_cycles": null,
+    "shared_resources_and_overlap": null
+  },
+  "rtl_certified": false,
+  "accuracy_2_percent_certified": false
+}

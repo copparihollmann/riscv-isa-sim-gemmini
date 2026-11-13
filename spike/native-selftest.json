@@ -1,0 +1,9 @@
+{
+  "pass": true,
+  "narrow_cases": 20480,
+  "wide_cases": 11520,
+  "reduction_cases": 640,
+  "forms": 45,
+  "rtl_certified": false,
+  "log_sha256": "8e21d2ca7e19a3715a5b559078cc2df4f4a197f4de0321913bc70ec19e626797"
+}

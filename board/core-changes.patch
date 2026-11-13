@@ -1,0 +1,70 @@
+--- a/riscv/cfg.h
++++ b/riscv/cfg.h
+@@ -85,6 +85,7 @@
+   // Iris fork: explicit heterogeneous ISA overrides keyed by architectural hart ID.
+   std::map<size_t, std::string> hart_isa;
+   bool                    iris_vme = false;
++  std::string             iris_bootrom_file; // explicit source-backed physical boot
+   std::optional<uint64_t>  iris_schedule_seed;
+   const char* isa_for_hart(size_t id) const {
+     auto it = hart_isa.find(id);
+--- a/riscv/processor.cc
++++ b/riscv/processor.cc
+@@ -104,7 +104,7 @@
+ 
+ void state_t::reset(processor_t* const proc, reg_t max_isa)
+ {
+-  pc = DEFAULT_RSTVEC;
++  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
+   XPR.reset();
+   FPR.reset();
+ 
+--- a/riscv/sim.cc
++++ b/riscv/sim.cc
+@@ -3,6 +3,7 @@
+ #include "config.h"
+ #include "dtb_discovery.h"
+ #include "sim.h"
++#include "../../../board/iris_boot.hpp"
+ #include "mmu.h"
+ #include "dts.h"
+ #include "remote_bitbang.h"
+@@ -479,8 +480,26 @@
+ 
+ void sim_t::reset()
+ {
+-  if (dtb_enabled)
+-    set_rom();
++  if (cfg->iris_bootrom_file.empty()) {
++    if (dtb_enabled) set_rom();
++    return;
++  }
++  if (!dtb_enabled || !clint || cfg->hartids != std::vector<size_t>({0, 1, 2}))
++    throw std::runtime_error("Iris physical boot requires DTB, CLINT and harts 0/1/2");
++  auto prefix = iris_board::read_binary(cfg->iris_bootrom_file);
++  auto rom = std::make_shared<iris_board::ReadOnlyBootROM>(prefix,
++      std::vector<char>(dtb.begin(), dtb.end()));
++  auto bootreg = std::make_shared<iris_board::BootAddressRegister>();
++  add_device(iris_board::rom_base, rom);
++  add_device(iris_board::bootreg_base, bootreg);
++  // htif has loaded the ELF before reset(): model the external loader writing
++  // the boot address register and raising hart 0's software interrupt.
++  reg_t entry = cfg->start_pc.get(0).value_or(get_entry_point());
++  uint8_t data[8];
++  for (unsigned i = 0; i < 8; ++i) data[i] = uint8_t(entry >> (8 * i));
++  if (!bootreg->store(0, 8, data)) throw std::runtime_error("Iris boot address write failed");
++  const uint8_t release[4] = {1, 0, 0, 0};
++  if (!clint->store(0, 4, release)) throw std::runtime_error("Iris boot release failed");
+ }
+ 
+ void sim_t::idle()
+--- a/spike_main/spike.cc
++++ b/spike_main/spike.cc
+@@ -417,6 +417,7 @@
+   parser.option(0, "log-cache-miss", 0, [&](const char UNUSED *s){log_cache = true;});
+   parser.option(0, "isa", 1, [&](const char* s){cfg.isa = s;});
+   parser.option(0, "iris-vme", 0, [&](const char*){cfg.iris_vme = true;});
++  parser.option(0, "iris-bootrom", 1, [&](const char* path){cfg.iris_bootrom_file = path;});
+   parser.option(0, "iris-schedule-seed", 1, [&](const char* raw){
+     std::string value(raw); size_t used = 0;
+     try {

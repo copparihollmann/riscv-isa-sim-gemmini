@@ -1,0 +1,25 @@
+{
+  "schema": "iris.pow2_scalar_private_frozen_split.v2",
+  "frozen_before_new_hardware": true,
+  "reserved_N": [
+    32,
+    256,
+    1024
+  ],
+  "train_N": [
+    16,
+    64,
+    128,
+    512,
+    2048
+  ],
+  "grouping": "N acrossall8kinds/all3harts/all3trials",
+  "reserved_regions": 216,
+  "train_regions": 360,
+  "parent_shared_v1_split_preserved": true,
+  "parent_shared_v1_hardware_timings_not_transferred": true,
+  "source_shared_case_namespace": "scalar.pow2.",
+  "new_private_case_namespace": "scalar.pow2.private.v2.",
+  "reserved_timing_labels_root_only": true,
+  "hardware_contacted": false
+}

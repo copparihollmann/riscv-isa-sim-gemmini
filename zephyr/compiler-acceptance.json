@@ -1,0 +1,63 @@
+{
+  "schema": "iris.zephyr.compiler_acceptance.v1",
+  "status": "passed_real_mlir_zephyr_pipeline",
+  "generator_sha256": "75ce7f75b13eb4bde1bc1db18058082859e2809aabc0ff3a02eb53285c780310",
+  "historical_source_fallback_sha256": "fce576b4af6d262f432415929f99a37ec9419a54de3812970597b5538cb4bcdf",
+  "snapshot_manifest": "build/zephyr-primary-0c0fd778/manifest.json",
+  "snapshot_manifest_sha256": "3e724838bdc00abf5ee8223f7e017460856ae92c5d7435f343dbb631cbc4b170",
+  "native_binary_sha256": "0c0fd7785d3e7ba2785e2e9eabc0d0af719037ab2fa761b71bab33fe24a5f257",
+  "gates": [
+    {
+      "op": "gemm",
+      "workers": 1,
+      "path": "build/zephyr-mlir-final/gemm-h1/results.json",
+      "sha256": "37407295e962a9fa5e9135415e64ac45ebda3f5fe98cfa63a2661b8e8181187d",
+      "programs": 2,
+      "jobs_per_program": 3,
+      "full_int32_and_w8a8_elements_per_program": 12288
+    },
+    {
+      "op": "gemm",
+      "workers": 2,
+      "path": "build/zephyr-mlir-final/gemm-h2/results.json",
+      "sha256": "88ebc549c66aa502a0bf220b85fa2bdb72d3fa57ab489ca575a16ca3eb22f63d",
+      "programs": 2,
+      "jobs_per_program": 3,
+      "full_int32_and_w8a8_elements_per_program": 12288
+    },
+    {
+      "op": "conv2d",
+      "workers": 1,
+      "path": "build/zephyr-mlir-final/conv2d-h1/results.json",
+      "sha256": "6f47fb1d256cad2eac3974524b2a0728601c7a588ceaaa514253382d94b2752e",
+      "programs": 2,
+      "jobs_per_program": 3,
+      "full_int32_and_w8a8_elements_per_program": 12288
+    },
+    {
+      "op": "conv2d",
+      "workers": 2,
+      "path": "build/zephyr-mlir-final/conv2d-h2/results.json",
+      "sha256": "7ef29f02ad68a7dcde301e77ffe3b5096e624c78d98d12eb7a17b9fb4fbef469",
+      "programs": 2,
+      "jobs_per_program": 3,
+      "full_int32_and_w8a8_elements_per_program": 12288
+    }
+  ],
+  "programs": 8,
+  "all_int32_elements_checked": 98304,
+  "all_w8a8_elements_checked": 98304,
+  "physical_harts": 3,
+  "compute_harts": [
+    0,
+    1
+  ],
+  "producer_hart": 2,
+  "real_merlin_mlir": true,
+  "convolution_frontend": "producer-side im2col; compiled contraction endpoint",
+  "target_owned_vme_setup": true,
+  "whole_model_worker_pool_qualified": false,
+  "rtl_certified": false,
+  "fpga_certified": false,
+  "timing_certified": false
+}

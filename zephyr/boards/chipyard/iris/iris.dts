@@ -1,0 +1,122 @@
+/dts-v1/;
+
+/* Derived from board/evidence/firesim-dts.dts at the audited Iris source pins.
+ * Zephyr's PLIC binding carries a second IRQ cell for software priority; the
+ * physical source ID remains 1. The machine-timer node describes CLINT fields.
+ */
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	model = "ucb-bar,iris";
+	compatible = "ucb-bar,chipyard-dev";
+	chosen {
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+		zephyr,sram = &dram;
+	};
+	aliases { serial0 = &uart0; };
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		timebase-frequency = <500000>;
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "ucb-bar,shuttle", "riscv";
+			reg = <0>;
+			status = "okay";
+			clock-frequency = <500000000>;
+			riscv,isa = "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t";
+			mmu-type = "riscv,sv39";
+			hlic0: interrupt-controller {
+				compatible = "riscv,cpu-intc";
+				interrupt-controller;
+				#interrupt-cells = <1>;
+			};
+		};
+		cpu1: cpu@1 {
+			device_type = "cpu";
+			compatible = "ucb-bar,shuttle", "riscv";
+			reg = <1>;
+			status = "okay";
+			clock-frequency = <500000000>;
+			riscv,isa = "rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t";
+			mmu-type = "riscv,sv39";
+			hlic1: interrupt-controller {
+				compatible = "riscv,cpu-intc";
+				interrupt-controller;
+				#interrupt-cells = <1>;
+			};
+		};
+		cpu2: cpu@2 {
+			device_type = "cpu";
+			compatible = "sifive,rocket0", "riscv";
+			reg = <2>;
+			status = "okay";
+			clock-frequency = <500000000>;
+			riscv,isa = "rv64imafdcvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zvbb_xrocket";
+			mmu-type = "riscv,sv39";
+			riscv,pmpgranularity = <4>;
+			riscv,pmpregions = <8>;
+			hlic2: interrupt-controller {
+				compatible = "riscv,cpu-intc";
+				interrupt-controller;
+				#interrupt-cells = <1>;
+			};
+		};
+	};
+	dram: memory@80000000 {
+		device_type = "memory";
+		reg = <0 0x80000000 1 0>;
+	};
+	tcm0: memory@70000000 {
+		device_type = "memory";
+		reg = <0 0x70000000 0 0x20000>;
+		status = "disabled";
+	};
+	tcm1: memory@70020000 {
+		device_type = "memory";
+		reg = <0 0x70020000 0 0x20000>;
+		status = "disabled";
+	};
+	scratchpad: memory@580000000 {
+		device_type = "memory";
+		reg = <5 0x80000000 0 0x20000>;
+		status = "disabled";
+	};
+	htif: uart-htif { compatible = "ucb,htif"; label = "HTIF_UART"; status = "okay"; };
+	soc {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "simple-bus";
+		ranges;
+		plic: interrupt-controller@c000000 {
+			compatible = "sifive,plic-1.0.0";
+			reg = <0 0x0c000000 0 0x04000000>;
+			riscv,ndev = <1>;
+			riscv,max-priority = <1>;
+			interrupt-controller;
+			#address-cells = <0>;
+			#interrupt-cells = <2>;
+			interrupts-extended = <&hlic0 11 &hlic0 9 &hlic1 11 &hlic1 9 &hlic2 11 &hlic2 9>;
+		};
+		clint: clint@2000000 {
+			compatible = "sifive,clint0";
+			reg = <0 0x02000000 0 0x10000>;
+			interrupts-extended = <&hlic0 3 &hlic0 7 &hlic1 3 &hlic1 7 &hlic2 3 &hlic2 7>;
+		};
+		mtimer: timer@200bff8 {
+			compatible = "riscv,machine-timer";
+			reg = <0 0x0200bff8 0 8>, <0 0x02004000 0 24>;
+			reg-names = "mtime", "mtimecmp";
+			interrupts-extended = <&hlic0 7 &hlic1 7 &hlic2 7>;
+		};
+		uart0: serial@10020000 {
+			compatible = "sifive,uart0";
+			reg = <0 0x10020000 0 0x1000>;
+			interrupt-parent = <&plic>;
+			interrupts = <1 1>;
+			current-speed = <115200>;
+			status = "okay";
+		};
+	};
+};

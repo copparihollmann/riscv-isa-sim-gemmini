@@ -1,0 +1,41 @@
+{
+  "schema": "iris.zephyr_uart_profiles.v1",
+  "chipyard_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+  "zephyr_commit": "cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0",
+  "driver_divisor_formula": "floor(SIFIVE_PERIPHERAL_CLOCK_FREQUENCY / current_speed) - 1",
+  "peripheral_clock_formula": "CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC * CONFIG_RTC_CLOCK_DIVIDER_VALUE",
+  "clock_hz": 500000000,
+  "uart_bit_edges_formula": "DIV + 1",
+  "profiles": {
+    "physical": {
+      "overlay": null,
+      "requested_baud": 115200,
+      "expected_divisor": 4339,
+      "physical_bit_edges": 4340,
+      "fixed_bridge_key": null,
+      "scope": "External physical UART115200 or saved-IrisConfig SimUART harness; actual receiver tolerance must be respected."
+    },
+    "ethan-firesim": {
+      "overlay": "boards/chipyard/iris/ethan-firesim.overlay",
+      "requested_baud": 3676470,
+      "expected_divisor": 135,
+      "physical_bit_edges": 136,
+      "source_init_baud": 3686400,
+      "fixed_bridge_key": 135,
+      "scope": "Inspected Ethan FireSim fixed UART bridge: its TX decoder waits135 token edges then samples on one further edge. Software changing DIV does not reconfigure the bridge."
+    }
+  },
+  "source_sha256": {
+    "uart-profile-evidence/BridgeBinders.scala": "317955a03a36b5644270bddfedb5682e64b98e2c5a76964c80877f25175a1535",
+    "uart-profile-evidence/UARTBridge.scala": "96bfe1c1a6c182c5afee21076f4028d21b5105e0a1f4d5dd837bd33a19fb237e",
+    "uart-profile-evidence/UARTBridgeModule.scala": "53988098293011f3d061c9cca512e1d8dd101d1dad8fae395df44043447c9866",
+    "uart-profile-evidence/firesim-clocks.freq-summary": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+    "uart-profile-evidence/firesim-target-config.scala": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d",
+    "uart-profile-evidence/firesim-uart-annotation.json": "f36c01e8c7dfb21f4eb6e0cb5c7cf5d274693bc4372e7d2b6032a87a5d13dab2",
+    "uart-profile-evidence/soc.h": "9e66fea5ee48c94c61bd45a5f01beb26bdfb63864314f53707ee90d961017b6b",
+    "uart-profile-evidence/uart_sifive.c": "e6787d7db5a5fadb5a842fbeba9f9ff0772406c8dc7b01b4d1df62ee430598fa"
+  },
+  "source_image_association_verified": false,
+  "deployed_hardware_tested": false,
+  "timing_calibrated": false
+}

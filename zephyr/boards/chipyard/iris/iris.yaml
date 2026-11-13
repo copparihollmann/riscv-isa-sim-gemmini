@@ -1,0 +1,11 @@
+identifier: iris
+name: Iris heterogeneous three-hart SoC
+type: mcu
+arch: riscv
+toolchain:
+  - cross-compile
+ram: 4194304
+supported:
+  - smp
+  - uart
+  - counter

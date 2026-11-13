@@ -1,0 +1,137 @@
+{
+  "class": "firesim.lib.bridgeutils.BridgeAnnotation",
+  "target": "~FireSim|FASEDBridge",
+  "bridgeChannels": [
+    {
+      "class": "firesim.lib.bridgeutils.PipeBridgeChannel",
+      "name": "reset",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [],
+      "sources": [
+        "~FireSim|FASEDBridge>reset"
+      ],
+      "latency": 1
+    },
+    {
+      "class": "firesim.lib.bridgeutils.ReadyValidBridgeChannel",
+      "fwdName": "axi4_ar_fwd",
+      "revName": "axi4_ar_rev",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [],
+      "sources": [
+        "~FireSim|FASEDBridge>axi4.ar.bits.user",
+        "~FireSim|FASEDBridge>axi4.ar.bits.id",
+        "~FireSim|FASEDBridge>axi4.ar.bits.region",
+        "~FireSim|FASEDBridge>axi4.ar.bits.qos",
+        "~FireSim|FASEDBridge>axi4.ar.bits.prot",
+        "~FireSim|FASEDBridge>axi4.ar.bits.cache",
+        "~FireSim|FASEDBridge>axi4.ar.bits.lock",
+        "~FireSim|FASEDBridge>axi4.ar.bits.burst",
+        "~FireSim|FASEDBridge>axi4.ar.bits.size",
+        "~FireSim|FASEDBridge>axi4.ar.bits.len",
+        "~FireSim|FASEDBridge>axi4.ar.bits.addr",
+        "~FireSim|FASEDBridge>axi4.ar.valid"
+      ],
+      "valid": "~FireSim|FASEDBridge>axi4.ar.valid",
+      "ready": "~FireSim|FASEDBridge>axi4.ar.ready"
+    },
+    {
+      "class": "firesim.lib.bridgeutils.ReadyValidBridgeChannel",
+      "fwdName": "axi4_w_fwd",
+      "revName": "axi4_w_rev",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [],
+      "sources": [
+        "~FireSim|FASEDBridge>axi4.w.bits.user",
+        "~FireSim|FASEDBridge>axi4.w.bits.strb",
+        "~FireSim|FASEDBridge>axi4.w.bits.id",
+        "~FireSim|FASEDBridge>axi4.w.bits.last",
+        "~FireSim|FASEDBridge>axi4.w.bits.data",
+        "~FireSim|FASEDBridge>axi4.w.valid"
+      ],
+      "valid": "~FireSim|FASEDBridge>axi4.w.valid",
+      "ready": "~FireSim|FASEDBridge>axi4.w.ready"
+    },
+    {
+      "class": "firesim.lib.bridgeutils.ReadyValidBridgeChannel",
+      "fwdName": "axi4_aw_fwd",
+      "revName": "axi4_aw_rev",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [],
+      "sources": [
+        "~FireSim|FASEDBridge>axi4.aw.bits.user",
+        "~FireSim|FASEDBridge>axi4.aw.bits.id",
+        "~FireSim|FASEDBridge>axi4.aw.bits.region",
+        "~FireSim|FASEDBridge>axi4.aw.bits.qos",
+        "~FireSim|FASEDBridge>axi4.aw.bits.prot",
+        "~FireSim|FASEDBridge>axi4.aw.bits.cache",
+        "~FireSim|FASEDBridge>axi4.aw.bits.lock",
+        "~FireSim|FASEDBridge>axi4.aw.bits.burst",
+        "~FireSim|FASEDBridge>axi4.aw.bits.size",
+        "~FireSim|FASEDBridge>axi4.aw.bits.len",
+        "~FireSim|FASEDBridge>axi4.aw.bits.addr",
+        "~FireSim|FASEDBridge>axi4.aw.valid"
+      ],
+      "valid": "~FireSim|FASEDBridge>axi4.aw.valid",
+      "ready": "~FireSim|FASEDBridge>axi4.aw.ready"
+    },
+    {
+      "class": "firesim.lib.bridgeutils.ReadyValidBridgeChannel",
+      "fwdName": "axi4_r_fwd",
+      "revName": "axi4_r_rev",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [
+        "~FireSim|FASEDBridge>axi4.r.bits.user",
+        "~FireSim|FASEDBridge>axi4.r.bits.id",
+        "~FireSim|FASEDBridge>axi4.r.bits.last",
+        "~FireSim|FASEDBridge>axi4.r.bits.data",
+        "~FireSim|FASEDBridge>axi4.r.bits.resp",
+        "~FireSim|FASEDBridge>axi4.r.valid"
+      ],
+      "sources": [],
+      "valid": "~FireSim|FASEDBridge>axi4.r.valid",
+      "ready": "~FireSim|FASEDBridge>axi4.r.ready"
+    },
+    {
+      "class": "firesim.lib.bridgeutils.ReadyValidBridgeChannel",
+      "fwdName": "axi4_b_fwd",
+      "revName": "axi4_b_rev",
+      "clock": "~FireSim|FASEDBridge>clock",
+      "sinks": [
+        "~FireSim|FASEDBridge>axi4.b.bits.user",
+        "~FireSim|FASEDBridge>axi4.b.bits.id",
+        "~FireSim|FASEDBridge>axi4.b.bits.resp",
+        "~FireSim|FASEDBridge>axi4.b.valid"
+      ],
+      "sources": [],
+      "valid": "~FireSim|FASEDBridge>axi4.b.valid",
+      "ready": "~FireSim|FASEDBridge>axi4.b.ready"
+    }
+  ],
+  "widgetClass": "midas.models.FASEDMemoryTimingModel",
+  "widgetConstructorKey": {
+    "class": "firesim.lib.bridges.CompleteConfig",
+    "axi4Widths": {
+      "dataBits": 64,
+      "addrBits": 33,
+      "idBits": 4
+    },
+    "axi4Edge": {
+      "maxReadTransfer": 8,
+      "maxWriteTransfer": 8,
+      "idReuse": 64,
+      "maxFlight": 1024,
+      "address": [
+        {
+          "base": 2147483648,
+          "mask": 2147483647
+        },
+        {
+          "base": 4294967296,
+          "mask": 2147483647
+        }
+      ]
+    },
+    "memoryRegionName": "MainMemory_1"
+  }
+}

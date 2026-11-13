@@ -1,0 +1,10 @@
+{
+  "conda": "recorded lock installed unchanged; stock regeneration skipped",
+  "submodules": "upstream initializer --saturn; optional Gemmini software dependency unavailable; all recorded gitlinks retained",
+  "chipyard_setup_flags": [
+    "riscv-tools",
+    "--skip-marshal",
+    "--skip-conda",
+    "--skip-submodules"
+  ]
+}

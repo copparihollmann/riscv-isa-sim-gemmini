@@ -1,0 +1,4 @@
+IRIS_CSRCONFIG {"hart":0,"checks":122,"hardware_hpm_counters":0,"padded_slots":29,"mcounteren":7,"scounteren":7,"mcountinhibit":5,"rdtime_illegal":true,"mtime_advances":true}
+IRIS_CSRCONFIG {"hart":1,"checks":122,"hardware_hpm_counters":0,"padded_slots":29,"mcounteren":7,"scounteren":7,"mcountinhibit":5,"rdtime_illegal":true,"mtime_advances":true}
+IRIS_CSRCONFIG {"hart":2,"checks":122,"hardware_hpm_counters":0,"padded_slots":29,"mcounteren":7,"scounteren":7,"mcountinhibit":5,"rdtime_illegal":true,"mtime_advances":true}
+PASSED source-configured CSR capabilities on all3 harts

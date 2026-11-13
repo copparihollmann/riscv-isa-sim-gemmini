@@ -1,0 +1,376 @@
+{
+  "schema": "iris.local_managed_path_readiness.v1",
+  "created_at_utc": "2026-11-06T07:02:56.662905+00:00",
+  "status": "local_tests_pass_operator_actions_still_required",
+  "hardware_contacted": false,
+  "remote_installed": false,
+  "inspection_complete_on_fpga_host": false,
+  "operator_allocation_confirmed": false,
+  "hardware_launch_permitted": false,
+  "loaded_image_verified": false,
+  "driver_image_build_association_verified": false,
+  "calibration_usable": false,
+  "inspector_version": "iris-fpga-inspection-v1",
+  "inspector_sha256": "5934aaa1907605a05cd6e9bca6c28e98fa6ab62dfb8339c5c5aabde59ac526d8",
+  "runner_sha256": "4bbb2c89b1ead981066be0a9f1820ec752e7dc8d255c84eae743c8e70abb0301",
+  "prepare_campaign_sha256": "b60d4e97e22490739d12f99d7c4dc0f1e3c7547f5119707f68731bb090f6fade",
+  "python": {
+    "executable": "/usr/bin/python3",
+    "version": "3.9.25 (main, Mar 26 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-11)]"
+  },
+  "tests": {
+    "run": 95,
+    "unique_case_ids": [
+      "test_batch_runner.BatchTests.test_cases_require_distinct_identifiers_and_harts",
+      "test_batch_runner.BatchTests.test_cleanup_allows_only_owned_uid_and_private_directory",
+      "test_batch_runner.BatchTests.test_failed_infrasetup_still_kills",
+      "test_batch_runner.BatchTests.test_foreign_job_appearing_after_initial_kill_blocks_setup_and_cleanup",
+      "test_batch_runner.BatchTests.test_guest_region_correctness_is_required_when_reported",
+      "test_batch_runner.BatchTests.test_incomplete_visibility_never_kills",
+      "test_batch_runner.BatchTests.test_independent_host_golden_defeats_self_consistent_guest_result",
+      "test_batch_runner.BatchTests.test_missing_driver_fails_before_ssh",
+      "test_batch_runner.BatchTests.test_nonzero_guest_exit_fails_and_still_cleans_up",
+      "test_batch_runner.BatchTests.test_occupancy_race_releases_lock_without_killing",
+      "test_batch_runner.BatchTests.test_occupied_fpga_never_killed",
+      "test_batch_runner.BatchTests.test_preparation_preserves_upstream_and_instrumentation",
+      "test_batch_runner.BatchTests.test_prepared_job_cannot_change_hwdb_or_retry_old_execution",
+      "test_batch_runner.BatchTests.test_prepared_job_verifies_copied_payload_without_network",
+      "test_batch_runner.BatchTests.test_region_counters_and_provenance",
+      "test_batch_runner.BatchTests.test_reject_wrap_bad_hart_and_bool_counter",
+      "test_batch_runner.BatchTests.test_required_goldens_reject_unknown_and_incomplete_evidence",
+      "test_batch_runner.BatchTests.test_required_lifecycle",
+      "test_batch_runner.BatchTests.test_untrusted_expired_and_rebooted_allocations_never_kill",
+      "test_batch_runner.BatchTests.test_visibility_loss_during_run_withholds_cleanup_and_retains_lock",
+      "test_capture_run.CaptureTests.test_cannot_overwrite_or_archive_recursively",
+      "test_capture_run.CaptureTests.test_context_missing_is_explicit_not_certification",
+      "test_capture_run.CaptureTests.test_failure_logs_and_each_archived_byte_are_preserved",
+      "test_capture_run.CaptureTests.test_shared_symlink_tree_and_secret_are_not_followed",
+      "test_inspector.CollectorTests.test_absent_or_malformed_database_is_incomplete",
+      "test_inspector.CollectorTests.test_all_programming_fd_classes_are_occupied",
+      "test_inspector.CollectorTests.test_allocation_symlink_is_untrusted",
+      "test_inspector.CollectorTests.test_collector_only_reads_existing_files",
+      "test_inspector.CollectorTests.test_disappearing_fd_is_not_a_hidden_pid",
+      "test_inspector.CollectorTests.test_empty_command_still_checks_held_fd",
+      "test_inspector.CollectorTests.test_empty_command_still_checks_memory_mapping",
+      "test_inspector.CollectorTests.test_empty_maps_and_fd_are_actually_scanned",
+      "test_inspector.CollectorTests.test_fd_link_permission_failure_is_incomplete",
+      "test_inspector.CollectorTests.test_hidepid_cannot_qualify_unprivileged_fallback",
+      "test_inspector.CollectorTests.test_kernel_bdf_source_is_recorded",
+      "test_inspector.CollectorTests.test_maps_permission_failure_is_incomplete",
+      "test_inspector.CollectorTests.test_missing_maps_of_still_present_process_is_incomplete",
+      "test_inspector.CollectorTests.test_non_device_files_do_not_claim_occupancy",
+      "test_inspector.CollectorTests.test_pid_reuse_is_incomplete",
+      "test_inspector.CollectorTests.test_programmer_variants_are_busy_without_an_open_device",
+      "test_inspector.CollectorTests.test_unrelated_pci_resource_is_uncertain_not_silently_ignored",
+      "test_inspector.EntryPointTests.test_any_argument_is_refused",
+      "test_inspector.EntryPointTests.test_entrypoint_passes_only_trusted_caller_identity",
+      "test_inspector.EntryPointTests.test_noninstalled_payload_is_refused",
+      "test_inspector.EntryPointTests.test_nonisolated_or_site_enabled_python_is_refused",
+      "test_inspector.EntryPointTests.test_nonroot_real_or_effective_identity_is_refused",
+      "test_inspector.EntryPointTests.test_stdin_pipe_is_refused",
+      "test_inspector.EntryPointTests.test_sudo_caller_cannot_be_root_missing_or_malformed",
+      "test_inspector.EntryPointTests.test_sudo_name_or_command_mismatch_is_refused",
+      "test_inspector.PhaseStreamTests.test_changed_runtime_refuses_before_process_spawn",
+      "test_inspector.PhaseStreamTests.test_cleanup_phase_is_explicit",
+      "test_inspector.PhaseStreamTests.test_nonzero_phase_preserves_both_streams_and_exit",
+      "test_inspector.PhaseStreamTests.test_shared_manager_dependency_change_refuses_before_spawn",
+      "test_inspector.PhaseStreamTests.test_spawn_failure_is_recorded",
+      "test_inspector.PhaseStreamTests.test_stdout_and_stderr_are_raw_distinct_streams",
+      "test_inspector.PhaseStreamTests.test_timeout_retains_partial_streams_and_local_process_exit",
+      "test_inspector.ProbeTests.test_absent_helper_can_use_genuinely_complete_unprivileged_view",
+      "test_inspector.ProbeTests.test_absent_helper_retains_incomplete_refusal",
+      "test_inspector.ProbeTests.test_bad_json_refuses",
+      "test_inspector.ProbeTests.test_caller_boot_euid_version_and_source_mismatches_are_refused",
+      "test_inspector.ProbeTests.test_expected_helper_is_fixed_no_args_no_stdin",
+      "test_inspector.ProbeTests.test_incomplete_privileged_scan_remains_incomplete",
+      "test_inspector.ProbeTests.test_password_or_privilege_failure_never_becomes_complete",
+      "test_inspector.ProbeTests.test_remote_program_binds_local_source_digest",
+      "test_inspector.ProbeTests.test_unknown_helper_is_not_invoked_even_if_unprivileged_view_complete",
+      "test_instrumentation.InstrumentationInventoryTests.test_include_or_type_name_is_not_an_instantiated_trace_bridge",
+      "test_instrumentation.InstrumentationInventoryTests.test_link_in_artifact_tar_is_not_treated_as_a_bitstream",
+      "test_instrumentation.InstrumentationInventoryTests.test_member_hash_binds_actual_bytes",
+      "test_instrumentation.InstrumentationInventoryTests.test_missing_generated_constructor_contract_refuses",
+      "test_instrumentation.InstrumentationInventoryTests.test_writable_latencies_are_not_periodic_counter_samples",
+      "test_managed_capture.ActualLocalProbeTests.test_actual_probe_hashes_the_three_staged_regular_files",
+      "test_managed_capture.ActualLocalProbeTests.test_actual_probe_refuses_fifo_without_blocking_or_opening_it",
+      "test_managed_capture.ActualLocalProbeTests.test_actual_probe_refuses_missing_elf",
+      "test_managed_capture.ActualLocalProbeTests.test_actual_probe_refuses_nonprivate_staging_parent",
+      "test_managed_capture.ActualLocalProbeTests.test_actual_probe_refuses_staged_symlink",
+      "test_managed_capture.ManagedEvidenceTests.test_archive_failure_does_not_mask_guest_failure",
+      "test_managed_capture.ManagedEvidenceTests.test_exact_audit_and_profile_override_are_bound_without_fabricating_widgets",
+      "test_managed_capture.ManagedEvidenceTests.test_invalid_or_ambiguous_profile_request_is_refused",
+      "test_managed_capture.ManagedEvidenceTests.test_lock_release_failure_withholds_capture_and_records_retained_lock",
+      "test_managed_capture.ManagedEvidenceTests.test_new_inventory_v3_is_frozen_by_digest_without_hardcoded_candidate",
+      "test_managed_capture.ManagedEvidenceTests.test_staging_refusal_withholds_workload_and_keeps_owned_cleanup",
+      "test_managed_capture.ManagedEvidenceTests.test_successful_guest_capture_failure_retains_guest_outcome",
+      "test_managed_capture.ManagedEvidenceTests.test_uncertain_cleanup_withholds_capture",
+      "test_managed_capture.ManagedEvidenceTests.test_unfrozen_audit_refuses_before_any_remote_inspection",
+      "test_managed_capture.ManagedEvidenceTests.test_unknown_audit_schema_is_refused",
+      "test_managed_capture.ManagedEvidenceTests.test_wrong_candidate_image_or_driver_is_refused",
+      "test_managed_capture.TransportTests.test_capture_partial_and_errors_are_preserved_without_changing_guest_status",
+      "test_managed_capture.TransportTests.test_isolated_system_python_ignores_untrusted_pythonpath_and_cwd_imports",
+      "test_managed_capture.TransportTests.test_missing_and_empty_optional_counters_are_explicit_not_guest_failures",
+      "test_managed_capture.TransportTests.test_optional_transport_traversal_and_identity_mismatch_are_unavailable",
+      "test_managed_capture.TransportTests.test_optional_transport_wrong_uid_is_unavailable",
+      "test_managed_capture.TransportTests.test_real_capture_cli_produces_archive_outside_job_after_preserving_raw_files",
+      "test_managed_capture.TransportTests.test_staging_digest_mismatch_is_recorded_before_exception",
+      "test_managed_capture.TransportTests.test_staging_probe_failure_keeps_original_stderr_bytes",
+      "test_managed_capture.TransportTests.test_verified_staging_binds_both_raw_streams_and_fixed_readonly_probe"
+    ],
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "api": {
+    "prepare": "prepare(..., observability_report=Path(...), profile_interval=1000000)",
+    "profile_interval_target_cycles": 1000000,
+    "observability_report": "build/firesim-observability-candidate-v2/report.json",
+    "candidate_observability_sha256": "3c11c53f38a275ebfa29f850738071404c7516b817721d26a74623021446bc0f"
+  },
+  "source_snapshots": [
+    {
+      "source": "/scratch/copparihollmann/AGENTS.md",
+      "artifact": "sources/000-AGENTS.md",
+      "sha256": "da1d5374df3f9ef11f21880ba748c2a4ba05aca4c773590f671dca815f8b6c9c"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/AGENTS.md",
+      "artifact": "sources/001-AGENTS.md",
+      "sha256": "87a27ddde94d7215bd6e82c614e0c4c41ffa3dae11422fca3e21b5e0ba231549"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/build/access-privilege-details-20261106/report.json",
+      "artifact": "sources/002-report.json",
+      "sha256": "924366ac04ee038def127ca1b81615978fde946efc614377a33b0568a1f96679"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/build/firesim-observability-candidate-v2/report.json",
+      "artifact": "sources/003-report.json",
+      "sha256": "3c11c53f38a275ebfa29f850738071404c7516b817721d26a74623021446bc0f"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/CAMPAIGN_POLICY.md",
+      "artifact": "sources/004-CAMPAIGN_POLICY.md",
+      "sha256": "1a20d027c489e5d2c353e7c6c022f079d5eced9d51875bf62cfe6c2793e5c09d"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/OPERATING_RULES.md",
+      "artifact": "sources/005-OPERATING_RULES.md",
+      "sha256": "40cb37125acf6bb6f5b54da8f1bdcb836b1048692479e3dbb0e3b0fcce906be2"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/batch_runner.py",
+      "artifact": "sources/006-batch_runner.py",
+      "sha256": "4bbb2c89b1ead981066be0a9f1820ec752e7dc8d255c84eae743c8e70abb0301"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/capture_run.py",
+      "artifact": "sources/007-capture_run.py",
+      "sha256": "8058f2671ba1886e9fee6e567e91ce4c6094a9bdbc496fd6a1e26ed7021352f1"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/firesim-observed-dirty.patch",
+      "artifact": "sources/008-firesim-observed-dirty.patch",
+      "sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/inspect_instrumentation.py",
+      "artifact": "sources/009-inspect_instrumentation.py",
+      "sha256": "b6b980df8f1e4639cacb0c431057f05c1a04453e61d1dbfdd55f56d80654fcdc"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/operator/README.md",
+      "artifact": "sources/010-README.md",
+      "sha256": "fb6fd102bb9538858723b8a2a5c1b69836c547454c200fbcb27aeefb70e45912"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/operator/audit_managed_path.py",
+      "artifact": "sources/011-audit_managed_path.py",
+      "sha256": "4a28a2524dd99c9f150775478e0472e1436104a86bce8d0690cc80b1a99c075d"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/operator/firesim-iris-inspect",
+      "artifact": "sources/012-firesim-iris-inspect",
+      "sha256": "5934aaa1907605a05cd6e9bca6c28e98fa6ab62dfb8339c5c5aabde59ac526d8"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/operator/managed-path-audit.json",
+      "artifact": "sources/013-managed-path-audit.json",
+      "sha256": "d1c2fe2f640120b39b0c0ea3c271d3da379d579ef4f1a6939b0420f19c81e185"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/operator/release.py",
+      "artifact": "sources/014-release.py",
+      "sha256": "d9501ea7ee8b4de7a777938e3ea9a549b734446b96590c198e2f9368e5ebb04b"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/prepare_campaign.py",
+      "artifact": "sources/015-prepare_campaign.py",
+      "sha256": "b60d4e97e22490739d12f99d7c4dc0f1e3c7547f5119707f68731bb090f6fade"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/run_prepared.py",
+      "artifact": "sources/016-run_prepared.py",
+      "sha256": "741e0c03f06330e9a1213d14a5d60113f395a7486a827adff72a3082025e2c53"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/source-clones.json",
+      "artifact": "sources/017-source-clones.json",
+      "sha256": "2361ce2edc24b93b142ee1b432576b94e51ea29c39dde9c8fc640a9525592cdf"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/tests/test_batch_runner.py",
+      "artifact": "sources/018-test_batch_runner.py",
+      "sha256": "8ff5a09b98b387b32e8c9be202409c023ac66c0ab2087c6a5915406fc25f1b50"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/tests/test_capture_run.py",
+      "artifact": "sources/019-test_capture_run.py",
+      "sha256": "9887231948b495cea92010919c6959b3ee5db3da7a7166555a39a44b2eef9a3d"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/tests/test_inspector.py",
+      "artifact": "sources/020-test_inspector.py",
+      "sha256": "5486878a24816340ebbfc64c87624b822f87d2c8faf81f5ba7c17a48621b99bd"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/tests/test_instrumentation.py",
+      "artifact": "sources/021-test_instrumentation.py",
+      "sha256": "3706e0c0b0380f9eba9f5aeeb86ad92dcae32b6c18419add25ba50eaf72d74e6"
+    },
+    {
+      "source": "/scratch/copparihollmann/iris-model/firesim/tests/test_managed_capture.py",
+      "artifact": "sources/022-test_managed_capture.py",
+      "sha256": "15368c8747c2c9b22c0f24edb9fe655e9fdd1dd0c73e2561d0b519b95055bcba"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/config_runtime.yaml",
+      "artifact": "sources/023-config_runtime.yaml",
+      "sha256": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/firesim_topology_elements.py",
+      "artifact": "sources/024-firesim_topology_elements.py",
+      "sha256": "04c950f2d6f78ac6749327904a5786f895d9177ec7554b9bb5b5cab002286dee"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/run_farm_deploy_managers.py",
+      "artifact": "sources/025-run_farm_deploy_managers.py",
+      "sha256": "c347a4652fb2b777d015ae30886ff3263aaf45252bf565861fd388a39550ec62"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/runtime_config.py",
+      "artifact": "sources/026-runtime_config.py",
+      "sha256": "e40e29881d5cdba1b7965e14c813b074554d7a74dcf4ce9b3cd947365c485dd4"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/utils.py",
+      "artifact": "sources/027-utils.py",
+      "sha256": "cef5eef5c16b56879d6af4077a662b797437fda4c4db68e11939eb167106b046"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-change-pcie-perms",
+      "artifact": "sources/028-firesim-change-pcie-perms",
+      "sha256": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-chmod-xdma-perm",
+      "artifact": "sources/029-firesim-chmod-xdma-perm",
+      "sha256": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-load-xdma-module",
+      "artifact": "sources/030-firesim-load-xdma-module",
+      "sha256": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-remove-xdma-module",
+      "artifact": "sources/031-firesim-remove-xdma-module",
+      "sha256": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d"
+    },
+    {
+      "source": "/scratch/eygao/iris-cy/sims/firesim/platforms/xilinx_alveo_u250/scripts/firesim-fpga-util.py",
+      "artifact": "sources/032-firesim-fpga-util.py",
+      "sha256": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1"
+    }
+  ],
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/AGENTS.md": "87a27ddde94d7215bd6e82c614e0c4c41ffa3dae11422fca3e21b5e0ba231549",
+    "/scratch/copparihollmann/AGENTS.md": "da1d5374df3f9ef11f21880ba748c2a4ba05aca4c773590f671dca815f8b6c9c",
+    "/scratch/copparihollmann/iris-model/firesim/OPERATING_RULES.md": "40cb37125acf6bb6f5b54da8f1bdcb836b1048692479e3dbb0e3b0fcce906be2",
+    "/scratch/copparihollmann/iris-model/firesim/batch_runner.py": "4bbb2c89b1ead981066be0a9f1820ec752e7dc8d255c84eae743c8e70abb0301",
+    "/scratch/copparihollmann/iris-model/firesim/prepare_campaign.py": "b60d4e97e22490739d12f99d7c4dc0f1e3c7547f5119707f68731bb090f6fade",
+    "/scratch/copparihollmann/iris-model/firesim/run_prepared.py": "741e0c03f06330e9a1213d14a5d60113f395a7486a827adff72a3082025e2c53",
+    "/scratch/copparihollmann/iris-model/firesim/capture_run.py": "8058f2671ba1886e9fee6e567e91ce4c6094a9bdbc496fd6a1e26ed7021352f1",
+    "/scratch/copparihollmann/iris-model/firesim/CAMPAIGN_POLICY.md": "1a20d027c489e5d2c353e7c6c022f079d5eced9d51875bf62cfe6c2793e5c09d",
+    "/scratch/copparihollmann/iris-model/firesim/inspect_instrumentation.py": "b6b980df8f1e4639cacb0c431057f05c1a04453e61d1dbfdd55f56d80654fcdc",
+    "/scratch/copparihollmann/iris-model/build/firesim-observability-candidate-v2/report.json": "3c11c53f38a275ebfa29f850738071404c7516b817721d26a74623021446bc0f",
+    "/scratch/copparihollmann/iris-model/firesim/tests/test_batch_runner.py": "8ff5a09b98b387b32e8c9be202409c023ac66c0ab2087c6a5915406fc25f1b50",
+    "/scratch/copparihollmann/iris-model/firesim/tests/test_capture_run.py": "9887231948b495cea92010919c6959b3ee5db3da7a7166555a39a44b2eef9a3d",
+    "/scratch/copparihollmann/iris-model/firesim/tests/test_inspector.py": "5486878a24816340ebbfc64c87624b822f87d2c8faf81f5ba7c17a48621b99bd",
+    "/scratch/copparihollmann/iris-model/firesim/tests/test_instrumentation.py": "3706e0c0b0380f9eba9f5aeeb86ad92dcae32b6c18419add25ba50eaf72d74e6",
+    "/scratch/copparihollmann/iris-model/firesim/tests/test_managed_capture.py": "15368c8747c2c9b22c0f24edb9fe655e9fdd1dd0c73e2561d0b519b95055bcba",
+    "/scratch/copparihollmann/iris-model/firesim/operator/audit_managed_path.py": "4a28a2524dd99c9f150775478e0472e1436104a86bce8d0690cc80b1a99c075d",
+    "/scratch/copparihollmann/iris-model/firesim/operator/firesim-iris-inspect": "5934aaa1907605a05cd6e9bca6c28e98fa6ab62dfb8339c5c5aabde59ac526d8",
+    "/scratch/copparihollmann/iris-model/firesim/operator/managed-path-audit.json": "d1c2fe2f640120b39b0c0ea3c271d3da379d579ef4f1a6939b0420f19c81e185",
+    "/scratch/copparihollmann/iris-model/firesim/operator/README.md": "fb6fd102bb9538858723b8a2a5c1b69836c547454c200fbcb27aeefb70e45912",
+    "/scratch/copparihollmann/iris-model/firesim/operator/release.py": "d9501ea7ee8b4de7a777938e3ea9a549b734446b96590c198e2f9368e5ebb04b",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/run_farm_deploy_managers.py": "c347a4652fb2b777d015ae30886ff3263aaf45252bf565861fd388a39550ec62",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/runtime_config.py": "e40e29881d5cdba1b7965e14c813b074554d7a74dcf4ce9b3cd947365c485dd4",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/utils.py": "cef5eef5c16b56879d6af4077a662b797437fda4c4db68e11939eb167106b046",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/firesim_topology_elements.py": "04c950f2d6f78ac6749327904a5786f895d9177ec7554b9bb5b5cab002286dee",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/config_runtime.yaml": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02",
+    "/scratch/copparihollmann/iris-model/firesim/source-clones.json": "2361ce2edc24b93b142ee1b432576b94e51ea29c39dde9c8fc640a9525592cdf",
+    "/scratch/copparihollmann/iris-model/firesim/firesim-observed-dirty.patch": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+    "/scratch/copparihollmann/iris-model/build/access-privilege-details-20261106/report.json": "924366ac04ee038def127ca1b81615978fde946efc614377a33b0568a1f96679",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-remove-xdma-module": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-load-xdma-module": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-chmod-xdma-perm": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-change-pcie-perms": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db",
+    "/scratch/eygao/iris-cy/sims/firesim/platforms/xilinx_alveo_u250/scripts/firesim-fpga-util.py": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1"
+  },
+  "artifact_sha256": {
+    "tests.log": "08e03adf2a170f8208c49f2fc9a60c410dfce5dc395a9073bd8179c6a4e1e4a8",
+    "sources/026-runtime_config.py": "e40e29881d5cdba1b7965e14c813b074554d7a74dcf4ce9b3cd947365c485dd4",
+    "sources/018-test_batch_runner.py": "8ff5a09b98b387b32e8c9be202409c023ac66c0ab2087c6a5915406fc25f1b50",
+    "sources/012-firesim-iris-inspect": "5934aaa1907605a05cd6e9bca6c28e98fa6ab62dfb8339c5c5aabde59ac526d8",
+    "sources/029-firesim-chmod-xdma-perm": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505",
+    "sources/023-config_runtime.yaml": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02",
+    "sources/004-CAMPAIGN_POLICY.md": "1a20d027c489e5d2c353e7c6c022f079d5eced9d51875bf62cfe6c2793e5c09d",
+    "sources/013-managed-path-audit.json": "d1c2fe2f640120b39b0c0ea3c271d3da379d579ef4f1a6939b0420f19c81e185",
+    "sources/028-firesim-change-pcie-perms": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db",
+    "sources/022-test_managed_capture.py": "15368c8747c2c9b22c0f24edb9fe655e9fdd1dd0c73e2561d0b519b95055bcba",
+    "sources/025-run_farm_deploy_managers.py": "c347a4652fb2b777d015ae30886ff3263aaf45252bf565861fd388a39550ec62",
+    "sources/008-firesim-observed-dirty.patch": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+    "sources/002-report.json": "924366ac04ee038def127ca1b81615978fde946efc614377a33b0568a1f96679",
+    "sources/032-firesim-fpga-util.py": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1",
+    "sources/019-test_capture_run.py": "9887231948b495cea92010919c6959b3ee5db3da7a7166555a39a44b2eef9a3d",
+    "sources/000-AGENTS.md": "da1d5374df3f9ef11f21880ba748c2a4ba05aca4c773590f671dca815f8b6c9c",
+    "sources/024-firesim_topology_elements.py": "04c950f2d6f78ac6749327904a5786f895d9177ec7554b9bb5b5cab002286dee",
+    "sources/030-firesim-load-xdma-module": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445",
+    "sources/005-OPERATING_RULES.md": "40cb37125acf6bb6f5b54da8f1bdcb836b1048692479e3dbb0e3b0fcce906be2",
+    "sources/006-batch_runner.py": "4bbb2c89b1ead981066be0a9f1820ec752e7dc8d255c84eae743c8e70abb0301",
+    "sources/027-utils.py": "cef5eef5c16b56879d6af4077a662b797437fda4c4db68e11939eb167106b046",
+    "sources/016-run_prepared.py": "741e0c03f06330e9a1213d14a5d60113f395a7486a827adff72a3082025e2c53",
+    "sources/031-firesim-remove-xdma-module": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d",
+    "sources/011-audit_managed_path.py": "4a28a2524dd99c9f150775478e0472e1436104a86bce8d0690cc80b1a99c075d",
+    "sources/010-README.md": "fb6fd102bb9538858723b8a2a5c1b69836c547454c200fbcb27aeefb70e45912",
+    "sources/001-AGENTS.md": "87a27ddde94d7215bd6e82c614e0c4c41ffa3dae11422fca3e21b5e0ba231549",
+    "sources/009-inspect_instrumentation.py": "b6b980df8f1e4639cacb0c431057f05c1a04453e61d1dbfdd55f56d80654fcdc",
+    "sources/017-source-clones.json": "2361ce2edc24b93b142ee1b432576b94e51ea29c39dde9c8fc640a9525592cdf",
+    "sources/003-report.json": "3c11c53f38a275ebfa29f850738071404c7516b817721d26a74623021446bc0f",
+    "sources/014-release.py": "d9501ea7ee8b4de7a777938e3ea9a549b734446b96590c198e2f9368e5ebb04b",
+    "sources/020-test_inspector.py": "5486878a24816340ebbfc64c87624b822f87d2c8faf81f5ba7c17a48621b99bd",
+    "sources/015-prepare_campaign.py": "b60d4e97e22490739d12f99d7c4dc0f1e3c7547f5119707f68731bb090f6fade",
+    "sources/007-capture_run.py": "8058f2671ba1886e9fee6e567e91ce4c6094a9bdbc496fd6a1e26ed7021352f1",
+    "sources/021-test_instrumentation.py": "3706e0c0b0380f9eba9f5aeeb86ad92dcae32b6c18419add25ba50eaf72d74e6"
+  },
+  "remaining_requirements": [
+    "operator installs reviewed fixed inspector",
+    "complete current all-user inspection",
+    "genuine exclusive operator allocation",
+    "held shared lock and full lifecycle",
+    "root driver/image pairing decision"
+  ],
+  "scope": "Local synthetic process, actual local transport/capture and mocked managed lifecycle tests. No SSH, root helper execution, device access or hardware lifecycle."
+}

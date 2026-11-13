@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "operation_cases": 23360,
+  "reduction_cases": 1120,
+  "forms": 45,
+  "scalar_bf16_illegal_cases": 6,
+  "hart2_ieee_flags": true,
+  "rtl_certified": false,
+  "log_sha256": "8e21d2ca7e19a3715a5b559078cc2df4f4a197f4de0321913bc70ec19e626797"
+}

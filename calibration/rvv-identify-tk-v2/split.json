@@ -1,0 +1,19 @@
+{
+  "schema": "iris.rvv_identify_with_TK_grouped_split.v2",
+  "frozen_before_new_hardware": true,
+  "timing_labels_used_for_selection": false,
+  "groups": "All harts/trials/counts/regimes within reserved arithmeticLMUL4; all harts/trials/counts for64Bvector memory and128Boverlap; rowmove count16 onbothcompute harts. Matrixjointedge16/TK4 reservedacrossdtypes/harts/N/trials; othermatrixgroupsTRAIN.",
+  "reserved_rule": {
+    "arithmetic_lmul": 4,
+    "memory_bytes": 64,
+    "overlap_bytes": 128,
+    "rowmove_count": 16,
+    "matrix_joint_group": {
+      "edge": 16,
+      "tk": 4
+    }
+  },
+  "global_holdout_labels_accessed": false,
+  "new_exact_ELF_reference_required": true,
+  "parent_split_preserved": "calibration/rvv-identify-v1/split.json"
+}

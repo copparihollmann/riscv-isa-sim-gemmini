@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-11-05T20:08:11.137859+00:00",
+  "status": "unverified",
+  "host": "sohumpc.eecs.berkeley.edu",
+  "sandbox_network_disabled": "1",
+  "checks": {
+    "ipv4_tcp_socket": {
+      "status": "denied",
+      "errno": 1,
+      "error": "[Errno 1] Operation not permitted"
+    },
+    "ipv4_udp_socket": {
+      "status": "denied",
+      "errno": 1,
+      "error": "[Errno 1] Operation not permitted"
+    },
+    "ipv6_tcp_socket": {
+      "status": "denied",
+      "errno": 1,
+      "error": "[Errno 1] Operation not permitted"
+    },
+    "dns": {
+      "status": "failed",
+      "errno": -2,
+      "error": "[Errno -2] Name or service not known"
+    }
+  },
+  "tool_capabilities": "No SSH or remote terminal tool is registered; shell is the only SSH execution path.",
+  "vcs_paths": {
+    "/tools": false,
+    "/tools/synopsys/vcs/Y-2026.03-SP2/bin/vcs": false,
+    "/tools/synopsys/vcs/W-2024.09-1/bin/vcs": false
+  },
+  "smoke_passed": false,
+  "fpga_occupancy": null,
+  "interpretation": "The current command environment still prohibits network socket creation. A hostname/IP change alone cannot repair this execution path. No bypass, FPGA lifecycle command, or remote mutation was attempted."
+}

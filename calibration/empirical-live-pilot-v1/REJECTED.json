@@ -1,0 +1,41 @@
+{
+  "effects": [
+    "Per-access cost inferred from incomplete counters is invalid.",
+    "BSS/preparation compressed stores also absent from timing-tag history."
+  ],
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "native_binary_sha256": "fa14dbb545d18d74026d98c4f803de061f1807072aefb18c333c64b0227ab313",
+  "parameters_sha256": "09abd782b13f16fe4d2535213bd0c23db52644cb9701a0c51b9fa192d3da59c4",
+  "reason": "Compressed C.SW/SD/FSD and stack-store encodings incorrectly classified as branch because quadrant was ignored; cache accesses and dirty state incomplete. Correct numeric execution does not certify feature correctness.",
+  "schema": "iris.empirical_fit_rejection.v1",
+  "status": "REJECTED_DO_NOT_BIND",
+  "superseded_by": "Next native epoch after independent six-compressed-store native proof",
+  "witness": {
+    "actual_prefix_memory": {
+      "LOCAL_TCM": {
+        "accesses": 1024,
+        "bytes": 4096,
+        "coherence_invalidations": 0,
+        "dirty_owner_forwards": 0,
+        "dirtywritebacks": 0,
+        "l1_dirty_victims": 0,
+        "l1hits": 0,
+        "l1misses": 0,
+        "l2hits": 0,
+        "l2misses": 0,
+        "other_bank_contenders": 0,
+        "reads": 1024,
+        "same_bank_contenders": 0,
+        "shared_line_contenders": 0
+      }
+    },
+    "hart": 0,
+    "parent_case_id": "memory.tcm.4k",
+    "source_kernel": "benchmarks/batch.c::local_tcm(bytes=4096)",
+    "source_kernel_expected_requests": 2048,
+    "source_kernel_file_sha256": "ccc72adeac438a5c14c4141404cb4c73d47c5761744d767d56dd682516e268f4",
+    "source_kernel_loads": 1024,
+    "source_kernel_stores": 1024
+  }
+}

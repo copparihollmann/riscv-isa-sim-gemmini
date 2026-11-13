@@ -1,0 +1,114 @@
+{
+  "schema": "iris.rvv_compute1320_TRAIN_linear_proposal.v1",
+  "pass": true,
+  "proposal_only": true,
+  "actual_fitted_replay_required": true,
+  "coefficients_accepted": false,
+  "protected_or_reserved_labels_consumed": false,
+  "plan_sha256": "75703735513a44552eb0565e902048e236642b6eebe99d7db0ce4c5960c5c16f",
+  "all_TRAIN_rows_retained": true,
+  "TRAIN_rows": 978,
+  "models": {
+    "Shuttle": {
+      "harts": [
+        0,
+        1
+      ],
+      "TRAIN_rows": 978,
+      "columns": [
+        {
+          "family": "rvv.integer",
+          "basis": "instructions"
+        },
+        {
+          "family": "rvv.integer",
+          "basis": "work"
+        },
+        {
+          "family": "rvv.fadd.fp16",
+          "basis": "instructions"
+        },
+        {
+          "family": "rvv.fadd.fp16",
+          "basis": "work"
+        },
+        {
+          "family": "rvv.fadd.fp32",
+          "basis": "instructions"
+        },
+        {
+          "family": "rvv.fadd.fp32",
+          "basis": "work"
+        },
+        {
+          "family": "rvv.fadd.fp64",
+          "basis": "instructions"
+        },
+        {
+          "family": "rvv.fadd.fp64",
+          "basis": "work"
+        },
+        {
+          "family": "memory.vector.load",
+          "basis": "instructions"
+        },
+        {
+          "family": "memory.vector.load",
+          "basis": "work"
+        },
+        {
+          "family": "memory.vector.store",
+          "basis": "instructions"
+        },
+        {
+          "family": "memory.vector.store",
+          "basis": "work"
+        },
+        {
+          "family": "vme.row_move",
+          "basis": "instructions"
+        }
+      ],
+      "rank": 13,
+      "identified": true,
+      "coefficients": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.14996109836660615,
+        0.0,
+        1.3429927575974707,
+        0.0
+      ],
+      "fit": {
+        "iterations": 2,
+        "converged": true,
+        "max_coefficient_delta": 4.440892098500626e-16,
+        "relative_squared_residual": 40.11204299590174
+      },
+      "negative_residual_rows": 911,
+      "zero_feature_rows": 72
+    }
+  },
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/rvv_compute1320_fit_v1.py": "52843ee52302bef4d21ede399c99d68b47f863351113b57170c0de9ace4d40a9",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-compute1320-v1/fit-plan.json": "75703735513a44552eb0565e902048e236642b6eebe99d7db0ce4c5960c5c16f",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-v2/ready.json": "29fe7361720babf4488ab04a803c335ef96e67758d4e492801f080043be6b774",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-v2/corpus.json": "93a329606e0f2dc49555cfbc79bb5d6b09d446a3e2b62eaa55b1fceb229ac514",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-7108-zero-adjustment-v1/run.json": "2bc889cb69eed1b1cfb36b8312d6296b07a515ccbfd53a35f9d7be313e262e32",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-7108-zero-adjustment-v1/regions.jsonl": "1a2d76dbba18336f4d46fc320bd6431a56c96051aa8469f6357dec1cc1d09f56",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-7108-zero-adjustment-v1/features.jsonl": "b466e8c3e3d4e6368e75567487d9f9fd266fec241afb11798c4ecf0004b32eed",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-HARDWARE-TRAIN-v1/report.json": "020b772755c735ca2a36997df8325242ac67df392b742c09a0f4034791619f91",
+    "/scratch/copparihollmann/iris-model/build/rvv-compute1320-HARDWARE-TRAIN-v1/regions.jsonl": "e9da9d8be1c62afb11faea887ca05157f1e03c1757b4319390039224a59df954"
+  },
+  "zero_adjustment_identity": "rvv-compute1320-zero-adjustment-v1",
+  "output_basis_sha256": "64ae8f8f2a8c48308cd6db551713fde3af81f97c17f1aca8577444ff91923af2",
+  "estimator": "Nonnegative relativeLS;coordinate-descent tolerance1e-12/max10000;no intercepts/no grid;rowmoveWORK0",
+  "source_limits": "WholeVRFowner/blockedvector memory/partialgroupchaining/OPUbridge not repaired by coefficients;negative residuals remain"
+}

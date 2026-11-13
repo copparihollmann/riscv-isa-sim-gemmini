@@ -1,0 +1,28 @@
+alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_15mhz:
+  PLATFORM: xilinx_alveo_u250
+  TARGET_PROJECT: firesim
+  TARGET_PROJECT_MAKEFRAG: /scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/generators/firechip/chip/src/main/makefrag/firesim
+  DESIGN: FireSim
+  TARGET_CONFIG: FireSimVMEV256D128DualShuttleConfig
+  PLATFORM_CONFIG: FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config
+  deploy_quintuplet: null
+  platform_config_args:
+    fpga_frequency: 15
+    build_strategy: TIMING
+  post_build_hook: null
+  metasim_customruntimeconfig: null
+  bit_builder_recipe: bit-builder-recipes/xilinx_alveo_u250.yaml
+alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_25mhz:
+  PLATFORM: xilinx_alveo_u250
+  TARGET_PROJECT: firesim
+  TARGET_PROJECT_MAKEFRAG: /scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/generators/firechip/chip/src/main/makefrag/firesim
+  DESIGN: FireSim
+  TARGET_CONFIG: FireSimVMEV256D128DualShuttleConfig
+  PLATFORM_CONFIG: FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config
+  deploy_quintuplet: null
+  platform_config_args:
+    fpga_frequency: 25
+    build_strategy: TIMING
+  post_build_hook: null
+  metasim_customruntimeconfig: null
+  bit_builder_recipe: bit-builder-recipes/xilinx_alveo_u250.yaml

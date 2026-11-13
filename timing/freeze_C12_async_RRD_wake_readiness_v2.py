@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import json,hashlib
+R=Path(__file__).resolve().parents[1];O=R/'build/C12-async-RRD-wake-readiness-v2';O.mkdir();sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();C=R/'build/C12-async-RRD-wake-frozen-8fcf4e98-v2';S=R/'pipeline/riscv-isa-sim-C12-async-RRD-wake-v2';reports={
+'OFF_first59':R/'build/RVV-ASM-C12-async-wake-OFF-first59-v2/run.json',
+'ON_first59':R/'build/RVV-ASM-C12-async-wake-ON-first59-v2/run.json',
+'ON_own_full1320':R/'build/rvv-compute-asm-C12-async-RRD-wake-ON-v2/run.json',
+'full1320_numerical_instret_comparison':R/'build/RVV-ASM-C12-async-wake-model-comparison-v2/report.json',
+'normal_exit_directed_guards':R/'build/C12-async-RRD-wake-native-guards-v3/report.json',
+'parser_refusals':R/'build/C12-async-RRD-wake-parser-controls-v2/report.json',
+'causal78edges_and_backend_invariance':R/'build/C12-async-RRD-wake-causal-proof-v2/report.json',
+'source_reconstruction':R/'build/C12-async-RRD-wake-source-closure-v2/report.json',
+'own_six_TRAIN_attribution':R/'build/RVV-ASM-C12-async-wake-six-TRAIN-v3/report.json'};inputs={str(Path(__file__)):sha(Path(__file__))};bindings={}
+for name,p in reports.items():
+ r=json.loads(p.read_text());assert r.get('pass')is True,name;inputs[str(p)]=sha(p);bindings[name]={'path':str(p),'sha256':sha(p)}
+ for n,h in r.get('input_sha256',{}).items():assert sha(n)==h,(name,n);inputs[n]=h
+ for n,h in r.get('reports',{}).items():
+  if isinstance(h,str)and len(h)==64 and Path(n).is_file():assert sha(n)==h;inputs[n]=h
+m=json.loads((C/'manifest.json').read_text());inputs[str(C/'manifest.json')]=sha(C/'manifest.json')
+for n,h in m['artifact_sha256'].items():assert sha(C/n)==h,n;inputs[str(C/n)]=h
+inv=json.loads((C/'native-inventory.json').read_text());assert len(inv)==2139
+for n,h in inv.items():assert sha(S/n)==h,n
+review={'schema':'iris.recorded_agent_source_review.v1','recorded_by':'/root/spike_finish','reviewer':'/root/pipeline_model','kind':'Read-only V1helper review plus explicit V2source-OPU-exclusion delta acknowledgment; no runtime tests byreviewer','initial_scope_finding':'SourceOPU-entry actors use opu_can_dispatch, so explicitly exclude head->opu_entry before legacy eligibility arithmetic.','resolved':'V2explicitly excludes head->opu_entry and backend-null heads; no further source concern reported for that narrow delta.','full_CPU_or_hardware_timing_certification':False,'reviewed_native_manifest_sha256':sha(C/'manifest.json')};(O/'recorded-source-review.json').write_text(json.dumps(review,indent=2)+'\n');inputs[str(O/'recorded-source-review.json')]=sha(O/'recorded-source-review.json')
+r={'schema':'iris.C12_async_RRD_wake_readiness.v2','pass':True,'status':'default_OFF_experimental_source_model_scheduler_fix_qualified_in_stated_scope','native_manifest':str(C/'manifest.json'),'native_manifest_sha256':sha(C/'manifest.json'),'native_binary_sha256':m['binary_sha256'],'UART_sha256':m['uart_sha256'],'selector':m['selector'],'default_OFF':True,'source_files_reconstructed_and_reverified':2139,'source_patch':str(R/'build/C12-async-RRD-wake-source-closure-v2/wake-on-fca1.patch'),'source_patch_sha256':sha(R/'build/C12-async-RRD-wake-source-closure-v2/wake-on-fca1.patch'),'gates':bindings,
+'mechanism':'Include future aligned max(legacy_head.COM, issued_backend.end)-divider in scheduler deadline when current blocking/context guards clear. Existing can_dispatch reruns at that edge. No new timing node, latency, interval, capacity, architectural retirement or physical publication rule.',
+'guards':['h0/h1only','engaged nonboundary empty cohort','notblocked/recovery/WFI/sourcecounter-RRD-blocked/enabled-pendingIRQ','liveissued matching samehart nonphysical legacy head, no tail','sourceOPU-entry and backend-null perEG heads excluded','strictlyfuture and strictlyearlier thanexisting deadline; neverretroactive/currentedge'],
+'proof':{'OFF':'first59all1003rawrecordfields,all180commonCSRprefixbytes,fullasyncstream exactprimaryC12parity','ON_full':'own1320records/184128per-elementgoldens/3960CSR-to-ELFjoins;zero fullrow numerical and total/issue/draininstret mismatches','mechanism':'all78previouslyskippedeligibleedges removed; m8RRDspacing17→16,actualbackendlatency16unchanged; m1/m2spacing2/4unchanged','model_windows':{'m8_N16_cycles':[284,269],'m8_N64_cycles':[1102,1039],'m1_N16_N64_unchanged':[55,157],'m2_N16_N64_unchanged':[85,283]},'directed':'10freshnormalexitcases: short,long,timerIRQ,two-ownerIRQ,wrongpathannulment,scalar-only64MSIPs;no orphanowners;priorpubbysuccessorEX;short/scalarOFFONstdoutCSRasyncbyteparity','parser':'5malformed/unsupportedconfigurations refused','readback_scope':'fullASM uses controlledintentionalpostmeasurementdebuggerquit, notnormalHTIF/endtoendtiming; directed10do normalexit','logging':'ON first59actualMCYCLE-ROI/eventfilter17.9MB; old1.4GBdiagnosticpreserved; no timingPCfilter'},
+'qualification_not_transferred':{'df6957_scope_predecessor':'preservedimmutable; v2OWNfull1320and10guards requiredandcompleted; fullv1/v2records/prefix/debugreadbacksbyteidentical','pending_base_2c40_and_WB0980':'separateparents/flagsOFF; notcomposed','source_FADD_perEG_and_OPUFENCE':'separateagentcapsules; notcomposed'},
+'open_scopes':['experimentalbridge remains wholeVRF/two-owner forlegacyRVV; notwholeSaturn/wholeCPUtimingcertification','no newepochcanonical32/5Zephyr/realcompiler packagequalification run inthis task; oldresults nottransferred','ownnewcalibration/runtimebinding requiredbefore any calibratedprovider admission','futureindependentheldoutaccuracy qualification stillrequired','inheritedmemory/FP/CPU modeling gaps remain'],
+'flags':{'hardware_contacted':False,'protected_or_reserved_hardware_labels_read':False,'parameters_fitted':False,'model_selected_or_promoted':False,'calibrated_provider_available':False,'source_image_association':False,'physical_profile_qualified':False,'whole_CPU_RTL_timing_certified':False,'timing_2pct_certified':False},'input_sha256':inputs};(O/'readiness.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({'pass':True,'bound_inputs':len(inputs),'readiness_sha256':sha(O/'readiness.json')}))

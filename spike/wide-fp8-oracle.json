@@ -1,0 +1,27 @@
+{
+  "cases": 11520,
+  "operations": [
+    "vfwadd.vv",
+    "vfwadd.vf",
+    "vfwsub.vv",
+    "vfwsub.vf",
+    "vfwadd.wv",
+    "vfwadd.wf",
+    "vfwsub.wv",
+    "vfwsub.wf",
+    "vfwmul.vv",
+    "vfwmul.vf",
+    "vfwmacc.vv",
+    "vfwmacc.vf",
+    "vfwnmacc.vv",
+    "vfwnmacc.vf",
+    "vfwmsac.vv",
+    "vfwmsac.vf",
+    "vfwnmsac.vv",
+    "vfwnmsac.vf"
+  ],
+  "header_sha256": "cdf688de4b50955ea59da57db639489a2d1013b4c81787902de925ce1cadb8b1",
+  "host_float_used": false,
+  "rtl_executed": false,
+  "exception_policy": "Only FMA invalid is wired, as flags bit0; lane-dependent same-exp signalingness"
+}

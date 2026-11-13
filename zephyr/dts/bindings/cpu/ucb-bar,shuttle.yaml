@@ -1,0 +1,3 @@
+description: UCB Shuttle RISC-V CPU, as emitted by the pinned Iris elaboration
+compatible: "ucb-bar,shuttle"
+include: riscv,cpus.yaml

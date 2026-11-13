@@ -1,0 +1,61 @@
+{
+  "schema": "iris.rvv_identify_TK_frozen_TRAIN_fit_plan.v1",
+  "frozen_before_new_TRAIN_labels": true,
+  "hardware_timing_labels_consumed": false,
+  "protected_or_reserved_labels_consumed": false,
+  "regions_reported": 1920,
+  "TRAIN_rows_required": 1422,
+  "all_TRAIN_rows_and_repetitions_retained": true,
+  "reserved_rows_root_only": 498,
+  "native_epoch": "7108a6ecfd98e6d8c4c983f7b089dbda99d4a143e7e189a7b99eedc322d79d27",
+  "initial_prediction": "Exact inherited-cost99a768e7 baseline, OPU OFF, sourceFADD+warm ON; no qualification transfer.",
+  "fit_baseline_requirement": "OWN completed all1920 numeric zero-adjustment replay: zero ONLY setup/work of the eligible families below; keep all other directives, resource lanes/intervals, scalarCPU/cache/Icache/outerII/memoryownership/OPU modes unchanged. Use its actual mcycle deltas and its own actual prefix counts, never subtract old charged costs posthoc. A changed history/basis is disclosed and is not paired to oldcounts.",
+  "eligible_families": [
+    "rvv.integer",
+    "rvv.fadd.fp16",
+    "rvv.fadd.fp32",
+    "rvv.fadd.fp64",
+    "memory.vector.load",
+    "memory.vector.store",
+    "vme.row_move"
+  ],
+  "parameter_scope": {
+    "Shuttle_coreclass": [
+      0,
+      1
+    ],
+    "Rocket_coreclass": [
+      2
+    ],
+    "row_move_harts": [
+      0,
+      1
+    ]
+  },
+  "parameters": "Nonnegative effective SETUP perinstruction + WORK slope per actual native family work unit. No new issueinterval or latencyfloor mode.",
+  "units": {
+    "rvv.integer": "DLEN element groups (128bits Shuttle/256bits Rocket); not operations/cycle peak",
+    "rvv.fadd.compute": "DLENgroups; plainIEEEHSD only",
+    "rvv.fadd.Rocket": "VLelements through sharedscalar FU; plainIEEEHSD only",
+    "memory.vector": "Native requested-DLEN-payload groups; LSUrequests/TLtransactions/physicaltraffic remain unmeasured, not interchangeable with ATLbeats",
+    "vme.row_move": "All controls have32x32 tile/128Brow. Setup/work columns are collinear: fit aggregate extra perinstruction with canonical WORK0; separate setup/beat latency remains unidentifiable."
+  },
+  "estimator": "One deterministic joint nonnegative relative least-squares fit per coreclass on total begin-to-drain mcycle deltas, target HWminus actual zero-adjustment baseline; features actual retained instruction/work prefix differences. Include every1422TRAIN row, including zero-feature matrixMM rows. No ROI/case/PC/trial intercept or lookup. Nonnegative coordinate descent fixed tolerance1e-12/max10000 iterations; require identified rank after predefined rowmove WORK0 restriction. No model grid or error-based row selection.",
+  "phase_policy": "Fit total begin-to-drain only; report issue anddrain separately using actual3CSR/mret endpoints, without double-weighting overlappingwindows or inventedretirements.",
+  "nonlinear_validation": "The linear proposal is not acceptance. Freeze coefficients then replay sameexact1920ELF with unchangedcache and functionalpolicy. Report actual TRAIN and all numeric/counter joins. No retuning on498reserved labels.",
+  "explicit_infeasible_cases": "WholeVRFowner serialization, blocked vector-memory issue, missing partial-group chaining and finiteOPUcontroller/cpu availability bridge cannot be repaired with coefficients. Negative residuals/overbaseline/zero-basis and poor predictions remain in all reports; no negative costs or new modes to hide them.",
+  "excluded_parameters": [
+    "scalarCPU/scalarFP",
+    "cache/tag/replacement/outer/Icache/branch",
+    "VMEint8/FP8/zero sourceMM scheduling/controller",
+    "sourceeligibility/clock/IRQ/functionalvalues"
+  ],
+  "current_provider_changed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/rvv-identify-TK-v4/ready.json": "cc266f283499a076687b1e3fca5679f0f193df989062c781f7047e664b433727",
+    "/scratch/copparihollmann/iris-model/build/rvv-identify-TK-v4/corpus.json": "bb3c4ead0418852b766c48bd13f99ce58f5de0cd6146777c992941673cf2ecd0",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-identify-tk-v2/split.json": "7400fc47240a60624328a5ff7c71d7805a03eb9188ae36c499aba945ce73ecb1",
+    "/scratch/copparihollmann/iris-model/build/warm-OPU-frozen-7108a6ec-v1/manifest.json": "7391e5fd64327d0179ee86c130f71f894b3f13655586b932606ad4d00a8e3a43",
+    "/scratch/copparihollmann/iris-model/build/warm-OPU-inputs-v2/baseline.fixture": "99a768e7517cae291ad797173131815126da1aaa564f1f226dc42bfcd4871d69"
+  }
+}

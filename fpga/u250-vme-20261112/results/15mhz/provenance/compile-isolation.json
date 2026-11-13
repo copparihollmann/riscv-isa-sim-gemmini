@@ -1,0 +1,10 @@
+{
+  "reason": "Unrelated example configurations incompatible at supplied repository pins",
+  "excluded_source_files": [
+    "IrisConfigs.scala",
+    "ChipletConfigs.scala"
+  ],
+  "excluded_source_directory": "generators/tacit/chipyard",
+  "hardware_config_unchanged": "FireSimVMEV256D128DualShuttleConfig",
+  "source_revisions_unchanged": true
+}

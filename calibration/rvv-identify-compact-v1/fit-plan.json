@@ -1,0 +1,78 @@
+{
+  "schema": "iris.rvv_identify_compact_frozen_TRAIN_fit_plan.v1",
+  "frozen_before_new_TRAIN_labels": true,
+  "hardware_timing_labels_consumed": false,
+  "protected_or_reserved_labels_consumed": false,
+  "regions_reported": 1908,
+  "TRAIN_rows_required": 1410,
+  "all_TRAIN_rows_and_repetitions_retained": true,
+  "reserved_rows_root_only": 498,
+  "native_epoch": "7108a6ecfd98e6d8c4c983f7b089dbda99d4a143e7e189a7b99eedc322d79d27",
+  "initial_prediction": "Exact inherited-cost99a768e7 baseline, OPU OFF, sourceFADD+warm ON; no qualification transfer.",
+  "fit_baseline_requirement": "OWN completed all1908 numeric zero-adjustment replay: zero ONLY setup/work of the eligible families below; keep all other directives, resource lanes/intervals, scalarCPU/cache/Icache/outerII/memoryownership/OPU modes unchanged. Use its actual mcycle deltas and its own actual prefix counts, never subtract old charged costs posthoc. A changed history/basis is disclosed and is not paired to oldcounts.",
+  "eligible_families": [
+    "rvv.integer",
+    "rvv.fadd.fp16",
+    "rvv.fadd.fp32",
+    "rvv.fadd.fp64",
+    "memory.vector.load",
+    "memory.vector.store",
+    "vme.row_move"
+  ],
+  "parameter_scope": {
+    "Shuttle_coreclass": [
+      0,
+      1
+    ],
+    "Rocket_coreclass": [
+      2
+    ],
+    "row_move_harts": [
+      0,
+      1
+    ]
+  },
+  "parameters": "Nonnegative effective SETUP perinstruction + WORK slope per actual native family work unit. No new issueinterval or latencyfloor mode.",
+  "units": {
+    "rvv.integer": "DLEN element groups (128bits Shuttle/256bits Rocket); not operations/cycle peak",
+    "rvv.fadd.compute": "DLENgroups; plainIEEEHSD only",
+    "rvv.fadd.Rocket": "VLelements through sharedscalar FU; plainIEEEHSD only",
+    "memory.vector": "Native requested-DLEN-payload groups; LSUrequests/TLtransactions/physicaltraffic remain unmeasured, not interchangeable with ATLbeats",
+    "vme.row_move": "All controls have32x32 tile/128Brow. Setup/work columns are collinear: fit aggregate extra perinstruction with canonical WORK0; separate setup/beat latency remains unidentifiable."
+  },
+  "estimator": "One deterministic joint nonnegative relative least-squares fit per coreclass on total begin-to-drain mcycle deltas, target HWminus actual zero-adjustment baseline; features actual retained instruction/work prefix differences. Include every1410TRAIN row, including zero-feature matrixMM rows. No ROI/case/PC/trial intercept or lookup. Nonnegative coordinate descent fixed tolerance1e-12/max10000 iterations; require identified rank after predefined rowmove WORK0 restriction. No model grid or error-based row selection.",
+  "phase_policy": "Fit total begin-to-drain only; report issue anddrain separately using actual3CSR/mret endpoints, without double-weighting overlappingwindows or inventedretirements.",
+  "nonlinear_validation": "The linear proposal is not acceptance. Freeze coefficients then replay sameexact1908ELF with unchangedcache and functionalpolicy. Report actual TRAIN and all numeric/counter joins. No retuning on498reserved labels.",
+  "explicit_infeasible_cases": "WholeVRFowner serialization, blocked vector-memory issue, missing partial-group chaining and finiteOPUcontroller/cpu availability bridge cannot be repaired with coefficients. Negative residuals/overbaseline/zero-basis and poor predictions remain in all reports; no negative costs or new modes to hide them.",
+  "excluded_parameters": [
+    "scalarCPU/scalarFP",
+    "cache/tag/replacement/outer/Icache/branch",
+    "VMEint8/FP8/zero sourceMM scheduling/controller",
+    "sourceeligibility/clock/IRQ/functionalvalues"
+  ],
+  "current_provider_changed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/rvv-identify-1908-phased-v1/fit-plan.json": "177afec30e373c1d8b7c9cf9d2207174a45bfb83de1be1d19ae8ed72ece9dd78",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-identify-compact-v1/split.json": "2017969dee24a462875aba4acc289361cbca3c8b54b995accfd08536949dc5ab",
+    "/scratch/copparihollmann/iris-model/benchmarks/rvv_identify_compact_v1/cases.py": "baee378ddd7a2402d17d21cf0ec073ec7d5d02dde1653f3327f2e1a02d88805a"
+  },
+  "scope_amendment_only": true,
+  "parameters_or_estimator_changed": false,
+  "scope_exclusion": {
+    "hart": 2,
+    "kind": [
+      "load",
+      "store"
+    ],
+    "bytes": 256,
+    "regions": 12,
+    "reason": "Observed stalled hart2 256B load in separate diagnostic; stores remain unqualified risk, not illegal ISA. New packet, not posthoc filtering."
+  },
+  "parent_fit_plan_sha256": "782508a8518b72aa97063c3fd3f5a88f84a5f9420ae0b2796633a00177fda3c9",
+  "schedule_amendment_only": true,
+  "parent_scope_plan_sha256": "b6e4d6dd50aff833875479f2482462450cc40698fab483bcd6506e767e599e35",
+  "schedule": "Allhart0cases,thenallhart1cases,thenallhart2cases;stablewithin-hartorder",
+  "new_exact_ELF_zero_adjustment_and_fitted_replays_required": true,
+  "compact_identity_only_amendment": true,
+  "parent_schedule_plan_sha256": "177afec30e373c1d8b7c9cf9d2207174a45bfb83de1be1d19ae8ed72ece9dd78"
+}

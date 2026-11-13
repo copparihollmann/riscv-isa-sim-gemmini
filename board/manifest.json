@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "status": "source_backed_helpers_not_integrated_board",
+  "repositories": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "testchipip": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+    "rocket-chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "rocket-chip-blocks": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b"
+  },
+  "sources": {
+    "boot-config.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/chipyard/src/main/scala/config/fragments/PeripheralFragments.scala",
+      "snapshot": "evidence/boot-config.scala",
+      "sha256": "65f495f847c5ffd09ed96b25890643123556a6ff324c9ba7c7389744777be53d",
+      "bytes": 7113,
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19"
+    },
+    "bootrom.rv64.img": {
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/src/main/resources/testchipip/bootrom/bootrom.rv64.img",
+      "snapshot": "evidence/bootrom.rv64.img",
+      "sha256": "5f6ae520d6612da2b31c2ee70bc872b743a77bbde0abba87bf96aa5fc249a216",
+      "bytes": 192,
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c"
+    },
+    "bootrom.S": {
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/bootrom/bootrom.S",
+      "snapshot": "evidence/bootrom.S",
+      "sha256": "0741269bb151f738f141362d733c4687310a0f2f9a638d8aa9c537860bd3d923",
+      "bytes": 2220,
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c"
+    },
+    "bootrom-linker.ld": {
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/bootrom/linker.ld",
+      "snapshot": "evidence/bootrom-linker.ld",
+      "sha256": "9673f1344bc6b8e4987058eee2d8c957b3da0d1814147c60c4eda0f2a9244c6f",
+      "bytes": 328,
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c"
+    },
+    "boot-address-register.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/src/main/scala/boot/BootAddrReg.scala",
+      "snapshot": "evidence/boot-address-register.scala",
+      "sha256": "cb69e7997221ad6a9b6de097dfd8066f4d761d56f9a284be97b3766f22f4c9b9",
+      "bytes": 1290,
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c"
+    },
+    "bootrom.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/devices/tilelink/BootROM.scala",
+      "snapshot": "evidence/bootrom.scala",
+      "sha256": "ec5065ffb153f79bbee5b3f28412076e9c516bf462e5ff63063af88e870ee659",
+      "bytes": 4655,
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "register-router.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/tilelink/RegisterRouter.scala",
+      "snapshot": "evidence/register-router.scala",
+      "sha256": "dd716211f9e96825a34ceca2033a5a5ace8d48629cf3bdae3776ef3a1244c940",
+      "bytes": 6368,
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "plic.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/devices/tilelink/Plic.scala",
+      "snapshot": "evidence/plic.scala",
+      "sha256": "a15e8990370aefdd294e6678c8e062ef31632f24cb0136070daaef33f88ffda1",
+      "bytes": 15419,
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "clint.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/devices/tilelink/CLINT.scala",
+      "snapshot": "evidence/clint.scala",
+      "sha256": "258b4a765a57f230d7833e3242489652e49d101ce26b4d0730fa36fc7a48868b",
+      "bytes": 4345,
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "uart.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip-blocks/src/main/scala/devices/uart/UART.scala",
+      "snapshot": "evidence/uart.scala",
+      "sha256": "e99a964e045f67ed1d0c408268202ae06f7ef112fb54946cea07ff01e98a662d",
+      "bytes": 12725,
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b"
+    },
+    "uart-registers.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip-blocks/src/main/scala/devices/uart/UARTCtrlRegs.scala",
+      "snapshot": "evidence/uart-registers.scala",
+      "sha256": "3524c67cbf81ae819ab28d99f24fef5edb276560960f8f7e879adb6c04ce2520",
+      "bytes": 895,
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b"
+    },
+    "firesim-dts.dts": {
+      "source_path": "/scratch/copparihollmann/iris-model/hardware/evidence/firesim-dts.dts",
+      "snapshot": "evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "bytes": 6477,
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19"
+    },
+    "firesim-memmap.json": {
+      "source_path": "/scratch/copparihollmann/iris-model/hardware/evidence/firesim-memmap.json",
+      "snapshot": "evidence/firesim-memmap.json",
+      "sha256": "1ac5e83588fc89417f42d1dbc8e6da605f283ff2fe5d52ed35843ba30359c0dd",
+      "bytes": 2283,
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19"
+    }
+  },
+  "reset_pc": 65536,
+  "rom_base": 65536,
+  "rom_size": 65536,
+  "dtb_offset": 192,
+  "boot_address_register_base": 4096,
+  "boot_address_register_size": 4096,
+  "boot_address_default": 2147483648,
+  "clint_base": 33554432,
+  "mtime_hz": 500000,
+  "plic_base": 201326592,
+  "plic_size": 67108864,
+  "plic_sources": 1,
+  "plic_max_priority": 1,
+  "plic_contexts": [
+    {
+      "hart": 0,
+      "privilege": "M"
+    },
+    {
+      "hart": 0,
+      "privilege": "S"
+    },
+    {
+      "hart": 1,
+      "privilege": "M"
+    },
+    {
+      "hart": 1,
+      "privilege": "S"
+    },
+    {
+      "hart": 2,
+      "privilege": "M"
+    },
+    {
+      "hart": 2,
+      "privilege": "S"
+    }
+  ],
+  "uart_base": 268566528,
+  "uart_interrupt_source": 1,
+  "uninitialized_rtl_registers": [
+    "CLINT.mtimecmp[0..2]",
+    "PLIC.priority[1]",
+    "PLIC.threshold[0..5]",
+    "PLIC.enable[0..5]"
+  ],
+  "physical_map_sha256": "6a6e8e60c59a332d5d650a702febfacc796776d5d36b5fd3a5b9e449071e6842",
+  "fact_evidence": {
+    "reset_pc": [
+      {
+        "source": "boot-config.scala",
+        "lines": [
+          30,
+          45
+        ]
+      }
+    ],
+    "rom_base": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          187,
+          191
+        ]
+      }
+    ],
+    "rom_size": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          187,
+          191
+        ]
+      }
+    ],
+    "dtb_offset": [
+      {
+        "source": "bootrom.rv64.img",
+        "byte_length": 192
+      },
+      {
+        "source": "bootrom.scala",
+        "lines": [
+          90,
+          96
+        ]
+      }
+    ],
+    "boot_address_register_base": [
+      {
+        "source": "boot-address-register.scala",
+        "lines": [
+          12,
+          15
+        ]
+      }
+    ],
+    "boot_address_register_size": [
+      {
+        "source": "boot-address-register.scala",
+        "lines": [
+          25,
+          30
+        ]
+      }
+    ],
+    "boot_address_default": [
+      {
+        "source": "boot-address-register.scala",
+        "lines": [
+          12,
+          15
+        ]
+      }
+    ],
+    "clint_base": [
+      {
+        "source": "bootrom.S",
+        "lines": [
+          6,
+          8
+        ]
+      }
+    ],
+    "mtime_hz": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          13,
+          17
+        ]
+      }
+    ],
+    "plic_base": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "plic_size": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "plic_sources": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "plic_max_priority": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "plic_contexts": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "uart_base": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          201,
+          208
+        ]
+      }
+    ],
+    "uart_interrupt_source": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          201,
+          208
+        ]
+      }
+    ],
+    "uninitialized_rtl_registers": [
+      {
+        "source": "clint.scala",
+        "lines": [
+          71,
+          81
+        ]
+      },
+      {
+        "source": "plic.scala",
+        "lines": [
+          166,
+          184
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "No deployed bitstream binding.",
+    "No boot/timer/PLIC helper is installed into Spike automatically.",
+    "PMA helper validates coarse region permission; transfer sizes and transaction-specific access faults require core integration."
+  ]
+}

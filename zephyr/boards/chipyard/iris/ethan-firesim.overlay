@@ -1,0 +1,6 @@
+/* Ethan's inspected FireSim bridge has fixed UARTKey(div=135), source500MHz.
+ * The pinned driver writes floor(clock/current_speed)-1; use floor(500MHz/136)
+ * so its programmed DIV is135. Nominal source initBaudRate was3686400.
+ * This is a deployment profile; it does not change hardware or bridge params.
+ */
+&uart0 { current-speed = <3676470>; };

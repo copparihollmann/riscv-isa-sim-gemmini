@@ -1,0 +1,42 @@
+{
+  "schema": "iris.node5_return_branch_source_profile.v1",
+  "source_capsule": "build/rtl-memory-return-path-v1-final/report.json",
+  "source_capsule_sha256": "2e32a62c428c8f434c7893beb419da576b1e3a7ff4f4574aef41dc2c1f1dac0c",
+  "arbiter_component": "build/noc-component-v1-final/report.json",
+  "arbiter_component_sha256": "3621f024fcf72c7fa95cfb3d93ba964f5dda73f47f28497a17f3c980f5fa73e0",
+  "constellation_commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+  "standalone_iris_fir_sha256": "f1b36c8565bd67825c636af40079ea048a9196bf1e36fcb719270411270201f4",
+  "parameters": {
+    "input_virtual_channels": 6,
+    "input_fifo_depth": 5,
+    "egress_fifo_depth": 2,
+    "node_id": 5,
+    "local_egress_id": 0,
+    "router_input_units": 4,
+    "output_virtual_channels": 13,
+    "local_input_unit": 0,
+    "local_output_bit": 12
+  },
+  "source_contracts": {
+    "input_fifo": "InputBuffer instantiates six Queue5_BaseFlit, flow=false, pipe=false",
+    "egress_fifo": "EgressUnit_21 instantiates Queue2_EgressFlit, flow=true, pipe=false",
+    "egress_credit": "Available only when q.count==0",
+    "reservation": "channel_empty clears on output allocation; sets on tail switch-credit allocation; new allocation wins",
+    "input_switch": "SwitchArbiter_41 lock retains packet owner until tail; idle mask rotates even without acceptance",
+    "timing_stages": "Generated combinational salloc_outs proves combineSAST=true; EgressUnit_21 has no coupled-SAVA empty bypass",
+    "fifo_dependencies": "Qualified InputUnit_10 has no fifo_deps state or filtering",
+    "flit_encoding": "Queue5_BaseFlit and Queue2_EgressFlit store75bits: head0,tail1,payload74:2"
+  },
+  "external_dependencies": [
+    "Accepted physical flits on node5 input0 from node4, including VC and exact75bitdata",
+    "Local NIF3 downstream ready, produced by unmodelled endpoint/CDC/tile state",
+    "Other physical input units' post-occupancy VA requests for forwarding outputs; those input machines/network outputs remain external",
+    "Exact route-completion event/response; these local-return traces have no route-completion events"
+  ],
+  "qualified_flow": "All captured input0 flits have destination node5/local-egress0; peer local VA and switch contenders absent",
+  "nonlocal_flow": "Fails closed; forwarding output credit/reservation and peer input machine models are required",
+  "whole_router_certified": false,
+  "whole_noc_certified": false,
+  "timing_calibrated": false,
+  "ethan_image_association": false
+}

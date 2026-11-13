@@ -1,0 +1,22 @@
+{
+  "actual_native_quality_claimed": false,
+  "fixture_sha256": "0e5de2939b30c3b8833f3d1d8bfcd87e4beb9d65105c0a79e79f7c0949db8c48",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "build/empirical-priority-28a0-features-v1/regions.jsonl": "2018200703c33796b3f22b5349061f2282fbdb75d2b6819e61ddae72eed29986",
+    "build/empirical-vector-layer-proof-v1/report.json": "51a55d547dccde888e33b0f747c14d719d9f26ec32521707704079ac08d73aa0",
+    "calibration/empirical-priority-28a0-fit-v2/parameters.json": "4d34a14718ad1ddf5f7e2619da865cb31a82de826347971415c1008fa1215f48",
+    "calibration/empirical-priority-reference-v2/report.json": "264653d2435f28c843e1f13e110f337545fc911c08e8ca68efd91ee753b3cf9a",
+    "calibration/empirical-priority-v2/split.json": "63b0013d8a28e5d25537c83a3e19412c7567f77a0d5799860ca9207798527158",
+    "timing/empirical_priority_fixture.py": "9a08c6c0a2cfd27c9332060bee6337d111a211fdff3eb7fa64410c0af0d3ccc1"
+  },
+  "integer_projected_families": 17,
+  "old_448_unfitted_interval_replaced": true,
+  "parameters_sha256": "d2ff9fcb454a9fe085fc4ded586c22d8cac4d439c5a62623486186a9fe86d87e",
+  "raw_parameters_sha256": "4d34a14718ad1ddf5f7e2619da865cb31a82de826347971415c1008fa1215f48",
+  "schema": "iris.empirical_priority_parameter_selection.v1",
+  "shared_outer_launch_fit_uses_train_only": true,
+  "shared_return_service_transfer_is_explicit": true,
+  "status": "actual_fit_mapped_native_replay_pending"
+}

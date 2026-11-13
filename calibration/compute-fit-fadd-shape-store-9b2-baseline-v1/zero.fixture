@@ -1,0 +1,35 @@
+purpose uncalibrated-integration-fixture
+source experimental-fast-event-baseline-no-RTL-peer-evaluation-unfitted
+base_hz 500000000
+rtc_divider 1000
+max_cycles 100000000000
+trap_cycles 4
+hart 0 1 source
+hart 1 1 source
+hart 2 1 source
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+rule 0 0 0 scalar0 3 1 uncalibrated-conservative-boundary base_cycles
+rule 1 0 0 scalar1 3 1 uncalibrated-conservative-boundary base_cycles
+rule 2 0 0 scalar2 3 1 uncalibrated-conservative-boundary base_cycles
+shuttle_pipeline pure-integer-rvc-counter-sequential-frontend
+rocket_pipeline pure-integer-rvc-counter-sequential-frontend
+pipeline_values private-pure-integer
+
+empirical_profile experimental-effective-services compute-fit-fadd-shape-store-9b2-zero-v1 bounded
+
+empirical_async integer-vme-fadd-nonmemory-v3
+
+counter_policy source-ungated-stall
+
+empirical_icache address-tags-refill-proxy-v1
+empirical_load_front dram-L1-hit-latched-response-v1
+
+shuttle_frontend source-C++-M-mode 1 16
+icache_service empirical-shared-L2 1 1 explicit-unfitted-source-frontend-service
+empirical_rocket_packets source-IBuf-demand-4B-v1
+
+empirical_scalar_fadd source-HSD-pipeline-v1
+empirical_vme_work source-shape-subtiles-v1
+empirical_store_front owned-dirty-L1-COM-v1

@@ -1,0 +1,21 @@
+The configured StoreSequencer component is available in `build/rvv-store-sequence-component-v1/sdk/`. Its continuous native state matches 600,000 independently evaluated saved-RTL edges (11,201,658 qualified fields), with five compiled control mutations rejected. The final active-only measurement was 35.7 million component edges/s; this is not SoC MIPS. The source/evidence archive and input hashes are in its `report.json`.
+
+`evaluate` computes without advancing, `sample` observes those outputs, and `commit` advances exactly one source edge. A caller must supply defined physical peer readiness, the older-write mask and VAT head. Only configured unmasked unit-stride nf1 control is admitted. Actual reset establishes the valid bit; inactive unreset payload is absent. The saved specialization removes `dis_stall`, tied false in this configured cut. There are separate Compute128 and Rocket256 profiles. This component neither creates physical readiness nor predicts memory latency.
+
+Source `StoreSequencer.scala:18-55,57-107` establishes valid/dispatch, per-EG RAW masks, real read/issue handshakes, byte masks and chaining release. `Mem.scala:334,347-406` has additional segmenter, compactor, depth-two address queue, store ROB and ACK-ordered SIFQ behavior. These remain separate peers. `TLInterface.scala:33-37` counts internal A/D; it must not be inferred from external A acceptance across width adapters.
+
+The closed whole-unit probe is `build/rvv-source-store-proof-v2/report.json`: 20 finite initialized Compute/Rocket cases plus 12 transcript corruptions. Compute128 issues 16-byte requests onto a 32-byte ATL port (half masks); Rocket256 issues 32-byte requests expanded to four 8-byte ATL beats, including masked padding. VRF groups, TL requests, physical A beats, wire slots and payload bytes are separate counts. Its explicit ACK delays of 2/20 edges are synthetic services, not physical L2/DRAM latency.
+
+The finite native store actor is experimental. Its opt-in fixture line is:
+
+```
+empirical_vector_store_actor finite-VSE32-single-hart-v1 HART FRONT READ ACK A_PERIOD core_edges
+```
+
+All five numbers are required. The validation fixtures use FRONT=3, READ=3, ACK=20 or 200, A_PERIOD=1. These are conditional CPU/VU joining and synthetic service controls; they are not fitted physical parameters. The source StoreSequencer is exact within its qualified cut; the surrounding VMU/TL peer is an effective bounded-credit actor, not the exact segmenter/compactor/address-queue/width-widget/CDC network. Its two-edge read-to-A path is conditioned on the finite uncontended source witnesses, not a universal path guarantee.
+
+The original VSE handler runs at CPU COM with MMU word writes quarantined. Every captured value and known mask is checked against initialized source VRF; RAM and its known masks must remain unchanged. The source sequencer then owns a conservative whole-VRF lease through its group reads. Scalar integer work and counter reads may overlap outstanding requests. Ordinary scalar memory, FENCE and state-changing CSR paths drain every matching ACK. At each noncancellable ACK, only that request's typed bytes are published; destination bytes are checked unchanged before publication. Partial wire padding never becomes RAM data.
+
+Initial support is one active M-mode hart, quiet peers, no interrupts, fully defined unmasked aligned nf1 VSE32 up to 256 bytes. Other vector operations wait until the store's VRF reads finish; overlapping store cache lines drain older stores. Pending interrupts, actual traps, active peers, undefined source data and out-of-scope formats refuse explicitly. This is not Zephyr/context-switch/shared-memory qualification. OFF-mode compatibility is qualified separately. It does not resolve the actual hart-2 256-byte load frontier or earlier Zephyr/page-store hangs.
+
+`build/rvv-vector-store-actor-gates-v5/report.json` records actual single-active harts 0/1/2, seeds 0/17, 20/200-edge service controls, VRF reuse, fence drain, wrong-path nonacceptance, and IRQ/peer refusals. `build/rvv-vector-store-actor-full-overlap-v2/report.json` independently checks bounded/full guest-counter parity and actual scalar pipeline nodes while a store owns pending ACKs. No new hardware timing labels or reserved validation data were used.

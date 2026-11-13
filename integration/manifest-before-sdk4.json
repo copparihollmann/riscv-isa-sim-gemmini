@@ -1,0 +1,89 @@
+{
+  "schema": "iris.companion_integration.v1",
+  "repositories": {
+    "merlin": {
+      "baseline_commit": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
+      "pristine_baseline": "/scratch/copparihollmann/iris-model/third_party/merlin",
+      "derived_worktree": "/scratch/copparihollmann/iris-model/integration/merlin",
+      "patch": "integration/patches/merlin.patch",
+      "patch_sha256": "69ee68692dc4c3621e58e227cf2349aeb865552642f8cb4e2f6fb1a7cb7cf272",
+      "patch_applies": true,
+      "source_sha256": {
+        "docs/README.md": "122c0fc2da8dece9269e7e0717bcaf52936488f395646905e074e1486c9a7b69",
+        "docs/reference/provider_execution.md": "a3bf3efa57df3719e46b58b6e909bf526e3f1e3d1767c8ad5ecf01e85bf9ae89",
+        "merlin/tests/kernels/test_matrix_descriptor_bridge.py": "dd22ea0a9ec827264731eb8d381717c033084a4af715a63eb5376e6488327692",
+        "merlin/tests/kernels/test_matrix_pointer_shim.py": "e5c3650732b116b87f995d4ad9c6b01cf84ee44dd594f5e959208c505b849dda",
+        "merlin/tests/runtime/test_board_heterogeneous_harts.py": "3d32d6e7020d744bc94e97ae8523f835d85678dc03b93d65d579cc7a8abc334c",
+        "merlin/tests/runtime/test_device_simulator_provider.py": "7d811c322eb20b52eb1cbb261c9897ceb6d823aa3bddbc8bc6c7693f6ea34740",
+        "src/merlin/kernels/matrix_shim.py": "1f5c353f427807057f55acf7e5f36e2dbfd8ee385124602c72ebea267e2308ce",
+        "src/merlin/runtime/backends/device_simulator.py": "5738e33ee93c6e2715bdf6609189d2c7ddaf8cf609641ee82bb212bfd0da59a7",
+        "src/merlin/runtime/boards.py": "a01fefbf21487faae35931b4bf1ce3a4f4c61f2920b2ebf7acb6a614869c1319",
+        "src/merlin/targetgen/provider_compose.py": "fcbad1e244d9c7cfedd29f801668f48fc730ab193033e7eaf0f415d69852f239",
+        "src/merlin/targetgen/providers.py": "1fb80d02d3aa9fba7bfa8624de21c06efe30b6a3886bdfc64290c061cdd7c5ac"
+      }
+    },
+    "iris-mlir": {
+      "baseline_commit": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
+      "pristine_baseline": "/scratch/copparihollmann/iris-model/third_party/iris-mlir",
+      "derived_worktree": "/scratch/copparihollmann/iris-model/integration/iris-mlir",
+      "patch": "integration/patches/iris-mlir.patch",
+      "patch_sha256": "22d0825de31664be776856f767d60fe454e171a91573a8dd543a7f34649acb1d",
+      "patch_applies": true,
+      "source_sha256": {
+        "README.md": "12ea4846ebe183c37896ea81b03f9f463ec9ebf9119b033d8f8f5683848eb18e",
+        "boards.yaml": "fd413849bed22f5a2774531b4e6cf101937df5b8e20b4cc5547bb17231ddd06c",
+        "compile_model.py": "750c63f9d7babde00e6c7cc235c369fd2e7531e02f0c9c3c65d29d7dde6518ff",
+        "configure_model.py": "3746de4fdd6c3d6b17375d010bfb87c20414b69be38e7ef35bb9cf5b6d5a2e08",
+        "examples/iris/fixtures/conv2d-im2col.mlir": "86ddece98ce1f4b477c4297458c50139f35f196951a5a6829056bed86d43ad93",
+        "examples/iris/fixtures/gemm.mlir": "7ff9e8952fff1dd9858cff158808a3b94ff16811d5c0e3886d83c1f1449a7781",
+        "examples/iris/run.py": "5c429bd4669993fe2707c7d0d486fac8ec418ec767abb44d484ac54f9421d54d",
+        "examples/iris/run.sh": "09f94626bf1c3a212d7a9cc2f419ddd8cd1a199bf51f791818d15dccfe055317",
+        "provenance.json": "24b76cda33527983306da9c6630877c7ed4c9242d30df2c44119341d01c4fa7d",
+        "simulator.py": "0e4d3dba3d9fbda9489dff71be9cc8e0558620deb5b1feb561a1be7ed92454be",
+        "source-identity.json": "d3f61edea2833cf7d95e7dfe9dada04a12ba4f32f76830bc232ea8adff1cba8f",
+        "source_facts.py": "11bc7df4efc22eb20d43ec03045a990ef975b45c92e68fde0e6d8a68b4279cc0",
+        "tests/test_matrix_lowering.py": "7accb492214f359fe98a3a21b4e39359cbaf33e2489bc7cc8b88873516ece54d",
+        "tests/test_simulator_integration.py": "09e3b8d5dd42c4472b9b897c8ca866f4058a0b125d3a3820fa5b38c701b2193c",
+        "tests/test_support_contract.py": "10f6acc1b964cb7889da0167c4e70d6c3d0c5d06e19b592946342943e78f24aa",
+        "vme_shim.py": "9c18d69402cf5e97105128f3b36a31c75cc0348d2cd97399917be0cebaa24a4a",
+        "zephyr/CONTEXT.md": "6413e729cb517312d7cc187426e74b67f48e999c55cd353ad9521244b5d5e98b",
+        "zephyr/boards/chipyard/iris/Kconfig.defconfig": "defb17640d25293b1458996b6a6585140c941229ef413706bfb9fac5e13af0a1",
+        "zephyr/boards/chipyard/iris/Kconfig.iris": "a576c19125c23b6ca8795c1c151bfa504c51dc8167e7971e966159beb32f8525",
+        "zephyr/boards/chipyard/iris/board.yml": "648612f017d1973bf9fa0eaf5933995342cae5461665d42447ece25fbf42d65b",
+        "zephyr/boards/chipyard/iris/iris.dts": "be3db1708a3e8c76da6a33fd27bf4f88d35c521163ccba7af43875fbf17c9342",
+        "zephyr/boards/chipyard/iris/iris.yaml": "a2a0abb1fd4ec6eac23c05fde9d35f25a710007345c38ac78ebae18fdb134066",
+        "zephyr/boards/chipyard/iris/iris_defconfig": "bc5036c6911ca5d0a07ced311e600a9498bd1335f64cea87754072b513136621",
+        "zephyr/context-support.json": "3a2ea7a7203508f0f553e5dccd4429448d5d3781cebda25285e09d73c5283953",
+        "zephyr/dts/bindings/cpu/sifive,rocket0.yaml": "d2c702ab14972e3b4c305f1d53c99e97fcad9fa1eaae49d287859f59b3657924",
+        "zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml": "71397a360aafa56f8b099638a0cb8f9116b1c81b1bab033ee198864bcc23173b",
+        "zephyr/dts/bindings/vendor-prefixes.txt": "c1672eab002cf7802c13791781318db34469511b29811d0cb7c0411d6d969e0f",
+        "zephyr/patches/0002-iris-vme-context.patch": "558cefc2f57225774cc891e1df0d2f7149f6e834a7012b4c0735f0fba0d1aa1b",
+        "zephyr/task_setup.h": "bccccc400828f7cf5785bccd58b6d8bc37aa5be1041614f129ce324d6ea36693"
+      }
+    }
+  },
+  "rvv_base_commit": "a80eea3eb749e5fd4cb822779a08d0d8ca09e5d5",
+  "evidence_sha256": {
+    "build/merlin-targeted-final-tests.log": "dbaa1073c12be9386314133d93ac78900c7e26a54417d082329bbf101797c3f5",
+    "build/merlin-integration-tests.log": "d601846ca5cc1d8cab5f26200a27e03a29a53bb03610a79d7ce8a88378c4d5cc",
+    "build/merlin-baseline-board-tests.log": "5c94a51597b083c9053a7a83e3388e42bf2a2b1dc0a723274a89846dc4825740",
+    "build/merlin-structure-check.log": "68d75711a5b0ee4a797d16e96447996e9185b906024896e660533df410cd7f7a",
+    "build/llvm23-toolchain.json": "a6fe4966f3d0bf98d48d495d157302dfccb4aca88ba20bde9e535261fd8e20e5",
+    "build/merlin-evidence/closure.json": "08440558e9937d6872fb8d9c675f86a33e496db4bd041f266c05c1e91c0509fc",
+    "build/merlin-epilogue-crosscheck.json": "4455a552219ac08c7b7f597e2b4a0e801b1b6f48437021f3d7e5d859336a46d6",
+    "zephyr/compiler-acceptance.json": "7e79d7427447645f184c4f9ed1053c7b63af214b7d51eed8c0acf4fa8ae6f283",
+    "build/merlin-workflow/current-memory-gemm-h2/results.json": "e77fb80379eb98257ab43374f7854a78e98632bbbb6cdd251249408be4f5af87",
+    "workloads/model-inputs.json": "d2567c39ae82821c79f6c047ec494b9d1cc394a999ada615c73d6fb2f0bb9a7b",
+    "workloads/operator-coverage.json": "8ed8503699d4a4f0c91d370e1491bda2e01e12c90961acc99eb9b0da84fa80f7"
+  },
+  "tests": {
+    "focused": "20 passed",
+    "broader": "106 passed,3 skipped,4 pre-existing board/source-assertion failures",
+    "baseline_reproduction": "same4 failures on pristine d561",
+    "structure": "passed"
+  },
+  "whole_model_qualified": false,
+  "rtl_certified": false,
+  "timing_calibrated": false,
+  "published": false
+}

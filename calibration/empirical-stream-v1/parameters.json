@@ -1,0 +1,46 @@
+{
+  "full_2pct_certified": false,
+  "inputs_sha256": {
+    "calibration/empirical-v1/observations.jsonl": "2f859f5f7ee2a5ebd13f39a02b6cb4d5381bbdb6b9db8cd8fc8f672bddfa50b3",
+    "hardware/manifest.json": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+    "timing/empirical_stream_fit.py": "7eecc10e4659b7066bb233ca7282e4b7c68aaed1458e8c06579d1874d77386b3"
+  },
+  "live_model_verified": false,
+  "models": {
+    "rocket": {
+      "coefficients": {
+        "l1_miss_lines": 564.0064191526227,
+        "loads": 0.10302279316231863,
+        "outer_miss_lines": 4.245510239358738e-14,
+        "outer_miss_peer_lines": 85.82168828868063,
+        "region_intercept_cycles": 121.15492919182779
+      },
+      "columns": 5,
+      "rank": 3,
+      "training_groups": 13
+    },
+    "shuttle": {
+      "coefficients": {
+        "l1_miss_lines": 62.92335435794887,
+        "loads": 1.4945471059680409,
+        "outer_miss_lines": 596.4022346302061,
+        "outer_miss_peer_lines": 93.8163885294324,
+        "region_intercept_cycles": 767.6360480902252
+      },
+      "columns": 5,
+      "rank": 5,
+      "training_groups": 47
+    }
+  },
+  "schema": "iris.empirical_cache_tier_proxy.v1",
+  "scope": [
+    "Capacity-only proxy8KiB/16KiBL1D;512KiBL2;64Bline.",
+    "Prepare warm/eviction metadata used ONLY to approximate feature counts; live model MUST derive warm state from actual runtime tags.",
+    "Counts are NOT a physical source-cache trace, and no tag state is injected.",
+    "No source/image association; outer cost combines L2miss/serial/DRAM/dirtyvictim/bandwidth/backpressure.",
+    "No FASED30 conversion. Globalheldouttimingunused."
+  ],
+  "source_image_association_verified": false,
+  "status": "effective_service_exploration_counts_not_live_tag_verified",
+  "units": "core_cycles_at_500MHz"
+}

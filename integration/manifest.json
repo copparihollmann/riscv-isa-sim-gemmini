@@ -1,0 +1,77 @@
+{
+  "schema": "iris.companion_integration.v2",
+  "status": "sdk4_publication_candidate_not_published",
+  "repositories": {
+    "merlin": {
+      "baseline_commit": "d56133b168bbee3d73cb8b4304d3622d4191fc6a",
+      "pristine_baseline": "/scratch/copparihollmann/iris-model/third_party/merlin",
+      "candidate_projection": "/scratch/copparihollmann/iris-model/build/sdk4-publication-companion-patches-v1/merlin",
+      "intended_derived_worktree": "/scratch/copparihollmann/iris-model/integration/merlin",
+      "patch": "integration/patches/merlin.patch",
+      "patch_sha256": "a7685ceb5af2d813976b1a3f25afb7bc36ada8be8f26237488934553dc8a861e",
+      "patch_applies": true,
+      "source_sha256": {
+        "docs/README.md": "122c0fc2da8dece9269e7e0717bcaf52936488f395646905e074e1486c9a7b69",
+        "docs/reference/provider_execution.md": "a3bf3efa57df3719e46b58b6e909bf526e3f1e3d1767c8ad5ecf01e85bf9ae89",
+        "src/merlin/kernels/matrix_shim.py": "1f5c353f427807057f55acf7e5f36e2dbfd8ee385124602c72ebea267e2308ce",
+        "src/merlin/runtime/backends/device_simulator.py": "118577d4808a66c30b90880d963ebec89f09b986f2bb4691558999ff917e07c1",
+        "src/merlin/runtime/boards.py": "a01fefbf21487faae35931b4bf1ce3a4f4c61f2920b2ebf7acb6a614869c1319",
+        "src/merlin/targetgen/provider_compose.py": "fcbad1e244d9c7cfedd29f801668f48fc730ab193033e7eaf0f415d69852f239",
+        "src/merlin/targetgen/providers.py": "1fb80d02d3aa9fba7bfa8624de21c06efe30b6a3886bdfc64290c061cdd7c5ac"
+      }
+    },
+    "iris-mlir": {
+      "baseline_commit": "8447703ae5805271911e8ef232d8fd1aa7b6947d",
+      "pristine_baseline": "/scratch/copparihollmann/iris-model/third_party/iris-mlir",
+      "candidate_projection": "/scratch/copparihollmann/iris-model/build/sdk4-publication-companion-patches-v1/iris-mlir",
+      "intended_derived_worktree": "/scratch/copparihollmann/iris-model/integration/iris-mlir",
+      "patch": "integration/patches/iris-mlir.patch",
+      "patch_sha256": "52fdcc136f27453af9f8fddc79592c8848015229bb5d47eca9b425a16a4254b5",
+      "patch_applies": true,
+      "source_sha256": {
+        "README.md": "0fd3e31e6fd67b5217984cc23166577b7a8b2b672b7e6ddc69f77a59b3d3407b",
+        "boards.yaml": "a18a72375283211ca6eaf4e1bb9c59905ce1b83860ab3d0716b04e6f5eb96c75",
+        "compile_model.py": "750c63f9d7babde00e6c7cc235c369fd2e7531e02f0c9c3c65d29d7dde6518ff",
+        "configure_model.py": "46912a5e216a4733552d6c2bd7dc067d35450b27476016bd90c29a0f51001c47",
+        "examples/iris/fixtures/conv2d-im2col.mlir": "86ddece98ce1f4b477c4297458c50139f35f196951a5a6829056bed86d43ad93",
+        "examples/iris/fixtures/gemm.mlir": "7ff9e8952fff1dd9858cff158808a3b94ff16811d5c0e3886d83c1f1449a7781",
+        "examples/iris/run.py": "9bc53b241a6caf859f5aa804883b00d01ab48e12236c2d11c245c5e2ea956b8f",
+        "examples/iris/run.sh": "09f94626bf1c3a212d7a9cc2f419ddd8cd1a199bf51f791818d15dccfe055317",
+        "provenance.json": "b4350da2fe43d338d0dd53d4448f589f35606f764bbf75da72733e1bc84d56be",
+        "simulator.py": "d6366a45dd9d2621db8a508d1461ea4ec2a68d1e20dad604e9925ca996ef4fb5",
+        "source-identity.json": "d3f61edea2833cf7d95e7dfe9dada04a12ba4f32f76830bc232ea8adff1cba8f",
+        "source_facts.py": "11bc7df4efc22eb20d43ec03045a990ef975b45c92e68fde0e6d8a68b4279cc0",
+        "tests/test_matrix_lowering.py": "7accb492214f359fe98a3a21b4e39359cbaf33e2489bc7cc8b88873516ece54d",
+        "tests/test_simulator_integration.py": "09e3b8d5dd42c4472b9b897c8ca866f4058a0b125d3a3820fa5b38c701b2193c",
+        "tests/test_support_contract.py": "10f6acc1b964cb7889da0167c4e70d6c3d0c5d06e19b592946342943e78f24aa",
+        "vme_shim.py": "9c18d69402cf5e97105128f3b36a31c75cc0348d2cd97399917be0cebaa24a4a",
+        "zephyr/CONTEXT.md": "28e636d14589809563da59952da6381679fe179b66ff971877c827a696750d33",
+        "zephyr/boards/chipyard/iris/Kconfig.defconfig": "defb17640d25293b1458996b6a6585140c941229ef413706bfb9fac5e13af0a1",
+        "zephyr/boards/chipyard/iris/Kconfig.iris": "a576c19125c23b6ca8795c1c151bfa504c51dc8167e7971e966159beb32f8525",
+        "zephyr/boards/chipyard/iris/board.yml": "648612f017d1973bf9fa0eaf5933995342cae5461665d42447ece25fbf42d65b",
+        "zephyr/boards/chipyard/iris/iris.dts": "be3db1708a3e8c76da6a33fd27bf4f88d35c521163ccba7af43875fbf17c9342",
+        "zephyr/boards/chipyard/iris/iris.yaml": "a2a0abb1fd4ec6eac23c05fde9d35f25a710007345c38ac78ebae18fdb134066",
+        "zephyr/boards/chipyard/iris/iris_defconfig": "bc5036c6911ca5d0a07ced311e600a9498bd1335f64cea87754072b513136621",
+        "zephyr/context-support.json": "3a2ea7a7203508f0f553e5dccd4429448d5d3781cebda25285e09d73c5283953",
+        "zephyr/dts/bindings/cpu/sifive,rocket0.yaml": "d2c702ab14972e3b4c305f1d53c99e97fcad9fa1eaae49d287859f59b3657924",
+        "zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml": "71397a360aafa56f8b099638a0cb8f9116b1c81b1bab033ee198864bcc23173b",
+        "zephyr/dts/bindings/vendor-prefixes.txt": "c1672eab002cf7802c13791781318db34469511b29811d0cb7c0411d6d969e0f",
+        "zephyr/patches/0002-iris-vme-context.patch": "558cefc2f57225774cc891e1df0d2f7149f6e834a7012b4c0735f0fba0d1aa1b",
+        "zephyr/task_setup.h": "bccccc400828f7cf5785bccd58b6d8bc37aa5be1041614f129ce324d6ea36693"
+      }
+    }
+  },
+  "historical_parent": {
+    "path": "integration/manifest-before-sdk4.json",
+    "sha256": "4dee071f5dced4acf775e9aae321a2e1fbd91082d4a886f54e740a67cabf8197",
+    "scope": "Unchanged historical source/test associations; not relabeled as current tests"
+  },
+  "native_sha256": "35901887c93ab80aa92e68aac2f26cefa6cc785ae8251d5dc283471aa97faf5d",
+  "launcher_sha256": "ca007ad96ad93afbec0c2d062e735ed5de00668f224535f74ce306b9c41d5b44",
+  "native_device_abi": 4,
+  "validation": "Fresh source/default/selftest/provider/Merlin candidate receipts are bound in the separate publication review closure.",
+  "whole_model_qualified": false,
+  "rtl_certified": false,
+  "timing_calibrated": false,
+  "published": false
+}

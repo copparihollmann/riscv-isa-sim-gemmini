@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "unapplied_boot_only_proposal",
+  "base_input_sha256": {
+    "riscv/cfg.h": "6eab299d4a80306b594345380a7a7dfa5ab4e8ddb04af93452f81b7c4ec13ce8",
+    "riscv/processor.cc": "4eca8e623baed5ca40debdd69e66bdb9586b7d8a7a64e7e8cac7f1f4c3aaa8ea",
+    "riscv/sim.cc": "965b52aa8753b6b2d9a24cb056700322ecaab293055268ce5e51d094994c8848",
+    "spike_main/spike.cc": "511beac037f2240e43e4f77a81d7277497798357232bd2e2ebfa026442c572fe"
+  },
+  "patch_sha256": "27e04a99c5c4a9b1e57eee6a829457fb8f3dcb739be1fc7c3dc365eadb710e5d",
+  "limitations": [
+    "Does not install board PMA, PLIC or UART replacements.",
+    "Does not change mtime frequency or hook timer callbacks.",
+    "Relative board header include assumes this workspace source layout.",
+    "Parent must reconcile with concurrent timing/core integration and refresh build provenance."
+  ]
+}

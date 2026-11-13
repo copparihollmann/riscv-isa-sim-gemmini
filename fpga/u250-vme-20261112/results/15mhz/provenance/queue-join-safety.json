@@ -1,0 +1,7 @@
+{
+  "original_native_entrypoint_sha256": "4227b99b4453e9f26419ff25e01b21e2596ebc1f9c1fa9d3c3495b6eac24e675",
+  "original_matches_pinned_git_blob": true,
+  "dispatcher_handles_bash_cached_executable_path": true,
+  "25mhz_native_manager_entrypoint": "parallel-25mhz/firesim/deploy/firesim",
+  "active_15mhz_python_process_untouched": true
+}

@@ -1,0 +1,92 @@
+Configured scope: compute Saturn, VLEN256/DLEN128, xDim=yDim=4,
+clusterXdim=clusterYdim=4, R=2, tileEdge32, useOpuColReadout=false.
+Source OPU is hardware/evidence/outer-product-unit.scala (be2f6842...),
+whose gated_clock=clock matches the saved SV. The different clock-gate-enabled
+third_party Scala text is not substituted for this source snapshot.
+
+Independent cause derivation
+
+1. OuterProductSequencer.scala:215-230 selects latency L=5-(index&3).
+   Its column control changes tile-slot packing and shift_h, but row_idx is
+   still (index>>2)&3 and col_idx is the current group&3 (:251-273).
+2. OuterProductUnit.scala:203-207 loads every cluster's vertical pipe on EVERY
+   edge. When vertical shift is false, it loads cell_outs(row_idx)(col_idx).
+   The optional horizontal pipe at :209-215 does not exist in this config.
+   Column shifts consequently have no connection to these vertical registers.
+3. Backend.scala:379-416 unconditionally registers the OPU controls, including
+   default mrf/row/col zero when the sequencer does not fire. The actual saved
+   VectorBackend.sv retains those unconditional nonblocking assignments.
+4. Backend.scala:446-449 captures the VERTICAL OPU output with RegEnable when
+   write_reg_enable is asserted. The saved SV explicitly packs out3..out0;
+   it has no write_col mux. Our tiny extracted SV copies those exact register
+   assignments and capture statement, without modifying them.
+
+Let edge t denote the actual accepted OPU microissue, with index cluster c.
+The source control register captures that issue at t. Its selected matrix cell
+enters the array pipe at t+1. The sequencer capture enable is at t+L and the
+VRF write is at t+L+1. Thus the captured vertical output reflects control from
+t+L-2 = t+3-c, unless a vertical shift from another ROW readout intervenes.
+
+For one isolated column instruction with eight consecutive microissues and
+no competing row readout, group g therefore samples group q=g+3-c. If q<8,
+source slot=4*tile+2*(q//4)+(index//16); the last physical cluster row is3,
+local cell row=(index//4)&3, and local cell col=q&3. Physical-to-logical packing
+then gives:
+
+  row = 16*(q//4) + 4*((index//4)&3) + 3
+  col = 16*(index//16) + 4*(q%4) + lane
+
+If q>=8 and no successor command fires, idle controls select tile0,row3,col=lane.
+For our injective matrix fixture value=tile*65536+row*64+col, idle is192+lane.
+This is a derived SPECIAL CASE, not general column ISA semantics.
+
+General continuous oracle
+
+The checker generates dispatch/issue times from explicit external availability,
+the source tail-replacement contract, and absolute PipeScheduler reservations.
+It never consumes observed RTL queues, waiting flags, controls or array state.
+Physical register evolution is carried continuously:
+
+  C(E+1) = sequencer_controls(E)
+  P[r,lane](E+1) = C.shift[r](E) ? P[r-1,lane](E)
+                                      : selected_MRF_cell(C(E),r,lane)
+  D(E+1) = write_reg_enable(E) ? P[3](E) : D(E)
+
+VRF write consumes D(E) with the actual source-valid write at E. Row shift times
+derive from accepted row issues and their cluster positions. This handles the
+mixed row/column successor cases rather than applying the isolated formula.
+
+Finite proof
+
+The actual compiled sequencer+PipeScheduler and full OPU array execute all
+1,216 scenarios. All4,096 physical words are initialized through public OPU
+move-in ports and scanned through public readout pipes before data is consumed.
+There is no direct matrix/register-state initialization. Cases cover all4 tiles,
+all32 indices, rows/columns, four write-port availability patterns, and adjacent
+column/column, column/row and row/column commands with separate destinations.
+Every issue and all45,056 output words agree with the independent event/physical
+coordinate oracle. The extracted Backend-register RTL independently checks
+2,935,276 control/capture values against the coupling implementation.
+Those are concrete two-state register comparisons, not a blanket reset-knownness
+claim: four capture-word comparisons occur in the uninitialized reset prefix and
+are explicitly unqualified. Every one of the45,056 consumed readout words instead
+has a real capture after complete public initialization. The driver refuses any
+write that would consume an unknown readout; default C++ placeholder buffers are
+never accepted as architectural initialization.
+
+An explicit counterexample to universal instruction-only semantics: tile0,
+index0, isolated column, contiguous issue yields first group204,205,206,207.
+Allowing the write port only on alternating edges makes the first group
+192,193,194,195. The instruction, tile contents, VL and TSS are identical.
+The difference comes from idle control at the later sampling edge. Across the
+isolated subset, 288 index/policy comparisons change output. No observed FPGA
+data are used as fitting labels or lookup values in this oracle.
+
+Limits
+
+This is a bounded component proof. External write-port availability is a legal
+fixture input, not a complete VRF arbitration model. Matrix data remain constant
+after explicit initialization; concurrent arithmetic requires its own known
+storage/physical-write trace. It does not certify arbitrary column behavior,
+full SoC timing, four-state reset definedness, or an FPGA-image association.
+The functional Spike column capability refusal remains unchanged.

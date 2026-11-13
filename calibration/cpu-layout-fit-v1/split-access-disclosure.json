@@ -1,0 +1,11 @@
+{
+  "schema": "iris.empirical_fit_split_access_disclosure.v1",
+  "fitter_loader_parses_full_reference_csv": true,
+  "fitter_uses_internal_validation_timings_for_coefficients": false,
+  "predictions_frozen_before_internal_validation_metric_evaluation": true,
+  "is_airgapped_label_storage": false,
+  "training_exclusion_independently_poison_tested": true,
+  "internal_validation_is_development_evidence": true,
+  "global_heldout_timings_consumed": false,
+  "note": "The typed loader parses all reference rows to verify corpus identity and integrity. Only pre-frozen training offsets enter robust fitting. The separate evaluate command first computes internal-validation errors; the poison-CV test proves its labels cannot change training coefficients. Do not describe this as an airgapped internal-label file."
+}

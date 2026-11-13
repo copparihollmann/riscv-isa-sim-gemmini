@@ -1,0 +1,35 @@
+{
+  "actual_final_identity_replay_completed": false,
+  "actual_parameter_fit_performed": true,
+  "chosen": "intent18",
+  "fixture_sha256": "60b0b6684fd70a28d0d26bf3abe555b0882733226b3c80d133665e8c4af23a0f",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/split.json": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-constrained-v1/parameters.json": "cd5ec63a655479d654ec98306156e3813307c5852e0a9241dc4b390968f9ff5c",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-control-lf4-evaluation-v1/report.json": "e3c99afbe0141bef0a3b9a3fa21a45c8debf436ddcdc7d5065188b49a19c7785",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-control-lf4-evaluation-v1/signed-regions.jsonl": "77361b2d74fbdce4bdc85bc81e9e46ed82f3b9e991d95e4c08846dbf4f63ff3d",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-control-read55-evaluation-v1/report.json": "5244dcf731791e07e791485e59095f012b655de5253d12c03ca9d13d07791270",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-control-read55-evaluation-v1/signed-regions.jsonl": "54cafb5d4070bee6263669bcf6ac0efe26d62341d88db0c7c800628a1ac4c342",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-intent18-evaluation-v1/report.json": "a0fcf1465d829e35a38dd749f50a5ac9b5acb1d2d66041bd8caf49c04572c99e",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-intent18-evaluation-v1/signed-regions.jsonl": "6cb172914bd7fc3adf057ede3635429e65512d77d6adefa0eb9db89a950a15ff",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-intent18-v1/runtime.fixture": "1a9367f99f048fcc9dfa70eb4463dab93c5ae87b2c6cdc29d443a6b414f36eec",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-outer-prior-evaluation-v1/report.json": "e9def33454b4a349bceb6d4ae98e1c31f9e61c11897f808ab325f1b0dd617afa",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-525-outer-prior-evaluation-v1/signed-regions.jsonl": "6a05cfd4a8fc148f580fdc691c2201aebe3b0d51167b52402bf7c563698eef4a",
+    "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/parameters.json": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258",
+    "/scratch/copparihollmann/iris-model/timing/empirical_compute_freeze_525_v1.py": "11b407c26e9e9d22264425d43147e13b4e16148f4fdc5f50fdef62e8b5d24501"
+  },
+  "native_binary_sha256": "525cc4afafa8a235c036d70b68abdb34ee35b4b343dfff80d14442ed9c971a03",
+  "old_native_qualification_transferred": false,
+  "own_training_objectives": {
+    "intent18": 0.0323243834835217,
+    "lf4": 0.03608269514747478,
+    "outer": 0.12994497448616435,
+    "read55": 0.0324227256700764
+  },
+  "parameters_sha256": "a607c7710d217391586e65e7b6e60ef19c48b7b040169c41990b911775c1e29b",
+  "schema": "iris.empirical_compute_own_epoch_selection.v1",
+  "status": "selected_final_identity_replay_pending",
+  "uart_library_sha256": "62eff3025bcfa77c4d272d096947c0675eb65060f97ce3224675e3212bbb2e84"
+}

@@ -1,0 +1,20 @@
+# Synthetic integration test only; these are not fitted Iris costs.
+purpose uncalibrated-integration-fixture
+source synthetic-scheduler-test
+base_hz 100000000
+rtc_divider 200
+max_cycles 10000000
+trap_cycles 4
+hart 0 1 1
+hart 1 1 1
+hart 2 2 1
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+resource shared_memory 1
+rule 0 0x7f 0x2f shared_memory 12 4 atomic base_cycles
+rule 1 0x7f 0x2f shared_memory 12 4 atomic base_cycles
+rule 2 0x7f 0x2f shared_memory 12 4 atomic base_cycles
+rule 0 0 0 scalar0 7 1 instruction base_cycles
+rule 1 0 0 scalar1 7 1 instruction base_cycles
+rule 2 0 0 scalar2 7 1 instruction base_cycles

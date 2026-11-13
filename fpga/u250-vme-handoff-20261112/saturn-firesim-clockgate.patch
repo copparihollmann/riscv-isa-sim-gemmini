@@ -1,0 +1,12 @@
+--- a/src/main/scala/exu/OuterProductUnit.scala
++++ b/src/main/scala/exu/OuterProductUnit.scala
+@@ -262,7 +262,8 @@
+   })
+ 
+   // clock gating
+-  val gated_clock = ClockGate(clock, io.op.clock_enable, "opu_clock_gate")
++  // FireSim compatibility: bypass the OPU black-box clock gate.
++  val gated_clock = clock
+ 
+   // Force OuterProductUnit to have logic to be syn-mappable
+   io.YOU_SHALL_PASS := io.op.macc(0) & io.op.macc(0) | io.op.shift(0)

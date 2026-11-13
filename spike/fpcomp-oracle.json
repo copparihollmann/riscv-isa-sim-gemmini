@@ -1,0 +1,10 @@
+{
+  "cases": 8448,
+  "forms": 22,
+  "seed": 301994298704,
+  "host_float_used": false,
+  "rtl_executed": false,
+  "source_image_association_verified": false,
+  "header_sha256": "c1d135bc03184a9ae1ff96bbbc575b2608ee1d7b4e112467beaf97fc842c92e1",
+  "policy": "flags H chunks except S chunks at SEW64; full unmasked physical EG incl tail; min/max ties vs1; altfmt accepted and ignored at H/S/D widths on all harts; reductions DLEN-dependent per-lane plus halving fold"
+}

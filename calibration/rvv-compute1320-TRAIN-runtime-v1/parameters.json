@@ -1,0 +1,42 @@
+{
+  "schema": "iris.rvv_compute1320_linear_runtime_proposal.v1",
+  "status": "UNACCEPTED_REQUIRES_ACTUAL_MATCHED_REPLAY",
+  "plan_sha256": "75703735513a44552eb0565e902048e236642b6eebe99d7db0ce4c5960c5c16f",
+  "TRAIN_fit_report_sha256": "922e62bee4b5e1dc4ddfc75d2b3f20b3463e1f7bbcfb7fc4b2a84230118a909f",
+  "zero_fixture_sha256": "5c04aac9cb7f1d9543ace1803297d35de2bd17537d75c1650e26a8f87ddcbe8a",
+  "models": {
+    "Shuttle": {
+      "rvv.integer": {
+        "setup": 0.0,
+        "work": 0.0
+      },
+      "rvv.fadd.fp16": {
+        "setup": 0.0,
+        "work": 0.0
+      },
+      "rvv.fadd.fp32": {
+        "setup": 0.0,
+        "work": 0.0
+      },
+      "rvv.fadd.fp64": {
+        "setup": 0.0,
+        "work": 0.0
+      },
+      "memory.vector.load": {
+        "setup": 0.0,
+        "work": 0.14996109836660615
+      },
+      "memory.vector.store": {
+        "setup": 0.0,
+        "work": 1.3429927575974707
+      },
+      "vme.row_move": {
+        "setup": 0.0,
+        "work": 0.0
+      }
+    }
+  },
+  "units": "500MHzcorecycles;setup/instruction+nativeWORKslope;noROIintercept",
+  "source_limits": "WholeVRFowner/blockedvector memory/partialgroupchaining/OPUbridge not repaired by coefficients;negative residuals remain",
+  "protected_or_reserved_labels_consumed": false
+}

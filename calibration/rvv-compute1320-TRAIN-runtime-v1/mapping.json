@@ -1,0 +1,19 @@
+{
+  "schema": "iris.rvv_compute1320_fixture_mapping.v1",
+  "pass": true,
+  "actual_replay_qualified": false,
+  "fixture_sha256": "d509e5d3bfb3f44c0ae017fabea5c07946e0404df62eea1483bcec7e72cf0999",
+  "parameters_sha256": "95cebff8a4d87a88e2e505c5dca631b0822d4eebb555133c318af79ab9a0efd9",
+  "eligible_rules_written": 14,
+  "source_default_Rocket_integer_rule_added": false,
+  "all_other_costs_modes_resources_II_cache_history_and_ISA_unchanged": true,
+  "no_OPU_controller_or_MM_cost_fit": true,
+  "no_intercept_or_PC_case_lookup": true,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/emit_rvv_compute1320_fixture_v1.py": "1b506c57c8004bb5e9f6c7da3edd152331ea171b4dc8b5c15845a88ed9c999ee",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-compute1320-TRAIN-proposal-v1/report.json": "922e62bee4b5e1dc4ddfc75d2b3f20b3463e1f7bbcfb7fc4b2a84230118a909f",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-compute1320-zero-adjustment-v1/zero-adjustment.fixture": "5c04aac9cb7f1d9543ace1803297d35de2bd17537d75c1650e26a8f87ddcbe8a",
+    "/scratch/copparihollmann/iris-model/timing/rvv_compute1320_fit_v1.py": "52843ee52302bef4d21ede399c99d68b47f863351113b57170c0de9ace4d40a9",
+    "/scratch/copparihollmann/iris-model/calibration/rvv-compute1320-v1/fit-plan.json": "75703735513a44552eb0565e902048e236642b6eebe99d7db0ce4c5960c5c16f"
+  }
+}

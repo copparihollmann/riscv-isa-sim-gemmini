@@ -1,0 +1,18 @@
+purpose uncalibrated-integration-fixture
+source experimental-fast-event-baseline-no-RTL-peer-evaluation-unfitted
+base_hz 500000000
+rtc_divider 1000
+max_cycles 1000000000
+trap_cycles 4
+hart 0 1 0
+hart 1 1 0
+hart 2 1 0
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+rule 0 0 0 scalar0 3 1 uncalibrated-conservative-boundary base_cycles
+rule 1 0 0 scalar1 3 1 uncalibrated-conservative-boundary base_cycles
+rule 2 0 0 scalar2 3 1 uncalibrated-conservative-boundary base_cycles
+shuttle_pipeline pure-integer-rvc-counter-sequential-frontend
+rocket_pipeline pure-integer-rvc-counter-sequential-frontend
+pipeline_values private-pure-integer

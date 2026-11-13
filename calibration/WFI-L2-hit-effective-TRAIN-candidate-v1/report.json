@@ -1,0 +1,37 @@
+{
+  "schema": "iris.WFI_effective_service_candidate_frozen.v1",
+  "pass": true,
+  "estimator_frozen_before_candidate_evaluation": true,
+  "candidate_not_runtime_qualified": true,
+  "fixture_sha256": "8173b498db5e219b6939b0bafe57ce3403c244e6aa5e8d0b5ff02a745e87955a",
+  "parameters_sha256": "190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37",
+  "changes": [
+    {
+      "before": "empirical_cache_service 0 0 0 0 545.732041126 461 0 EFFECTIVE_PRIORITY_TRAIN_FIT 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles",
+      "after": "empirical_cache_service 0 0 0 52.323370483491 493.40867064251 461 0 EFFECTIVE_WFI_TRAIN_TAG_SERVICE 190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37 core_cycles"
+    },
+    {
+      "before": "empirical_cache_service 1 0 0 0 545.732041126 461 0 EFFECTIVE_PRIORITY_TRAIN_FIT 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles",
+      "after": "empirical_cache_service 1 0 0 48.851691916854 496.88034920915 461 0 EFFECTIVE_WFI_TRAIN_TAG_SERVICE 190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37 core_cycles"
+    },
+    {
+      "before": "empirical_cache_service 2 0 0 0 545.732041126 461 0 EFFECTIVE_PRIORITY_TRAIN_FIT 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles",
+      "after": "empirical_cache_service 2 0 0 63.387505674576 482.34453545142 461 0 EFFECTIVE_WFI_TRAIN_TAG_SERVICE 190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37 core_cycles"
+    }
+  ],
+  "modeled_tag_counter_units": "accesses=count accepted intents; hits/misses=count64B line probes; bytes=requested bytes",
+  "model_classifications_are_not_hardware_cache_observations": true,
+  "scope": "Model LRU tag history and charge-boundary approximation retained; effective correction only; all360 diagnostics retained; no filtering/ROI-ID prediction/intercept.",
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/fit_wfi_L2_hit_service_v1.py": "b71a8e12bd93b66a098a52baea8e39b54525c632abdcbd7a9126e04d2f99e40d",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-selected-v1/runtime.fixture": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-hybrid7bd5-comparison-v2/report.json": "e767646bf7bcdf7e6c491a10488bc80387b8fdc850362c01ac46388e980eccf5",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-hybrid7bd5-comparison-v2/regions.jsonl": "8f1ad0493e759a37668e3b2704ba5942d26b13f1657ab5749b89dfb035ef89c0",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-groups-hybrid7bd5-selected-v1/features.jsonl": "0058764ff74ce205df74e9c05ed7dc99b2c6d4b5eadf2987d3991e71fb23d23a",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-groups-hybrid7bd5-selected-v1/CSR-endpoint-qualification.json": "cc21a4edc66fe7ce70da8f534b450c7f8347ee7ed43411d32ac43a2259397809",
+    "/scratch/copparihollmann/iris-model/calibration/WFI-L2-hit-effective-TRAIN-candidate-v1/parameters.json": "190275cd4de0781693912192714d63b8bdd29bacf72bb120ff82bcbafd93da37",
+    "/scratch/copparihollmann/iris-model/calibration/WFI-L2-hit-effective-TRAIN-candidate-v1/runtime.fixture": "8173b498db5e219b6939b0bafe57ce3403c244e6aa5e8d0b5ff02a745e87955a"
+  },
+  "hardware_contacted": false,
+  "native_changed": false
+}

@@ -1,0 +1,7 @@
+TE (tile edge) = 32
+mm.e4m3.e4m3: 992/992 bit-exact vs sequential-FP32 model
+mm.e4m3.e5m2: 992/992 bit-exact vs sequential-FP32 model
+mm.e5m2.e4m3: 992/992 bit-exact vs sequential-FP32 model
+mm.e5m2.e5m2: 992/992 bit-exact vs sequential-FP32 model
+checksum 0x16ed4a89
+PASSED

@@ -1,0 +1,26 @@
+The original power-of-two scalar benchmark mixes CPU work with coherent ownership traffic. Its actual ELF places `result_values` at `0x80012c80` (32 bytes) and the inactive-hart polling flag `done` at `0x80012ca4`. They occupy the same 64-byte cache line. Inactive peers can read that flag and go to WFI while retaining a shared copy of the line that the active kernel will write. A data-tag hit therefore need not be a writable coherence hit.
+
+The pinned Shuttle cache is coherent writeback. `DCache.scala:248–251` requires a tag match, sufficient permission and unchanged coherence state for a hit. A clean exclusive Trunk line needs a metadata change to Dirty; `MSHR.scala:106–124` routes that through metadata/replay. A Branch/shared store upgrades permission through the actual acquire path. A true Dirty store hit writes the local S3 data array (`DCache.scala:290–312`); it does not require a TileLink write or a new NoC acknowledgement for every store.
+
+The finite source witness is frozen at `build/store-fence-source-proof-v3/report.json`. It reuses the unchanged complete three-hart cache/NoC/L2/Serial component, real reset and 64 accepted warmup loads per Shuttle to initialize the guarded replay queues. Across seeds 1 and 17:
+
+| Source history before writer-hart-0 store | Store response delay | Cache ordered delay | New outer reads |
+| --- | ---: | ---: | ---: |
+| Clean exclusive line; set dirty metadata | 8 edges | 9 edges | 0 |
+| Already Dirty, exclusive line | 2 edges | 3 edges | 0 |
+| Both other harts read a neighboring same-line flag | 86 edges | 87 edges | 0 |
+| Peer polls moved to another line | 2 edges | 3 edges | 0 |
+
+The shared-line transcript records an accepted AcquireBlock with BtoT growth, a peer Probe, ProbeAck and matching Grant to the writer before its replayed response and ordered assertion. This is a causal source-component observation, not a fitted 84-cycle penalty. The fixed external FASED test parameters are explicit; no external read occurs in these measured cases. The observer does not invent an optimized-away B opcode: that metadata remains unknown. Seven independent transcript corruptions are rejected. The earlier partial v1 field-lookup refusal and the v2 parser remain preserved.
+
+This witness executes physical cache requests, not a CPU FENCE instruction. Shuttle `Core.scala:443–445` additionally stalls FENCE at RRD on EX/MEM/COM, integer/FP scoreboards, `!dmem.ordered`, RoCC and vector busy. The cache ordered predicate (`DCache.scala:531`) drains active request/replay stages and requires MSHRs/MMIO to be ready. It does not explicitly include S3 or the GrantAck E queue; the surrounding CPU stages and the memory protocol have their own ordering roles. It must not be replaced by “all NoC activity is globally idle.”
+
+Rocket has a different gate: ordinary FENCE sets `id_reg_fence`; `id_mem_busy` then orders later memory operations. A following CSR need not be held by precisely the same immediate drain as Shuttle. See pinned `RocketCore.scala:408–423` and `DCache.scala:923–928`. Neither a cache-only observation nor a generic barrier constant establishes the exact CSR-after-FENCE phase on the complete CPU.
+
+The current selected legacy fixture has optional owned-storefront timing disabled. Its L1 hit and coherence-invalidation counts do not imply that the full physical permission-upgrade wait has been modeled. Scalar L2 load alpha/beta costs cannot repair a missing store permission path that generates no outer read. The 87-edge source example also does not by itself explain the FPGA's entire 100–160-cycle ROI gap or establish loaded-image equivalence.
+
+A new isolation packet preserves the original workload as a valid coherence test. `benchmarks/pow2_scalar_private_v2` uses three separate padded 64-byte result slots and a dedicated padded 64-byte polling flag. Each active hart initializes its own slot before the ROI barrier; hart 0 reads it only after the ROI. All 576 measurements are buffered before UART, and the completion sentinel is published before printing. Every one of the eight kernel assembly byte streams is unchanged. The new ELF, source layout, execution history and case namespace require a new hardware reference. Original shared-case results and failures remain intact.
+
+The new packet is `runs/fpga-pow2-scalar-private-v2-001`, with qualification `build/pow2-scalar-private-reviewed-v4/ready.json` and PRELAUNCH closure `build/pow2-scalar-private-prelaunch-closure-v2/report.json`. Seeds 0 and 17 passed all 576 regions/2,304 numerical words; an actual omission build failed all 576 and exited nonzero. N=32/256/1024 remain reserved across every dtype, hart and trial. Only the coordinator analyzes their hardware timings.
+
+For software iteration, `benchmarks/pow2_scalar_private_v2/readback.py` intentionally quits after the sentinel and all buffered measurements. Its first actual e8ed+fixed-FADD-ON run passed all 576 regions and 1,152 actual CSR/ELF endpoint joins in 12.34 host seconds. It explicitly claims neither normal HTIF exit nor end-to-end timing. Full normal-exit functional tests are separate. The helper, frozen guest and current selected provider are unchanged by this postmeasurement reader.

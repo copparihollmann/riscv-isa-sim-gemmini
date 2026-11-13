@@ -1,0 +1,268 @@
+{
+  "actual_parameter_fit_performed": true,
+  "empirical_quality_accepted": false,
+  "files_sha256": {
+    "README.md": "cf7e08e29ad13d5a9410f73c88c83453dfccd60c3bee4e0bc1617a4b67cb9957",
+    "fit-report.json": "6113a96ccbda3310390461d3ac4868a6796488754b40cef6af6cfcce05621ba4",
+    "fixture-draft-v1/mapping.json": "8a30c5e27b0767b8335afa029aed0b2f82ffa755e60cd744835c24ab08cdaaa8",
+    "fixture-draft-v1/residual.fixture": "bfe2ec37448e793cd89c01b6594b68df0c223139efe54f76a6aa1c09fd78838a",
+    "observations.jsonl": "2f859f5f7ee2a5ebd13f39a02b6cb4d5381bbdb6b9db8cd8fc8f672bddfa50b3",
+    "parameters.json": "6b161126f1967b879e329e638087f610870dd16a4d0f07c436b0a695e6fce246",
+    "predictions.csv": "78f1382585e6d4e6444629af7d2ea3d3007d9c284fc6f11e2d8d8cb62df28cd2",
+    "repetition-variance.json": "97659c841d14216fa0e42cbd77e3b9551bbd254e6f0813ef42bc80aec9a32c64",
+    "split.json": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c"
+  },
+  "full_2pct_certified": false,
+  "heldout_timing_consumed": false,
+  "internal_validation_metrics": {
+    "absolute_max_pct": 94.65076660988075,
+    "absolute_median_pct": 2.095723773533422,
+    "absolute_p90_pct": 23.242467763713563,
+    "regions": 1190,
+    "signed_mean_pct": -2.1111363211668763,
+    "signed_median_pct": -0.023800144647840783,
+    "within_2pct_fraction": 0.49411764705882355
+  },
+  "live_feature_implementation_sha256": null,
+  "native_binary_sha256": null,
+  "native_fixture_sha256": null,
+  "next_required": "Bind actual live feature implementation and scheduling semantics; freeze native fixture+model hashes, replay training corpus, fit runtime residuals, evaluate independent heldouts separately.",
+  "proofs": {
+    "build/empirical-calibration-verify-v1/results.json": "ddf1e51511e6cfa05d3fda8bd05cc7bc56f40868857365266404ca7eb832385d",
+    "build/empirical-v1-tests.json": "bfdeffa650ff325a7c7453e3285639d978c1b11b21c167b7b8cf89db17f04fc7"
+  },
+  "reference_artifacts": {
+    "archive_sha256": "ac4445271bf781b10e4b09e1bafa86ded73470279a63f4ac3ef898ad641fcaeb",
+    "driver": {
+      "sha256": "5457de1e9c0dd1e3c52efbf5d083bdac7dfa5a5e3124c9887961c08159b03450",
+      "uri": "file:///scratch/copparihollmann/iris-model/firesim/artifacts/archived-build-driver-v1/driver-bundle.tar.gz"
+    },
+    "driver_executable": {
+      "bytes": 12979808,
+      "name": "FireSim-corigine_mimicturbo_gt",
+      "sha256": "8f78167b754097623b031f41d7e5f121f4ae368f716255fdcf574693a071c48a"
+    },
+    "elf_sha256": "9d6f692c98d955276e0ac7d941afefa3551a240f2f8ce39cd2a6f1ab57f44942",
+    "image": {
+      "name": "corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush",
+      "sha256": "9bbe1f12a2b18091c28b05ea43c001e579f70c8cfef0f528fcb49003212fb776",
+      "uri": "file:///scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/firesim.tar.gz"
+    },
+    "image_members": [
+      {
+        "bytes": 508,
+        "name": "corigine_mimicturbo_gt/metadata",
+        "sha256": "ffd3e17291986f8fb07fce1885ce0895b8d2b31118985f40ca6440c2a748b2f6"
+      },
+      {
+        "bytes": 453103740,
+        "name": "corigine_mimicturbo_gt/firesim.mcs",
+        "sha256": "f27c9a9fef7ae1f42ca8a57ebc745c934fc9cb80e2d77e28718ef41f59e64ecf"
+      },
+      {
+        "bytes": 164750499,
+        "name": "corigine_mimicturbo_gt/firesim.bit",
+        "sha256": "fe3e6097489f14b10ecdeaf0d781201835810de41635b46b92426095cbda1e98"
+      }
+    ],
+    "loaded_image_verified": false,
+    "observability_audit_sha256": "e0cefa3a9fc03e40755eea4b89cd9970ad75690f361bf400a5f9887fea68d712",
+    "run_manifest": "runs/fpga-user-authorized-v12/broad-fit/run.json",
+    "run_manifest_sha256": "b849cba5da6b6b5e01fbc0898cdb4534cbb5d8a7bd845dbd94ded786029ccf01"
+  },
+  "rtl_certified": false,
+  "schema": "iris.empirical_calibration_release.v1",
+  "source_image_association_verified": false,
+  "split": {
+    "internal_validation_parents": 156,
+    "observed_regions": 6750,
+    "predicted_regions": 5540,
+    "train_parents": 580
+  },
+  "status": "proxy_fit_complete_live_binding_pending",
+  "tool_sources_sha256": {
+    "calibration/test_empirical.py": "d88adbea026d3779f94cc454ea91fe87b80c30728e306bd9a5a2fa6a149668e9",
+    "timing/empirical_fit.py": "72a8841aab64697a9d7279f3c41a834041422d6c5cf4ea0e9261ebfd8cc18314",
+    "timing/empirical_fixture.py": "ddd4fae99cae20b401fa0f0f1bc4a49d7792f7050c2e0932160a6ba32e6dd95b",
+    "timing/empirical_prepare.py": "ce2e33993f7d55cc5c5f7fc8e2adddc3ab75f1b815be3ba61cbaadef79b5dd17",
+    "timing/empirical_stream_fit.py": "7eecc10e4659b7066bb233ca7282e4b7c68aaed1458e8c06579d1874d77386b3",
+    "timing/empirical_verify.py": "c08eccfdfd6c5894de081dc73212d4ff5bd757a6faf44772f6d1309483483734"
+  },
+  "unsupported_regions": [
+    {
+      "family": "atomic",
+      "partition": "internal_validation",
+      "regions": 25
+    },
+    {
+      "family": "branch",
+      "partition": "internal_validation",
+      "regions": 15
+    },
+    {
+      "family": "frontend",
+      "partition": "internal_validation",
+      "regions": 15
+    },
+    {
+      "family": "memory",
+      "partition": "internal_validation",
+      "regions": 105
+    },
+    {
+      "family": "scalar_fp",
+      "partition": "internal_validation",
+      "regions": 30
+    },
+    {
+      "family": "scratchpad",
+      "partition": "internal_validation",
+      "regions": 15
+    },
+    {
+      "family": "stream",
+      "partition": "internal_validation",
+      "regions": 5
+    },
+    {
+      "family": "sync_barrier",
+      "partition": "internal_validation",
+      "regions": 15
+    },
+    {
+      "family": "vec_e8_m1",
+      "partition": "internal_validation",
+      "regions": 10
+    },
+    {
+      "family": "vme_mm",
+      "partition": "internal_validation",
+      "regions": 10
+    },
+    {
+      "family": "atomic",
+      "partition": "train",
+      "regions": 155
+    },
+    {
+      "family": "atomics",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "branch",
+      "partition": "train",
+      "regions": 45
+    },
+    {
+      "family": "branches",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "dependent",
+      "partition": "train",
+      "regions": 30
+    },
+    {
+      "family": "empty",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "frontend",
+      "partition": "train",
+      "regions": 75
+    },
+    {
+      "family": "ipi",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "local_tcm",
+      "partition": "train",
+      "regions": 10
+    },
+    {
+      "family": "lrsc",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "memory",
+      "partition": "train",
+      "regions": 355
+    },
+    {
+      "family": "pipeline",
+      "partition": "train",
+      "regions": 45
+    },
+    {
+      "family": "pipeline_vme",
+      "partition": "train",
+      "regions": 30
+    },
+    {
+      "family": "pointer_chase",
+      "partition": "train",
+      "regions": 20
+    },
+    {
+      "family": "refuse_vme",
+      "partition": "train",
+      "regions": 5
+    },
+    {
+      "family": "shared_fpu",
+      "partition": "train",
+      "regions": 20
+    },
+    {
+      "family": "stream",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "timer",
+      "partition": "train",
+      "regions": 15
+    },
+    {
+      "family": "vec_e32_m1",
+      "partition": "train",
+      "regions": 10
+    },
+    {
+      "family": "vec_e32_m2",
+      "partition": "train",
+      "regions": 10
+    },
+    {
+      "family": "vec_e8_m1",
+      "partition": "train",
+      "regions": 10
+    },
+    {
+      "family": "vec_e8_m2",
+      "partition": "train",
+      "regions": 10
+    },
+    {
+      "family": "vme_memory",
+      "partition": "train",
+      "regions": 20
+    },
+    {
+      "family": "vme_mm",
+      "partition": "train",
+      "regions": 5
+    },
+    {
+      "family": "vme_refusal",
+      "partition": "train",
+      "regions": 5
+    }
+  ]
+}

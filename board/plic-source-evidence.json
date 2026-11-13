@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "status": "source_backed_functional_helper",
+  "sources": {
+    "regmapper.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/regmapper/RegMapper.scala",
+      "snapshot": "plic-evidence/regmapper.scala",
+      "sha256": "8387a9b444dd4509deabf448bb76129ff0623d0192cccb4b59f9d3f5b8b43475",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "regfield.scala": {
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip/src/main/scala/regmapper/RegField.scala",
+      "snapshot": "plic-evidence/regfield.scala",
+      "sha256": "b66c926ddeb3e6bea1c66c65a54797e833fae918a27606b7a9349f86418c64d0",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "plic.scala": {
+      "snapshot": "evidence/plic.scala",
+      "sha256": "a15e8990370aefdd294e6678c8e062ef31632f24cb0136070daaef33f88ffda1",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "firesim-dts.dts": {
+      "snapshot": "evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19"
+    }
+  },
+  "facts": {
+    "configuration": [
+      {
+        "source": "firesim-dts.dts",
+        "lines": [
+          168,
+          176
+        ]
+      }
+    ],
+    "reset_unknowns": [
+      {
+        "source": "plic.scala",
+        "lines": [
+          166,
+          191
+        ]
+      }
+    ],
+    "gateway": [
+      {
+        "source": "plic.scala",
+        "lines": [
+          31,
+          40
+        ]
+      },
+      {
+        "source": "plic.scala",
+        "lines": [
+          242,
+          272
+        ]
+      }
+    ],
+    "claim_threshold_independent": [
+      {
+        "source": "plic.scala",
+        "lines": [
+          186,
+          194
+        ]
+      },
+      {
+        "source": "plic.scala",
+        "lines": [
+          286,
+          310
+        ]
+      },
+      {
+        "source": "plic.scala",
+        "lines": [
+          337,
+          359
+        ]
+      }
+    ],
+    "completion_mask_and_enables": [
+      {
+        "source": "plic.scala",
+        "lines": [
+          286,
+          305
+        ]
+      }
+    ],
+    "byte_mask_read_or_write_and": [
+      {
+        "source": "regmapper.scala",
+        "lines": [
+          135,
+          155
+        ]
+      }
+    ],
+    "read_write_completion_effects": [
+      {
+        "source": "regfield.scala",
+        "lines": [
+          18,
+          37
+        ]
+      },
+      {
+        "source": "regfield.scala",
+        "lines": [
+          50,
+          76
+        ]
+      }
+    ],
+    "unmapped_zero": [
+      {
+        "source": "plic.scala",
+        "lines": [
+          99,
+          104
+        ]
+      }
+    ]
+  },
+  "core_integration": false,
+  "pipeline_timing_certified": false,
+  "limitations": [
+    "Functional MMIO side effects are committed at helper calls. Registered maxDevs, RegNext priority and TileLink transaction latency are not modeled.",
+    "Gateway register sampling is explicit advance_gateway(); parent must drive modeled peripheral events.",
+    "Unknown IRQ lines remain optional until caller observes via require_irq; core adapter must fail closed when an enabled IRQ is unknown.",
+    "No FPGA/RTL comparison or Zephyr certification."
+  ]
+}

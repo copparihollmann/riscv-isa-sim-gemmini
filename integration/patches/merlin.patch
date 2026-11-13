@@ -1,0 +1,563 @@
+diff --git a/docs/README.md b/docs/README.md
+index 1ec423107..aee1fa391 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -41,6 +41,7 @@ predates the newest change to the code it documents (see `check_docs_freshness.p
+ - [Execution memory admission](reference/execution_memory_admission.md) — `current`, verified 2026-10-07 · owner: core — see also: [architecture](reference/architecture.md), [runtime](reference/runtime.md)
+ - [Experiment ABI](reference/experiment_abi.md) — `current`, verified 2026-07-14 · owner: targetgen — see also: [targetgen](guides/targetgen.md), [adding_a_target](guides/adding_a_target.md)
+ - [Explicit approximate source roundoff](reference/approximate_source_roundoff.md) — `current`, verified 2026-10-07 · owner: core — see also: [independent_scalar_lanes](reference/independent_scalar_lanes.md), [prepared_operand_owners](reference/prepared_operand_owners.md)
++- [Explicit provider execution and heterogeneous boards](reference/provider_execution.md) — `current`, verified 2026-11-05 · owner: core — see also: [architecture](reference/architecture.md), [target_resolution](guides/target_resolution.md)
+ - [Four-cell prepared polynomial scheduling](reference/prepared_polynomial_batch.md) — `current`, verified 2026-10-06 · owner: core — see also: [ordered_fma_certificates](reference/ordered_fma_certificates.md), [quantized_host_optimizations](reference/quantized_host_optimizations.md)
+ - [Fused canonical encoder witness](reference/fused_encoded_witness.md) — `current`, verified 2026-10-06 · owner: core — see also: [ordered_fma_certificates](reference/ordered_fma_certificates.md), [quantized_host_optimizations](reference/quantized_host_optimizations.md)
+ - [Generated target repositories](reference/generated_target_repos.md) — `current`, verified 2026-07-07 · owner: targetgen — see also: [targetgen](guides/targetgen.md), [adding_a_target](guides/adding_a_target.md)
+@@ -206,7 +207,7 @@ predates the newest change to the code it documents (see `check_docs_freshness.p
+ - **capsule-bench** — [Running capsule-bench experiments on AWS Bedrock](guides/bedrock_experiments.md)
+ - **compiler** — [Borrowed pointwise lane packets](reference/borrowed_pointwise_packet.md), [Compile debugging — stop at a stage, dump its IR, trace a build, inspect one group](guides/compile_debugging.md), [Compiling a whole model onto an accelerator](guides/whole_model_on_accelerator.md), [Complete integer product families](design/integer-product-families.md), [Design note: what open-coding the mesh stream costs, and which lever pays where](design/open_coded_nest_costs.md), [Exact BF16 integer observations](design/bf16-integer-observer.md), [Exact integer radix reconstruction before binary64 conversion](design/exact-integer-radix-reconstruction.md), [Exact zero metadata for encoded integer panels](design/encoded-integer-zero-metadata.md), [Extending the compiler stack](guides/extending_the_stack.md), [Finite point observations at the BF16 quantization frontier](design/frontier-point-observations.md), [Historical Gemmini OOT backend qualification](guides/gemmini_oot_package.md), [Independent source FMA batch permission](reference/source_fma_batch.md), [Optional lowering passes — list, select, copy](guides/optional_passes.md), [Prepared model transformation](reference/prepared_model_transform.md), [Prepared private endpoint DAG](reference/prepared_endpoint_dag.md), [Reproducing the whole-model gemmini result](guides/reproducing_whole_model_on_rtl.md)
+ - **compiler-evaluation** — [Materialize the frozen paper capture set](guides/paper-capture-workflow.md)
+-- **core** — [Architecture](reference/architecture.md), [Checked alignment for exact paired readouts](design/checked_pair_readout_alignment.md), [Closed row domains and private partition plans](reference/closed_row_domain.md), [Closed scalar observations from current fused source](design/current-source-observation.md), [Compact whole-output evidence](reference/output_sha256.md), [Conditional counted-copy static proof](reference/counted_copy_static_proof.md), [Consumer-derived reconstruction norm requirements](reference/dot_norm_requirements.md), [Debug companion PC attribution](reference/debug_pc_attribution.md), [Design note: attributing the expert-kernel gap (instructions vs stalls)](design/expert_gap_attribution.md), [Design note: auditing for runtime escapes in emitted compute regions](design/runtime_escape_audit.md), [Design note: deriving the axes a conformance cell cannot express](design/derived_capsule_axes.md), [Design note: integration adapters](design/integrations.md), [Design note: memory mapping is an obligation set, not a heuristic](design/memory_mapping_obligations.md), [Design note: teaching a compiler to fit real models, and measuring an agent against a code writer](design/agent_uses_the_compiler_gemmini.md), [Design note: the future MLIR/C++ compiler plane](design/compiler_plane.md), [Design note: the perf corpus cannot express the optimizations that matter](design/perf_corpus_scope_gap.md), [Design note: the performance lever is a property of the archetype, not of the compiler](design/performance_levers_per_archetype.md), [Design note: the reorder emitter a command-driven target needs](design/command_stream_reorder_emitter.md), [Design note: the static memory arena and the path we actually measure](design/static_arena_wiring.md), [Design note: VL-agnostic (scalable) RVV codegen — dropping the VLEN pin](design/vl_agnostic_codegen.md), [Design note: what a performance query actually costs, and what is scarce](design/performance_budget_unit.md), [Design note: where the whole-model codegen-vs-hand-C gap lives (it is the emitted matmul)](design/codegen_vs_handc_wholemodel.md), [Design note: whole-model per-op profiler and where model time actually goes](design/whole_model_op_profile.md), [Design note: whole-model transpose-b fusion (fuse_transpose_b)](design/transpose_fusion.md), [Design: compiler abstractions and tools for performance convergence](design/agent_compiler_performance.md), [Design: deriving the corpus from the spec, the RTL facts and the workloads](design/derived_corpus_sources.md), [Design: exact quantized affine pair certificates](design/quantized_affine_pair.md), [Design: how a capsule corpus is generated](design/capsule_generation.md), [Design: rules for citable agentic-compiler experiments](design/agentic_experiment_integrity.md), [Design: subsystem boundaries and the schemas between them](design/parallel_workstreams.md), [Design: which phase a capsule can serve, derived for every target](design/capsule_phase_split.md), [Encoder row equality](reference/encoded_row_equality.md), [Exact bounded host rounding](reference/late_quant_rne.md), [Exact finite bound conversion](reference/exact_bound_conversion.md), [Exact integer reconstruction in the source attention frontier](reference/source_frontier_integer_reconstruction.md), [Exact polynomial BF16 buckets](reference/polynomial_bf16_buckets.md), [Execution memory admission](reference/execution_memory_admission.md), [Explicit approximate source roundoff](reference/approximate_source_roundoff.md), [Explicit effects for closed-mask model lowering](design/model-mask-effects.md), [Four-cell prepared polynomial scheduling](reference/prepared_polynomial_batch.md), [Fused canonical encoder witness](reference/fused_encoded_witness.md), [Getting started — the setup and prerequisites reference](guides/getting_started.md), [Host integer primitive source witnesses: what the shift and mask probe proved](design/host_primitive_source_witnesses.md), [Independent scalar lane schedules](reference/independent_scalar_lanes.md), [Macro scheduling: a stream-level plan over compute groups](design/macro_scheduling.md), [merlin/ layout — what goes where](reference/merlin_layout.md), [MX Gemmini Phase 0 contract](guides/mx_gemmini_phase0.md), [Numerical provider evidence identity](reference/numeric_provider_identity.md), [Optional separable ordered-FMA radius](reference/separable_source_fma_radius.md), [Ordered FMA certificates](reference/ordered_fma_certificates.md), [Owned BF16 producer facts](reference/produced_bf16_row_facts.md), [Prepared operand owners](reference/prepared_operand_owners.md), [Prepared probability bins](reference/prepared_probability_bins.md), [Prepared word-space softmax interval domain](reference/word_softmax_domain.md), [Private softmax producer spans](reference/prepared_softmax_spans.md), [Quantized host optimizations](reference/quantized_host_optimizations.md), [Reference: broadcast scaled integer finite guards](reference/scaled_integer_finite.md), [Reference: source expression interval tables](reference/source_expression_interval.md), [Repository structure](reference/repo_structure.md), [Retaining completed observation certificates](reference/certified_row_retention.md), [Running the Gemmini recipe-select agent campaigns](guides/running_recipe_select_campaigns.md), [Shared explicit tensor permutation proof](reference/shared_permutation.md), [Source-attention bound strategies that were tried and not kept](design/source_attention_bound_strategies.md), [Source-numerics probe findings: whole-model gates, accumulation order and host compile](design/source_numerics_probe_findings.md), [Source-rounded interval endpoints](reference/f32_interval_endpoints.md), [Target publishing — preserved payloads and scoped evidence](design/target_publishing.md), [The cross-target dialect test bar](design/dialect_test_bar.md)
++- **core** — [Architecture](reference/architecture.md), [Checked alignment for exact paired readouts](design/checked_pair_readout_alignment.md), [Closed row domains and private partition plans](reference/closed_row_domain.md), [Closed scalar observations from current fused source](design/current-source-observation.md), [Compact whole-output evidence](reference/output_sha256.md), [Conditional counted-copy static proof](reference/counted_copy_static_proof.md), [Consumer-derived reconstruction norm requirements](reference/dot_norm_requirements.md), [Debug companion PC attribution](reference/debug_pc_attribution.md), [Design note: attributing the expert-kernel gap (instructions vs stalls)](design/expert_gap_attribution.md), [Design note: auditing for runtime escapes in emitted compute regions](design/runtime_escape_audit.md), [Design note: deriving the axes a conformance cell cannot express](design/derived_capsule_axes.md), [Design note: integration adapters](design/integrations.md), [Design note: memory mapping is an obligation set, not a heuristic](design/memory_mapping_obligations.md), [Design note: teaching a compiler to fit real models, and measuring an agent against a code writer](design/agent_uses_the_compiler_gemmini.md), [Design note: the future MLIR/C++ compiler plane](design/compiler_plane.md), [Design note: the perf corpus cannot express the optimizations that matter](design/perf_corpus_scope_gap.md), [Design note: the performance lever is a property of the archetype, not of the compiler](design/performance_levers_per_archetype.md), [Design note: the reorder emitter a command-driven target needs](design/command_stream_reorder_emitter.md), [Design note: the static memory arena and the path we actually measure](design/static_arena_wiring.md), [Design note: VL-agnostic (scalable) RVV codegen — dropping the VLEN pin](design/vl_agnostic_codegen.md), [Design note: what a performance query actually costs, and what is scarce](design/performance_budget_unit.md), [Design note: where the whole-model codegen-vs-hand-C gap lives (it is the emitted matmul)](design/codegen_vs_handc_wholemodel.md), [Design note: whole-model per-op profiler and where model time actually goes](design/whole_model_op_profile.md), [Design note: whole-model transpose-b fusion (fuse_transpose_b)](design/transpose_fusion.md), [Design: compiler abstractions and tools for performance convergence](design/agent_compiler_performance.md), [Design: deriving the corpus from the spec, the RTL facts and the workloads](design/derived_corpus_sources.md), [Design: exact quantized affine pair certificates](design/quantized_affine_pair.md), [Design: how a capsule corpus is generated](design/capsule_generation.md), [Design: rules for citable agentic-compiler experiments](design/agentic_experiment_integrity.md), [Design: subsystem boundaries and the schemas between them](design/parallel_workstreams.md), [Design: which phase a capsule can serve, derived for every target](design/capsule_phase_split.md), [Encoder row equality](reference/encoded_row_equality.md), [Exact bounded host rounding](reference/late_quant_rne.md), [Exact finite bound conversion](reference/exact_bound_conversion.md), [Exact integer reconstruction in the source attention frontier](reference/source_frontier_integer_reconstruction.md), [Exact polynomial BF16 buckets](reference/polynomial_bf16_buckets.md), [Execution memory admission](reference/execution_memory_admission.md), [Explicit approximate source roundoff](reference/approximate_source_roundoff.md), [Explicit effects for closed-mask model lowering](design/model-mask-effects.md), [Explicit provider execution and heterogeneous boards](reference/provider_execution.md), [Four-cell prepared polynomial scheduling](reference/prepared_polynomial_batch.md), [Fused canonical encoder witness](reference/fused_encoded_witness.md), [Getting started — the setup and prerequisites reference](guides/getting_started.md), [Host integer primitive source witnesses: what the shift and mask probe proved](design/host_primitive_source_witnesses.md), [Independent scalar lane schedules](reference/independent_scalar_lanes.md), [Macro scheduling: a stream-level plan over compute groups](design/macro_scheduling.md), [merlin/ layout — what goes where](reference/merlin_layout.md), [MX Gemmini Phase 0 contract](guides/mx_gemmini_phase0.md), [Numerical provider evidence identity](reference/numeric_provider_identity.md), [Optional separable ordered-FMA radius](reference/separable_source_fma_radius.md), [Ordered FMA certificates](reference/ordered_fma_certificates.md), [Owned BF16 producer facts](reference/produced_bf16_row_facts.md), [Prepared operand owners](reference/prepared_operand_owners.md), [Prepared probability bins](reference/prepared_probability_bins.md), [Prepared word-space softmax interval domain](reference/word_softmax_domain.md), [Private softmax producer spans](reference/prepared_softmax_spans.md), [Quantized host optimizations](reference/quantized_host_optimizations.md), [Reference: broadcast scaled integer finite guards](reference/scaled_integer_finite.md), [Reference: source expression interval tables](reference/source_expression_interval.md), [Repository structure](reference/repo_structure.md), [Retaining completed observation certificates](reference/certified_row_retention.md), [Running the Gemmini recipe-select agent campaigns](guides/running_recipe_select_campaigns.md), [Shared explicit tensor permutation proof](reference/shared_permutation.md), [Source-attention bound strategies that were tried and not kept](design/source_attention_bound_strategies.md), [Source-numerics probe findings: whole-model gates, accumulation order and host compile](design/source_numerics_probe_findings.md), [Source-rounded interval endpoints](reference/f32_interval_endpoints.md), [Target publishing — preserved payloads and scoped evidence](design/target_publishing.md), [The cross-target dialect test bar](design/dialect_test_bar.md)
+ - **design_pressure** — [Design pressure](guides/design_pressure.md)
+ - **dse** — [Compilation strategies](guides/compilation_strategies.md), [Design-space exploration](guides/dse.md), [DSE boundary-placement vocabulary](reference/dse_boundary_vocabulary.md), [DSE guidance](guides/dse_guidance.md), [Search policy](guides/search.md)
+ - **experiments** — [Component feedback transport and supervision](design/component_feedback_supervision.md), [Component-driven compiler convergence and experiment isolation](design/component_compiler_convergence.md), [Independent component feedback authority](design/component_independent_feedback.md), [Independent source-only coverage rosters](design/component_compile_sources.md), [Justifying Phase 2 tests from Phase 0 evidence](guides/phase2_test_justification.md), [Tracking experiments — the dashboard and the watch view](guides/experiment_dashboard.md)
+diff --git a/docs/reference/provider_execution.md b/docs/reference/provider_execution.md
+new file mode 100644
+index 000000000..1c95a52ae
+--- /dev/null
++++ b/docs/reference/provider_execution.md
+@@ -0,0 +1,49 @@
++---
++title: Explicit provider execution and heterogeneous boards
++kind: reference
++status: current
++owner: core
++last_verified: 2026-11-05
++related: [architecture, target_resolution]
++code_refs: [src/merlin/targetgen/providers.py, src/merlin/targetgen/provider_compose.py, src/merlin/runtime/boards.py, src/merlin/runtime/backends/device_simulator.py, src/merlin/kernels/matrix_shim.py]
++---
++
++# Explicit provider execution and heterogeneous boards
++
++Version2 support metadata may declare an exact base with `extends.target`,
++`extends.repo` and a full lowercase `extends.commit`. Reading metadata imports
++no provider code. `provider_compose.materialize(root, check=True)` verifies the
++selected `MERLIN_PROVIDER_BASE_PATH` and frozen composition inputs. It never
++fetches a base or silently regenerates an overlay. This check proves input
++identity; the target owns merge semantics and hardware facts.
++
++Board catalogs may declare a complete `per_hart` roster containing physical ID,
++core type, source ISA and known VLEN/DLEN/ELEN dimensions. Matrix eligibility is
++an explicit `matrix_hart_ids` list. Duplicate/out-of-range IDs and contradictory
++matrix flags refuse loading. Missing matrix facts permit no matrix image. A
++worker mask selects execution resources; it does not remove physical CPUs.
++
++`runtime.backends.device_simulator` invokes the selected matrix provider's
++`device_simulator(unit, config)` callback. A refused/missing provider never
++falls back to another simulator. Execution verifies the binary digest and exact
++image before/after running. Physical hart count and active worker IDs are
++separate arguments; per-hart ISA overrides remain present for inactive CPUs.
++The target owns launch arguments and memory regions. Availability and process
++success do not imply a timing model, RTL correspondence or certification.
++
++`kernels.matrix_shim` supplies a software ABI for signed-i8 contractions with
++i32 accumulation. Positive-stride inputs pack into K-major panels, the target
++kernel runs, and results scatter through the requested strides. Each caller
++owns an aligned workspace; there is no hidden shared scratch. Rank2 and rank3
++static signatures are supported. Allocation capacity, aliasing and effects
++remain caller obligations.
++
++The optional LLVM bridge uses the actual upstream flattened-memref function
++type and aggregate return. Emitting that bridge in LLVM IR avoids assuming that
++a C compiler's struct/sret convention matches upstream MLIR. The bridge checks
++static descriptor dimensions, allocates/frees one workspace per invocation and
++returns the supplied output descriptor. Native tests lower actual rank2/rank3
++MLIR through the selected compiler and compare every result independently.
++Those checks establish the exercised ABI cases, not arbitrary compiler,
++runtime or hardware qualification. Target OS context setup remains a separate
++target-owned obligation.
+diff --git a/src/merlin/kernels/matrix_shim.py b/src/merlin/kernels/matrix_shim.py
+new file mode 100644
+index 000000000..666fc12b3
+--- /dev/null
++++ b/src/merlin/kernels/matrix_shim.py
+@@ -0,0 +1,137 @@
++"""Caller-workspace pointer ABI around a supplied signed-i8 contraction kernel.
++
++The kernel consumes K-major inputs and row-major i32 output. This adapter packs
++arbitrary positive strides and scatters results. Workspace belongs to the caller;
++concurrent invocations never share hidden scratch. This explicit software ABI is
++not an assertion about an upstream MLIR external-function calling convention.
++"""
++from __future__ import annotations
++
++
++class TranslationUnit(str):
++    def __new__(cls, text, scratch_bytes):
++        result = super().__new__(cls, text)
++        result.scratch_bytes = scratch_bytes
++        return result
++
++
++def _identifier(name):
++    if not isinstance(name, str) or not name.isascii() or not name.isidentifier():
++        raise ValueError("expected an ASCII C identifier")
++    return name
++
++
++def emit_translation_unit(kernel, entry, signatures, *, alignment_bytes, prefix, scratch_bytes=None):
++    _identifier(entry)
++    _identifier(prefix)
++    if type(alignment_bytes) is not int or alignment_bytes < 1 or alignment_bytes & (alignment_bytes - 1):
++        raise ValueError("alignment must be a positive power of two")
++    alignment_bytes = max(alignment_bytes, 4)  # i32 readout alignment is part of this software ABI.
++    declarations = []
++    maximum = 0
++    for symbol, shape in sorted(signatures.items()):
++        _identifier(symbol)
++        if len(shape) not in (3, 4) or any(type(v) is not int or v < 1 for v in shape):
++            raise ValueError("static signatures are (M,N,K) or (batch,M,N,K), positive integers")
++        batch, m, n, k = (1, *shape) if len(shape) == 3 else tuple(shape)
++        # Workspace holds one batch at a time. Round each panel so i32 remains aligned.
++        a_bytes = (m*k + alignment_bytes-1) // alignment_bytes * alignment_bytes
++        b_bytes = (k*n + alignment_bytes-1) // alignment_bytes * alignment_bytes
++        required = a_bytes + b_bytes + 4*m*n
++        maximum = max(maximum, required)
++        declarations.append(f"""
++/* Explicit ABI v1: row-major logical operands with element strides, caller-owned workspace.
++ * This symbol is deliberately distinct from the unqualified compiler external ABI. */
++int {symbol}_pointers(int32_t *c, const int8_t *a, const int8_t *b,
++    size_t ars, size_t acs, size_t brs, size_t bcs, size_t crs, size_t ccs,
++    size_t abs, size_t bbs, size_t cbs, void *workspace, size_t workspace_bytes) {{
++  if (!c || !a || !b || !workspace || workspace_bytes < {required} ||
++      ((uintptr_t)workspace % {alignment_bytes}) || !ars || !acs || !brs || !bcs || !crs || !ccs) return -1;
++  int8_t *at = (int8_t *)workspace;
++  int8_t *bp = at + {a_bytes};
++  int32_t *cp = (int32_t *)(bp + {b_bytes});
++  for (size_t z=0; z<{batch}; ++z) {{
++    for (size_t q=0;q<{k};++q) for(size_t i=0;i<{m};++i) at[q*{m}+i]=a[z*abs+i*ars+q*acs];
++    for (size_t q=0;q<{k};++q) for(size_t j=0;j<{n};++j) bp[q*{n}+j]=b[z*bbs+q*brs+j*bcs];
++    {entry}(cp, at, bp, 0, {m}, {n}, {k});
++    for (size_t i=0;i<{m};++i) for(size_t j=0;j<{n};++j) c[z*cbs+i*crs+j*ccs]=cp[i*{n}+j];
++  }}
++  return 0;
++}}
++""")
++    if scratch_bytes is not None and scratch_bytes < maximum:
++        raise ValueError("declared scratch budget cannot hold packed operands/readout")
++    return TranslationUnit(str(kernel) + "\n" + "\n".join(declarations), maximum)
++
++
++def emit_llvm_descriptor_bridge(signatures, *, alignment_bytes):
++    """Bridge the observed upstream flattened-memref ABI to the explicit C ABI.
++
++    The aggregate return is emitted in LLVM IR itself, avoiding an assumption
++    that a C compiler's sret convention equals upstream MLIR's aggregate ABI.
++    Each call owns/frees its packing workspace. Shapes and positive strides are
++    checked before calling target code. i8/i8/i32, 64-bit index only.
++    """
++    if type(alignment_bytes) is not int or alignment_bytes < 1 or alignment_bytes & (alignment_bytes-1):
++        raise ValueError("alignment must be a positive power of two")
++    alignment_bytes=max(alignment_bytes,4)
++    functions=[]
++    for symbol,shape in sorted(signatures.items()):
++        _identifier(symbol)
++        if len(shape) not in (3,4) or any(type(v) is not int or v<1 for v in shape):
++            raise ValueError("positive static rank2/rank3 contraction required")
++        batch,m,n,k=(1,*shape) if len(shape)==3 else tuple(shape)
++        rank=2 if len(shape)==3 else 3
++        shapes=((m,k),(k,n),(m,n)) if rank==2 else ((batch,m,k),(batch,k,n),(batch,m,n))
++        dtype=f"{{ ptr, ptr, i64, [{rank} x i64], [{rank} x i64] }}"
++        args=[];checks=[];body=[];serial=0
++        def fresh():
++            nonlocal serial
++            serial+=1
++            return f"%v{serial}"
++        def emit(expression):
++            name=fresh();body.append(f"  {name} = {expression}");return name
++        for prefix,dims in zip(("a","b","c"),shapes):
++            args += [f"ptr %{prefix}alloc",f"ptr %{prefix}data",f"i64 %{prefix}off"]
++            args += [f"i64 %{prefix}size{i}" for i in range(rank)]
++            args += [f"i64 %{prefix}stride{i}" for i in range(rank)]
++            checks.append(emit(f"icmp ne ptr %{prefix}data, null"))
++            checks.append(emit(f"icmp sge i64 %{prefix}off, 0"))
++            for i,extent in enumerate(dims):
++                checks.append(emit(f"icmp eq i64 %{prefix}size{i}, {extent}"))
++                checks.append(emit(f"icmp sgt i64 %{prefix}stride{i}, 0"))
++        valid=checks[0]
++        for check in checks[1:]:valid=emit(f"and i1 {valid}, {check}")
++        body += [f"  br i1 {valid}, label %allocate, label %failure","allocate:"]
++        panel_a=(m*k+alignment_bytes-1)//alignment_bytes*alignment_bytes
++        panel_b=(k*n+alignment_bytes-1)//alignment_bytes*alignment_bytes
++        required=panel_a+panel_b+4*m*n
++        raw=emit(f"call ptr @malloc(i64 {required+alignment_bytes-1})")
++        nonnull=emit(f"icmp ne ptr {raw}, null")
++        body += [f"  br i1 {nonnull}, label %invoke, label %failure","invoke:"]
++        raw_int=emit(f"ptrtoint ptr {raw} to i64")
++        round_up=emit(f"add i64 {raw_int}, {alignment_bytes-1}")
++        aligned=emit(f"and i64 {round_up}, {-alignment_bytes}")
++        workspace=emit(f"inttoptr i64 {aligned} to ptr")
++        a=emit("getelementptr i8, ptr %adata, i64 %aoff")
++        b=emit("getelementptr i8, ptr %bdata, i64 %boff")
++        c=emit("getelementptr i32, ptr %cdata, i64 %coff")
++        stride_base=rank-2
++        call_args=[f"ptr {c}",f"ptr {a}",f"ptr {b}"]
++        call_args += [f"i64 %{p}stride{i}" for p in ("a","b","c") for i in range(stride_base,rank)]
++        call_args += ["i64 0" if rank==2 else f"i64 %{p}stride0" for p in ("a","b","c")]
++        call_args += [f"ptr {workspace}",f"i64 {required}"]
++        status=emit(f"call i32 @{symbol}_pointers("+", ".join(call_args)+")")
++        body.append(f"  call void @free(ptr {raw})")
++        success=emit(f"icmp eq i32 {status}, 0")
++        body += [f"  br i1 {success}, label %result, label %failure","result:"]
++        result="undef"
++        for field,value,typ in ((0,"%calloc","ptr"),(1,"%cdata","ptr"),(2,"%coff","i64")):
++            result=emit(f"insertvalue {dtype} {result}, {typ} {value}, {field}")
++        for i in range(rank):result=emit(f"insertvalue {dtype} {result}, i64 %csize{i}, 3, {i}")
++        for i in range(rank):result=emit(f"insertvalue {dtype} {result}, i64 %cstride{i}, 4, {i}")
++        body += [f"  ret {dtype} {result}","failure:","  call void @abort()","  unreachable"]
++        c_args=["ptr"]*3+["i64"]*9+["ptr","i64"]
++        functions.append(f"declare i32 @{symbol}_pointers("+", ".join(c_args)+")\n"+
++                         f"define {dtype} @{symbol}("+", ".join(args)+") {\n"+"\n".join(body)+"\n}\n")
++    return "declare ptr @malloc(i64)\ndeclare void @free(ptr)\ndeclare void @abort() noreturn\n"+"\n".join(functions)
+diff --git a/src/merlin/runtime/backends/device_simulator.py b/src/merlin/runtime/backends/device_simulator.py
+new file mode 100644
+index 000000000..4757e13fd
+--- /dev/null
++++ b/src/merlin/runtime/backends/device_simulator.py
+@@ -0,0 +1,104 @@
++"""Explicit matrix-provider simulator selection and byte-bound execution.
++
++This module does not select a device, infer a cycle model, or grant certification.
++The target provider owns the launch arguments and support policy.
++"""
++from __future__ import annotations
++
++import hashlib
++import subprocess
++from pathlib import Path
++from typing import Any
++
++
++class DeviceSimulatorError(RuntimeError):
++    pass
++
++
++def sha256(path: str | Path) -> str:
++    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++
++def execution_inputs(descriptor: dict[str, Any]) -> dict[str, str]:
++    """Validate launcher/native/support bytes without inferring certification."""
++    expected = descriptor.get("execution_input_sha256", {})
++    if not isinstance(expected, dict):
++        raise DeviceSimulatorError("execution_input_sha256 must be a mapping")
++    expected = dict(expected)
++    for name, value in [(descriptor.get("binary"), descriptor.get("binary_sha256")),
++                        (descriptor.get("native_binary"), descriptor.get("native_binary_sha256"))]:
++        if name is None and value is None:
++            continue
++        if not isinstance(name, str) or not isinstance(value, str) or len(value) != 64:
++            raise DeviceSimulatorError("invalid launcher/native input identity")
++        if name in expected and expected[name] != value:
++            raise DeviceSimulatorError("conflicting simulator input identity")
++        expected[name] = value
++    for name, value in expected.items():
++        if not isinstance(name, str) or not isinstance(value, str) or not Path(name).is_file() or sha256(name) != value:
++            raise DeviceSimulatorError("simulator execution input missing or changed: " + str(name))
++    return expected
++
++
++def resolve(matrix) -> dict[str, Any]:
++    """Ask the selected provider; never fall back after a refusal."""
++    callback = getattr(matrix.provider(), "device_simulator", None)
++    if not callable(callback):
++        raise DeviceSimulatorError("selected matrix provider declares no device_simulator")
++    descriptor = callback(unit=matrix.unit, config=matrix.config)
++    if not isinstance(descriptor, dict) or descriptor.get("available") is not True:
++        reason = descriptor.get("reason", "unavailable") if isinstance(descriptor, dict) else "invalid descriptor"
++        raise DeviceSimulatorError(str(reason))
++    binary = Path(descriptor.get("binary", ""))
++    if not binary.is_file() or sha256(binary) != descriptor.get("binary_sha256"):
++        raise DeviceSimulatorError("simulator binary missing or changed after provider verification")
++    if not isinstance(descriptor.get("isa_extensions"), list) or not descriptor.get("provenance"):
++        raise DeviceSimulatorError("simulator descriptor lacks ISA/provenance")
++    execution_inputs(descriptor)
++    return descriptor
++
++
++def run(matrix, elf: str | Path, *, harts: int, isa: str, memory: tuple[int, int],
++        active_hart_ids: tuple[int, ...] | None = None, timeout: float = 300):
++    """Run an exact ELF and return captured bytes plus immutable identities.
++
++    Provider launch_args are an argv list. No shell expansion is performed.
++    Timing/certification status is propagated, never inferred from exit status.
++    """
++    descriptor = resolve(matrix)
++    if type(harts) is not int or harts < 1:
++        raise DeviceSimulatorError("harts must be a positive integer")
++    allowed = descriptor.get("matrix_hart_ids")
++    active = tuple(range(harts)) if active_hart_ids is None else tuple(active_hart_ids)
++    if not active or len(set(active)) != len(active) or any(type(h) is not int or h < 0 or h >= harts for h in active):
++        raise DeviceSimulatorError("active_hart_ids must select distinct physical harts")
++    if allowed is not None and any(h not in allowed for h in active):
++        raise DeviceSimulatorError("requested image includes a hart without the selected matrix unit")
++    extensions = list(dict.fromkeys([*isa.split("_"), *descriptor["isa_extensions"]]))
++    regions = descriptor.get("memory_regions", [memory])
++    if (not isinstance(regions, list) or not all(isinstance(r, (list, tuple)) and len(r) == 2
++            and all(type(v) is int for v in r) and r[0] >= 0 and r[1] > 0 for r in regions)
++            or list(memory) not in [list(r) for r in regions]):
++        raise DeviceSimulatorError("provider memory map does not contain requested image DRAM")
++    argv = [descriptor["binary"], "--isa=" + "_".join(extensions), f"-p{harts}",
++            "-m" + ",".join(f"{base:#x}:{size:#x}" for base, size in regions), *descriptor.get("launch_args", [])]
++    per_hart = descriptor.get("per_hart_isa")
++    if per_hart is not None:
++        for hart in range(harts):
++            selected = per_hart.get(str(hart))
++            if not isinstance(selected, str) or not selected:
++                raise DeviceSimulatorError(f"no declared ISA for requested hart {hart}")
++            argv.append(f"--hart-isa={hart}:{selected}")
++    argv.append(str(elf))
++    if not all(isinstance(a, str) for a in argv):
++        raise DeviceSimulatorError("provider launch arguments must be strings")
++    before = sha256(elf)
++    inputs = execution_inputs(descriptor)
++    proc = subprocess.run(argv, capture_output=True, timeout=timeout)
++    if sha256(elf) != before or sha256(descriptor["binary"]) != descriptor["binary_sha256"]:
++        raise DeviceSimulatorError("execution inputs changed during run")
++    if any(sha256(name) != value for name, value in inputs.items()):
++        raise DeviceSimulatorError("launcher/native/support inputs changed during run")
++    return {"argv": argv, "returncode": proc.returncode, "stdout": proc.stdout, "stderr": proc.stderr,
++            "elf_sha256": before, "execution_input_sha256": inputs, "simulator": descriptor}
+diff --git a/src/merlin/runtime/boards.py b/src/merlin/runtime/boards.py
+index 145afb4f8..ba2966db1 100644
+--- a/src/merlin/runtime/boards.py
++++ b/src/merlin/runtime/boards.py
+@@ -38,6 +38,20 @@ LOADER_UART_TSI = "uart_tsi"
+ LOADER_PYUARTSI = "pyuartsi"
+ 
+ 
++@dataclass(frozen=True)
++class Hart:
++    """Target-owned per-hart facts; unknown dimensions remain explicit nulls."""
++
++    hart_id: int
++    core_type: str
++    isa: str
++    vlen: int | None = None
++    dlen: int | None = None
++    elen: int | None = None
++    matrix: bool = False
++    dtypes: tuple[str, ...] = ()
++
++
+ @dataclass(frozen=True)
+ class Board:
+     """Everything the generated app needs to know about a target."""
+@@ -59,6 +73,9 @@ class Board:
+     #: WHICH harts are vector-capable, when they are not the first `vector_harts` of them. A count
+     #: alone assumes 0..N-1. None = the count's default.
+     vector_hart_ids: tuple[int, ...] | None = None
++    matrix_hart_ids: tuple[int, ...] | None = None
++    per_hart: tuple[Hart, ...] | None = None
++    mtime_hz: int | None = None
+     vlen: int | None = None  # hardware vector length in bits; None = unknown, assume the V minimum
+     ram_label: str | None = None  # required for Zephyr; DT memory label to override
+     fpu_sharing: bool | None = None
+@@ -141,6 +158,16 @@ class Board:
+             return tuple(self.vector_hart_ids)
+         return tuple(range(self.n_vector_harts))
+ 
++    @property
++    def matrix_harts(self) -> tuple[int, ...]:
++        """Unknown matrix capability permits no matrix image."""
++        return self.matrix_hart_ids or ()
++
++    def check_matrix_image(self, harts: int | tuple[int, ...]) -> None:
++        selected = tuple(range(harts)) if isinstance(harts, int) else tuple(harts)
++        if not selected or len(set(selected)) != len(selected) or any(h not in self.matrix_harts for h in selected):
++            raise BoardRegistryError(f"{self.name}: selected harts {selected} exceed matrix harts {self.matrix_harts}")
++
+     @property
+     def vector_max_len(self) -> int:
+         """Bits to size the per-thread vector save area. 32 registers of this width per thread.
+@@ -210,6 +237,28 @@ def _coerce(key: str, value: Any, ftype: str, where: str) -> Any:
+             return None
+         raise BoardRegistryError(f"{where}: may not be null")
+     base = alternatives[0]
++    if key == "per_hart":
++        if not isinstance(value, list):
++            raise BoardRegistryError(f"{where}: expected a list of hart records")
++        fields = {f.name: f for f in dataclasses.fields(Hart)}
++        records = []
++        for item in value:
++            if not isinstance(item, dict) or set(item) - set(fields):
++                raise BoardRegistryError(f"{where}: invalid hart record {item!r}")
++            try:
++                args = {k: tuple(v) if k == "dtypes" and isinstance(v, list) else
++                        _coerce(k, v, str(fields[k].type), where + "." + k) for k, v in item.items()}
++                record = Hart(**args)
++            except (TypeError, ValueError) as exc:
++                raise BoardRegistryError(f"{where}: malformed hart record: {exc}") from exc
++            if not all(isinstance(d, str) and d for d in record.dtypes):
++                raise BoardRegistryError(f"{where}: dtypes must be nonempty strings")
++            if record.hart_id < 0 or not record.core_type or not record.isa:
++                raise BoardRegistryError(f"{where}: hart identity/type/ISA required")
++            if any(v is not None and v <= 0 for v in (record.vlen, record.dlen, record.elen)):
++                raise BoardRegistryError(f"{where}: known vector dimensions must be positive")
++            records.append(record)
++        return tuple(records)
+     if key in _SIZE_FIELDS:
+         return _byte_size(value, where)
+     if base == "bool":
+@@ -322,6 +371,19 @@ def load_boards(path: str | Path | None = None) -> dict[str, Board]:
+             raise BoardRegistryError(f"{where}: loader_baud must be positive")
+         if kwargs["dram_base"] < 0:
+             raise BoardRegistryError(f"{where}: dram_base must be nonnegative")
++        for field in ("vector_hart_ids", "matrix_hart_ids"):
++            ids = kwargs.get(field)
++            if ids is not None and (len(set(ids)) != len(ids) or any(h < 0 or h >= kwargs["harts"] for h in ids)):
++                raise BoardRegistryError(f"{where}: {field} must contain distinct physical hart IDs")
++        if kwargs.get("mtime_hz") is not None and kwargs["mtime_hz"] <= 0:
++            raise BoardRegistryError(f"{where}: mtime_hz must be positive")
++        records = kwargs.get("per_hart")
++        if records is not None:
++            if sorted(h.hart_id for h in records) != list(range(kwargs["harts"])):
++                raise BoardRegistryError(f"{where}: per_hart must describe every physical hart exactly once")
++            matrix = tuple(h.hart_id for h in records if h.matrix)
++            if set(matrix) != set(kwargs.get("matrix_hart_ids") or ()):
++                raise BoardRegistryError(f"{where}: per_hart matrix flags disagree with matrix_hart_ids")
+         if kwargs.get("code_reserve") is not None and kwargs["code_reserve"] <= 0:
+             raise BoardRegistryError(f"{where}: code_reserve must be positive")
+         if kwargs["flow"] == FLOW_ZEPHYR:
+diff --git a/src/merlin/targetgen/provider_compose.py b/src/merlin/targetgen/provider_compose.py
+new file mode 100644
+index 000000000..20fd08ec9
+--- /dev/null
++++ b/src/merlin/targetgen/provider_compose.py
+@@ -0,0 +1,66 @@
++"""Verify the input closure of an explicitly layered support package.
++
++Materialized contracts remain target-owned. This reader checks exact source and
++input digests without fetching code, executing providers, or blessing their facts.
++"""
++from __future__ import annotations
++
++import hashlib
++import os
++import subprocess
++from dataclasses import dataclass
++from pathlib import Path
++
++import yaml
++
++from .providers import ProviderError, contained_resource, read_provider
++
++
++@dataclass(frozen=True)
++class Composition:
++    base: object
++    base_revision: str
++
++
++def _sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def _effective_sha(path):
++    # The compose format's lock binds YAML payload after its generated comment header.
++    lines = path.read_text().splitlines(keepends=True)
++    while lines and lines[0].startswith("#"):
++        lines.pop(0)
++    return hashlib.sha256("".join(lines).encode()).hexdigest()
++
++
++def materialize(root, *, check=False):
++    """Check a frozen composition lock against an explicitly selected base.
++
++    There is intentionally no silent checkout/fetch or lossy overlay merge. A new
++    generated contract must be produced by the owner that owns its merge policy.
++    """
++    root = Path(root).resolve()
++    provider = read_provider(root)
++    if provider is None or provider.extends is None:
++        raise ProviderError("selected provider does not declare an exact base")
++    selected = os.environ.get("MERLIN_PROVIDER_BASE_PATH")
++    if not selected:
++        raise ProviderError("set MERLIN_PROVIDER_BASE_PATH to the exact base support checkout")
++    base = read_provider(selected)
++    if base is None or base.target != provider.extends.target:
++        raise ProviderError("base support identity differs from extends.target")
++    revision = subprocess.check_output(["git", "-C", str(base.root), "rev-parse", "HEAD"], text=True).strip()
++    lock = yaml.safe_load((root / "contracts/composed.lock.yaml").read_text())
++    overlay = contained_resource(root, lock["overlay"]["path"])
++    effective = contained_resource(root, lock["effective"]["path"])
++    fresh = (lock.get("schema") == "merlin.provider_compose.v1" and lock.get("target") == provider.target
++             and lock.get("provider_id") == provider.id and lock["base"]["provider_id"] == base.id
++             and lock["base"]["target"] == base.target and lock["base"]["repo"] == provider.extends.repo
++             and revision == provider.extends.commit == lock["base"]["revision"] == lock["base"]["pinned"]
++             and _sha(base.contract_path) == lock["base"]["contract_sha256"]
++             and _sha(overlay) == lock["overlay"]["sha256"]
++             and _effective_sha(effective) == lock["effective"]["sha256"])
++    if not check:
++        raise ProviderError("this check-only API never synthesizes a new contract or rewrites its lock")
++    return fresh, Composition(base, revision)
+diff --git a/src/merlin/targetgen/providers.py b/src/merlin/targetgen/providers.py
+index 5351ae41c..e254c20a0 100644
+--- a/src/merlin/targetgen/providers.py
++++ b/src/merlin/targetgen/providers.py
+@@ -29,6 +29,15 @@ class ProviderRole(StrEnum):
+     HOST_SCHEDULE = "host_schedule"
+ 
+ 
++@dataclass(frozen=True)
++class ProviderExtension:
++    """An immutable, explicitly selected support-provider dependency."""
++
++    target: str
++    repo: str
++    commit: str
++
++
+ @dataclass(frozen=True)
+ class Provider:
+     id: str
+@@ -37,6 +46,7 @@ class Provider:
+     root: Path
+     contract_path: Path | None = None
+     declared: bool = False
++    extends: ProviderExtension | None = None
+ 
+ 
+ def _mapping(path: Path) -> dict[str, Any]:
+@@ -83,9 +93,9 @@ def read_provider(root: str | Path) -> Provider | None:
+     metadata = root / METADATA_FILE
+     if metadata.is_file():
+         doc = _mapping(metadata)
+-        if doc.get("schema") != SCHEMA:
++        if doc.get("schema") not in (SCHEMA, "merlin.provider.v2"):
+             raise ProviderError(f"{metadata}: expected schema {SCHEMA!r}")
+-        unknown = set(doc) - {"schema", "id", "target", "role", "contract"}
++        unknown = set(doc) - {"schema", "id", "target", "role", "contract", "extends"}
+         if unknown:
+             raise ProviderError(f"{metadata}: unknown fields {sorted(unknown)}")
+         identity = _identity(doc.get("id"), field="id", path=metadata)
+@@ -103,7 +113,19 @@ def read_provider(root: str | Path) -> Provider | None:
+                 raise ProviderError(f"{metadata}: target {target!r} differs from contract name {name!r}")
+         elif "contract" in doc:
+             raise ProviderError(f"{metadata}: only support providers may declare a contract")
+-        return Provider(identity, target, role, root, contract, declared=True)
++        extends = None
++        if "extends" in doc:
++            ext = doc["extends"]
++            if doc["schema"] != "merlin.provider.v2" or role != ProviderRole.SUPPORT:
++                raise ProviderError(f"{metadata}: only v2 support providers may extend a base")
++            if not isinstance(ext, dict) or set(ext) != {"target", "repo", "commit"}:
++                raise ProviderError(f"{metadata}: extends requires target, repo and commit")
++            values = {key: _identity(ext[key], field=key, path=metadata) for key in ext}
++            commit = values["commit"]
++            if len(commit) != 40 or any(c not in "0123456789abcdef" for c in commit):
++                raise ProviderError(f"{metadata}: extends.commit must be a full lowercase git SHA")
++            extends = ProviderExtension(**values)
++        return Provider(identity, target, role, root, contract, declared=True, extends=extends)
+ 
+     contract = root / "contracts" / "target_contract.yaml"
+     if contract.is_file():

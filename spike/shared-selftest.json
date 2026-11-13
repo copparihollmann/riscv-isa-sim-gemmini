@@ -1,0 +1,12 @@
+{
+  "pass": true,
+  "operation_cases": 21000,
+  "reduction_cases": 1200,
+  "forms": 45,
+  "masked_exception_flags": true,
+  "raw_vf_input": true,
+  "vstart_zero_required": true,
+  "fs_dirty_checked": true,
+  "rtl_certified": false,
+  "log_sha256": "8e21d2ca7e19a3715a5b559078cc2df4f4a197f4de0321913bc70ec19e626797"
+}

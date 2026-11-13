@@ -1,0 +1,3 @@
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/bitmanip.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/cease.elf has a LOAD segment with RWX permissions
+/scratch/eygao/iris-cy/.conda-env/riscv-tools/riscv64-unknown-elf/bin/ld: warning: /scratch/copparihollmann/iris-model/spike/benchmarks/cpu_config.elf has a LOAD segment with RWX permissions

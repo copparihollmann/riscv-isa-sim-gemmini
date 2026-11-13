@@ -1,0 +1,139 @@
+{
+  "schema": "iris.actual_scalar_bf16_decode_observation.v1",
+  "status": "observed_illegal_all_tested_encodings_all_harts",
+  "observed_date_utc": "2026-11-06",
+  "hardware_executed": true,
+  "job": "/scratch/copparihollmann/iris-model/runs/fpga-scalar-bf16-probe-v2",
+  "elf_sha256": "f0d517be9cfb9258ac2df3833436d6219d98aa070a7893ad4e40f4a4baad0ee9",
+  "selected_image": {
+    "name": "corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush",
+    "uri": "file:///scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/firesim.tar.gz",
+    "sha256": "9bbe1f12a2b18091c28b05ea43c001e579f70c8cfef0f528fcb49003212fb776"
+  },
+  "selected_driver_bundle": {
+    "uri": "file:///scratch/copparihollmann/iris-model/firesim/artifacts/archived-build-driver-v1/driver-bundle.tar.gz",
+    "sha256": "5457de1e9c0dd1e3c52efbf5d083bdac7dfa5a5e3124c9887961c08159b03450"
+  },
+  "archive_sha256": "fb6309d08e4cf33888de5a5e7e800162afe2f43cda038ca04c278d098f1dd160",
+  "archive_analysis_sha256": "e0c54885dbeb254d50fab886d2f4c55c2c47bd259756ad8585bcc913e9d1dc1b",
+  "cases": {
+    "instructions": [
+      "fcvt.bf16.s",
+      "fcvt.s.bf16"
+    ],
+    "rounding_mode_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "operand_patterns": 3,
+    "trials": 5,
+    "regions": 720,
+    "per_hart": [
+      240,
+      240,
+      240
+    ]
+  },
+  "observations": {
+    "trap_cause": 2,
+    "precise_PC_verified_against_archived_ELF": true,
+    "destination_FPR_bits_preserved": true,
+    "fcsr_preserved": true,
+    "trap_value": "Retained as raw observation; payload not a general architectural guarantee."
+  },
+  "source_pins": {
+    "chipyard": {
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd"
+    },
+    "saturn": {
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b"
+    },
+    "rocket-chip": {
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "shuttle": {
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "spike_base_commit": "72958551566a30f19444bd7e354552824e4d0a98",
+  "lifecycle": [
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 23.26759647578001,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "infrasetup",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 115.14952113712206,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "runworkload",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 70.0302594481036,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": true,
+      "host_elapsed_seconds": 23.32918912684545,
+      "returncode": 0,
+      "timed_out": false
+    }
+  ],
+  "cleanup_status": "passed",
+  "post_cleanup_complete_idle_inspection": true,
+  "shared_lock_absent_after_cleanup": true,
+  "memory_startup_observation": {
+    "selected_parameters": {
+      "writeLatency": 30,
+      "readLatency": 30
+    },
+    "units": "FASED memory-model target-clock cycles, not CPU cycles",
+    "before_driver_initialization": true,
+    "calibration_usable": false
+  },
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/runs/fpga-scalar-bf16-probe-v2/run.json": "990cc040092eaec1ed74847b84f2e9526bd2e15d1b0725739ee4d5351bd69aa7",
+    "/scratch/copparihollmann/iris-model/build/fpga-scalar-bf16-probe-v2-archive-analysis/report.json": "e0c54885dbeb254d50fab886d2f4c55c2c47bd259756ad8585bcc913e9d1dc1b",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1/build.json": "a7a89581fd3a3c879475f470b507940e95d3b8cd50b6b6c93aaff8dcfe932c2d",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1/corpus.json": "99bfa08656b887c5cd691cb8781aee8de1fcd7e679122c3b9c91d6c5cd9d58c0",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1-seed0/report.json": "c9e2ba8062c413bd6e41c05d162c54e91e9fc00feacebf6ccf1e0e7d83840ed2",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1-seed17/report.json": "e78f291fc24202761bd0d6ff68eeaf4c069d0ca93a7a6641e9f2f3318fa2a41d",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1-acceptance/report.json": "a3f22d37e431d8a47f4a5479bc3f5f8c5ee643a96cbd08392ad71c97b47c07f2",
+    "/scratch/copparihollmann/iris-model/build/fpga-scalar-bf16-analysis-acceptance-v1/report.json": "0fcadf838b05be87661aecdcfb4c20c032c577a7a091db345a2d168e9d1c3b19",
+    "/scratch/copparihollmann/iris-model/spike/scalar-bf16-decoder-proof.json": "e0635b73cfa3683bfe814714f8a399da06ae614968fac8a5c87e6537dd56c4f3",
+    "/scratch/copparihollmann/iris-model/hardware/manifest.json": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+    "/scratch/copparihollmann/iris-model/build/fpga-scalar-bf16-post-cleanup-v1.json": "9d6e8a2b15ac84a781da90f863235607272897089080fb38b80b841d3da3e689",
+    "/scratch/copparihollmann/iris-model/build/scalar-bf16-probe-v1/post-cleanup-shared-lock.json": "0b3801b90d8f06c64a5a527dd542388885c0155b6018fca1556e08ff1c8c9e64"
+  },
+  "qualification": "Actual execution of these scalar encodings on the selected programmed image; does not establish absence of vector BF16 or full dtype support.",
+  "source_image_association_verified": false,
+  "loaded_image_readback_verified": false,
+  "full_functional_certified": false,
+  "timing_certified": false,
+  "calibration_usable": false
+}

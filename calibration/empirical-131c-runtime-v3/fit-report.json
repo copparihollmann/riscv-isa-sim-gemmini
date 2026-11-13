@@ -1,0 +1,95 @@
+{
+  "actual_native_smoke": {
+    "exit_status": 0,
+    "functional_checks": 12,
+    "harts": [
+      0,
+      1,
+      2
+    ],
+    "result_path": "build/empirical-131c-runtime-smoke-v3/results.json",
+    "result_sha256": "4f7398dfbb76547334db67ccf6e2ee2f8fe1ef89e8008059817c17d1f5ffe70f",
+    "speed": {
+      "host_seconds": 13.131422067061067,
+      "includes_startup_console_and_outside_ROI": true,
+      "retired_instructions": 2955355,
+      "simulated_MIPS": 0.2250597829319057
+    },
+    "timing": {
+      "absolute_max_pct": 49.709583736689254,
+      "absolute_median_pct": 25.10333019632054,
+      "absolute_p90_pct": 49.553836961160904,
+      "regions": 12,
+      "scope": "Actual sameELF12-region development smoke; not finalblindholdout.",
+      "signed_mean_pct": -17.316282918086696,
+      "signed_median_pct": -16.50902979505409,
+      "within_2pct_fraction": 0.16666666666666666
+    }
+  },
+  "actual_parameter_fit_performed": true,
+  "configured_family_coverage": {
+    "memory.LOCAL_TCM.load": {
+      "actual_smoke_exercised": false,
+      "fit_basis_observed": true
+    },
+    "memory.LOCAL_TCM.store": {
+      "actual_smoke_exercised": false,
+      "fit_basis_observed": true
+    },
+    "shared_data_cache": {
+      "actual_smoke_exercised": true,
+      "fit_basis_observed": true
+    }
+  },
+  "counter_elf_profile": {
+    "identity_verified": true,
+    "path": "build/empirical-131c-selected-profile-v3/summary.json",
+    "regions": 12,
+    "sha256": "99dfd980222e1d5b8a0a5302301b7d52ed31e2069293c74b2a3052263b21da71"
+  },
+  "fitting_basis": {
+    "full6750_native_run_completed": false,
+    "path": "build/empirical-training-corrected-basis-v1/regions.jsonl",
+    "regions": 306,
+    "selection": "Frozenparenttrainpartitiononly;internalvalidationnotfitted.",
+    "sha256": "be4c81f223989975d91a853259ec7c1194be57c8baa19f2098ffde9e23308660"
+  },
+  "fixture_sha256": "3c80a315ac5959b9cfb725c2e9bc85d9e524f6199a2669a246e1a32017b812ed",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "instruction_cache_service": {
+    "enabled": false,
+    "failure_path": "build/empirical-131c-runtime-smoke-v2/termination.json",
+    "reason": "v2nonzeroinstructionservice stallsafter3emptyregions;v3diffdisablesonlyIcachetag/serviceflag andpasses12;failurepreserved."
+  },
+  "live_quality_accepted": false,
+  "raw_linearized_diagnostics": {
+    "path": "calibration/empirical-corrected-shared-v1/report.json",
+    "scope": "Diagnosticlinearizationincludesunappliedcoefficients;notreported asactualruntimequality.",
+    "sha256": "120a4b80ae30c96bb17164856bac043f2ec34c76cea7ab96db715c23ef7911af"
+  },
+  "raw_positive_fit_parameters": {
+    "path": "calibration/empirical-corrected-shared-v1/parameters.json",
+    "sha256": "8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8"
+  },
+  "rtl_certified": false,
+  "schema": "iris.empirical_runtime_fit_report.v1",
+  "selected_parameters_sha256": "afe6a74817ed60ae2b712c5283ea64952dcb51cf1df7d765c0e6187485cc23b4",
+  "selftest": {
+    "passed": true,
+    "path": "build/empirical-131c-selected-selftest-v3/report.json",
+    "sha256": "fff3753b2d383aa40dc79825f4cc6d13b1db301655217759ebdc63bd8173c3d4"
+  },
+  "source_image_association_verified": false,
+  "status": "corrected_actual_features_partial_fit_runnable_data_only",
+  "unknowns": [
+    "FP8matrixlatencyunfitted;functionalsupportunchanged",
+    "RVV/VMEcomputebackendworkheuristicunfitted",
+    "Vector-memoryprivate-L1routeunqualified;nextsourcebypassfixrequired",
+    "RemoteTCM/scratchpadserviceunfittedforcurrentnative",
+    "ScalarFP/VectorFPserviceconservativefallback",
+    "IRQ/synchronization/atomics/LRSCtimingunqualified",
+    "Cold-cache/replacement/branch-historyapproximationhaslargeobservederrors",
+    "Instruction-cachetag/serviceexplicitlydisabledafterv2runtimestall;data-onlyfixtureisolation"
+  ]
+}

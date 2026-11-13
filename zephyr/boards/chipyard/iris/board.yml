@@ -1,0 +1,6 @@
+board:
+  name: iris
+  full_name: Iris heterogeneous three-hart SoC
+  vendor: chipyard
+  socs:
+    - name: rocketchip_virt_riscv64

@@ -1,0 +1,84 @@
+{
+  "schema": "iris.noc_arbiter_source_profile.v1",
+  "source_capsule": "build/rtl-memory-return-path-v1-final/report.json",
+  "source_capsule_sha256": "2e32a62c428c8f434c7893beb419da576b1e3a7ff4f4574aef41dc2c1f1dac0c",
+  "fixture": "build/rtl-memory-return-path-v1-final/build/rtl-loader-diag/noc-arbiter-transitions.json",
+  "constellation_commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+  "constellation_tracked_modified": false,
+  "standalone_iris_fir_sha256": "f1b36c8565bd67825c636af40079ea048a9196bf1e36fcb719270411270201f4",
+  "parameters": {
+    "input_virtual_channels": 6,
+    "router_input_units": 4,
+    "output_virtual_channels": 13,
+    "local_input_unit": 0
+  },
+  "parameter_source": "Frozen actualRTL fixture node5/input0; generated InputUnit_10 and RotatingSingleVCAllocator_5 ports/state widths. Output flattening is six VCs to node4, six to node6, one local NIF3 egress.",
+  "reset": "All three masks RegInit(0); live state is seeded once from the explicit captured snapshot.",
+  "external_boundaries": [
+    "Per-input-unit ready VC requests after queue/route/FIFO dependencies",
+    "Incoming route completion and source VC (mask override)",
+    "Router input-unit eligibility after occupied-output filtering",
+    "Selected input's eligible flattened output VCs",
+    "For isolated egress reproduction: arbiter-ready arrivals and local-egress free slots"
+  ],
+  "semantics": {
+    "input_attempt_advances_without_ready": true,
+    "input_route_completion_overrides_attempt_mask": true,
+    "single_vc_input_mask_advances_when_eligible_input_exists": true,
+    "islip_output_mask_advances_only_on_allocation_fire": true
+  },
+  "whole_noc_certified": false,
+  "timing_calibrated": false,
+  "ethan_image_association": false,
+  "parameter_sources": {
+    "input_virtual_channels": {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/InputUnit_10.sv",
+      "sha256": "b4e403dac02df5e4d40b7c126f2fd027409f65f940896a3587a84f5c7da9d322",
+      "line": 307,
+      "match": "reg  [2:0]  states_5_g;"
+    },
+    "router_input_units": {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/RotatingSingleVCAllocator_5.sv",
+      "sha256": "32e33b92ad67f650c802da9c1b2d7200d709a5815430f89ff6314fc51401b4cc",
+      "line": 212,
+      "match": "wire [3:0]  in_arb_sel ="
+    },
+    "output_virtual_channels": {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/RotatingSingleVCAllocator_5.sv",
+      "sha256": "32e33b92ad67f650c802da9c1b2d7200d709a5815430f89ff6314fc51401b4cc",
+      "line": 282,
+      "match": "wire [12:0] sel ="
+    },
+    "local_input_unit": {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-loader-diag/noc-arbiter-transitions.json",
+      "sha256": "1a487cf2d1227d016b66cb02b9ef9688265835c884f7373685c4c13a5deae604",
+      "json_pointer": "/input_unit"
+    }
+  },
+  "semantic_sources": [
+    {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/InputUnit_10.sv",
+      "sha256": "b4e403dac02df5e4d40b7c126f2fd027409f65f940896a3587a84f5c7da9d322",
+      "line": 600,
+      "match": "else if (vcalloc_vals_0 |"
+    },
+    {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/InputUnit_10.sv",
+      "sha256": "b4e403dac02df5e4d40b7c126f2fd027409f65f940896a3587a84f5c7da9d322",
+      "line": 598,
+      "match": "else if (_route_arbiter_io_out_valid)"
+    },
+    {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/RotatingSingleVCAllocator_5.sv",
+      "sha256": "32e33b92ad67f650c802da9c1b2d7200d709a5815430f89ff6314fc51401b4cc",
+      "line": 325,
+      "match": "if (_GEN)"
+    },
+    {
+      "path": "build/rtl-memory-return-path-v1-final/build/rtl-verilator/gen-collateral/RotatingSingleVCAllocator_5.sv",
+      "sha256": "32e33b92ad67f650c802da9c1b2d7200d709a5815430f89ff6314fc51401b4cc",
+      "line": 327,
+      "match": "if (in_arb_sel[0] & io_req_0_valid"
+    }
+  ]
+}

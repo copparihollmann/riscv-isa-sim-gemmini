@@ -1,0 +1,2 @@
+<stdin>:109.18-90: Warning (interrupts_property): /soc/serial@10020000: Missing interrupt-parent
+IRIS_UNSUPPORTED_CORE_INSTRUCTION hart=2 pc=0x800004b8 instruction=0x30500073 reason=Rocket CEASE halt-until-reset behavior is not modeled

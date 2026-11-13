@@ -1,0 +1,8 @@
+  module OuterProductCluster : @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 135:7]
+    input clock : Clock @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 135:7]
+    input reset : Reset @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 135:7]
+    output io : { flip in_l : UInt<8>[4], flip in_t : UInt<8>[4], flip in_pipe : UInt<32>, out_pipe : UInt<32>, flip mrf_idx : UInt<4>, flip row_idx : UInt<2>, flip col_idx : UInt<2>, flip macc : UInt<1>, flip zero : UInt<1>, flip shift : UInt<1>, flip shift_h : UInt<1>, flip mvin : UInt<1>, flip mvin_col : UInt<1>, flip row_en : UInt<1>[4], flip col_en : UInt<1>[4], flip mv_en_row : UInt<1>, flip mv_en_col : UInt<1>, flip signed_l : UInt<1>, flip signed_t : UInt<1>, flip fp8 : UInt<1>, flip e5m2_l : UInt<1>, flip e5m2_t : UInt<1>, flip rm : UInt<3>} @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 136:14]
+  module OuterProductUnit : @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 253:7]
+    input clock : Clock @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 253:7]
+    input reset : Reset @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 253:7]
+    output io : { flip op : { clock_enable : UInt<1>, in_l : UInt<8>[4][4], in_t : UInt<8>[4][4], mrf_idx : UInt<4>[4], row_idx : UInt<2>[4], col_idx : UInt<2>[4], macc : UInt<1>[4], zero : UInt<1>[4], shift : UInt<1>[4], mvin : UInt<1>[4], row_en : UInt<1>[4][4], mvin_col : UInt<1>[4], shift_h : UInt<1>[4], col_en : UInt<1>[4][4], mv_en : UInt<1>[4], signed_l : UInt<1>, signed_t : UInt<1>, fp8 : UInt<1>, e5m2_l : UInt<1>, e5m2_t : UInt<1>, rm : UInt<3>}, out : UInt<32>[4], YOU_SHALL_PASS : UInt<1>} @[generators/saturn/src/main/scala/exu/OuterProductUnit.scala 256:14]

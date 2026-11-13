@@ -1,0 +1,86 @@
+{
+  "schema": "iris.pipeline_source_design.v1",
+  "primary_binary_sha256": "db964603d91ffb19f7e63dde0e14397635b879559011f1da8acaf5ecd06319a8",
+  "spike_base_commit": "72958551566a30f19444bd7e354552824e4d0a98",
+  "spike_overlay_sha256": "450a9418864ab562255eb0635cdda15414a709d8d6241fcd038918da027223e2",
+  "source_issue_receipt_sha256": "984e7e279e7f53c8cb3c8970c9722b71512bb614f89ead14e32b23b65c81f7bf",
+  "sources": {
+    "shuttle-core": {
+      "original": "third_party/shuttle/src/main/scala/exu/Core.scala",
+      "snapshot": "pipeline/evidence/Core.scala",
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "lines": [
+        [
+          78,
+          142
+        ],
+        [
+          255,
+          284
+        ],
+        [
+          286,
+          310
+        ],
+        [
+          328,
+          389
+        ],
+        [
+          650,
+          674
+        ],
+        [
+          998,
+          1018
+        ],
+        [
+          1190,
+          1215
+        ],
+        [
+          1272,
+          1304
+        ]
+      ]
+    },
+    "spike-execute": {
+      "original": "third_party/riscv-isa-sim/riscv/execute.cc",
+      "snapshot": "pipeline/evidence/execute.cc",
+      "sha256": "86bae601bbfbeade8422e21bbfae69f77df0121821f17844ac8ecdbf2e3accd0",
+      "lines": [
+        [
+          306,
+          409
+        ],
+        [
+          414,
+          465
+        ]
+      ]
+    },
+    "spike-adapter": {
+      "original": "third_party/riscv-isa-sim/riscv/iris_timing_adapter.cc",
+      "snapshot": "pipeline/evidence/iris_timing_adapter.cc",
+      "sha256": "4dc0fdbf0b4a8922f71308fb321d0fd37b805b8ae9bb395d898a2bb129042914",
+      "lines": [
+        [
+          129,
+          229
+        ]
+      ]
+    },
+    "issue-classifier": {
+      "original": "timing/shuttle_issue.cpp",
+      "snapshot": "pipeline/evidence/shuttle_issue.cpp",
+      "sha256": "9fcbc0b18148d527ebe45fa3742fe108c021733112dce4db2fc2b12225fa489a",
+      "lines": [
+        [
+          75,
+          177
+        ]
+      ]
+    }
+  },
+  "calibrated": false
+}

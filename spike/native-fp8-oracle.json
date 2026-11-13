@@ -1,0 +1,8 @@
+{
+  "cases": 20480,
+  "seed": 1313230904,
+  "header_sha256": "519f3d319a62aeaff3c77df954dea3bd2f7a19a7ade6fcd26f65eab318ee2ad6",
+  "host_float_used": false,
+  "rtl_executed": false,
+  "source_semantics": "single-round exact fused sum; dual independent IEEE rounds for OFP E4; odd-lane signalingness per recoded same-exp widening"
+}

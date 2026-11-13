@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-11-12T21:00:05.448734+00:00",
+  "frequency_mhz": 25,
+  "event": "manager packaging tail completed post-hoc",
+  "reason": "firesim buildbitstream exited 1 after Vivado finished successfully: get_metadata_string() ran 'git rev-parse HEAD' inside the isolated non-git snapshot parallel-25mhz/firesim/deploy",
+  "vivado_result": "bitstream+mcs written, 0 errors; post-route-physopt WNS +0.055 ns, WHS +0.010 ns, all timing constraints met, 0 routing errors",
+  "replicated_steps": "bitbuilder.py XilinxAlveoBitBuilder.build_bitstream: metadata echo, tar zcvf firesim.tar.gz xilinx_alveo_u250/, built-hwdb-entries file",
+  "metadata_commit_source": "chipyard-vme-u250/sims/firesim (source of hash-verified frozen inputs)",
+  "firesim_commit": "e1bdea8bb042b900995436ecc3d7c44100eb9da0-dirty",
+  "firesim_tar_sha256": "449c00014b50ad61cf88665a3460b3716a1e14a1b49ecb72bfca35e2f3b76460",
+  "firesim_bit_sha256": "a3a46424b99906ad70add060769ecf89e469cdd1166c7995f604a4602a2ea452",
+  "hardware_actions_performed": false
+}

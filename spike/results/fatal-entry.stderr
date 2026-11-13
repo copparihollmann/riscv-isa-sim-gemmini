@@ -1,0 +1,2 @@
+<stdin>:109.18-90: Warning (interrupts_property): /soc/serial@10020000: Missing interrupt-parent
+IRIS_FATAL hart=0 pc=0x80000000 cause=0x0 epc=0x0 tval=0x0 cycle=3

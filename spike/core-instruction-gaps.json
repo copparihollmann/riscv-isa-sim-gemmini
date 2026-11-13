@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "scope": "source-proven core instruction gaps, not deployed-image certification",
+  "sources": {
+    "rocket-core": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala",
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+      "lines": [
+        [
+          48,
+          83
+        ],
+        [
+          230,
+          248
+        ]
+      ]
+    },
+    "rocket-ctrl": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/IDecode.scala",
+      "sha256": "56ff065ff7b6ed15283afe071f2e79b6f09d2848df6729f0fc4ba3bea9036ace",
+      "lines": [
+        [
+          126,
+          131
+        ]
+      ]
+    },
+    "rocket-custom": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/CustomInstructions.scala",
+      "sha256": "6313d95d0fd760a092ae50f6b0dcb27a1bfbac42c7e1e841b008e893fdc72bb1",
+      "lines": [
+        [
+          8,
+          11
+        ]
+      ]
+    },
+    "rocket-csr": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/CSR.scala",
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10",
+      "lines": [
+        [
+          682,
+          704
+        ],
+        [
+          945,
+          962
+        ],
+        [
+          984,
+          1005
+        ],
+        [
+          1230,
+          1232
+        ],
+        [
+          852,
+          862
+        ]
+      ]
+    },
+    "shuttle-ctrl": {
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "path": "third_party/shuttle/src/main/scala/exu/Core.scala",
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "lines": [
+        [
+          167,
+          192
+        ],
+        [
+          250,
+          263
+        ]
+      ]
+    },
+    "shuttle-dcache": {
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "path": "third_party/shuttle/src/main/scala/dmem/DCache.scala",
+      "sha256": "108a8a4d9fdcb8450cb27b675496925fb98f2fe7484549acbca5bf9083d87d61",
+      "lines": [
+        [
+          254,
+          278
+        ],
+        [
+          365,
+          366
+        ]
+      ]
+    },
+    "shuttle-params": {
+      "repository": "shuttle",
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "path": "third_party/shuttle/src/main/scala/common/Parameters.scala",
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "lines": [
+        [
+          37,
+          58
+        ],
+        [
+          72,
+          72
+        ]
+      ]
+    },
+    "rocket-dcache": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/DCache.scala",
+      "sha256": "05c07b22f5a0795d9c54dc6b035b4bdcbba63af8518943a26490a1f3dbd5dc78",
+      "lines": [
+        [
+          467,
+          482
+        ],
+        [
+          764,
+          767
+        ]
+      ]
+    },
+    "rocket-cache-params": {
+      "repository": "rocket-chip",
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "path": "third_party/rocket-chip/src/main/scala/rocket/HellaCache.scala",
+      "sha256": "74d2d44341413b5950855af44dd1fefc2429bb25dbbcbcc171756f6501df9353",
+      "lines": [
+        [
+          88,
+          89
+        ]
+      ]
+    }
+  },
+  "cease": {
+    "encoding": "0x30500073",
+    "hardware_harts": [
+      2
+    ],
+    "legal_privilege": "M",
+    "core_behavior": "halts until reset and suppresses interrupt wakeup",
+    "model_behavior": "explicit capability-refusal diagnostic on hart2 in M-mode; lower privileges and harts0/1 retain architectural illegal",
+    "misa_x_behavior_modeled": false,
+    "source_refs": [
+      "rocket-core",
+      "rocket-ctrl",
+      "rocket-custom",
+      "rocket-csr",
+      "shuttle-ctrl"
+    ],
+    "rtl_certified": false
+  },
+  "bitmanip": {
+    "scalar_extensions_by_hart": {
+      "0": [
+        "Zba",
+        "Zbb",
+        "Zbs"
+      ],
+      "1": [
+        "Zba",
+        "Zbb",
+        "Zbs"
+      ],
+      "2": []
+    },
+    "source_refs": [
+      "shuttle-ctrl"
+    ],
+    "misa_b_note": "Rocket CSR isaMaskString omits B; enable explicit Zb subsets rather than Spike b alias to avoid adding a fictitious misa.B bit."
+  },
+  "lrsc": {
+    "reservation_match": "cache-line address, addr>>blockOffBits (64-byte blocks in audited design)",
+    "hart_lifetime_cycles": {
+      "0": 30,
+      "1": 30,
+      "2": 80
+    },
+    "backoff_cycles": 3,
+    "source_behavior": "expiration and memory/probe-dependent clearing; Shuttle blocks probes while reservation valid; source priority and replay behavior matter",
+    "model_gap": "current exact-byte matching and overlapping-store invalidation do not reproduce full RTL granule, expiration, replay or coherence/probe timing",
+    "source_refs": [
+      "shuttle-dcache",
+      "shuttle-params",
+      "rocket-dcache",
+      "rocket-cache-params",
+      "rocket-core"
+    ],
+    "rtl_certified": false
+  },
+  "cpu_layout": {
+    "pmp_entries_by_hart": {
+      "0": 0,
+      "1": 0,
+      "2": 8
+    },
+    "pmp_granularity_bytes": 4,
+    "mmu_mode_by_hart": {
+      "0": "Sv39",
+      "1": "Sv39",
+      "2": "Sv39"
+    },
+    "hart2_unimplemented_pmp_slots": "read zero / ignore writes via source read_mapping padding",
+    "source_refs": [
+      "shuttle-params",
+      "rocket-core",
+      "rocket-csr"
+    ],
+    "rtl_certified": false
+  }
+}

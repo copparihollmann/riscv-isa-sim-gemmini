@@ -1,0 +1,3866 @@
+{
+  "schema": "iris.operator_coverage_plan.v1",
+  "input_manifest_sha256": "d2567c39ae82821c79f6c047ec494b9d1cc394a999ada615c73d6fb2f0bb9a7b",
+  "models": [
+    {
+      "model_id": "openai/gpt-oss-20b",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/config.json",
+          "sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/model.safetensors.index.json",
+          "sha256": "0e085b977c4c9942f85938828e8c989ed7d5cdabf852e4da6a67c116cd502cd1",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/model.safetensors.index.json"
+        },
+        "original/config.json": {
+          "path": "workloads/sources/openai--gpt-oss-20b/original/config.json",
+          "sha256": "317522155fc243327ee341857d0c752d0094a0817e0e9aee2890d5ad8e009e04",
+          "url": "https://huggingface.co/openai/gpt-oss-20b/resolve/6cee5e81ee83917806bbde320786a8fb61efebee/original/config.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "6cee5e81ee83917806bbde320786a8fb61efebee",
+      "operator_cases": [
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            1,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            1,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            1,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            1,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            1,
+            32,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            8,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            8,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            8,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            8,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            8,
+            32,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            32,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            32,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            32,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            32,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            32,
+            32,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            64,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            64,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            64,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            64,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            64,
+            32,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        }
+      ],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "primary-user-selected",
+      "facts": {
+        "model_type": {
+          "value": "gpt_oss",
+          "json_pointer": "/model_type",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "hidden_size": {
+          "value": 2880,
+          "json_pointer": "/hidden_size",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "intermediate_size": {
+          "value": 2880,
+          "json_pointer": "/intermediate_size",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "num_hidden_layers": {
+          "value": 24,
+          "json_pointer": "/num_hidden_layers",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "num_attention_heads": {
+          "value": 64,
+          "json_pointer": "/num_attention_heads",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "num_key_value_heads": {
+          "value": 8,
+          "json_pointer": "/num_key_value_heads",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "head_dim": {
+          "value": 64,
+          "json_pointer": "/head_dim",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "num_local_experts": {
+          "value": 32,
+          "json_pointer": "/num_local_experts",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "num_experts_per_tok": {
+          "value": 4,
+          "json_pointer": "/num_experts_per_tok",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "vocab_size": {
+          "value": 201088,
+          "json_pointer": "/vocab_size",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "layer_types": {
+          "value": [
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention"
+          ],
+          "json_pointer": "/layer_types",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "sliding_window": {
+          "value": 128,
+          "json_pointer": "/sliding_window",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "hidden_act": {
+          "value": "silu",
+          "json_pointer": "/hidden_act",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "swiglu_limit": {
+          "value": 7.0,
+          "json_pointer": "/swiglu_limit",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        },
+        "rope_scaling": {
+          "value": {
+            "beta_fast": 32.0,
+            "beta_slow": 1.0,
+            "factor": 32.0,
+            "original_max_position_embeddings": 4096,
+            "rope_type": "yarn",
+            "truncate": false
+          },
+          "json_pointer": "/rope_scaling",
+          "source_sha256": "3a2a26ded679375b7928ddeca59764df7cea83220c1961035f6d6e232659e9ce"
+        }
+      },
+      "checkpoint_quantization": {
+        "modules_to_not_convert": [
+          "model.layers.*.self_attn",
+          "model.layers.*.mlp.router",
+          "model.embed_tokens",
+          "lm_head"
+        ],
+        "quant_method": "mxfp4"
+      },
+      "independent_original_config_crosscheck": {
+        "hidden_size": true,
+        "intermediate_size": true,
+        "num_hidden_layers": true,
+        "num_local_experts": true,
+        "num_attention_heads": true,
+        "num_key_value_heads": true,
+        "head_dim": true
+      },
+      "checkpoint_payload_bytes": 13761264768,
+      "selected_matrix_storage_lower_bound": {
+        "parameters": 19110297600,
+        "int8_bytes": 19110297600,
+        "fp8_bytes": 19110297600,
+        "bf16_bytes": 38220595200,
+        "formula": "layers * experts * (2*intermediate*hidden + hidden*intermediate)",
+        "implementation_evidence": "gpt-oss/gpt_oss/torch/model.py:275-301",
+        "excludes": "attention/normalization/biases/scales/embedding/vision/audio unless formula names them",
+        "int8_exceeds_physical_dram": true,
+        "native_checkpoint_dtype": null
+      },
+      "architecture_caveats": [
+        "These shape cases are not full-model captures or a certified quantization policy.",
+        "Native checkpoint MXFP4 must not be interpreted as Iris FP8. Unpack/dequantize/requantize needs an explicit checked software policy.",
+        "Actual expert loads/routing and sliding/full attention remain data-dependent."
+      ],
+      "memory_residency_qualified": false,
+      "status": "operator-shapes-only",
+      "required_nonmatmul_coverage": [
+        {
+          "operator": "embedding_gather",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "RMSNorm",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "rotary_position_embedding",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "masked_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "residual_add",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "silu",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "activation_product",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "quantize_dequantize",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "logits_argmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "router_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "topk",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_dispatch_compact",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_gather_weighted_combine",
+          "executed": false,
+          "compiler_qualified": false
+        }
+      ]
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/config.json",
+          "sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/model.safetensors.index.json",
+          "sha256": "ede2655fdc05008561983b6e0829c600727c28d591e071077377059f03a6c00e",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/model.safetensors.index.json"
+        },
+        "original/config.json": {
+          "path": "workloads/sources/openai--gpt-oss-120b/original/config.json",
+          "sha256": "063aaa98e012cac330d58d18471700f0b0eb90bb15c58fb227809d45090f3e65",
+          "url": "https://huggingface.co/openai/gpt-oss-120b/resolve/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/original/config.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "b5c939de8f754692c1647ca79fbf85e8c1e70f8a",
+      "operator_cases": [
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            1,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            1,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            1,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            1,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            1,
+            128,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            1,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            8,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            8,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            8,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            8,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            8,
+            128,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            8,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            32,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            32,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            32,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            32,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            32,
+            128,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            32,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.q",
+          "shape_mnk": [
+            64,
+            4096,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.k",
+          "shape_mnk": [
+            64,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.o",
+          "shape_mnk": [
+            64,
+            2880,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "attention.v",
+          "shape_mnk": [
+            64,
+            512,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            64,
+            128,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            64,
+            2880,
+            2880
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        }
+      ],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "exploratory-only",
+      "facts": {
+        "model_type": {
+          "value": "gpt_oss",
+          "json_pointer": "/model_type",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "hidden_size": {
+          "value": 2880,
+          "json_pointer": "/hidden_size",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "intermediate_size": {
+          "value": 2880,
+          "json_pointer": "/intermediate_size",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "num_hidden_layers": {
+          "value": 36,
+          "json_pointer": "/num_hidden_layers",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "num_attention_heads": {
+          "value": 64,
+          "json_pointer": "/num_attention_heads",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "num_key_value_heads": {
+          "value": 8,
+          "json_pointer": "/num_key_value_heads",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "head_dim": {
+          "value": 64,
+          "json_pointer": "/head_dim",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "num_local_experts": {
+          "value": 128,
+          "json_pointer": "/num_local_experts",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "num_experts_per_tok": {
+          "value": 4,
+          "json_pointer": "/num_experts_per_tok",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "vocab_size": {
+          "value": 201088,
+          "json_pointer": "/vocab_size",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "layer_types": {
+          "value": [
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "full_attention"
+          ],
+          "json_pointer": "/layer_types",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "sliding_window": {
+          "value": 128,
+          "json_pointer": "/sliding_window",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "hidden_act": {
+          "value": "silu",
+          "json_pointer": "/hidden_act",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "swiglu_limit": {
+          "value": 7.0,
+          "json_pointer": "/swiglu_limit",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        },
+        "rope_scaling": {
+          "value": {
+            "beta_fast": 32.0,
+            "beta_slow": 1.0,
+            "factor": 32.0,
+            "original_max_position_embeddings": 4096,
+            "rope_type": "yarn",
+            "truncate": false
+          },
+          "json_pointer": "/rope_scaling",
+          "source_sha256": "933aeb666a3fd851133ddd7686414f369bc564c4185fb5704416550879f10566"
+        }
+      },
+      "checkpoint_quantization": {
+        "modules_to_not_convert": [
+          "model.layers.*.self_attn",
+          "model.layers.*.mlp.router",
+          "model.embed_tokens",
+          "lm_head"
+        ],
+        "quant_method": "mxfp4"
+      },
+      "independent_original_config_crosscheck": {
+        "hidden_size": true,
+        "intermediate_size": true,
+        "num_hidden_layers": true,
+        "num_local_experts": true,
+        "num_attention_heads": true,
+        "num_key_value_heads": true,
+        "head_dim": true
+      },
+      "checkpoint_payload_bytes": 65248815744,
+      "selected_matrix_storage_lower_bound": {
+        "parameters": 114661785600,
+        "int8_bytes": 114661785600,
+        "fp8_bytes": 114661785600,
+        "bf16_bytes": 229323571200,
+        "formula": "layers * experts * (2*intermediate*hidden + hidden*intermediate)",
+        "implementation_evidence": "gpt-oss/gpt_oss/torch/model.py:275-301",
+        "excludes": "attention/normalization/biases/scales/embedding/vision/audio unless formula names them",
+        "int8_exceeds_physical_dram": true,
+        "native_checkpoint_dtype": null
+      },
+      "architecture_caveats": [
+        "These shape cases are not full-model captures or a certified quantization policy.",
+        "Native checkpoint MXFP4 must not be interpreted as Iris FP8. Unpack/dequantize/requantize needs an explicit checked software policy.",
+        "Actual expert loads/routing and sliding/full attention remain data-dependent."
+      ],
+      "memory_residency_qualified": false,
+      "status": "operator-shapes-only",
+      "required_nonmatmul_coverage": [
+        {
+          "operator": "embedding_gather",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "RMSNorm",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "rotary_position_embedding",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "masked_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "residual_add",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "silu",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "activation_product",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "quantize_dequantize",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "logits_argmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "router_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "topk",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_dispatch_compact",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_gather_weighted_combine",
+          "executed": false,
+          "compiler_qualified": false
+        }
+      ]
+    },
+    {
+      "model_id": "google/gemma-4-E4B-it",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/google--gemma-4-E4B-it/config.json",
+          "sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "url": "https://huggingface.co/google/gemma-4-E4B-it/resolve/4ecc2ba63bcac23ba4a767fc87025b1450f84c9c/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "4ecc2ba63bcac23ba4a767fc87025b1450f84c9c",
+      "operator_cases": [
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            1,
+            2048,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            1,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            1,
+            2560,
+            2048
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            1,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            1,
+            4096,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            1,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            1,
+            2560,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.v",
+          "shape_mnk": [
+            1,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            1,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            1,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            1,
+            2560,
+            10240
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.model_projection",
+          "shape_mnk": [
+            1,
+            10752,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.gate",
+          "shape_mnk": [
+            1,
+            256,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.output_projection",
+          "shape_mnk": [
+            1,
+            2560,
+            256
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            8,
+            2048,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            8,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            8,
+            2560,
+            2048
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            8,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            8,
+            4096,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            8,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            8,
+            2560,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.v",
+          "shape_mnk": [
+            8,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            8,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            8,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            8,
+            2560,
+            10240
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.model_projection",
+          "shape_mnk": [
+            8,
+            10752,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.gate",
+          "shape_mnk": [
+            8,
+            256,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.output_projection",
+          "shape_mnk": [
+            8,
+            2560,
+            256
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            32,
+            2048,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            32,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            32,
+            2560,
+            2048
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            32,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            32,
+            4096,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            32,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            32,
+            2560,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.v",
+          "shape_mnk": [
+            32,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            32,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            32,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            32,
+            2560,
+            10240
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.model_projection",
+          "shape_mnk": [
+            32,
+            10752,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.gate",
+          "shape_mnk": [
+            32,
+            256,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.output_projection",
+          "shape_mnk": [
+            32,
+            2560,
+            256
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            64,
+            2048,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            64,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            64,
+            2560,
+            2048
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            64,
+            512,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            64,
+            4096,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            64,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            64,
+            2560,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.v",
+          "shape_mnk": [
+            64,
+            1024,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            64,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            64,
+            10240,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            64,
+            2560,
+            10240
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.model_projection",
+          "shape_mnk": [
+            64,
+            10752,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.gate",
+          "shape_mnk": [
+            64,
+            256,
+            2560
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "ple.output_projection",
+          "shape_mnk": [
+            64,
+            2560,
+            256
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4",
+          "fit_eligible": true,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        }
+      ],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "primary-user-selected",
+      "facts": {
+        "model_type": {
+          "value": "gemma4_text",
+          "json_pointer": "/text_config/model_type",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "hidden_size": {
+          "value": 2560,
+          "json_pointer": "/text_config/hidden_size",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "intermediate_size": {
+          "value": 10240,
+          "json_pointer": "/text_config/intermediate_size",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_hidden_layers": {
+          "value": 42,
+          "json_pointer": "/text_config/num_hidden_layers",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_attention_heads": {
+          "value": 8,
+          "json_pointer": "/text_config/num_attention_heads",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_key_value_heads": {
+          "value": 2,
+          "json_pointer": "/text_config/num_key_value_heads",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "head_dim": {
+          "value": 256,
+          "json_pointer": "/text_config/head_dim",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "global_head_dim": {
+          "value": 512,
+          "json_pointer": "/text_config/global_head_dim",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_global_key_value_heads": {
+          "value": null,
+          "json_pointer": "/text_config/num_global_key_value_heads",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_experts": {
+          "value": null,
+          "json_pointer": "/text_config/num_experts",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "top_k_experts": {
+          "value": null,
+          "json_pointer": "/text_config/top_k_experts",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "hidden_size_per_layer_input": {
+          "value": 256,
+          "json_pointer": "/text_config/hidden_size_per_layer_input",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "vocab_size_per_layer_input": {
+          "value": 262144,
+          "json_pointer": "/text_config/vocab_size_per_layer_input",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "vocab_size": {
+          "value": 262144,
+          "json_pointer": "/text_config/vocab_size",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "num_kv_shared_layers": {
+          "value": 18,
+          "json_pointer": "/text_config/num_kv_shared_layers",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "layer_types": {
+          "value": [
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention"
+          ],
+          "json_pointer": "/text_config/layer_types",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "sliding_window": {
+          "value": 512,
+          "json_pointer": "/text_config/sliding_window",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "enable_moe_block": {
+          "value": false,
+          "json_pointer": "/text_config/enable_moe_block",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "attention_k_eq_v": {
+          "value": false,
+          "json_pointer": "/text_config/attention_k_eq_v",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "use_double_wide_mlp": {
+          "value": false,
+          "json_pointer": "/text_config/use_double_wide_mlp",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "hidden_activation": {
+          "value": "gelu_pytorch_tanh",
+          "json_pointer": "/text_config/hidden_activation",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        },
+        "rope_parameters": {
+          "value": {
+            "full_attention": {
+              "partial_rotary_factor": 0.25,
+              "rope_theta": 1000000.0,
+              "rope_type": "proportional"
+            },
+            "sliding_attention": {
+              "rope_theta": 10000.0,
+              "rope_type": "default"
+            }
+          },
+          "json_pointer": "/text_config/rope_parameters",
+          "source_sha256": "33b10c02df3c2e8536cf323d29d53262aaa2f4d11dbe19bc729373fbe90295d4"
+        }
+      },
+      "checkpoint_quantization": null,
+      "checkpoint_payload_bytes": null,
+      "selected_matrix_storage_lower_bound": {
+        "parameters": 6121586688,
+        "int8_bytes": 6121586688,
+        "fp8_bytes": 6121586688,
+        "bf16_bytes": 12243173376,
+        "formula": "layers * (2*hidden*intermediate + intermediate*hidden) + vocab_per_layer * layers * hidden_per_layer",
+        "implementation_evidence": "transformers/modeling_gemma4.py:1059-1074; modeling_gemma4.py:1571-1585",
+        "excludes": "attention/normalization/biases/scales/embedding/vision/audio unless formula names them",
+        "int8_exceeds_physical_dram": true,
+        "native_checkpoint_dtype": "bfloat16"
+      },
+      "architecture_caveats": [
+        "These shape cases are not full-model captures or a certified quantization policy.",
+        "Full attention has a different head width; KV reuse removes some k/v projections. The cases are role coverage, not per-layer execution counts.",
+        "KV allocation with shared full-length/sliding states needs actual runtime ownership accounting; no cache-fit claim follows from a naive layers*heads product."
+      ],
+      "memory_residency_qualified": false,
+      "status": "operator-shapes-only",
+      "required_nonmatmul_coverage": [
+        {
+          "operator": "embedding_gather",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "RMSNorm",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "rotary_position_embedding",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "masked_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "residual_add",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "gelu_pytorch_tanh",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "activation_product",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "quantize_dequantize",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "logits_argmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "per_layer_embedding_gather",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "per_layer_gate_and_residual",
+          "executed": false,
+          "compiler_qualified": false
+        }
+      ]
+    },
+    {
+      "model_id": "google/gemma-4-26B-A4B-it",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/google--gemma-4-26B-A4B-it/config.json",
+          "sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "url": "https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/4d7ae4984b7db7de8f8457170b3f1a419ee76d52/config.json"
+        },
+        "model.safetensors.index.json": {
+          "path": "workloads/sources/google--gemma-4-26B-A4B-it/model.safetensors.index.json",
+          "sha256": "907826a6e46ff454272bd6db1fee629d5531a2303be22986d825a0871d7dc7a7",
+          "url": "https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/4d7ae4984b7db7de8f8457170b3f1a419ee76d52/model.safetensors.index.json"
+        }
+      },
+      "unknowns": [],
+      "revision": "4d7ae4984b7db7de8f8457170b3f1a419ee76d52",
+      "operator_cases": [
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            1,
+            4096,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            1,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            1,
+            2816,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            1,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            1,
+            8192,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            1,
+            1024,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            1,
+            2816,
+            8192
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            1,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            1,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            1,
+            2816,
+            2112
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            1,
+            128,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            1,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            1,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            1,
+            2816,
+            704
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            8,
+            4096,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            8,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            8,
+            2816,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            8,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            8,
+            8192,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            8,
+            1024,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            8,
+            2816,
+            8192
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            8,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            8,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            8,
+            2816,
+            2112
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            8,
+            128,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            8,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            8,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            8,
+            2816,
+            704
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            32,
+            4096,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            32,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            32,
+            2816,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            32,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            32,
+            8192,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            32,
+            1024,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            32,
+            2816,
+            8192
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            32,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            32,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            32,
+            2816,
+            2112
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            32,
+            128,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            32,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            32,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            32,
+            2816,
+            704
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.q",
+          "shape_mnk": [
+            64,
+            4096,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.k",
+          "shape_mnk": [
+            64,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.o",
+          "shape_mnk": [
+            64,
+            2816,
+            4096
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "sliding_attention.v",
+          "shape_mnk": [
+            64,
+            2048,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.q",
+          "shape_mnk": [
+            64,
+            8192,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.k",
+          "shape_mnk": [
+            64,
+            1024,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "full_attention.o",
+          "shape_mnk": [
+            64,
+            2816,
+            8192
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            64,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            64,
+            2112,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            64,
+            2816,
+            2112
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "router",
+          "shape_mnk": [
+            64,
+            128,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.gate",
+          "shape_mnk": [
+            64,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.up",
+          "shape_mnk": [
+            64,
+            704,
+            2816
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        },
+        {
+          "role": "expert.down",
+          "shape_mnk": [
+            64,
+            2816,
+            704
+          ],
+          "dtype_policy": "unqualified W8A8 proposal",
+          "source_config_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3",
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "source-derived operator shape; no checkpoint values or measured shape frequencies"
+        }
+      ],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "exploratory-only",
+      "facts": {
+        "model_type": {
+          "value": "gemma4_text",
+          "json_pointer": "/text_config/model_type",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "hidden_size": {
+          "value": 2816,
+          "json_pointer": "/text_config/hidden_size",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "intermediate_size": {
+          "value": 2112,
+          "json_pointer": "/text_config/intermediate_size",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_hidden_layers": {
+          "value": 30,
+          "json_pointer": "/text_config/num_hidden_layers",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_attention_heads": {
+          "value": 16,
+          "json_pointer": "/text_config/num_attention_heads",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_key_value_heads": {
+          "value": 8,
+          "json_pointer": "/text_config/num_key_value_heads",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "head_dim": {
+          "value": 256,
+          "json_pointer": "/text_config/head_dim",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "global_head_dim": {
+          "value": 512,
+          "json_pointer": "/text_config/global_head_dim",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_global_key_value_heads": {
+          "value": 2,
+          "json_pointer": "/text_config/num_global_key_value_heads",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_experts": {
+          "value": 128,
+          "json_pointer": "/text_config/num_experts",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "top_k_experts": {
+          "value": 8,
+          "json_pointer": "/text_config/top_k_experts",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "moe_intermediate_size": {
+          "value": 704,
+          "json_pointer": "/text_config/moe_intermediate_size",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "hidden_size_per_layer_input": {
+          "value": 0,
+          "json_pointer": "/text_config/hidden_size_per_layer_input",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "vocab_size_per_layer_input": {
+          "value": 262144,
+          "json_pointer": "/text_config/vocab_size_per_layer_input",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "vocab_size": {
+          "value": 262144,
+          "json_pointer": "/text_config/vocab_size",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "num_kv_shared_layers": {
+          "value": 0,
+          "json_pointer": "/text_config/num_kv_shared_layers",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "layer_types": {
+          "value": [
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "sliding_attention",
+            "full_attention"
+          ],
+          "json_pointer": "/text_config/layer_types",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "sliding_window": {
+          "value": 1024,
+          "json_pointer": "/text_config/sliding_window",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "enable_moe_block": {
+          "value": true,
+          "json_pointer": "/text_config/enable_moe_block",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "attention_k_eq_v": {
+          "value": true,
+          "json_pointer": "/text_config/attention_k_eq_v",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "use_double_wide_mlp": {
+          "value": false,
+          "json_pointer": "/text_config/use_double_wide_mlp",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "hidden_activation": {
+          "value": "gelu_pytorch_tanh",
+          "json_pointer": "/text_config/hidden_activation",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        },
+        "rope_parameters": {
+          "value": {
+            "full_attention": {
+              "partial_rotary_factor": 0.25,
+              "rope_theta": 1000000.0,
+              "rope_type": "proportional"
+            },
+            "sliding_attention": {
+              "rope_theta": 10000.0,
+              "rope_type": "default"
+            }
+          },
+          "json_pointer": "/text_config/rope_parameters",
+          "source_sha256": "ed0c1eb3633de771906e9ba004a44cc5635bcc06ee2062077c3d2e88a50707d3"
+        }
+      },
+      "checkpoint_quantization": null,
+      "checkpoint_payload_bytes": 51611872412,
+      "selected_matrix_storage_lower_bound": {
+        "parameters": 22837985280,
+        "int8_bytes": 22837985280,
+        "fp8_bytes": 22837985280,
+        "bf16_bytes": 45675970560,
+        "formula": "layers * experts * (2*intermediate*hidden + hidden*intermediate)",
+        "implementation_evidence": "transformers/modeling_gemma4.py:1262-1273",
+        "excludes": "attention/normalization/biases/scales/embedding/vision/audio unless formula names them",
+        "int8_exceeds_physical_dram": true,
+        "native_checkpoint_dtype": "bfloat16"
+      },
+      "architecture_caveats": [
+        "These shape cases are not full-model captures or a certified quantization policy.",
+        "Full attention has a different head width; KV reuse removes some k/v projections. The cases are role coverage, not per-layer execution counts.",
+        "KV allocation with shared full-length/sliding states needs actual runtime ownership accounting; no cache-fit claim follows from a naive layers*heads product."
+      ],
+      "memory_residency_qualified": false,
+      "status": "operator-shapes-only",
+      "required_nonmatmul_coverage": [
+        {
+          "operator": "embedding_gather",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "RMSNorm",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "rotary_position_embedding",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "masked_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "residual_add",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "gelu_pytorch_tanh",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "activation_product",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "quantize_dequantize",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "logits_argmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "router_softmax",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "topk",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_dispatch_compact",
+          "executed": false,
+          "compiler_qualified": false
+        },
+        {
+          "operator": "expert_gather_weighted_combine",
+          "executed": false,
+          "compiler_qualified": false
+        }
+      ]
+    },
+    {
+      "model_id": "meta-llama/Llama-2-7b-hf",
+      "validation_only": false,
+      "weights_downloaded": false,
+      "files": {},
+      "unknowns": [
+        "config.json unavailable: HTTP Error 401: Unauthorized",
+        "model.safetensors.index.json unavailable: HTTP Error 401: Unauthorized"
+      ],
+      "revision": "01c7f73d771dfac7d292323805ebc428287df4f9",
+      "operator_cases": [
+        {
+          "role": "q",
+          "shape_mnk": [
+            1,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "k",
+          "shape_mnk": [
+            1,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "v",
+          "shape_mnk": [
+            1,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "o",
+          "shape_mnk": [
+            1,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            1,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            1,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            1,
+            4096,
+            11008
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "q",
+          "shape_mnk": [
+            8,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "k",
+          "shape_mnk": [
+            8,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "v",
+          "shape_mnk": [
+            8,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "o",
+          "shape_mnk": [
+            8,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            8,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            8,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            8,
+            4096,
+            11008
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "q",
+          "shape_mnk": [
+            32,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "k",
+          "shape_mnk": [
+            32,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "v",
+          "shape_mnk": [
+            32,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "o",
+          "shape_mnk": [
+            32,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            32,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            32,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            32,
+            4096,
+            11008
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "q",
+          "shape_mnk": [
+            64,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "k",
+          "shape_mnk": [
+            64,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "v",
+          "shape_mnk": [
+            64,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "o",
+          "shape_mnk": [
+            64,
+            4096,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.gate",
+          "shape_mnk": [
+            64,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.up",
+          "shape_mnk": [
+            64,
+            11008,
+            4096
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        },
+        {
+          "role": "mlp.down",
+          "shape_mnk": [
+            64,
+            4096,
+            11008
+          ],
+          "fit_eligible": false,
+          "executed": false,
+          "scope": "provisional reference-default shape, not exact checkpoint admission",
+          "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281"
+        }
+      ],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "primary-user-selected",
+      "status": "provisional-reference-defaults-exact-config-refused",
+      "provisional_reference_defaults": {
+        "hidden_size": 4096,
+        "layers": 32,
+        "heads": 32,
+        "head_dim": 128,
+        "intermediate_size": 11008,
+        "vocab_size": null,
+        "source_sha256": "b409ea3db2a4029afd4129246d3b5e76ea95b6503364842545403dbcd7476281",
+        "source_lines": [
+          [
+            20,
+            31
+          ],
+          [
+            200,
+            207
+          ],
+          [
+            330,
+            343
+          ],
+          [
+            376,
+            381
+          ]
+        ],
+        "scope": "User-authorized official Meta reference defaults; exact gated checkpoint config remains unknown"
+      }
+    },
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "validation_only": true,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/TinyLlama--TinyLlama-1.1B-Chat-v1.0/config.json",
+          "sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9",
+          "url": "https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/fe8a4ea1ffedaf415f4da2f062534de366a451e6/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "fe8a4ea1ffedaf415f4da2f062534de366a451e6",
+      "operator_cases": [],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "exploratory-only",
+      "facts": {
+        "model_type": {
+          "value": "llama",
+          "json_pointer": "/model_type",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "hidden_size": {
+          "value": 2048,
+          "json_pointer": "/hidden_size",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "intermediate_size": {
+          "value": 5632,
+          "json_pointer": "/intermediate_size",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "num_hidden_layers": {
+          "value": 22,
+          "json_pointer": "/num_hidden_layers",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "num_attention_heads": {
+          "value": 32,
+          "json_pointer": "/num_attention_heads",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "num_key_value_heads": {
+          "value": 4,
+          "json_pointer": "/num_key_value_heads",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "vocab_size": {
+          "value": 32000,
+          "json_pointer": "/vocab_size",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "hidden_act": {
+          "value": "silu",
+          "json_pointer": "/hidden_act",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        },
+        "rope_scaling": {
+          "value": null,
+          "json_pointer": "/rope_scaling",
+          "source_sha256": "486bedda3a6988332e60d9638a09ca4b260d34ebcf1b19e22cf3b140b63d8fe9"
+        }
+      },
+      "checkpoint_quantization": null,
+      "checkpoint_payload_bytes": null,
+      "status": "validation-only-no-corpus-derivation",
+      "memory_residency_qualified": false
+    },
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T",
+      "validation_only": true,
+      "weights_downloaded": false,
+      "files": {
+        "config.json": {
+          "path": "workloads/sources/TinyLlama--TinyLlama-1.1B-intermediate-step-1431k-3T/config.json",
+          "sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50",
+          "url": "https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T/resolve/59f6f375b26bde864a6ca194a9a3044570490064/config.json"
+        }
+      },
+      "unknowns": [
+        "model.safetensors.index.json unavailable: HTTP Error 404: Not Found"
+      ],
+      "revision": "59f6f375b26bde864a6ca194a9a3044570490064",
+      "operator_cases": [],
+      "model_execution_qualified": false,
+      "numeric_policy_qualified": false,
+      "selection": "primary-user-selected",
+      "facts": {
+        "model_type": {
+          "value": "llama",
+          "json_pointer": "/model_type",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "hidden_size": {
+          "value": 2048,
+          "json_pointer": "/hidden_size",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "intermediate_size": {
+          "value": 5632,
+          "json_pointer": "/intermediate_size",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "num_hidden_layers": {
+          "value": 22,
+          "json_pointer": "/num_hidden_layers",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "num_attention_heads": {
+          "value": 32,
+          "json_pointer": "/num_attention_heads",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "num_key_value_heads": {
+          "value": 4,
+          "json_pointer": "/num_key_value_heads",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "vocab_size": {
+          "value": 32000,
+          "json_pointer": "/vocab_size",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "hidden_act": {
+          "value": "silu",
+          "json_pointer": "/hidden_act",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        },
+        "rope_scaling": {
+          "value": null,
+          "json_pointer": "/rope_scaling",
+          "source_sha256": "7ef24df4204405995b8a3936355171b0d80f64fc3bc0ca5991158eaa5c75de50"
+        }
+      },
+      "checkpoint_quantization": null,
+      "checkpoint_payload_bytes": null,
+      "status": "validation-only-no-corpus-derivation",
+      "memory_residency_qualified": false
+    }
+  ],
+  "streaming_contract": {
+    "physical_dram_bytes": 4294967296,
+    "hardware_manifest_sha256": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+    "reserve_bytes_policy": 268435456,
+    "weight_panel_bytes_policy": 67108864,
+    "double_buffer_weight_panels": true,
+    "kv_bytes": null,
+    "serial_latency_cycles": null,
+    "bandwidth_bytes_per_cycle": null,
+    "fits_qualified": false,
+    "rules": [
+      "Count code/OS/stacks/heap/activations/KV/scales and both resident panels before admission.",
+      "Treat the 4GiB physical window separately from the Zephyr linked-image relocation limit.",
+      "Stream only requested weight/expert panels through an explicit bounded transport with completion/fence ownership.",
+      "Run CPU/RVV producer on hart2; VME tasks stay0/1 under explicit context setup. Benchmark competing CPU compute as a separate placement.",
+      "Do not simulate a tensor as silently backed RAM outside real mappings.",
+      "Report cold/miss/streaming paths separately; unknown transport latency/bandwidth prevents calibrated cycle estimates."
+    ]
+  },
+  "calibration_status": "unfitted; TinyLlama excluded from fitting and corpus derivation",
+  "full_model_execution_qualified": false
+}

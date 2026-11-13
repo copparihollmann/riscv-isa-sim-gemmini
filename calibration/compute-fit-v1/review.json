@@ -1,0 +1,106 @@
+{
+  "ELF_sha256": "694295b288d92e906b629ab553c1c7722a5720abe2bc0959be68fa5d72b00526",
+  "bss_bytes": 79680,
+  "cases": 456,
+  "compiled_table_identity_order_verified": true,
+  "corpus_sha256": "77e0ebfcd2ee74ee67bfd7ab101b4bb33ad63b08ea4154299446decd99454371",
+  "elf_sha256": "694295b288d92e906b629ab553c1c7722a5720abe2bc0959be68fa5d72b00526",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "hardware_contacted": false,
+  "independent_goldens_verified": true,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/benchmarks/calibration-corpus.json": "2b2a38126cbfebdf6e7e242c07bbdbc2b9c3579c111bef250592fb5b7c6719f9",
+    "/scratch/copparihollmann/iris-model/benchmarks/campaign_buffered/main_reordered.c": "307685150954194c6594c22f03626d712e9f871a0617da4e5c6b6289628166a4",
+    "/scratch/copparihollmann/iris-model/benchmarks/golden.py": "827d50d52f1c417e671f53f3f70408d6c7f5799f6456c07971119125081aa1dc",
+    "/scratch/copparihollmann/iris-model/benchmarks/memory_routes/cases.py": "0d254ad610d5b26208d49b244a73fd39f93268c921d34757266c7edb9b6bc356",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/cases.py": "bfcba12b24c27145ba1a669dd44b449899ec7ea87a0cf7b263fc81c927eab1f3",
+    "/scratch/copparihollmann/iris-model/build/campaign-buffered-priority-v2-final/corpus.json": "eedd67b79cb5489f2ad31763a99795b29c8ebd8ed621e8785443cb8867bd2c57",
+    "/scratch/copparihollmann/iris-model/build/campaign-buffered-priority-v2-final/distribution.c": "19729e3ba8bb18a3cbcb76f795e5f9f8ebcaaddd2688c37328660907b887a206",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/buffered_cases.inc": "7e6f12eb95ec65cb199df45f0650ba5416137dc197e70e31272390a1d3beb17c",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/build.json": "a97a062161b1d73cc9cfef3c7952935f39d8ba48fff4b5702deea5334dc147e8",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/campaign.elf": "694295b288d92e906b629ab553c1c7722a5720abe2bc0959be68fa5d72b00526",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/corpus.json": "77e0ebfcd2ee74ee67bfd7ab101b4bb33ad63b08ea4154299446decd99454371",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/distribution.c": "35b1b3753c3d1010fa5c68429bc42306a155cb9ec0fc10135e3524ab14e70e01",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/distribution_cases.inc": "c6ec9cb72cf7e2708ff1ec1338af4657535ce2ab8644e3be572da4ebca804084",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/main.c": "dbd7d66451480b73b420ec4431900a61457a523f930b6c8e3652a034faabd821",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/readback-layout.json": "3fe0a66684cda25b743d1cb3846b61dbc994b4251a4183773c30a4416755dc24",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/split.json": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd",
+    "/scratch/copparihollmann/iris-model/calibration/empirical-priority-v2/split.json": "63b0013d8a28e5d25537c83a3e19412c7567f77a0d5799860ca9207798527158",
+    "/scratch/copparihollmann/iris-model/timing/empirical_buffered_review.py": "d7296f098f1eec1f1297a6b7f42fd6088a707d6474d4ec27f00db081705744d2",
+    "/scratch/copparihollmann/iris-model/timing/empirical_compute_review_v1.py": "8ccd98faf4de352414b462c3ca611a41009a0b1022f05663cae3bcab4af2ecef",
+    "/scratch/copparihollmann/iris-model/timing/empirical_priority_review.py": "7321b8ebf2d0285a3e3072359360618f10fb1830594dc820939dbafe5916dcb7"
+  },
+  "kernel_preparation_window_source_equal": true,
+  "negative_controls": [
+    {
+      "name": "golden",
+      "rejected": true
+    },
+    {
+      "name": "reordered",
+      "rejected": true
+    },
+    {
+      "name": "boolean_trial",
+      "rejected": true
+    },
+    {
+      "name": "unknown_field",
+      "rejected": true
+    },
+    {
+      "name": "memory_case",
+      "rejected": true
+    },
+    {
+      "name": "wrong_dataset",
+      "rejected": true
+    },
+    {
+      "name": "split_partition",
+      "rejected": true
+    }
+  ],
+  "no_bulk_memory_cases": true,
+  "noinit_bytes": 10485760,
+  "noinit_pt_load_coverage": [
+    {
+      "file_bytes": 122312,
+      "memory_bytes": 10687808,
+      "virtual_address": 2147483648
+    }
+  ],
+  "noinit_scope": "Unreachable for admitted fixed kinds; NOLOAD/NOBITS does not itself promise unknown memory because FESVR may zero the PT_LOAD tail. CRT never clears these bytes.",
+  "noinit_start": 2147685696,
+  "noinit_symbols": [
+    [
+      2147685696,
+      2153977152,
+      "eviction"
+    ],
+    [
+      2153977152,
+      2155025728,
+      "shared_data"
+    ],
+    [
+      2155025728,
+      2158171456,
+      "data"
+    ]
+  ],
+  "noinit_unknown_reset_claimed": false,
+  "numeric_functional_execution_claimed": false,
+  "old_timing_labels_reused": false,
+  "pass": true,
+  "regions": 1008,
+  "schema": "iris.compute_fitting_independent_review.v1",
+  "semantic_parents": 152,
+  "split_partitions": {
+    "internal_validation": 29,
+    "train": 123
+  },
+  "split_sha256": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd",
+  "unused_access_proof": "All admitted immutable call-table kinds exclude memory/vme_memory. Unchanged prepare/kernel only reference data/shared_data/eviction in those branches; unrelated startup bulk fills are removed. This is a source/control-flow proof, not a runtime memory trace."
+}

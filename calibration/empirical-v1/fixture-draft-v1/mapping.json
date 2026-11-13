@@ -1,0 +1,739 @@
+{
+  "application_contract": "Residual costs only, plus scalar source scheduler; setup is per instruction, not per region; issue interval1 is explicit source fallback, not fitted.",
+  "fixture_sha256": "bfe2ec37448e793cd89c01b6594b68df0c223139efe54f76a6aa1c09fd78838a",
+  "full_2pct_certified": false,
+  "lines": 43,
+  "mapping": [
+    {
+      "cycles_per_work": 0.2640464638610702,
+      "family": "rvv.integer",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/integer",
+      "resource": "vector0",
+      "setup_cycles": 1.5728446143579442,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 3/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.17800102832488543,
+      "family": "rvv.fp16",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp16",
+      "resource": "vector0",
+      "setup_cycles": 2.0853822126425143,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 2/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "rvv.fp32",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp32",
+      "resource": "vector0",
+      "setup_cycles": 3.4528721362045114,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "rvv.fp64",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp64",
+      "resource": "vector0",
+      "setup_cycles": 3.403942402545958,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "scalar.fp64",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "scalar_fp/shuttle/e64",
+      "resource": "scalar_fp0",
+      "setup_cycles": 3.043996797742837,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "FADD dependent-chain only; does not qualify multiply/divide/sqrt."
+      ],
+      "work_definition": "one FP operation"
+    },
+    {
+      "cycles_per_work": 0.1630869726738007,
+      "family": "vme.int8",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/int8",
+      "resource": "vme0",
+      "setup_cycles": 5.82529516518451,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "32x32 calibration shape only; other shapes uncalibrated.",
+        "Physical MAC pipeline interval not identified."
+      ],
+      "work_definition": "ceil(tm/16)*ceil(tn/16)*tk"
+    },
+    {
+      "cycles_per_work": 0.34471860364146034,
+      "family": "vme.fp8",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/fp8",
+      "resource": "vme0",
+      "setup_cycles": 9.244109378288753e-17,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "32x32 calibration shape only; other shapes uncalibrated.",
+        "Physical MAC pipeline interval not identified."
+      ],
+      "work_definition": "ceil(tm/16)*ceil(tn/16)*tk"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "vme.zero",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/tile_zero",
+      "resource": "vme0",
+      "setup_cycles": 2.1885647363346576,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Zero/move residual only; full tile semantics remain functional."
+      ],
+      "work_definition": "one tile operation"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/local_tcm/chase",
+      "resource": "memory_local_tcm",
+      "setup_cycles": 8.64883053101443,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/local_tcm/write",
+      "resource": "memory_local_tcm",
+      "setup_cycles": 6.6920033322027175,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/remote_tcm/chase",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 31.549345945590158,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/remote_tcm/write",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 30.699055308847015,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/scratchpad/chase",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 24.788432811054804,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/scratchpad/write",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 21.075440952995596,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.load",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/dram/chase",
+      "resource": "memory_dram",
+      "setup_cycles": 2.6462050562292063,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.store",
+      "hart": 0,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/dram/write",
+      "resource": "memory_dram",
+      "setup_cycles": 0.8626398234012906,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.2640464638610702,
+      "family": "rvv.integer",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/integer",
+      "resource": "vector1",
+      "setup_cycles": 1.5728446143579442,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 3/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.17800102832488543,
+      "family": "rvv.fp16",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp16",
+      "resource": "vector1",
+      "setup_cycles": 2.0853822126425143,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 2/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "rvv.fp32",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp32",
+      "resource": "vector1",
+      "setup_cycles": 3.4528721362045114,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "rvv.fp64",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/shuttle/fp64",
+      "resource": "vector1",
+      "setup_cycles": 3.403942402545958,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "scalar.fp64",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "scalar_fp/shuttle/e64",
+      "resource": "scalar_fp1",
+      "setup_cycles": 3.043996797742837,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "FADD dependent-chain only; does not qualify multiply/divide/sqrt."
+      ],
+      "work_definition": "one FP operation"
+    },
+    {
+      "cycles_per_work": 0.1630869726738007,
+      "family": "vme.int8",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/int8",
+      "resource": "vme1",
+      "setup_cycles": 5.82529516518451,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "32x32 calibration shape only; other shapes uncalibrated.",
+        "Physical MAC pipeline interval not identified."
+      ],
+      "work_definition": "ceil(tm/16)*ceil(tn/16)*tk"
+    },
+    {
+      "cycles_per_work": 0.34471860364146034,
+      "family": "vme.fp8",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/fp8",
+      "resource": "vme1",
+      "setup_cycles": 9.244109378288753e-17,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "32x32 calibration shape only; other shapes uncalibrated.",
+        "Physical MAC pipeline interval not identified."
+      ],
+      "work_definition": "ceil(tm/16)*ceil(tn/16)*tk"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "vme.zero",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vme/tile_zero",
+      "resource": "vme1",
+      "setup_cycles": 2.1885647363346576,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Zero/move residual only; full tile semantics remain functional."
+      ],
+      "work_definition": "one tile operation"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/local_tcm/chase",
+      "resource": "memory_local_tcm",
+      "setup_cycles": 8.64883053101443,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/local_tcm/write",
+      "resource": "memory_local_tcm",
+      "setup_cycles": 6.6920033322027175,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/remote_tcm/chase",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 31.549345945590158,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/remote_tcm/write",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 30.699055308847015,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/scratchpad/chase",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 24.788432811054804,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/scratchpad/write",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 21.075440952995596,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.load",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/dram/chase",
+      "resource": "memory_dram",
+      "setup_cycles": 2.6462050562292063,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.store",
+      "hart": 1,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/shuttle/dram/write",
+      "resource": "memory_dram",
+      "setup_cycles": 0.8626398234012906,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.08780292111132361,
+      "family": "rvv.integer",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/rocket/integer",
+      "resource": "vector2",
+      "setup_cycles": 0.05550866283381522,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 3/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 6.78124998346598,
+      "family": "rvv.fp16",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/rocket/fp16",
+      "resource": "vector2",
+      "setup_cycles": 13.468750026317881,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 2/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 4.015778931928641,
+      "family": "rvv.fp32",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/rocket/fp32",
+      "resource": "vector2",
+      "setup_cycles": 1.8768156398809834,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.1249999707072734,
+      "family": "rvv.fp64",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "vector/rocket/fp64",
+      "resource": "vector2",
+      "setup_cycles": 1.7500000464099572,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "Adds residual to scalar scheduling; does not replace scalar pipeline.",
+        "Dependent residual conservatively charged to each op; raw dependency-aware refinement pending.",
+        "Rank 4/5; drain_bytes and ROI intercept not charged per op."
+      ],
+      "work_definition": "ceil(VL*SEW/DLEN)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "scalar.fp64",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "scalar_fp/rocket/e64",
+      "resource": "scalar_fp2",
+      "setup_cycles": 0.7291666660148438,
+      "status": "PROXY_RESIDUAL",
+      "unknowns": [
+        "FADD dependent-chain only; does not qualify multiply/divide/sqrt."
+      ],
+      "work_definition": "one FP operation"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/remote_tcm/chase",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 28.190169518010258,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/remote_tcm/write",
+      "resource": "memory_remote_tcm",
+      "setup_cycles": 24.87324007478667,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/scratchpad/chase",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 32.01394361483572,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/scratchpad/write",
+      "resource": "memory_scratchpad",
+      "setup_cycles": 29.802295765157425,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.load",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/dram/chase",
+      "resource": "memory_dram",
+      "setup_cycles": 0.09174576806147036,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    },
+    {
+      "cycles_per_work": 0.0,
+      "family": "memory.DRAM.store",
+      "hart": 2,
+      "issue_interval_cycles": 1,
+      "issue_interval_status": "explicit_source_fallback_not_fitted",
+      "parameter_model": "memory/rocket/dram/write",
+      "resource": "memory_dram",
+      "setup_cycles": 0.0,
+      "status": "WARM_PROXY_RESIDUAL",
+      "unknowns": [
+        "64-bit scalar accesses only.",
+        "Contention coefficients remain explicit in parameter JSON, not charged by active mask here.",
+        "DRAM is warm effective cached path; separate runtime-tag miss service required."
+      ],
+      "work_definition": "bytes (slope0; setup per actual request)"
+    }
+  ],
+  "native_binding_qualified": false,
+  "parameters_sha256": "6b161126f1967b879e329e638087f610870dd16a4d0f07c436b0a695e6fce246",
+  "schema": "iris.empirical_fixture_mapping.v1",
+  "source_image_association_verified": false,
+  "source_sha256": "ddd4fae99cae20b401fa0f0f1bc4a49d7792f7050c2e0932160a6ba32e6dd95b",
+  "unsupported": [
+    "scalar FP16 latency rankdeficient",
+    "scalarFP32 no trainingexamples",
+    "branchmiss penalty",
+    "VME rowmovesunidentified",
+    "atomic/LRSC/IRQ/sync",
+    "coldcachemiss service",
+    "independent contention scheduler"
+  ]
+}

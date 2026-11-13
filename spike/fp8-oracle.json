@@ -1,0 +1,18 @@
+{
+  "oracle": "integer-only FP8 decode and exact fused integer sum rounded to binary32 per K",
+  "seed": 1230129491,
+  "cases": 10260,
+  "formats": [
+    "E4M3",
+    "E5M2"
+  ],
+  "rounding_modes": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "header_sha256": "105d4211a820bd4efd4a712647c61050955734e8d73eb077cfc4f7c74a170bd4",
+  "rtl_executed": false
+}

@@ -1,0 +1,344 @@
+{
+  "schema_version": 2,
+  "purpose": "functional synchronization placement; no timing calibration",
+  "cases": [
+    {
+      "case_id": "distribution.lrsc.mask1",
+      "mask": 1,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 64
+    },
+    {
+      "case_id": "distribution.lrsc.mask2",
+      "mask": 2,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 64
+    },
+    {
+      "case_id": "distribution.lrsc.mask4",
+      "mask": 4,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 64
+    },
+    {
+      "case_id": "distribution.lrsc.mask3",
+      "mask": 3,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 128
+    },
+    {
+      "case_id": "distribution.lrsc.mask5",
+      "mask": 5,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 128
+    },
+    {
+      "case_id": "distribution.lrsc.mask6",
+      "mask": 6,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 128
+    },
+    {
+      "case_id": "distribution.lrsc.mask7",
+      "mask": 7,
+      "kind": "lrsc",
+      "iterations": 64,
+      "expected_checksums": [
+        64,
+        64,
+        64
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 192
+    },
+    {
+      "case_id": "distribution.ipi.mask1",
+      "mask": 1,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask2",
+      "mask": 2,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask4",
+      "mask": 4,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask3",
+      "mask": 3,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask5",
+      "mask": 5,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask6",
+      "mask": 6,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.ipi.mask7",
+      "mask": 7,
+      "kind": "ipi",
+      "iterations": 8,
+      "expected_checksums": [
+        8,
+        8,
+        8
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask1",
+      "mask": 1,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask2",
+      "mask": 2,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask4",
+      "mask": 4,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask3",
+      "mask": 3,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask5",
+      "mask": 5,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask6",
+      "mask": 6,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.fence_messages.mask7",
+      "mask": 7,
+      "kind": "fence_messages",
+      "iterations": 16,
+      "expected_checksums": [
+        136,
+        136,
+        136
+      ],
+      "region": "kernel",
+      "status": "ready"
+    },
+    {
+      "case_id": "distribution.lrsc_invalidated.mask3",
+      "mask": 3,
+      "kind": "lrsc_invalidated",
+      "iterations": 1,
+      "expected_checksums": [
+        1,
+        1,
+        1
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 7
+    },
+    {
+      "case_id": "distribution.lrsc_invalidated.mask5",
+      "mask": 5,
+      "kind": "lrsc_invalidated",
+      "iterations": 1,
+      "expected_checksums": [
+        1,
+        1,
+        1
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 7
+    },
+    {
+      "case_id": "distribution.lrsc_invalidated.mask6",
+      "mask": 6,
+      "kind": "lrsc_invalidated",
+      "iterations": 1,
+      "expected_checksums": [
+        1,
+        1,
+        1
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 7
+    },
+    {
+      "case_id": "distribution.lrsc_invalidated.mask7",
+      "mask": 7,
+      "kind": "lrsc_invalidated",
+      "iterations": 1,
+      "expected_checksums": [
+        1,
+        1,
+        1
+      ],
+      "region": "kernel",
+      "status": "ready",
+      "shared_counter_golden": 7
+    }
+  ],
+  "expected_region_count": 45,
+  "timing_certified": false
+}

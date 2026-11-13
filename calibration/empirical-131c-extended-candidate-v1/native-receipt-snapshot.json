@@ -1,0 +1,34 @@
+{
+  "schema": "iris.empirical_training_native_replay.v1",
+  "status": "running",
+  "argv": [
+    "/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/spike",
+    "--iris-vme",
+    "--isa=rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "--hart-isa=0:rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=1:rv64gcv_zfh_zvfh_zba_zbb_zbs_zvbb_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=2:rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "-p3",
+    "-m0x70000000:0x40000,0x80000000:0x100000000,0x580000000:0x20000",
+    "--extlib=/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/libsifive_uart.so",
+    "--device=sifive_uart,0x10020000",
+    "--iris-bootrom=/scratch/copparihollmann/iris-model/board/evidence/bootrom.rv64.img",
+    "--dtb=/scratch/copparihollmann/iris-model/board/build/iris.dtb",
+    "--iris-timing-fixture=/scratch/copparihollmann/iris-model/build/empirical-training-corrected-pilot-v1/fast.fixture",
+    "--iris-timing-trace=/scratch/copparihollmann/iris-model/build/empirical-training-corrected-pilot-v1/summary.json",
+    "/scratch/copparihollmann/iris-model/build/campaign-fit-v1/campaign.elf"
+  ],
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/spike": "131c604e835ee10b4b93c912daa0f09e7f3c2724128e7c67e3599e7f3343b4c7",
+    "/scratch/copparihollmann/iris-model/build/campaign-fit-v1/campaign.elf": "9d6f692c98d955276e0ac7d941afefa3551a240f2f8ce39cd2a6f1ab57f44942",
+    "/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/libsifive_uart.so": "92f6168dadd84d18628e04281abd83d134efe022a3db2aae331673b0be6c5b03",
+    "/scratch/copparihollmann/iris-model/board/evidence/bootrom.rv64.img": "5f6ae520d6612da2b31c2ee70bc872b743a77bbde0abba87bf96aa5fc249a216",
+    "/scratch/copparihollmann/iris-model/board/build/iris.dtb": "622c099a1dbcc87473d0760b1ec5b366c296d964aec834722d3c5ba0e4a95c78",
+    "/scratch/copparihollmann/iris-model/build/empirical-training-corrected-pilot-v1/fast.fixture": "bd42d3f233e2d14e8cadc085a145be18546805e55fab2c8c4b6c2b05c826024c"
+  },
+  "hardware_contacted": false,
+  "global_heldout_timings_consumed": false,
+  "feature_path": "/scratch/copparihollmann/iris-model/build/empirical-training-corrected-pilot-v1/features.jsonl",
+  "start_time_unix": 1793990106.0013967,
+  "pid": 38
+}

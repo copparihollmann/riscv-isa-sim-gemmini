@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "status": "source_verified_readonly_probe_candidate",
+  "sources": {
+    "LatencyBandwidthPipe.scala": {
+      "snapshot": "fased-read-evidence/LatencyBandwidthPipe.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/models/dram/LatencyBandwidthPipe.scala",
+      "sha256": "cfd38e9299b05ff3f2b74b8dbb00b86a89b5770eb26e9ae4dcd02d94243d9779",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "FASEDMemoryTimingModel.scala": {
+      "snapshot": "fased-read-evidence/FASEDMemoryTimingModel.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/models/dram/FASEDMemoryTimingModel.scala",
+      "sha256": "1591471d74974876ee1502ed20b1fa72ec92c4a6bd68e5b2f73dac0108cfe0ce",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "Widget.scala": {
+      "snapshot": "fased-read-evidence/Widget.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/widgets/Widget.scala",
+      "sha256": "bcab9a853a0ceff1ecae0286cf0d008d6ecd5ede3e44c7e841b0d3f31998d40e",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "Lib.scala": {
+      "snapshot": "fased-read-evidence/Lib.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/widgets/Lib.scala",
+      "sha256": "1dd150874a1c3498041f20c5763ad9423d0f4c20063732ac1ef2081f658dc541",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "address_map.h": {
+      "snapshot": "fased-read-evidence/address_map.h",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/core/address_map.h",
+      "sha256": "e535eef63630b5a52959d4e39d1fe93a5ebd2980d1a9b01685f4dbb5b5122d3f",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "fased_memory_timing_model.cc": {
+      "snapshot": "fased-read-evidence/fased_memory_timing_model.cc",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/bridges/fased_memory_timing_model.cc",
+      "sha256": "c28ef97ffd3dce155efb0d859194bf283bdc2e12ab0bfa41f11ab2cd0cc83ead",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "simif_corigine_mimicturbo_gt.cc": {
+      "snapshot": "fased-read-evidence/simif_corigine_mimicturbo_gt.cc",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/simif_corigine_mimicturbo_gt.cc",
+      "sha256": "56e8038d87b9a4c46ddb3c06fb2304be4932a7d91d3062bd78dc78270915a2a3",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "FireSim-generated.const.h": {
+      "snapshot": "fased-read-evidence/FireSim-generated.const.h",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/generated-src/corigine_mimicturbo_gt/corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/FireSim-generated.const.h",
+      "sha256": "89344115e3310113fa743169e4c47dc5d200a3f4585e23bf5a5b2fbc73cdfa51",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "master.cc": {
+      "snapshot": "fased-read-evidence/master.cc",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/bridges/master.cc",
+      "sha256": "8a3b8efa0dc7da120c7ce0c5df5fa51d2443802b354a7489a66d45ce6c7e53b2",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    }
+  },
+  "facts": {
+    "absolute_addresses": {
+      "value": {
+        "writeLatency": 0,
+        "readLatency": 4
+      },
+      "evidence": [
+        {
+          "source": "FireSim-generated.const.h",
+          "lines": [
+            141,
+            173
+          ]
+        },
+        {
+          "source": "Lib.scala",
+          "lines": [
+            244,
+            260
+          ]
+        },
+        {
+          "source": "address_map.h",
+          "lines": [
+            24,
+            36
+          ]
+        }
+      ]
+    },
+    "register_width": {
+      "value": 32,
+      "evidence": [
+        {
+          "source": "LatencyBandwidthPipe.scala",
+          "lines": [
+            19,
+            25
+          ]
+        },
+        {
+          "source": "Widget.scala",
+          "lines": [
+            38,
+            39
+          ]
+        }
+      ]
+    },
+    "plain_read_without_state_change": {
+      "value": "Input field attaches to a ReadWrite RegisterEntry; MCR read exposes reg.node and state assignment occurs only on write.valid",
+      "evidence": [
+        {
+          "source": "FASEDMemoryTimingModel.scala",
+          "lines": [
+            584,
+            585
+          ]
+        },
+        {
+          "source": "Widget.scala",
+          "lines": [
+            77,
+            105
+          ]
+        },
+        {
+          "source": "Widget.scala",
+          "lines": [
+            120,
+            137
+          ]
+        },
+        {
+          "source": "Lib.scala",
+          "lines": [
+            281,
+            297
+          ]
+        }
+      ]
+    },
+    "driver_mmio_mapping": {
+      "value": "driver maps /dev/xdmaN_user BAR0 and casts offset to uint32_t pointer; MMIO read is a plain dereference",
+      "evidence": [
+        {
+          "source": "simif_corigine_mimicturbo_gt.cc",
+          "lines": [
+            164,
+            183
+          ]
+        },
+        {
+          "source": "simif_corigine_mimicturbo_gt.cc",
+          "lines": [
+            277,
+            285
+          ]
+        }
+      ]
+    },
+    "default_is_not_observed_value": {
+      "value": {
+        "source_reset_default": 30,
+        "actual_writeLatency": null,
+        "actual_readLatency": null,
+        "units": "FASED memory-model target-clock cycles"
+      },
+      "evidence": [
+        {
+          "source": "LatencyBandwidthPipe.scala",
+          "lines": [
+            19,
+            25
+          ]
+        },
+        {
+          "source": "LatencyBandwidthPipe.scala",
+          "lines": [
+            56,
+            81
+          ]
+        }
+      ]
+    },
+    "values_persist_without_explicit_user_configuration": {
+      "value": "driver init only writes explicit user configuration keys; no supplied configuration leaves hardware register values unchanged",
+      "evidence": [
+        {
+          "source": "fased_memory_timing_model.cc",
+          "lines": [
+            142,
+            185
+          ]
+        }
+      ]
+    },
+    "presence_guard": {
+      "value": {
+        "byte_offset": 356,
+        "expected": 1181315685,
+        "before_parameter_access": true,
+        "after_parameter_sampling": true,
+        "invalid_result": "fail with selected_parameters null, without reporting timing values"
+      },
+      "evidence": [
+        {
+          "source": "FireSim-generated.const.h",
+          "lines": [
+            15,
+            21
+          ]
+        },
+        {
+          "source": "master.cc",
+          "lines": [
+            19,
+            23
+          ]
+        }
+      ]
+    }
+  },
+  "device": "/dev/xdma0_user",
+  "bdf": "0000:01:00.0",
+  "open_flags": "O_RDONLY|O_SYNC",
+  "mapping": "PROT_READ|MAP_SHARED, one host page at offset0",
+  "accesses": "source presence32 at356; only if valid read32 offsets0,4,0,4; then revalidate presence356; reject instability and all-ones samples",
+  "hardware_writes": false,
+  "hardware_read_performed_by_this_agent": false,
+  "byte_order": "little",
+  "candidate_source_sha256": "4990a9d4db717fc2b1cb30aa14b0f2b8653f30f9c58f93e9d164aae0f89b59e9",
+  "candidate_binary_sha256": "0becce9fa23ffe402395ded77d3c761a83a0117095bd49e9d8a07028d38bf780",
+  "candidate_argv": [
+    "./readonly-fased-latency",
+    "--read-idle-device",
+    "/dev/xdma0_user"
+  ],
+  "fixture_test": {
+    "path": "build/fased-readonly-tests/results.json",
+    "sha256": "0dfc84703aa56cd2c6ef3c3a7c8787f3b86b097d2969f9fe3972cae8215df2bf",
+    "pass": true,
+    "tests": 4,
+    "hardware_test": false
+  },
+  "execution_owner": "root agent only, after confirming idle exclusive allocation and holding its hardware lock",
+  "limits": [
+    "No hardware access or runtime parameter reading was performed by this audit agent.",
+    "Generic FireSim presence and matching driver do not prove exact loaded image identity.",
+    "Addresses0and4 are not latency values. Source default30 is not a measurement.",
+    "Read values are memory-model parameters, not complete SoC memory latency or CPU cycles.",
+    "Source/build association and empirical latency calibration remain separate gates.",
+    "An all-ones response is ambiguous/unusable even if a presence check briefly succeeds; it is rejected as selected timing."
+  ],
+  "actual_runtime_parameters": {
+    "readLatency": null,
+    "writeLatency": null,
+    "status": "no_valid_runtime_observation",
+    "reason": "Root-owned hardware inspection after failed third smoke observed all-ones presence and parameter MMIO; those responses are not timing parameters."
+  },
+  "invalid_bus_evidence": {
+    "path": "runs/fpga-smoke-access-enabled-001/reuse-check.json",
+    "sha256": "fa7aeb00d2b95a3a0b448ca9baa138bb1fa994fe5ccfa6d26f1c599599da0398"
+  }
+}

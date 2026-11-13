@@ -1,0 +1,16 @@
+--- a/board/iris_uart.hpp
++++ b/board/iris_uart.hpp
+@@ -134,6 +134,13 @@
+     }
+   }
+ 
++  // Read-only scheduler query; original register/state behavior is unchanged.
++  std::optional<uint64_t> next_tx_event_cycles() const {
++    if (!tx_busy()) return tx_enable_ && tx_.count ? std::optional<uint64_t>(1) : std::nullopt;
++    return uint64_t(tx_prescaler_) + 1 +
++      uint64_t(tx_bits_remaining_ - 1) * (uint64_t(divisor_) + 1);
++  }
++
+   // RX decoding/sampling is intentionally separate. A frame that started
+   // while enabled may finish after rxen clears, as in the source state machine.
+   bool begin_rx_frame() {

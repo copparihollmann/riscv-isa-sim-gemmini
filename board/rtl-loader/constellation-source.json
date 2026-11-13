@@ -1,0 +1,33 @@
+{
+  "repository": "/scratch/eygao/iris-cy/generators/constellation",
+  "commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+  "tracked_modified": false,
+  "read_only_git_commands": [
+    [
+      "git",
+      "-c",
+      "safe.directory=/scratch/eygao/iris-cy/generators/constellation",
+      "-C",
+      "/scratch/eygao/iris-cy/generators/constellation",
+      "rev-parse",
+      "HEAD"
+    ],
+    [
+      "git",
+      "-c",
+      "safe.directory=/scratch/eygao/iris-cy/generators/constellation",
+      "-C",
+      "/scratch/eygao/iris-cy/generators/constellation",
+      "status",
+      "--short"
+    ]
+  ],
+  "source_sha256": {
+    "router/InputUnit.scala": "80e95480cbc602f9366692b3b623a7d080d028a5a483fcb40d563d1cedb96855",
+    "router/OutputUnit.scala": "a6bed1150cc4024adb1bf0c8ca61eda53f6b72fe393511cfeaf20347f708d7c7",
+    "router/EgressUnit.scala": "a050d158ea8a77edae3c9663cdc53bb8e3931f332e5ccab30a6d497f8b25a0b9",
+    "router/vcalloc/SingleVCAllocator.scala": "5febddb9050000e7d17e2cbbf0902695ae8e3ac0ab4d7d2fc7cc42165e52499f",
+    "router/vcalloc/ISLIP.scala": "7de2de395f13a9b9a70e7a202c21b3424a32449e6749389ec01b42fea48a9ec9"
+  },
+  "deployed_image_association_verified": false
+}

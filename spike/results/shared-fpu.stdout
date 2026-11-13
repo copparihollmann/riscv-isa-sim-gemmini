@@ -1,0 +1,1 @@
+PASSED SHARED_FPU h2 21000 operations 1200 reductions 45 forms FP16/FP32/FP64; h0/h1 concurrent source flags

@@ -1,0 +1,207 @@
+{
+  "module": "FPUDecoder_4",
+  "module_first_line": 2330945,
+  "module_lines": 2627,
+  "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+  "snapshot_sha256": "9c651c4f6eb1d21e7cdbc453171ccf7c6f04052e2cafb756bc9683a957e19b33",
+  "wflags_pla_terms": [
+    {
+      "mask": "0x73",
+      "value": "0x43"
+    },
+    {
+      "mask": "0x7bf0007f",
+      "value": "0x40100053"
+    },
+    {
+      "mask": "0x7df0007f",
+      "value": "0x40200053"
+    },
+    {
+      "mask": "0x7fd0007f",
+      "value": "0x42000053"
+    },
+    {
+      "mask": "0x7fe0007f",
+      "value": "0x44000053"
+    },
+    {
+      "mask": "0xe200007f",
+      "value": "0x53"
+    },
+    {
+      "mask": "0xe400007f",
+      "value": "0x53"
+    },
+    {
+      "mask": "0xebc0007f",
+      "value": "0xc0000053"
+    },
+    {
+      "mask": "0xedc0007f",
+      "value": "0xc0000053"
+    },
+    {
+      "mask": "0xfa00507f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfa00607f",
+      "value": "0x28000053"
+    },
+    {
+      "mask": "0xfa00607f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfbf0007f",
+      "value": "0x58000053"
+    },
+    {
+      "mask": "0xfc00507f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfc00607f",
+      "value": "0x28000053"
+    },
+    {
+      "mask": "0xfc00607f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfdf0007f",
+      "value": "0x58000053"
+    }
+  ],
+  "cases": [
+    {
+      "instruction": "vfadd.vf",
+      "match": "0x5057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfsub.vf",
+      "match": "0x8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfrsub.vf",
+      "match": "0x9c005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmul.vf",
+      "match": "0x90005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmacc.vf",
+      "match": "0xb0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfnmacc.vf",
+      "match": "0xb4005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmsac.vf",
+      "match": "0xb8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfnmsac.vf",
+      "match": "0xbc005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmadd.vf",
+      "match": "0xa0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfnmadd.vf",
+      "match": "0xa4005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmsub.vf",
+      "match": "0xa8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfnmsub.vf",
+      "match": "0xac005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwadd.vf",
+      "match": "0xc0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwsub.vf",
+      "match": "0xc8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwadd.wf",
+      "match": "0xd0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwsub.wf",
+      "match": "0xd8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwmul.vf",
+      "match": "0xe0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwmacc.vf",
+      "match": "0xf0005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwnmacc.vf",
+      "match": "0xf4005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwmsac.vf",
+      "match": "0xf8005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfwnmsac.vf",
+      "match": "0xfc005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    }
+  ],
+  "source_image_association_verified": false,
+  "rtl_executed": false
+}

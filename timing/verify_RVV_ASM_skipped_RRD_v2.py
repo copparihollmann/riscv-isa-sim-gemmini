@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import hashlib,json
+R=Path(__file__).resolve().parents[1];P=R/'build/RVV-ASM-C12-six-TRAIN-attribution-v1';O=R/'build/RVV-ASM-C12-skipped-RRD-proof-v2';O.mkdir();sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();parent=json.loads((P/'report.json').read_text());assert parent['pass']is True;out=[];inputs={str(P/'report.json'):sha(P/'report.json')}
+for row in parent['rows']:
+ p=P/f"case{row['index']}.cpu.jsonl";xs=[json.loads(x)for x in p.read_text().splitlines()];inputs[str(p)]=sha(p);joins=[]
+ for gap in row['skipped_eligible_RRD_edges']:
+  evidence=[x for x in xs if x['event']=='rrd_reject'and x['cycle']==gap['from_cycle']and x['pc']==gap['frontier_PC']and x.get('reason')=='whole_async_owner'];assert len(evidence)==1;reject=evidence[0];assert reject['raw']&0xfc00707f==0x57,'Exact original VADD.vv candidate';assert gap['lost_eligible_cycles']==1 and gap['existing_predicate_first_RRD']==gap['head_end']-1 and gap['actual_next_VADD_RRD']==gap['head_end'];joins.append({'scheduler_jump':gap,'same_edge_actual_candidate_rejection':reject})
+ assert len(joins)==(row['N']-1 if row['LMUL']==8 else 0);out.append({'case_id':row['case_id'],'LMUL':row['LMUL'],'N':row['N'],'qualified_lost_RRD_edges':len(joins),'evidence':joins})
+r={'schema':'iris.RVV_ASM_C12_skipped_RRD_proof.v1','pass':True,'rows':out,'mechanism':'Actual ready instruction has already passed fetch/candidate admission; only whole-async-owner rejects at lastWB. Existing admission predicate permits nextRRD at backend.end-1, but scheduler selects end with no interveningevent. No changed vector duration or fitted cost is needed to visit the already-permitted edge.','scheduler_rule_not_implemented_here':True,'hardware_labels_read':False,'parameters_fitted':False,'source_timing_certified':False,'input_sha256':inputs};(O/'report.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({'pass':True,'qualified_skips':sum(x['qualified_lost_RRD_edges']for x in out),'sha256':sha(O/'report.json')}))

@@ -1,0 +1,31 @@
+{
+  "report": "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-7de-sweep-v1/read32-miss16/evaluation/report.json",
+  "overall": {
+    "train": {
+      "regions": 816,
+      "signed_mean_pct": 2.8254223169907986,
+      "signed_median_pct": -2.844870243443583,
+      "absolute_median_pct": 9.071316614420063,
+      "absolute_p90_pct": 48.907921114416126,
+      "absolute_max_pct": 114.4927536231884,
+      "within_2pct_count": 147,
+      "within_2pct_fraction": 0.1801470588235294
+    },
+    "internal_validation": {
+      "regions": 192,
+      "signed_mean_pct": -2.682334077600855,
+      "signed_median_pct": -4.166666666666667,
+      "absolute_median_pct": 9.868411409091005,
+      "absolute_p90_pct": 39.01611054075972,
+      "absolute_max_pct": 109.12319644839067,
+      "within_2pct_count": 27,
+      "within_2pct_fraction": 0.140625
+    }
+  },
+  "train_objective": {
+    "name": "mean_squared_relative_error_of_parent_hart_trial_medians",
+    "value": 0.019030834744574125,
+    "training_parent_hart_groups": 225,
+    "selection_uses_internal_validation": false
+  }
+}

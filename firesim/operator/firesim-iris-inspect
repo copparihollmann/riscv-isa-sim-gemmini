@@ -1,0 +1,294 @@
+#!/usr/bin/env -S /usr/bin/python3 -I -S
+"""Fixed, read-only operator capability. No arguments, input or hardware writes."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import pwd
+import re
+import stat
+import sys
+
+VERSION = 'iris-fpga-inspection-v1'
+INSTALL_PATH = '/usr/local/bin/firesim-iris-inspect'
+BDF = re.compile(r'(?<![0-9a-f])(?:[0-9a-f]{4}:)?[0-9a-f]{2}:[0-9a-f]{2}\.[0-7](?![0-9a-f])', re.I)
+PROGRAMMERS = ('firesim', 'vivado', 'hw_server', 'xsdb', 'openocd', 'xvsecctl', 'xvsec',
+               'fpga-util', 'fpgautil', 'openfpgaloader', 'quartus', 'xc3sprog', 'jtag', 'setpci', 'flashrom')
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def protected_regular(path):
+    """Reject symlinks and any unprivileged-writable install-path component."""
+    path = Path(path)
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022:
+        raise ValueError('helper must be root-owned regular and not group/other writable')
+    for parent in path.parents:
+        entry = parent.lstat()
+        if not stat.S_ISDIR(entry.st_mode) or entry.st_uid != 0 or entry.st_mode & 0o022:
+            raise ValueError('untrusted helper ancestor: ' + str(parent))
+    return {'uid': info.st_uid, 'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode),
+            'bytes': info.st_size, 'sha256': sha(path.read_bytes())}
+
+
+def normalize_bdf(value):
+    value = value.lower()
+    return value if value.count(':') == 2 else '0000:' + value
+
+
+def device_reference(target):
+    """Conservative: unrelated VFIO/UIO/PCI mappings are uncertain, never idle."""
+    if target.endswith(' (deleted)'):
+        target = target[:-len(' (deleted)')]
+    if target.startswith('anon_inode:') and any(token in target.lower() for token in ('vfio', 'iommufd')):
+        return {'kind': 'anonymous-vfio-or-iommu', 'target': target, 'bdfs': []}
+    for prefix, kind in [('/dev/xdma', 'xdma'), ('/dev/xvsec', 'xvsec'),
+                         ('/dev/vfio/', 'vfio'), ('/dev/uio', 'uio'),
+                         ('/dev/mem', 'physical-memory'), ('/dev/port', 'io-ports'),
+                         ('/dev/iommu', 'iommu'), ('/dev/fpga', 'fpga-manager'), ('/dev/xdevcfg', 'fpga-programmer')]:
+        if target.startswith(prefix):
+            return {'kind': kind, 'target': target, 'bdfs': [normalize_bdf(x) for x in BDF.findall(target)]}
+    if target.startswith('/sys/') and re.search(r'/resource(?:[0-9]+(?:_wc)?)?$', target):
+        bdfs = [normalize_bdf(x) for x in BDF.findall(target)]
+        if bdfs:
+            return {'kind': 'pci-resource', 'target': target, 'bdfs': bdfs}
+    return None
+
+
+def trusted_json(path):
+    """Open a fixed regular inode without following a replaceable symlink."""
+    before = Path(path).lstat()
+    if not stat.S_ISREG(before.st_mode):
+        raise ValueError('not a regular JSON file')
+    fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, 'rb') as stream:
+        info = os.fstat(stream.fileno())
+        if (before.st_dev, before.st_ino) != (info.st_dev, info.st_ino):
+            raise ValueError('JSON inode changed while opening')
+        data = stream.read(1024 * 1024 + 1)
+        after = os.fstat(stream.fileno())
+        current = Path(path).lstat()
+        signature = lambda entry: (entry.st_dev, entry.st_ino, entry.st_size, entry.st_mtime_ns, entry.st_ctime_ns)
+        if signature(before) != signature(after) or signature(before) != signature(current):
+            raise ValueError('JSON evidence changed during inspection')
+    if len(data) > 1024 * 1024 or not stat.S_ISREG(info.st_mode):
+        raise ValueError('not a bounded regular JSON file')
+    return json.loads(data), info.st_uid == 0 and not (info.st_mode & 0o022), sha(data)
+
+
+def process_start(path):
+    # comm may contain spaces and parentheses; fields after the LAST ')' start
+    # at process-state field3, so starttime field22 is index19 here.
+    return int((path / 'stat').read_text().rsplit(')', 1)[1].split()[19])
+
+
+def collect(root=Path('/'), caller_uid=None, caller_user=None, self_pid=None):
+    """The privileged entrypoint supplies only fixed paths; root is test injection."""
+    root = Path(root)
+    path = lambda value: root / value.lstrip('/')
+    self_pid = os.getpid() if self_pid is None else self_pid
+    uid = os.getuid() if caller_uid is None else caller_uid
+    user = pwd.getpwuid(uid).pw_name if caller_user is None else caller_user
+    report = {'schema': VERSION, 'hostname': os.uname().nodename, 'uid': uid, 'user': user,
+              'inspection_uid': os.getuid(), 'inspection_euid': os.geteuid(),
+              'busy_processes': [], 'device_holders': [], 'inspection_errors': [],
+              'sessions': [], 'wrapper_executable': False, 'scanned_processes': 0,
+              'empty_cmdline_processes': 0, 'vanished_processes': [], 'pci_inventory': [],
+              'unreadable_cmdline_processes': 0,
+              'fpga_bdfs': [], 'fpga_bdf_sources': {}, 'all_pci_holders_blocked_conservatively': True}
+    def error(stage, exc, pid=None):
+        report['inspection_errors'].append({'stage': stage, 'pid': pid, 'error': str(exc)})
+    try:
+        report['boot_id'] = path('/proc/sys/kernel/random/boot_id').read_text().strip()
+        if not report['boot_id']:
+            raise ValueError('empty boot id')
+    except (OSError, ValueError) as exc:
+        error('boot_id', exc)
+    try:
+        mounts = path('/proc/self/mountinfo').read_text().splitlines()
+        proc_mounts = [line for line in mounts if ' - proc ' in line and line.split()[4] == '/proc']
+        if len(proc_mounts) != 1:
+            raise ValueError('cannot identify a unique /proc mount')
+        report['proc_mount'] = proc_mounts[0]
+        hidden = re.search(r'(?:^|[, ])hidepid=(?:[1-9][0-9]*|invisible|ptraceable)(?:[, ]|$)', proc_mounts[0])
+        if hidden:
+            if os.geteuid() != 0:
+                raise ValueError('unprivileged hidepid view cannot prove complete all-user inspection')
+            status = path('/proc/self/status').read_text()
+            capability = re.search(r'^CapEff:\s*([0-9a-f]+)$', status, re.M | re.I)
+            if not capability or not (int(capability.group(1), 16) & (1 << 19)):
+                raise ValueError('root hidepid inspection requires effective CAP_SYS_PTRACE')
+        report['visibility_scope'] = 'current procfs PID namespace; operator must authorize host scope'
+    except (OSError, ValueError, IndexError) as exc:
+        error('proc_visibility', exc)
+    db = path('/scratch/firesim/firesim-db.json')
+    report['fpga_db_present'] = db.is_file()
+    try:
+        data, trusted, digest = trusted_json(db)
+        report.update(fpga_db_trusted=trusted, fpga_db_sha256=digest)
+        if not isinstance(data, list) or not data:
+            raise ValueError('expected nonempty FireSim database list')
+        for entry in data:
+            if not isinstance(entry, dict) or not isinstance(entry.get('bdf'), str) or not BDF.fullmatch(entry['bdf']):
+                raise ValueError('unrecognized FPGA database entry')
+            if trusted:
+                report['fpga_bdf_sources'].setdefault(normalize_bdf(entry['bdf']), []).append('trusted-fpga-db')
+    except (OSError, ValueError, TypeError) as exc:
+        report.update(fpga_db_trusted=False, fpga_db_error=str(exc), fpga_db_sha256=None)
+        error('fpga_db', exc)
+    try:
+        for entry in sorted(path('/sys/bus/pci/devices').iterdir()):
+            if not BDF.fullmatch(entry.name):
+                continue
+            report['pci_inventory'].append(normalize_bdf(entry.name))
+        for entry in sorted(path('/sys/class/xdma').glob('*/device')):
+            target = os.readlink(entry)
+            bdfs = BDF.findall(target)
+            if bdfs:
+                report['fpga_bdf_sources'].setdefault(normalize_bdf(bdfs[-1]), []).append('kernel-xdma-class')
+    except OSError as exc:
+        error('sysfs_inventory', exc)
+    report['fpga_bdfs'] = sorted(report['fpga_bdf_sources'])
+    if not report['fpga_bdfs']:
+        error('fpga_identity', 'no FPGA BDF derived from trusted database or kernel XDMA sysfs')
+    for bdf in report['fpga_bdfs']:
+        if bdf not in report['pci_inventory']:
+            error('fpga_identity', 'FPGA BDF absent from current kernel PCI inventory: ' + bdf)
+    report['xdma_devices'] = [str(p)[len(str(root)):] if root != Path('/') else str(p)
+                              for p in sorted(path('/dev').glob('xdma*'))]
+    report['programming_devices'] = [str(p)[len(str(root)):] if root != Path('/') else str(p)
+                                     for pattern in ['xvsec*', 'uio*', 'vfio/*']
+                                     for p in sorted(path('/dev').glob(pattern))]
+    try:
+        processes = {int(p.name): p for p in path('/proc').iterdir()
+                     if p.name.isdigit() and int(p.name) != self_pid}
+    except OSError as exc:
+        processes = {}
+        error('list_processes', exc)
+    for pid, entry in sorted(processes.items()):
+        try:
+            start = process_start(entry)
+            info = entry.stat()
+            try:
+                cmd = (entry / 'cmdline').read_bytes().replace(b'\0', b' ').decode(errors='replace').strip()
+                cmd_known = True
+            except OSError as exc:
+                error('cmdline', exc, pid)
+                cmd = ''
+                cmd_known = False
+                report['unreadable_cmdline_processes'] += 1
+            try:
+                comm = (entry / 'comm').read_text().strip()
+            except OSError as exc:
+                error('comm', exc, pid)
+                comm = ''
+            if cmd_known and not cmd:
+                report['empty_cmdline_processes'] += 1
+            try:
+                cwd = os.readlink(entry / 'cwd')
+            except OSError:
+                cwd = None
+            item = {'pid': pid, 'uid': info.st_uid, 'command': cmd, 'comm': comm,
+                    'cwd': cwd, 'start_time_ticks': start}
+            command_lower = cmd.lower()
+            if any(token in comm.lower() for token in PROGRAMMERS) or any(
+                    token in command_lower for token in ('firesim runworkload', 'firesim infrasetup',
+                        'firesim kill', 'xvsecctl', 'program_fpga', 'firesim-fpga-util',
+                        'firesim-load-xdma', 'firesim-remove-xdma', 'firesim-change-pcie',
+                        'vivado', 'hw_server', 'openfpgaloader', 'quartus_pgm', 'xc3sprog')) or re.search(
+                            r'(?:^|[ /])firesim\s.*(?:runworkload|infrasetup|kill)', command_lower) or (
+                    any(op in command_lower for op in ('modprobe', 'insmod', 'rmmod')) and
+                    any(driver in command_lower for driver in ('xdma', 'xvsec'))):
+                report['busy_processes'].append(item)
+            # Empty cmdline and kernel/zombie tasks still reach BOTH checks.
+            try:
+                mappings = (entry / 'maps').read_text().splitlines()
+            except OSError as exc:
+                error('maps', exc, pid)
+                mappings = []
+            for mapping in mappings:
+                fields = mapping.split(None, 5)
+                reference = device_reference(fields[5]) if len(fields) == 6 else None
+                if reference:
+                    report['device_holders'].append(dict(item, mapping=mapping, reference=reference))
+            try:
+                descriptors = sorted((entry / 'fd').iterdir())
+            except OSError as exc:
+                error('fd_directory', exc, pid)
+                descriptors = []
+            for descriptor in descriptors:
+                try:
+                    target = os.readlink(descriptor)
+                except FileNotFoundError:
+                    continue  # fd closed while the same process was scanned
+                except OSError as exc:
+                    error('fd_link', exc, pid)
+                    continue
+                reference = device_reference(target)
+                if reference:
+                    report['device_holders'].append(dict(item, fd=descriptor.name, device=target, reference=reference))
+            if process_start(entry) != start:
+                raise ValueError('PID reused during inspection')
+            report['scanned_processes'] += 1
+        except (FileNotFoundError, ProcessLookupError) as exc:
+            if entry.exists():
+                error('process_disappeared_incompletely', exc, pid)
+            else:
+                report['vanished_processes'].append(pid)
+        except (OSError, ValueError, IndexError) as exc:
+            error('process', exc, pid)
+    try:
+        new_pids = sorted(int(p.name) for p in path('/proc').iterdir()
+                          if p.name.isdigit() and int(p.name) != self_pid and int(p.name) not in processes)
+        if new_pids:
+            error('processes_started_during_inspection', repr(new_pids))
+    except OSError as exc:
+        error('relist_processes', exc)
+    allocation = path('/scratch/firesim/iris-exclusive-allocation.json')
+    try:
+        value, trusted, digest = trusted_json(allocation)
+        required = {'allocation_id', 'user', 'exclusive', 'boot_id', 'expires_at_utc'}
+        if not isinstance(value, dict) or set(value) != required:
+            raise ValueError('unrecognized operator allocation schema')
+        report.update(allocation=value, allocation_trusted=trusted, allocation_sha256=digest)
+    except (OSError, ValueError, TypeError) as exc:
+        report.update(allocation_trusted=False, allocation_error=str(exc))
+    report['inspection_complete'] = not report['inspection_errors']
+    return report
+
+
+def main():
+    if len(sys.argv) != 1:
+        raise ValueError('helper accepts no arguments')
+    if not sys.flags.isolated or not sys.flags.no_site:
+        raise ValueError('isolated system Python with -I -S required')
+    if os.getuid() != 0 or os.geteuid() != 0:
+        raise ValueError('fixed helper requires effective and real uid0')
+    if str(Path(__file__).absolute()) != INSTALL_PATH:
+        raise ValueError('fixed root-owned install path required')
+    stdin = os.fstat(0)
+    if not stat.S_ISCHR(stdin.st_mode) or stdin.st_rdev != os.stat('/dev/null').st_rdev:
+        raise ValueError('helper accepts no stdin; redirect /dev/null')
+    metadata = protected_regular(INSTALL_PATH)
+    raw_uid = os.environ.get('SUDO_UID', '')
+    caller = os.environ.get('SUDO_USER', '')
+    if not re.fullmatch(r'[1-9][0-9]*', raw_uid):
+        raise ValueError('trusted nonroot SUDO_UID required')
+    identity = pwd.getpwuid(int(raw_uid))
+    if identity.pw_name != caller or os.environ.get('SUDO_COMMAND') != INSTALL_PATH:
+        raise ValueError('sudo caller/command identity mismatch')
+    report = collect(caller_uid=identity.pw_uid, caller_user=identity.pw_name)
+    report['privileged_helper'] = dict(metadata, path=INSTALL_PATH, version=VERSION,
+                                      isolated=True, no_site=True, stdin='devnull')
+    print(json.dumps(report, sort_keys=True))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as exc:
+        print('iris-fpga-inspection-refused: ' + str(exc), file=sys.stderr)
+        sys.exit(1)

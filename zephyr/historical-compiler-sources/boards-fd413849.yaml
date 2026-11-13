@@ -1,0 +1,90 @@
+# Iris facts: full revisions and source hashes in source-identity.json.
+schema_version: 1
+boards:
+  iris_rtl:
+    zephyr_board: iris
+    dt_cpu_nodes: 3
+    dram_bytes: 4 GiB
+    dram_base: 2147483648
+    zephyr_default_ram_bytes: 256 MiB
+    zephyr_link_limit_bytes: 1900 MiB
+    harts: 3
+    vector_harts: 3
+    matrix_hart_ids:
+    - 0
+    - 1
+    vlen: 256
+    console: uart
+    flow: zephyr
+    loader: uart_tsi
+    loader_baud: 921600
+    ram_label: ram0
+    fpu_sharing: true
+    zephyr_vector_ext: true
+    target: iris
+    rtl_sim_config: IrisConfig
+    notes: Source-audited three-hart IrisConfig; target board requires the explicitly
+      patched Zephyr kernel declared in zephyr/context-support.json. All3 harts RVV
+      integer and IEEEFP16/32/64; VME and configured FP8/BF16 operations on Shuttle0/1
+      only. Scalar BF16 FCVT absent despite source ISA advertisement. VME context
+      requires iris_vme_enable() and affinity0/1 before first use. UART console and
+      mtime500kHz. Source-model functional evidence only; timing/RTL/deployed-image
+      association unqualified.
+    uart_label: uart0
+    mtime_hz: 500000
+    vector_hart_ids:
+    - 0
+    - 1
+    - 2
+    per_hart:
+    - hart_id: 0
+      core_type: ucb-bar,shuttle
+      isa: rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t
+      vlen: 256
+      dlen: 128
+      elen: 64
+      matrix: true
+      dtypes:
+      - int8
+      - int16
+      - int32
+      - int64
+      - fp16
+      - fp32
+      - fp64
+      - fp8_e4m3
+      - fp8_e5m2
+      - bf16
+    - hart_id: 1
+      core_type: ucb-bar,shuttle
+      isa: rv64imafdcbvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zba_zbb_zbs_zvbb_zvfofp8min_zfbfmin_zvfbfmin_zvfbfa_xsfmmbase_xsfmm32a8i_xsfmm32a8f_xsfmm32t
+      vlen: 256
+      dlen: 128
+      elen: 64
+      matrix: true
+      dtypes:
+      - int8
+      - int16
+      - int32
+      - int64
+      - fp16
+      - fp32
+      - fp64
+      - fp8_e4m3
+      - fp8_e5m2
+      - bf16
+    - hart_id: 2
+      core_type: sifive,rocket0
+      isa: rv64imafdcvzicsr_zifencei_zihpm_zvl256b_zve64d_zvfh_zfh_zvbb_xrocket
+      vlen: 256
+      dlen: 256
+      elen: 64
+      matrix: false
+      dtypes:
+      - int8
+      - int16
+      - int32
+      - int64
+      - fp16
+      - fp32
+      - fp64

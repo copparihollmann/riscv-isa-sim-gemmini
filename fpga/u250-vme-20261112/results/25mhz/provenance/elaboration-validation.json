@@ -1,0 +1,55 @@
+{
+  "validated": true,
+  "model_markers": [
+    "First-Ready FCFS MAS"
+  ],
+  "dts": [
+    {
+      "path": "/scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/sims/firesim-staging/generated-src/firechip.chip.FireSim.FireSimVMEV256D128DualShuttleConfig/firechip.chip.FireSim.FireSimVMEV256D128DualShuttleConfig.dts",
+      "harts": [
+        0,
+        1
+      ],
+      "memory_bytes": [
+        65536,
+        17179869184
+      ],
+      "sha256": "29259a582cc6c8c660fca76653db95b7374b59e61ca04c884b66ad5defeee582"
+    }
+  ],
+  "dram_timing_fields": [
+    {
+      "path": "/scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/sims/firesim/sim/generated-src/xilinx_alveo_u250/xilinx_alveo_u250-firesim-FireSim-FireSimVMEV256D128DualShuttleConfig-FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config/FireSim-generated.sv",
+      "fields": [
+        "tRAS",
+        "tRC",
+        "tRCD",
+        "tREFI",
+        "tRFC",
+        "tRP"
+      ]
+    },
+    {
+      "path": "/scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/sims/firesim/sim/generated-src/xilinx_alveo_u250/xilinx_alveo_u250-firesim-FireSim-FireSimVMEV256D128DualShuttleConfig-FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config/FireSim-generated.const.h",
+      "fields": [
+        "tRAS",
+        "tRC",
+        "tRCD",
+        "tREFI",
+        "tRFC",
+        "tRP"
+      ]
+    }
+  ],
+  "vector_parameters": {
+    "VLEN": 256,
+    "DLEN": 128,
+    "OPU": "INT8",
+    "verification": "Exact supplied Config at verified source pins and successful elaboration"
+  },
+  "fpga_host_frequencies_mhz": [
+    15,
+    25
+  ],
+  "target_memory_clock_mhz": 1000
+}

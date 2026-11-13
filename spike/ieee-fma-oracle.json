@@ -1,0 +1,17 @@
+{
+  "cases": 23360,
+  "reduction_cases": 1120,
+  "forms": 45,
+  "formats": [
+    "FP16",
+    "BF16",
+    "FP32",
+    "FP64"
+  ],
+  "rounding_modes": 5,
+  "seed": 1229276485,
+  "header_sha256": "2e1b0322033289ba52d2df2c6847cbe98d952f588e89ed8244f4e158ec712564",
+  "host_float_used": false,
+  "rtl_executed": false,
+  "source_semantics": "compute segmented unrounded FMA; input signalingness depends physical exponent; only invalid maps to flagsbit0; DLEN128 reduction graph"
+}

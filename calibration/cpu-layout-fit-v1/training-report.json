@@ -1,0 +1,61 @@
+{
+  "all_training_rows": {
+    "absolute_error_max_pct": 95.36526267662893,
+    "absolute_error_median_pct": 0.19507726019912494,
+    "absolute_error_p90_pct": 17.881499976524804,
+    "count": 1584,
+    "positive_reference_count": 1584,
+    "signed_error_mean_pct": -4.637147505357414,
+    "signed_error_median_pct": 0.018313403376505256,
+    "within_2pct_count": 1230,
+    "within_2pct_fraction": 0.7765151515151515
+  },
+  "conditioned_fit_rows": {
+    "absolute_error_max_pct": 11.236575850024936,
+    "absolute_error_median_pct": 0.07134253761029921,
+    "absolute_error_p90_pct": 0.40413405463051905,
+    "count": 792,
+    "positive_reference_count": 792,
+    "signed_error_mean_pct": -0.07410873636692261,
+    "signed_error_median_pct": 0.026053814692224855,
+    "within_2pct_count": 759,
+    "within_2pct_fraction": 0.9583333333333334
+  },
+  "global_heldout_timings_consumed": false,
+  "internal_validation_evaluated": false,
+  "models": {
+    "rocket": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        3.000122923951046,
+        0.9995492788461539,
+        7.27272727272859
+      ],
+      "dependency_issue_floor": 3,
+      "fetch_word_bytes": 4,
+      "fitting_rows": 264,
+      "rank": 3
+    },
+    "shuttle": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        2.0002886690562725,
+        0.9952766527238096,
+        4.239027163861398
+      ],
+      "dependency_issue_floor": 2,
+      "fetch_word_bytes": 8,
+      "fitting_rows": 528,
+      "rank": 3
+    }
+  },
+  "schema": "iris.cpu_layout_training_report.v1"
+}

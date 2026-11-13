@@ -1,0 +1,222 @@
+{
+  "actual_parameter_fit_performed": true,
+  "applied": [
+    {
+      "dirty_extra": 663.9876053711484,
+      "hart": 0,
+      "kind": "shared_instruction_data_cache_service",
+      "l1miss": 30.24009886676671,
+      "outer_interval": 448,
+      "outer_interval_status": "separate_training_aggregate_candidate_not_latency_identified",
+      "outermiss": 597.4833364986952,
+      "read_base": 0.0,
+      "scope": "Sourcegeometry/LRUapproximation; vectorrouteunqualifiedin131c.",
+      "write_base": 0.0,
+      "writeback_reservation_policy": "extra_latency_only_no_additional448reservation"
+    },
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 0,
+      "issue_interval_status": "explicit1fallback_not_independently_fitted",
+      "resource": "empirical.tcm0",
+      "scope": "Read/store tied per-access aggregate; calibrated4-byteordinaryscalar accesses.",
+      "setup": 2.0053249732335376,
+      "work": 0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 0,
+      "issue_interval_status": "explicit1fallback_not_independently_fitted",
+      "resource": "empirical.tcm0",
+      "scope": "Read/store tied per-access aggregate; calibrated4-byteordinaryscalar accesses.",
+      "setup": 2.0053249732335376,
+      "work": 0
+    },
+    {
+      "dirty_extra": 663.9876053711484,
+      "hart": 1,
+      "kind": "shared_instruction_data_cache_service",
+      "l1miss": 30.24009886676671,
+      "outer_interval": 448,
+      "outer_interval_status": "separate_training_aggregate_candidate_not_latency_identified",
+      "outermiss": 597.4833364986952,
+      "read_base": 0.0,
+      "scope": "Sourcegeometry/LRUapproximation; vectorrouteunqualifiedin131c.",
+      "write_base": 0.0,
+      "writeback_reservation_policy": "extra_latency_only_no_additional448reservation"
+    },
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 1,
+      "issue_interval_status": "explicit1fallback_not_independently_fitted",
+      "resource": "empirical.tcm1",
+      "scope": "Read/store tied per-access aggregate; calibrated4-byteordinaryscalar accesses.",
+      "setup": 2.0053249732335376,
+      "work": 0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 1,
+      "issue_interval_status": "explicit1fallback_not_independently_fitted",
+      "resource": "empirical.tcm1",
+      "scope": "Read/store tied per-access aggregate; calibrated4-byteordinaryscalar accesses.",
+      "setup": 2.0053249732335376,
+      "work": 0
+    },
+    {
+      "dirty_extra": 0,
+      "hart": 2,
+      "kind": "shared_instruction_data_cache_service",
+      "l1miss": 145.05052369377088,
+      "outer_interval": 448,
+      "outer_interval_status": "separate_training_aggregate_candidate_not_latency_identified",
+      "outermiss": 486.3091736426338,
+      "read_base": 0.0,
+      "scope": "Sourcegeometry/LRUapproximation; vectorrouteunqualifiedin131c.",
+      "write_base": 1.2372121654497594,
+      "writeback_reservation_policy": "extra_latency_only_no_additional448reservation"
+    }
+  ],
+  "calibration_identity": "iris-empirical-131c-pilot-v3",
+  "feature_implementation_sha256": "4e8e2bd596f3f92e2103e49cfaf377910ed302c0007357ad20f6bafdc0b72aab",
+  "fitter_sha256": "db1e37baa1020b439dbc2607ea617d9cecddc9d76bebf8f72e7d49594b47fe78",
+  "fixture_sha256": "3c80a315ac5959b9cfb725c2e9bc85d9e524f6199a2669a246e1a32017b812ed",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "icache_service_enabled": false,
+  "live_quality_accepted": false,
+  "raw_fit_report_sha256": "120a4b80ae30c96bb17164856bac043f2ec34c76cea7ab96db715c23ef7911af",
+  "raw_parameters_sha256": "8744c2058cc013bcca07cf75a99b7bd0384962171836bb4c403ca43daf6dfbb8",
+  "rtl_certified": false,
+  "schema": "iris.empirical_selected_runtime_parameters.v1",
+  "selector_sha256": "00170628b41bd161544dfc24e809bae40006639ac51f1c3dbca72a89673056c5",
+  "source_image_association_verified": false,
+  "status": "fitted_partial_candidate_requires_actual_native_validation",
+  "unapplied": [
+    {
+      "feature": "branch.mispredicts",
+      "fit_value": 2.030673474917554,
+      "hart": 0,
+      "reason": "Notapplied: unavailable131cbranch-serviceknob"
+    },
+    {
+      "feature": "rvv.integer.instructions",
+      "fit_value": 0.05509942112462596,
+      "hart": 0,
+      "reason": "Notapplied: asyncceilwouldturnsmallfractionintoonecycle/operation"
+    },
+    {
+      "feature": "rvv.integer.work",
+      "fit_value": 0.0,
+      "hart": 0,
+      "reason": "Notapplied: asyncceilwouldturnsmallfractionintoonecycle/operation"
+    },
+    {
+      "feature": "vme.int8.instructions",
+      "fit_value": 9.591319302770227,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.int8.work",
+      "fit_value": 1.222092581690856e-16,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.row_move.instructions",
+      "fit_value": 0.0,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.row_move.work",
+      "fit_value": 0.0,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.zero.instructions",
+      "fit_value": 0.0,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.zero.work",
+      "fit_value": 0.0,
+      "hart": 0,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "branch.mispredicts",
+      "fit_value": 2.030673474917554,
+      "hart": 1,
+      "reason": "Notapplied: unavailable131cbranch-serviceknob"
+    },
+    {
+      "feature": "rvv.integer.instructions",
+      "fit_value": 0.05509942112462596,
+      "hart": 1,
+      "reason": "Notapplied: asyncceilwouldturnsmallfractionintoonecycle/operation"
+    },
+    {
+      "feature": "rvv.integer.work",
+      "fit_value": 0.0,
+      "hart": 1,
+      "reason": "Notapplied: asyncceilwouldturnsmallfractionintoonecycle/operation"
+    },
+    {
+      "feature": "vme.int8.instructions",
+      "fit_value": 9.591319302770227,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.int8.work",
+      "fit_value": 1.222092581690856e-16,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.row_move.instructions",
+      "fit_value": 0.0,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.row_move.work",
+      "fit_value": 0.0,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.zero.instructions",
+      "fit_value": 0.0,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "vme.zero.work",
+      "fit_value": 0.0,
+      "hart": 1,
+      "reason": "Notapplied: per-operation/workcoefficientsconfoundedordrain/coldsetupnotidentified"
+    },
+    {
+      "feature": "branch.mispredicts",
+      "fit_value": 1.9532967997940534,
+      "hart": 2,
+      "reason": "Notapplied: unavailable131cbranch-serviceknob"
+    }
+  ],
+  "units": "core_cycles_at_500MHz",
+  "unsupported_or_unqualified": [
+    "FP8matrixlatencyunfitted;functionalsupportunchanged",
+    "RVV/VMEcomputebackendworkheuristicunfitted",
+    "Vector-memoryprivate-L1routeunqualified;nextsourcebypassfixrequired",
+    "RemoteTCM/scratchpadserviceunfittedforcurrentnative",
+    "ScalarFP/VectorFPserviceconservativefallback",
+    "IRQ/synchronization/atomics/LRSCtimingunqualified",
+    "Cold-cache/replacement/branch-historyapproximationhaslargeobservederrors",
+    "Instruction-cachetag/serviceexplicitlydisabledafterv2runtimestall;data-onlyfixtureisolation"
+  ]
+}

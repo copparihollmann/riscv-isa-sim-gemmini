@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "status": "source_audited_runtime_reuse_not_validated",
+  "sources": {
+    "simulation.cc": {
+      "snapshot": "reuse-evidence/simulation.cc",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/core/simulation.cc",
+      "sha256": "fe7f329aec6bc60f4e5f12d17a009d2008355f4c1041a7b66bb2fad84d7263a8",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "reset_pulse.cc": {
+      "snapshot": "reuse-evidence/reset_pulse.cc",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/bridges/reset_pulse.cc",
+      "sha256": "418170b6e57f6f4cb77068163e5371fa43226dbbc1fe66d6207556c108eaca03",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "reset_pulse.h": {
+      "snapshot": "reuse-evidence/reset_pulse.h",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/bridges/reset_pulse.h",
+      "sha256": "075694a87fe4c8fe52f30f3cb643af12d6232b8b44c6fa80c1f6186a99593c5b",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "ResetPulseBridge.scala": {
+      "snapshot": "reuse-evidence/ResetPulseBridge.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/widgets/ResetPulseBridge.scala",
+      "sha256": "c70dc5e1cc9c76a20e65bdcf490645ea79f4af673603f8f1ddb8b2dd03477c27",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "ClockBridge.scala": {
+      "snapshot": "reuse-evidence/ClockBridge.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/widgets/ClockBridge.scala",
+      "sha256": "2ee107f77c9778298585ca0996b04effeda731b7894c1eaf4e2f2357b674e79c",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "widget_registry.h": {
+      "snapshot": "reuse-evidence/widget_registry.h",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/cc/core/widget_registry.h",
+      "sha256": "a21b5132c397479fd11da557c6cb093cadcd821d4d326eed4ab68a15b8511310",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "FASEDMemoryTimingModel.scala": {
+      "snapshot": "reuse-evidence/FASEDMemoryTimingModel.scala",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/midas/src/main/scala/midas/models/dram/FASEDMemoryTimingModel.scala",
+      "sha256": "1591471d74974876ee1502ed20b1fa72ec92c4a6bd68e5b2f73dac0108cfe0ce",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "FireSim.scala": {
+      "snapshot": "reuse-evidence/FireSim.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/firechip/chip/src/main/scala/FireSim.scala",
+      "sha256": "9a135159c1677c10908c3d781abb6c0ff0ab8e3785be388244e6e1bb188b5603",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "TSIBridge.scala": {
+      "snapshot": "reuse-evidence/TSIBridge.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/firechip/goldengateimplementations/src/main/scala/TSIBridge.scala",
+      "sha256": "ded9740846700e744278bd317f9b694b965ad61b23b9dfa4cefb64d1ecbada31",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "UARTBridge.scala": {
+      "snapshot": "reuse-evidence/UARTBridge.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/firechip/goldengateimplementations/src/main/scala/UARTBridge.scala",
+      "sha256": "53988098293011f3d061c9cca512e1d8dd101d1dad8fae395df44043447c9866",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "firesim_tsi.cc": {
+      "snapshot": "reuse-evidence/firesim_tsi.cc",
+      "source_path": "/scratch/eygao/iris-cy/generators/firechip/bridgestubs/src/main/cc/fesvr/firesim_tsi.cc",
+      "sha256": "b13684f30191d23d73604c3265ada19406e550df0e0e8107a5d23211803f5e3a",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "testchip_tsi.cc": {
+      "snapshot": "reuse-evidence/testchip_tsi.cc",
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/src/main/resources/testchipip/csrc/testchip_tsi.cc",
+      "sha256": "3fd68eefb2adeb1c864ad9c7796884bd60621e9f77d70038e8d03c6400a7cb51",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "testchip_htif.cc": {
+      "snapshot": "reuse-evidence/testchip_htif.cc",
+      "source_path": "/scratch/eygao/iris-cy/generators/testchipip/src/main/resources/testchipip/csrc/testchip_htif.cc",
+      "sha256": "cf65d1439e6620dfdf373c203e43358f085e4e8b6fb9f9b7585276d1748e1807",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "tsi.cc": {
+      "snapshot": "reuse-evidence/tsi.cc",
+      "source_path": "/scratch/eygao/iris-cy/toolchains/riscv-tools/riscv-isa-sim/fesvr/tsi.cc",
+      "sha256": "ea01cc16b3e9cf86afef0f0d9aeff80f90bbe2e19763e45613e8ed6e67726bb6",
+      "repository": "spike_chipyard_pin",
+      "repository_commit": "9c190a07c6838f6392bafa4ad83acea462c7f759",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "TileResetSetter.scala": {
+      "snapshot": "reuse-evidence/TileResetSetter.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/chipyard/src/main/scala/clocking/TileResetSetter.scala",
+      "sha256": "5f7b94e8a5d3ec00481cdfe778c20a266eed3a2b0ffa75f1430b2679264d3a33",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "HasChipyardPRCI.scala": {
+      "snapshot": "reuse-evidence/HasChipyardPRCI.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/chipyard/src/main/scala/clocking/HasChipyardPRCI.scala",
+      "sha256": "a824716e58cf293c0be0b3c8f2bc89a2d0dea7040d5d9cc021787faff436dde5",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    },
+    "FireSim-generated.const.h": {
+      "snapshot": "reuse-evidence/FireSim-generated.const.h",
+      "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/generated-src/corigine_mimicturbo_gt/corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/FireSim-generated.const.h",
+      "sha256": "89344115e3310113fa743169e4c47dc5d200a3f4585e23bf5a5b2fbc73cdfa51",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "source_state": "inspected-local-working-tree",
+      "driver_build_input_association": "unverified"
+    }
+  },
+  "facts": {
+    "every_driver_invocation_rearms_target_reset": {
+      "value": "simulation_init initializes all bridges in construction order; reset_pulse init writes the requested pulseLength and doneInit again",
+      "evidence": [
+        {
+          "source": "simulation.cc",
+          "lines": [
+            90,
+            93
+          ]
+        },
+        {
+          "source": "widget_registry.h",
+          "lines": [
+            77,
+            87
+          ]
+        },
+        {
+          "source": "reset_pulse.cc",
+          "lines": [
+            36,
+            39
+          ]
+        },
+        {
+          "source": "ResetPulseBridge.scala",
+          "lines": [
+            19,
+            27
+          ]
+        }
+      ]
+    },
+    "exact_default_reset_programming": {
+      "value": {
+        "pulse_length_cycles": 50,
+        "maximum_cycles": 1023,
+        "pulseLength_mmio": 368,
+        "doneInit_mmio": 372
+      },
+      "evidence": [
+        {
+          "source": "FireSim-generated.const.h",
+          "lines": [
+            60,
+            72
+          ]
+        }
+      ]
+    },
+    "reset_is_harness_reference_reset": {
+      "value": "ResetPulseBridge feeds harness referenceReset, rather than only CLINT or a single tile",
+      "evidence": [
+        {
+          "source": "FireSim.scala",
+          "lines": [
+            102,
+            110
+          ]
+        }
+      ]
+    },
+    "tsi_restarts_token_budget_and_resets_queues": {
+      "value": "start reloads tokensToEnqueue; each targetReset clears TSI in/out FIFO state",
+      "evidence": [
+        {
+          "source": "TSIBridge.scala",
+          "lines": [
+            22,
+            31
+          ]
+        },
+        {
+          "source": "TSIBridge.scala",
+          "lines": [
+            48,
+            59
+          ]
+        }
+      ]
+    },
+    "fased_reset_drains_host_and_resets_pipeline": {
+      "value": "target reset waits for outstanding host memory to settle, then resets memory model plus ingress/read/write egress",
+      "evidence": [
+        {
+          "source": "FASEDMemoryTimingModel.scala",
+          "lines": [
+            330,
+            376
+          ]
+        },
+        {
+          "source": "FASEDMemoryTimingModel.scala",
+          "lines": [
+            400,
+            402
+          ]
+        }
+      ]
+    },
+    "tsi_reset_is_only_boot_ipi": {
+      "value": "testchip_tsi reset performs optional init accesses then tsi_t reset writes one to MSIP0; it does not reset halted harts or clear tile/L2 state",
+      "evidence": [
+        {
+          "source": "firesim_tsi.cc",
+          "lines": [
+            72,
+            83
+          ]
+        },
+        {
+          "source": "testchip_tsi.cc",
+          "lines": [
+            74,
+            79
+          ]
+        },
+        {
+          "source": "tsi.cc",
+          "lines": [
+            26,
+            34
+          ]
+        }
+      ]
+    },
+    "tile_reset_registers_are_not_full_system_reset": {
+      "value": "TileResetSetter controls per-tile reset domains; registers are four bytes apart at configured aperture0x110000; uncore/bridges are outside this reset",
+      "evidence": [
+        {
+          "source": "TileResetSetter.scala",
+          "lines": [
+            26,
+            63
+          ]
+        },
+        {
+          "source": "HasChipyardPRCI.scala",
+          "lines": [
+            79,
+            84
+          ]
+        }
+      ]
+    },
+    "uart_host_codec_not_target_reset": {
+      "value": "UART host FIFO reset includes targetReset; codec FSM/counters use host RegInit and have no targetReset condition",
+      "evidence": [
+        {
+          "source": "UARTBridge.scala",
+          "lines": [
+            50,
+            65
+          ]
+        },
+        {
+          "source": "UARTBridge.scala",
+          "lines": [
+            99,
+            104
+          ]
+        }
+      ]
+    },
+    "clock_counts_persist_across_target_reset": {
+      "value": "clock bridge hCycle and tCycle count host/clock tokens; no target-reset input clears them",
+      "evidence": [
+        {
+          "source": "ClockBridge.scala",
+          "lines": [
+            52,
+            81
+          ]
+        }
+      ]
+    },
+    "summary_does_not_subtract_start_tcycle": {
+      "value": "record_start_times captures hcycle only; performance summary uses cumulative end_tcycle as run cycles and rate numerator",
+      "evidence": [
+        {
+          "source": "simulation.cc",
+          "lines": [
+            43,
+            69
+          ]
+        }
+      ]
+    },
+    "dram_zeroing_precedes_target_reset_rearm": {
+      "value": "init_dram executes before simulation_init; repeated runs must not assume old active cores have already been reset while zeroing begins",
+      "evidence": [
+        {
+          "source": "simulation.cc",
+          "lines": [
+            139,
+            141
+          ]
+        }
+      ]
+    }
+  },
+  "hardware_mutated_by_this_audit": false,
+  "second_run_executed_by_this_audit": false,
+  "full_system_reuse_validated": false,
+  "calibration_usable": false,
+  "loaded_image_build_association": "unverified",
+  "observations": {
+    "new_smoke_receipt": "runs/fpga-smoke-access-enabled-001/direct/run.json",
+    "new_smoke_receipt_sha256": "f86f855b0d63a3520bcc5687ffc80644836cd870839cd7b5c4163cecb6853e8d",
+    "new_smoke_stdout_sha256": "fa78c349b20d1feb7ae2e4b93f8cd30180321c6899c5e20332c0d20bee2543b4",
+    "new_smoke_stderr_sha256": "ae38d1810308fdcef67f3dcda967a50a88f050977ca2ba324077105a78ddc951",
+    "reported_cumulative_target_cycles": 1242954302,
+    "reported_effective_mhz": 169.066,
+    "initial_guest_mcycles": [
+      96626,
+      96485,
+      96622
+    ],
+    "interpretation": "Guest counter values and complete three-hart output support core restart, but do not establish clean host instrumentation or unique image identity."
+  },
+  "next_validation": [
+    "Stop further hardware runs while presence/device responses are invalid.",
+    "Recover via the approved privileged deployment path and attest the selected image before further references.",
+    "Reevaluate repeatability and host bridge state after recovery; source target-reset support did not establish operationally reliable reuse."
+  ],
+  "remaining": [
+    "UART host codec and other host-only instrument state can persist.",
+    "Backing DRAM/TCM/scratchpad storage is not automatically cleared by target reset.",
+    "Driver wall-time/global-cycle performance summary is cumulative and misleading on reuse.",
+    "Actual runtime reuse and reset synchronization need measurement against the current deployed artifact.",
+    "Required managed reflash lifecycle remains unverified under the current non-admin account.",
+    "Two smoke runs passed, then a third returned no region records and the device became unresponsive; reuse is not operationally validated."
+  ],
+  "runtime_reuse_observation": {
+    "path": "runs/fpga-smoke-access-enabled-001/reuse-check.json",
+    "sha256": "fa7aeb00d2b95a3a0b448ca9baa138bb1fa994fe5ccfa6d26f1c599599da0398",
+    "status": "two_passed_then_device_unresponsive",
+    "trial_summaries": [
+      {
+        "trial": "direct",
+        "exit_status": 0,
+        "region_count": 12,
+        "run_sha256": "f86f855b0d63a3520bcc5687ffc80644836cd870839cd7b5c4163cecb6853e8d"
+      },
+      {
+        "trial": "direct-2",
+        "exit_status": 0,
+        "region_count": 12,
+        "run_sha256": "3d991b931c396a73a651711f6d3cedf9cfb39145e5f1b99223f0623d2913db50"
+      },
+      {
+        "trial": "direct-3",
+        "exit_status": 1,
+        "region_count": 0,
+        "run_sha256": "6fe10ad61b439c8fe88f47d182c0a4ac09a9ed0b21d8212eb9a27d757bde7b95"
+      }
+    ],
+    "failure": {
+      "presence_read": 4294967295,
+      "init_done_read": 4294967295,
+      "read_latency_observation": null,
+      "write_latency_observation": null,
+      "lspci": "Unknown header type 7f",
+      "recovery": "privileged FPGA/PCIe setup required; account agustin lacks sudo"
+    },
+    "cause": "unresolved; sequence alone does not establish causation"
+  }
+}

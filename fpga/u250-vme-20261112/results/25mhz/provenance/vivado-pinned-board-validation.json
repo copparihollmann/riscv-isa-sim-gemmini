@@ -1,0 +1,7 @@
+{
+  "validated": true,
+  "vivado_version": "2021.1",
+  "board_part": "xilinx.com:au250:part0:1.3",
+  "selected_board_xml": "/scratch/copparihollmann/u250-vme-20261112/provenance/open-nic-board-files/au250/1.3/board.xml",
+  "exited_normally": true
+}

@@ -1,0 +1,183 @@
+{
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "build/fpga-cpu-layout-v2-001-analysis/regions.csv": "c5f85eab0f7fad540dbb36aaaa80a082ce1c8636280dc95d54eb831445106c99",
+    "calibration/cpu-layout-v2/split.json": "1c9901b04717341f6934389ac24ebb0a0588a193a4bd3367cb4744ed6bedcf89",
+    "timing/empirical_cpu_layout_fit.py": "b50218feddeaab64e24b9b24d68f06f5fe9144ca89f7f8de17e73e1cf6473c5a"
+  },
+  "internal_validation": {
+    "N16_all_repeats": {
+      "absolute_error_max_pct": 94.61461428398785,
+      "absolute_error_median_pct": 8.683483984047324,
+      "absolute_error_p90_pct": 52.54943731655531,
+      "count": 180,
+      "positive_reference_count": 180,
+      "signed_error_mean_pct": -19.186890017553193,
+      "signed_error_median_pct": -6.3140778712791095,
+      "within_2pct_count": 60,
+      "within_2pct_fraction": 0.3333333333333333
+    },
+    "N_ge_64_repeat1_2": {
+      "absolute_error_max_pct": 8.154512511484135,
+      "absolute_error_median_pct": 0.06064465935408886,
+      "absolute_error_p90_pct": 0.40413405463051905,
+      "count": 360,
+      "positive_reference_count": 360,
+      "signed_error_mean_pct": -0.08235032358063105,
+      "signed_error_median_pct": 0.026053814692224855,
+      "within_2pct_count": 343,
+      "within_2pct_fraction": 0.9527777777777777
+    },
+    "all": {
+      "absolute_error_max_pct": 94.61461428398785,
+      "absolute_error_median_pct": 0.19507726019912494,
+      "absolute_error_p90_pct": 22.156017810314243,
+      "count": 720,
+      "positive_reference_count": 720,
+      "signed_error_mean_pct": -5.746384817388803,
+      "signed_error_median_pct": 0.018313403376505256,
+      "within_2pct_count": 531,
+      "within_2pct_fraction": 0.7375
+    },
+    "repeat0_all_N": {
+      "absolute_error_max_pct": 94.61461428398785,
+      "absolute_error_median_pct": 1.6749824176289088,
+      "absolute_error_p90_pct": 50.56625758091375,
+      "count": 240,
+      "positive_reference_count": 240,
+      "signed_error_mean_pct": -12.93157829260122,
+      "signed_error_median_pct": -1.5382045750600164,
+      "within_2pct_count": 133,
+      "within_2pct_fraction": 0.5541666666666667
+    }
+  },
+  "internal_validation_by_hart": {
+    "0": {
+      "absolute_error_max_pct": 94.58241466834653,
+      "absolute_error_median_pct": 0.2603835681046688,
+      "absolute_error_p90_pct": 24.612967255427712,
+      "count": 240,
+      "positive_reference_count": 240,
+      "signed_error_mean_pct": -6.699283481017089,
+      "signed_error_median_pct": 0.026053814692224855,
+      "within_2pct_count": 169,
+      "within_2pct_fraction": 0.7041666666666667
+    },
+    "1": {
+      "absolute_error_max_pct": 94.61461428398785,
+      "absolute_error_median_pct": 0.32568987601021265,
+      "absolute_error_p90_pct": 28.93402770831027,
+      "count": 240,
+      "positive_reference_count": 240,
+      "signed_error_mean_pct": -7.046429106472044,
+      "signed_error_median_pct": 0.026053814692224855,
+      "within_2pct_count": 163,
+      "within_2pct_fraction": 0.6791666666666667
+    },
+    "2": {
+      "absolute_error_max_pct": 91.68801593143678,
+      "absolute_error_median_pct": 0.14100221386710377,
+      "absolute_error_p90_pct": 6.814399542764854,
+      "count": 240,
+      "positive_reference_count": 240,
+      "signed_error_mean_pct": -3.493441864677276,
+      "signed_error_median_pct": 0.012945807034737475,
+      "within_2pct_count": 199,
+      "within_2pct_fraction": 0.8291666666666667
+    }
+  },
+  "internal_validation_by_mode": {
+    "compact": {
+      "absolute_error_max_pct": 94.61461428398785,
+      "absolute_error_median_pct": 0.19507726019912494,
+      "absolute_error_p90_pct": 24.492404440079664,
+      "count": 360,
+      "positive_reference_count": 360,
+      "signed_error_mean_pct": -6.346263096296098,
+      "signed_error_median_pct": 0.012945807034737475,
+      "within_2pct_count": 270,
+      "within_2pct_fraction": 0.75
+    },
+    "wide": {
+      "absolute_error_max_pct": 87.74397027584361,
+      "absolute_error_median_pct": 0.19507726019912494,
+      "absolute_error_p90_pct": 20.415071980921876,
+      "count": 360,
+      "positive_reference_count": 360,
+      "signed_error_mean_pct": -5.146506538481509,
+      "signed_error_median_pct": 0.026053814692224855,
+      "within_2pct_count": 261,
+      "within_2pct_fraction": 0.725
+    }
+  },
+  "internal_validation_is_development_evidence": true,
+  "limitations": [
+    "Conditioned compact loop is ~2 cycles/iteration on both Shuttles across offsets; simple loop alignment alone does not reproduce the old smoke 4-cycle cadence.",
+    "Training motif has two independent integer ops followed by a branch depending on the second; other dataflow/BTB/history and general kernels remain unvalidated.",
+    "First-use/reset/instruction-cache/branch-history effects are not predicted by this steady-footprint diagnostic; every row and error is retained.",
+    "Boundary constant is region-only diagnostic; never charge it per instruction or use repetition number as a live feature.",
+    "No native runtime timing knob is bound by this report. Existing source-image association and full heldout +/-2% remain false."
+  ],
+  "live_native_quality_certified": false,
+  "models": {
+    "rocket": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        3.000122923951046,
+        0.9995492788461539,
+        7.27272727272859
+      ],
+      "dependency_issue_floor": 3,
+      "fetch_word_bytes": 4,
+      "fitting_rows": 264,
+      "rank": 3
+    },
+    "shuttle": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        2.0002886690562725,
+        0.9952766527238096,
+        4.239027163861398
+      ],
+      "dependency_issue_floor": 2,
+      "fetch_word_bytes": 8,
+      "fitting_rows": 528,
+      "rank": 3
+    }
+  },
+  "noop_controls": 9,
+  "overhead_subtraction": false,
+  "parameters_sha256": "0283d4af46707bc1d07042fdc2c5889e44e311332caef464ac523b0bc7191590",
+  "predictions_sha256": "9b9ac3915fdddafb14a806e7c55f15af3336202954fc02fb40182ed8f6aacf11",
+  "reference_archive_sha256": "40ee7353db6cb0f2fa75fe63e28079328256773e2ce5d15f8d2dc77b8086fa26",
+  "reference_report_sha256": "b248604626e99ac67e30c3acc24803159c39408bc44df673224d508cfa718a09",
+  "rows": 2304,
+  "schema": "iris.empirical_cpu_layout_report.v1",
+  "source_image_association_verified": false,
+  "split_parent_counts": {
+    "control": 1,
+    "internal_validation": 80,
+    "train": 176
+  },
+  "status": "fit_and_internal_validation_complete_unbound_diagnostic",
+  "training": {
+    "absolute_error_max_pct": 95.36526267662893,
+    "absolute_error_median_pct": 0.19507726019912494,
+    "absolute_error_p90_pct": 17.881499976524804,
+    "count": 1584,
+    "positive_reference_count": 1584,
+    "signed_error_mean_pct": -4.637147505357414,
+    "signed_error_median_pct": 0.018313403376505256,
+    "within_2pct_count": 1230,
+    "within_2pct_fraction": 0.7765151515151515
+  }
+}

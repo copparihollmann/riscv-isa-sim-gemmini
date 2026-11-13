@@ -1,0 +1,31 @@
+{
+  "cases": 230,
+  "operations": [
+    "vfadd.vv",
+    "vfadd.vf",
+    "vfsub.vv",
+    "vfsub.vf",
+    "vfrsub.vf",
+    "vfmul.vv",
+    "vfmul.vf",
+    "vfmacc.vv",
+    "vfmacc.vf",
+    "vfnmacc.vv",
+    "vfnmacc.vf",
+    "vfmsac.vv",
+    "vfmsac.vf",
+    "vfnmsac.vv",
+    "vfnmsac.vf",
+    "vfmadd.vv",
+    "vfmadd.vf",
+    "vfnmadd.vv",
+    "vfnmadd.vf",
+    "vfmsub.vv",
+    "vfmsub.vf",
+    "vfnmsub.vv",
+    "vfnmsub.vf"
+  ],
+  "header_sha256": "feaa53f6e9d8a8178776a1b65de98aa239f8d23bd2f9db6e45c840c667a66c22",
+  "host_float_used": false,
+  "rtl_executed": false
+}

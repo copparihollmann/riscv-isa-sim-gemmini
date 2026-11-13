@@ -1,0 +1,129 @@
+{
+  "actual_parameter_fit_performed": true,
+  "eligible_fit_families_excluded": [
+    "atomic",
+    "atomics",
+    "empty",
+    "ipi",
+    "lrsc",
+    "pipeline",
+    "pipeline_vme",
+    "refuse_vme",
+    "sync_barrier",
+    "timer",
+    "vme_refusal"
+  ],
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "build/empirical-training-corrected-basis-v1/regions.jsonl": "be4c81f223989975d91a853259ec7c1194be57c8baa19f2098ffde9e23308660",
+    "build/empirical-training-corrected-pilot-v1/results.json": "9bd166cf73687ce853d6980ddf5bdcfa563779e1c4db85003891fc49928559ed",
+    "calibration/empirical-v1/split.json": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c"
+  },
+  "intercept_policy": "No ROI intercept or negative cost; fixed actual native baseline scale1.",
+  "linearization_unknowns": [
+    "Async compute overlap is not a sum; this pilot only proposes additional costs.",
+    "Shared outer launch interval cannot be fitted by simple per-hart instruction-count regression.",
+    "Cold Icache needs actual runtime Icache features; not assigned to an instruction family.",
+    "Snapshot may be an intentionally bounded training pilot, not the complete6750 run."
+  ],
+  "live_model_quality_accepted": false,
+  "models": {
+    "rocket": {
+      "baseline_scale": 1.0,
+      "coefficients": {
+        "branch.mispredicts": 1.9532967997938924,
+        "cache.DRAM.reads": 0.0,
+        "cache.DRAM.writes": 1.2372121654522006,
+        "icache.DRAM.l1misses": 145.05052369433764,
+        "icache.DRAM.l2misses": 486.30917364206744
+      },
+      "columns": 5,
+      "individual_coefficients_identifiable": true,
+      "rank": 5,
+      "region_intercept_cycles": 0.0,
+      "scope": "Nonnegative added-cost linearization; actual native replay required for nonlinear overlap/contention.",
+      "training_parent_ids": [
+        "scalar.branch.256",
+        "scalar.dep.1024",
+        "scalar.dep.256",
+        "v2.frontend.16384b.4",
+        "v2.frontend.4096b.16",
+        "v2.frontend.4096b.4",
+        "v2.frontend.512b.16",
+        "v2.frontend.512b.4",
+        "v2.scalar.dependent.2048",
+        "v2.scalar.dependent.512",
+        "v2.scalar.independent8.128",
+        "v2.scalar.independent8.2048",
+        "v2.scalar.independent8.512"
+      ],
+      "training_semantic_hart_groups": 13
+    },
+    "shuttle": {
+      "baseline_scale": 1.0,
+      "coefficients": {
+        "branch.mispredicts": 2.030219663847331,
+        "cache.DRAM.dirtywritebacks": 654.348405251422,
+        "cache.DRAM.l1misses": 0.0,
+        "cache.DRAM.l2misses": 635.4641520631545,
+        "cache.DRAM.reads": 0.0,
+        "cache.DRAM.writes": 0.0,
+        "icache.DRAM.l1misses": 30.353617051759457,
+        "memory.LOCAL_TCM.accesses": 2.0053256379958477,
+        "rvv.integer.instructions": 0.05672561161221395,
+        "rvv.integer.work": 0.0,
+        "vme.int8.instructions": 8.623814805134321,
+        "vme.int8.work": 7.263046030183995e-17,
+        "vme.row_move.instructions": 0.0,
+        "vme.row_move.work": 0.0,
+        "vme.zero.instructions": 0.0,
+        "vme.zero.work": 0.0
+      },
+      "columns": 16,
+      "individual_coefficients_identifiable": false,
+      "rank": 11,
+      "region_intercept_cycles": 0.0,
+      "scope": "Nonnegative added-cost linearization; actual native replay required for nonlinear overlap/contention.",
+      "training_parent_ids": [
+        "memory.dram.4k.compute",
+        "memory.dram.4k.h1",
+        "memory.pointer.1m",
+        "memory.pointer.4k",
+        "memory.tcm.4k",
+        "scalar.branch.256",
+        "scalar.dep.1024",
+        "scalar.dep.256",
+        "v2.frontend.16384b.4",
+        "v2.frontend.4096b.16",
+        "v2.frontend.4096b.4",
+        "v2.frontend.512b.16",
+        "v2.frontend.512b.4",
+        "v2.scalar.dependent.2048",
+        "v2.scalar.dependent.512",
+        "v2.scalar.independent8.128",
+        "v2.scalar.independent8.2048",
+        "v2.scalar.independent8.512",
+        "vector.e32.m1.64",
+        "vector.e32.m2.64",
+        "vector.e8.m1.64",
+        "vector.e8.m2.64",
+        "vme.int8.mm.16.h1"
+      ],
+      "training_semantic_hart_groups": 44
+    }
+  },
+  "native_inputs_sha256": {
+    "/scratch/copparihollmann/iris-model/board/build/iris.dtb": "622c099a1dbcc87473d0760b1ec5b366c296d964aec834722d3c5ba0e4a95c78",
+    "/scratch/copparihollmann/iris-model/board/evidence/bootrom.rv64.img": "5f6ae520d6612da2b31c2ee70bc872b743a77bbde0abba87bf96aa5fc249a216",
+    "/scratch/copparihollmann/iris-model/build/campaign-fit-v1/campaign.elf": "9d6f692c98d955276e0ac7d941afefa3551a240f2f8ce39cd2a6f1ab57f44942",
+    "/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/libsifive_uart.so": "92f6168dadd84d18628e04281abd83d134efe022a3db2aae331673b0be6c5b03",
+    "/scratch/copparihollmann/iris-model/build/empirical-fast-frozen-131c604e/spike": "131c604e835ee10b4b93c912daa0f09e7f3c2724128e7c67e3599e7f3343b4c7",
+    "/scratch/copparihollmann/iris-model/build/empirical-training-corrected-pilot-v1/fast.fixture": "bd42d3f233e2d14e8cadc085a145be18546805e55fab2c8c4b6c2b05c826024c"
+  },
+  "native_run_status_at_snapshot": "running",
+  "schema": "iris.empirical_live_residual_fit.v1",
+  "source_image_association_verified": false,
+  "source_sha256": "658659fff055b6ea73d24df3cff6794d606343326d0ef7b74f2ce698c81fc874",
+  "status": "pilot_fit_completed_runtime_replay_pending"
+}

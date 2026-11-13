@@ -1,0 +1,26 @@
+{
+  "schema": "iris.pow2_scalar_cache_two_fixed_modes_selection_plan.v1",
+  "policies": [
+    {
+      "mode": "LRU",
+      "parameters": "calibration/pow2-scalar-cache-LRU-TRAIN-NNLS-v2/parameters.json",
+      "parameters_sha256": "43039d0a8dec289a2efbf92cf187a7d3094e654b9ef1c126c5d4fe34cab0cf18",
+      "fixture": "calibration/pow2-scalar-cache-LRU-TRAIN-NNLS-v2/runtime.fixture",
+      "fixture_sha256": "ab489b819fbc747d521a9270fd8428a643f86f2f20b8a2ed56c7a8e411bdfd67"
+    },
+    {
+      "mode": "source-ShuttleRandom",
+      "parameters": "calibration/pow2-scalar-cache-source-ShuttleRandom-TRAIN-NNLS-v2/parameters.json",
+      "parameters_sha256": "280f08da35180c582a7faba09d35d9f69be5814d7215e7777caa3337001d71bb",
+      "fixture": "calibration/pow2-scalar-cache-source-ShuttleRandom-TRAIN-NNLS-v2/runtime.fixture",
+      "fixture_sha256": "52d2a0bca078d7190d6bc47a57a3ead393812fd2d1344885f2bcc73b1e208e6a"
+    }
+  ],
+  "source_seed_or_policy_grid": false,
+  "further_parameter_fits": false,
+  "selection_score": "Sum over all180TRAIN rows of (actual normal-fitted-native mcycle delta / hardware mcycle delta -1)^2. No row filtering. Actual normalexit and234goldens required before eligibility. Lower score wins; exacttie prefersLRU. No reserved timing labels. Selection only suggests an experimental candidate; root owns promotion and independent gates.",
+  "reference": "build/pow2-memory-HARDWARE-TRAIN-v2/regions.jsonl",
+  "reference_sha256": "896f97794b8ef4490ad6d54b5ca8da9e7023aabc7356926072465ff07cb041a5",
+  "actual_fitted_comparisons_available_at_plan_creation": false,
+  "current_selection_changed": false
+}

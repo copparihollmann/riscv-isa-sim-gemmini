@@ -1,0 +1,16 @@
+configure_empirical.py
+configure_empirical_compute.py
+configure_empirical_compute_v2.py
+configure_empirical_v2.py
+small-m-companion.json
+zephyr/boards/chipyard/iris/ethan-firesim.overlay
+zephyr/iris_uart_profile.h
+zephyr/uart-profile-evidence/BridgeBinders.scala
+zephyr/uart-profile-evidence/UARTBridge.scala
+zephyr/uart-profile-evidence/UARTBridgeModule.scala
+zephyr/uart-profile-evidence/firesim-clocks.freq-summary
+zephyr/uart-profile-evidence/firesim-target-config.scala
+zephyr/uart-profile-evidence/firesim-uart-annotation.json
+zephyr/uart-profile-evidence/soc.h
+zephyr/uart-profile-evidence/uart_sifive.c
+zephyr/uart-profiles.json

@@ -1,0 +1,10 @@
+{
+  "schema": "iris.historical_compiler_sources.v1",
+  "artifacts": {
+    "/scratch/copparihollmann/iris-model/integration/iris-mlir/boards.yaml": {
+      "path": "zephyr/historical-compiler-sources/boards-fd413849.yaml",
+      "sha256": "fd413849bed22f5a2774531b4e6cf101937df5b8e20b4cc5547bb17231ddd06c",
+      "preservation": "Exact prior bytes recovered by reversing the agent-owned documentation-only UART note edit; matches preexisting executed-gate digest fd413849."
+    }
+  }
+}

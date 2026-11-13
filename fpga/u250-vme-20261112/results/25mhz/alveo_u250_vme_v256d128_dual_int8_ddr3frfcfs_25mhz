@@ -1,0 +1,4 @@
+alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_25mhz:
+    bitstream_tar: file:///scratch/copparihollmann/u250-vme-20261112/parallel-25mhz/firesim/deploy/results-build/2026-11-12--09-36-21-alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_25mhz/cl_xilinx_alveo_u250-firesim-FireSim-FireSimVMEV256D128DualShuttleConfig-FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config/firesim.tar.gz
+    deploy_quintuplet_override: null
+    custom_runtime_config: null

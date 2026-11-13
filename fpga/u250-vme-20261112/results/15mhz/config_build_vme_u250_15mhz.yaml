@@ -1,0 +1,10 @@
+build_farm:
+  base_recipe: build-farm-recipes/externally_provisioned.yaml
+  recipe_arg_overrides:
+    default_build_dir: /scratch/copparihollmann/u250-vme-20261112/vivado-builds/15mhz
+    build_farm_hosts:
+    - localhost
+builds_to_run:
+- alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_15mhz
+agfis_to_share: []
+share_with_accounts: {}

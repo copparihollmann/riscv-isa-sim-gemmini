@@ -1,0 +1,92 @@
+{
+  "schema": "iris.pow2_scalar_cache_two_predeclared_modes_TRAIN_NNLS.v2",
+  "pass": true,
+  "mode": "source-ShuttleRandom",
+  "zero_baseline": "/scratch/copparihollmann/iris-model/build/pow2-memory-source-ShuttleRandom-zero-bases-v1",
+  "coefficients": [
+    {
+      "hart": 0,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 58.56707275663149,
+      "beta_core_cycles_per_modeled_outer_miss_line": 96.08389905652744,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.004565709635158809,
+            5.191917437959714e-06
+          ],
+          [
+            5.191917437959714e-06,
+            4.7588607855520386e-05
+          ]
+        ],
+        "determinant": 2.17248809403061e-07,
+        "relative_squared_loss_sum": 12.005050075698126,
+        "zero_basis_rows": 11
+      }
+    },
+    {
+      "hart": 1,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 51.627543375139744,
+      "beta_core_cycles_per_modeled_outer_miss_line": 78.35334926378529,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.005174915874564611,
+            2.8025466580501176e-06
+          ],
+          [
+            2.8025466580501176e-06,
+            5.1860980496096175e-05
+          ]
+        ],
+        "determinant": 2.6836835697196325e-07,
+        "relative_squared_loss_sum": 13.617845129425893,
+        "zero_basis_rows": 10
+      }
+    },
+    {
+      "hart": 2,
+      "alpha_core_cycles_per_modeled_L2_hit_line": 61.938621490406334,
+      "beta_core_cycles_per_modeled_outer_miss_line": 50.646800457238804,
+      "TRAIN_rows": 60,
+      "design": {
+        "rank": 2,
+        "gram": [
+          [
+            0.003100706412346545,
+            1.0472239358181102e-09
+          ],
+          [
+            1.0472239358181102e-09,
+            5.687202945602352e-05
+          ]
+        ],
+        "determinant": 1.7634346641635704e-07,
+        "relative_squared_loss_sum": 14.824984382862736,
+        "zero_basis_rows": 18
+      }
+    }
+  ],
+  "estimator": "Fixed per-hart2-column nonnegative relative LS; all60TRAIN rows/hart; no intercept, no filtering. Target=HWminus actual same-mode zero native cycles. X=actual ordinary scalar load L2-hit/outer-miss probes with strict same-run class equality.",
+  "finite_comparison_plan": "Only LRU versus fixed-source ShuttleRandom; no seed/PRNG/policy tuning; mode selection uses sum of TRAIN relative-square loss only; actual replay required.",
+  "TRAIN_relative_squared_loss_sum": 40.447879587986755,
+  "reserved_labels_consumed": false,
+  "physical_latencies_identified": false,
+  "actual_nonlinear_replay_qualified": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/pipeline/fit_pow2_scalar_cache_modes_v2.py": "bf495ebcdfc89298e9092328dc3ff9fe74c8c8d7b0362e67f44612b599f3b6ae",
+    "/scratch/copparihollmann/iris-model/pipeline/fit_pow2_scalar_cache_v1.py": "ffc763e1e83896875b7999c77a5fd56643fa1695ada41d69146525347fc01339",
+    "/scratch/copparihollmann/iris-model/build/scalar-cache-pow2-random-zero-input-v1/random-alpha0-beta0.fixture": "33f22ed5ee9fc11f8cab560708542c4406e22b248f000c1b19cf6ab4e9ed5ccf",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-HARDWARE-TRAIN-v2/report.json": "8f69d16c89bc200812af52c729d2611bee19e587ff01ba0dbf2e0fae1d3c196d",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-HARDWARE-TRAIN-v2/regions.jsonl": "896f97794b8ef4490ad6d54b5ca8da9e7023aabc7356926072465ff07cb041a5",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-single-v1/corpus.json": "d1658cb28517384d2000177db974909c2795c398465d3c39e297b16e94250abd",
+    "/scratch/copparihollmann/iris-model/benchmarks/pow2_memory_v1/validate.py": "b270a9485b70dbcdc7f5c97d0e9546e1d2976d226cad002f835527df7ba3d735",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-source-ShuttleRandom-zero-bases-v1/run.json": "a8a41f567408099c08a6640c851a0d4f7a00991616a6be2feb58fcd4764b2d54",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-source-ShuttleRandom-zero-bases-v1/stdout": "85450cc4350439f784b370df26d000b5218f8cbd2b43061585e0d3f8e5446255",
+    "/scratch/copparihollmann/iris-model/build/pow2-memory-source-ShuttleRandom-zero-bases-v1/features.jsonl": "00700ab1e448a2463eacd8bb823bcf9e499ec37a1900d9191474c8b2683c0ef2"
+  }
+}

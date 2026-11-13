@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "provenance_status": "current_workspace_observation_not_build_attestation",
+  "source_path": "/scratch/eygao/iris-cy/sims/firesim",
+  "source_revision": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+  "clean_clone": "third_party/firesim",
+  "observed_dirty_patch": "firesim/firesim-observed-dirty.patch",
+  "observed_dirty_patch_sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+  "untracked_files": [
+    {
+      "path": "deploy/workloads/bare.json",
+      "sha256": "ea08c8965130fe699cde55cf8e101a100d827807de5ea197c28fea36ab9d083f",
+      "bytes": 245
+    },
+    {
+      "path": "deploy/workloads/bare/README",
+      "sha256": "501fe6f1a377a561fd700385de16b8536c70fb948397b781f633d20b60171cb8",
+      "bytes": 205
+    },
+    {
+      "path": "deploy/workloads/br-base.json",
+      "sha256": "d8a04bc0fdea14be3aa4a970de9e5e6cea10b048b0be329d69ef5c2b9e2a42f7",
+      "bytes": 270
+    },
+    {
+      "path": "deploy/workloads/br-base/README",
+      "sha256": "93f73ae2f5a5c434154afe0634e1d4532aec93f06ed9df8d514d1c4550a6bcb3",
+      "bytes": 263
+    },
+    {
+      "path": "env.sh.backup",
+      "sha256": "c0093b0a370e6adf3e44a75372ee93abb407899a1f18ab63d690b7bffbd9168d",
+      "bytes": 738
+    },
+    {
+      "path": "firesim-load-xdma-module",
+      "sha256": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445",
+      "bytes": 491
+    }
+  ],
+  "libgemmini": {
+    "clean_clone": "third_party/libgemmini",
+    "requested_revision": "20961076afc2b83655e534d9b1e9fa3b81c83eeb",
+    "local_source_head": "ea8f7ed7afd68e001fb06ddccad9a023c990961d",
+    "note": "Requested commit was present in local object history and checked out in independent clone."
+  }
+}

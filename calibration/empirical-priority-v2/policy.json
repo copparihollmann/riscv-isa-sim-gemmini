@@ -1,0 +1,46 @@
+{
+  "schema": "iris.empirical_buffered_split_policy.v1",
+  "status": "policy_frozen_before_priority_reference_launch_and_labels",
+  "source_parent_split_sha256": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c",
+  "new_dataset": "buffered.v2",
+  "expected_semantic_parents": 736,
+  "expected_semantic_groups": 728,
+  "expected_trials_per_parent": 3,
+  "expected_regions": 4050,
+  "expected_parent_counts": {
+    "train": 580,
+    "internal_validation": 156
+  },
+  "expected_region_counts": {
+    "train": 3189,
+    "internal_validation": 861
+  },
+  "policy": "Each newparent semantic_parent_case_id maps to the exact old frozen split. Preserve its semantic_group and partition; all aliases, trials and harts remain together. New case/parent IDs and new ELF/reference identity must stay separate.",
+  "actual_new_FPGA_timings_opened": false,
+  "old_internal_validation_errors_previously_viewed": true,
+  "internal_validation_scope": "development_only_not_final_blind_acceptance",
+  "global_heldout_timings_consumed": false,
+  "allowed_runtime_features": [
+    "Decoded instruction family/register dependencies",
+    "Generic instruction fetch/branch-history address hashing and alignment, never exact-PC calibrated lookup",
+    "Actual address/bytes/tag-history/accepted-owner contention",
+    "VL/SEW/LMUL/DLEN/ATLgeometry and activeVMEshape/work",
+    "Actual issue/completion/CSRprefix observations"
+  ],
+  "forbidden_predictors": [
+    "Case IDs or benchmark names",
+    "Golden/reference cycles",
+    "Repetition number",
+    "Parent-specific or exact-PC fitted intercept/table",
+    "Unobserved internal RTL state/readiness as replay input"
+  ],
+  "old_ELF_reference_timings_may_be_used_as_new_labels": false,
+  "old_parameters_automatically_admitted": false,
+  "full_2pct_certified": false,
+  "source_image_association_verified": false,
+  "priority_order": "Memory route probes, then distribution sorted by static kind/footprint and small streaming basis, then heavy memory tail, baseline last; never measured cycles",
+  "priority_prefix_expected": {
+    "cases": 1989,
+    "regions": 3633
+  }
+}

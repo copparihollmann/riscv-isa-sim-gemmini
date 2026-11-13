@@ -1,0 +1,2 @@
+{"functional_handlers":"pass","mode":"upstream-zvt","hart2_refusal":true,"arithmetic_sign_cases":4,"fp8_oracle_cases":0,"fp8_widen_representations":0,"rtl_certified":false}
+{"functional_handlers":"pass","mode":"iris-experimental","hart2_refusal":true,"arithmetic_sign_cases":4,"fp8_oracle_cases":10260,"fp8_widen_representations":512,"rtl_certified":false}

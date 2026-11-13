@@ -1,0 +1,23 @@
+{"updated_at": "2026-11-12T09:06:46.141308+00:00", "phase": "runtime-bootstrap", "status": "running", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:06:46.170028+00:00", "phase": "locked-conda-environment", "status": "running", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:06:46.484874+00:00", "phase": "chipyard-setup", "status": "running", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:06:46.503595+00:00", "phase": "target-submodules", "status": "running", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:06:51.518456+00:00", "phase": "chipyard-setup", "status": "running", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:14:19.538205+00:00", "phase": "setup", "status": "ready", "pid": 1643215, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:14:20.792081+00:00", "phase": "manager-init", "status": "running", "pid": 1644118, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:14:21.423338+00:00", "phase": "configure-pinned-inputs", "status": "running", "pid": 1644118, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:14:34.669484+00:00", "phase": "elaborating-detailed-dram", "status": "running", "pid": 1644118, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:14:34.763247+00:00", "phase": "elaborating-detailed-dram", "status": "failed", "pid": 1644118, "frequencies_mhz": [15, 25], "cpu_budget": 12, "exit_code": 2}
+{"updated_at": "2026-11-12T09:15:09.161042+00:00", "phase": "manager-init", "status": "running", "pid": 1659599, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:15:09.735328+00:00", "phase": "configure-pinned-inputs", "status": "running", "pid": 1659599, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:15:22.746035+00:00", "phase": "elaborating-detailed-dram", "status": "running", "pid": 1659599, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:16:22.882012+00:00", "phase": "elaborating-detailed-dram", "status": "failed", "pid": 1659599, "frequencies_mhz": [15, 25], "cpu_budget": 12, "exit_code": 2}
+{"updated_at": "2026-11-12T09:18:06.262352+00:00", "phase": "manager-init", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:18:06.846168+00:00", "phase": "configure-pinned-inputs", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:18:20.602390+00:00", "phase": "elaborating-detailed-dram", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:22:54.139547+00:00", "phase": "validating-elaboration", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T09:23:05.056515+00:00", "phase": "build-15-mhz", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T13:08:33.022529+00:00", "phase": "archive-15-mhz", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T13:08:35.785996+00:00", "phase": "build-25-mhz", "status": "running", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12}
+{"updated_at": "2026-11-12T13:09:55.848743+00:00", "phase": "build-25-mhz", "status": "failed", "pid": 1664878, "frequencies_mhz": [15, 25], "cpu_budget": 12, "exit_code": 1}
+{"updated_at": "2026-11-12T21:00:08.565137+00:00", "phase": "all-builds", "status": "complete", "note": "25 MHz manager packaging completed post-hoc; see provenance/25mhz-packaging-recovery.json"}

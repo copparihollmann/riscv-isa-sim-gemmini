@@ -1,0 +1,1 @@
+PASSED WIDE_REDUCE_FP8 h0/h1 parallel 18 widening +4 reduction forms; h2 concurrent IEEE32 jobs

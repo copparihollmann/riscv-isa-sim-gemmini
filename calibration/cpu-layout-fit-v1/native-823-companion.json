@@ -1,0 +1,22 @@
+{
+  "schema": "iris.cpu_layout_native_qualification_companion.v1",
+  "status": "all2304_main_numeric_and_actual_CSR_timings_verified",
+  "native_binary_sha256": "823076967a10814e88dde1cb079db14e31c627e51288110a69a86506187c43ff",
+  "actual_same_ELF": true,
+  "main_regions": 2304,
+  "all_numeric_checksum_and_loop_PC_passed": true,
+  "timing_comparison_to_normal_mode_verified": true,
+  "normal_guest_exit_or_noop_claimed": false,
+  "previous_partial_report_unchanged": true,
+  "input_sha256": {
+    "build/cpu-layout-debug-readback-823-v1/validation.json": "a2a5217b649d8df4a705bd0143dc6d9192a3bd9fbc9b0c8df63dda069cd0ff6d",
+    "build/cpu-layout-debug-readback-823-v1/main-regions.jsonl": "cb17e6de4e234f16d5d6f8440b001c4f03b23773912839487b6c8a1084821bd1",
+    "build/empirical-cpu-layout-823-prefix-v1/report.json": "2c26ed1e10088a969b02854a58eafbf01ad8ff13355aebb8f5519d0cf117f80c",
+    "timing/cpu_layout_readback.py": "78bef8992e20b62426b2e6f6196ac3d02671a3ca5104dde93cb392e4f3520f4c",
+    "calibration/cpu-layout-fit-v1/report.json": "bed07c0907266c1fbd71ba6e575c4c48b1505cd3446845c5cf6293b73d2b9bcb"
+  },
+  "global_heldout_timings_consumed": false,
+  "native_runtime_parameters_bound": false,
+  "full_2pct_certified": false,
+  "source_image_association_verified": false
+}

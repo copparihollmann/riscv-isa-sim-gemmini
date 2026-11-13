@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "mode": "LRU",
+  "rows": 180,
+  "parameters_sha256": "43039d0a8dec289a2efbf92cf187a7d3094e654b9ef1c126c5d4fe34cab0cf18",
+  "fixture_sha256": "ab489b819fbc747d521a9270fd8428a643f86f2f20b8a2ed56c7a8e411bdfd67",
+  "reserved_labels_consumed": false,
+  "actual_runtime_accuracy_qualified": false,
+  "TRAIN_relative_squared_loss_sum": 41.543456266070585
+}

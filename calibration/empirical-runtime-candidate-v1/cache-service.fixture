@@ -1,0 +1,5 @@
+# Experimental cache service: additional to scalar baseline; overrides genericDRAMresidual.
+# 448launch applies ONLYperL2miss. Dirtyvictims recorded but no extra reservation untilidentified.
+empirical_cache_service 0 1.49454710597 0.862639823401 62.9233543579 596.40223463 448 0 CANDIDATE_LUMPED edfd77535706951baf29869c6568daaaf60153c622d4adb9f2fcf342e0002384 core_cycles
+empirical_cache_service 1 1.49454710597 0.862639823401 62.9233543579 596.40223463 448 0 CANDIDATE_LUMPED edfd77535706951baf29869c6568daaaf60153c622d4adb9f2fcf342e0002384 core_cycles
+empirical_cache_service 2 0.103022793162 0 62.9233543579 596.40223463 448 0 CANDIDATE_LUMPED edfd77535706951baf29869c6568daaaf60153c622d4adb9f2fcf342e0002384 core_cycles

@@ -1,0 +1,15 @@
+{
+  "schema": "iris.compute_fadd_shape_family_diagnostics.v1",
+  "pass": true,
+  "derivation": "Exact all-family all-hart aggregation of final own-epoch1008actualcounterreport; no parameter/model change",
+  "metrics_include_unqualified_families": true,
+  "normal_guest_exit_verified": false,
+  "global_heldout_timings_consumed": false,
+  "full_2pct_certified": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-7de-selected-evaluation-v1/report.json": "5335bac64aa1d47ff39d16893ddf7111e32a1e568faf61128a101d7ad7b5d727"
+  },
+  "output_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-fadd-shape-7de-family-diagnostics-v1/signed-family-hart.csv": "aa888559112900976689ff6ac5587498fc6aaf9b49782cf911d387630d20ece5"
+  }
+}

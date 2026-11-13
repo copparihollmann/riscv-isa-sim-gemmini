@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+  "harts": [
+    {
+      "hart": 0,
+      "module": "CSRFile",
+      "first_line": 1149444,
+      "snapshot_sha256": "0fbea66a2db7a61cf1a2c0e4a2c64df1ff3759e1f04c1cb23398150ee3676f4c",
+      "perf_counter_ports": 0,
+      "hpm_register_count": 0,
+      "mcountinhibit_width": 3,
+      "fflags_reset": "uninitialized register",
+      "frm_reset": "uninitialized register"
+    },
+    {
+      "hart": 1,
+      "module": "CSRFile_1",
+      "first_line": 1994415,
+      "snapshot_sha256": "37c3396db52e65aafcb790948732e0ff5ce326742379dbb07d667df0a4057bbf",
+      "perf_counter_ports": 0,
+      "hpm_register_count": 0,
+      "mcountinhibit_width": 3,
+      "fflags_reset": "uninitialized register",
+      "frm_reset": "uninitialized register"
+    },
+    {
+      "hart": 2,
+      "module": "CSRFile_2",
+      "first_line": 2350686,
+      "snapshot_sha256": "93d465a896fe05d8663b04fccbcfa4e731aa2df482484a46b4f2971477d652ae",
+      "perf_counter_ports": 0,
+      "hpm_register_count": 0,
+      "mcountinhibit_width": 3,
+      "fflags_reset": "uninitialized register",
+      "frm_reset": "uninitialized register"
+    }
+  ],
+  "source_inputs": {
+    "third_party/rocket-chip/src/main/scala/rocket/CSR.scala": {
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala": {
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/rocket-chip/src/main/scala/tile/FPU.scala": {
+      "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/shuttle/src/main/scala/common/Parameters.scala": {
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "git_sha": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "third_party/shuttle/src/main/scala/exu/Core.scala": {
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "git_sha": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "third_party/saturn/src/main/scala/backend/RegisterFile.scala": {
+      "sha256": "4f21a5f2b8a849571d1c26e6921f76a846d8c460e3cd56b940fbe16361886d4d",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    }
+  },
+  "rtl_executed": false,
+  "deployed_image_association_verified": false,
+  "claims": {
+    "HPM": "All3 elaborated CSRFiles have zero performance counter ports/regs. Source pads all29 HPM/event slots with0; writes loop empty.",
+    "counteren": "Read masks0x7; user/supervisor HPM access always illegal. Counteren internal registers themselves are unreset.",
+    "mcountinhibit": "3bit reset0; bit1 tied0; only CY/IR writable.",
+    "time": "No CSRs.time or timeh mapping in pinned CSR read_mapping. Independent selected saved-RTL probes are recorded separately; CLINT mtime is separate MMIO.",
+    "reset": "fflags/frm, scalar FPR storage and VRF/v0 storage have no reset initialization; model must not certify zero reset bits."
+  }
+}

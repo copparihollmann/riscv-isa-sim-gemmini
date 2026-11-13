@@ -1,0 +1,86 @@
+[
+  {
+    "name": "state",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__states_0_g"
+  },
+  {
+    "name": "valid",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__vcalloc_vals_0"
+  },
+  {
+    "name": "select",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__vcalloc_sel"
+  },
+  {
+    "name": "input_mask",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__mask"
+  },
+  {
+    "name": "out0_occupied",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__output_unit_1_to_5__DOT__states_0_occupied"
+  },
+  {
+    "name": "out1_occupied",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__output_unit_1_to_5__DOT__states_1_occupied"
+  },
+  {
+    "name": "vc_alloc_inputs",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__vc_allocator__DOT__in_arb_sel"
+  },
+  {
+    "name": "input0_eligible",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__vc_allocator__DOT__in_arb_vals_0"
+  },
+  {
+    "name": "input0_wants_out0",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__vc_allocator__DOT__in_arb_reqs_0_1_0"
+  },
+  {
+    "name": "allocated_out0",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__vc_allocator__DOT__in_alloc_1_0"
+  },
+  {
+    "name": "deq_ptr",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__input_buffer__DOT__qs_0__DOT__deq_ptr_value"
+  },
+  {
+    "name": "enq_ptr",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__input_buffer__DOT__qs_0__DOT__enq_ptr_value"
+  },
+  {
+    "name": "maybe_full",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__input_buffer__DOT__qs_0__DOT__maybe_full"
+  },
+  {
+    "name": "deq_valid",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT___input_buffer_io_deq_0_valid"
+  },
+  {
+    "name": "head_word0",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__input_buffer__DOT__qs_0__DOT__ram_ext__DOT__Memory[iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__input_buffer__DOT__qs_0__DOT__deq_ptr_value][0]"
+  },
+  {
+    "name": "permitted_out_0",
+    "expression": "iris_root->TestDriver__DOT__testHarness__DOT__chiptop0__DOT__system__DOT__sbus_system_bus_noc_acd_noc_noc_router_sink_domain_4__DOT__routers__DOT__input_unit_0_from_3__DOT__states_0_vc_sel_1_0"
+  },
+  {
+    "name": "permitted_out_1",
+    "expression": "0"
+  },
+  {
+    "name": "permitted_out_2",
+    "expression": "0"
+  },
+  {
+    "name": "permitted_out_3",
+    "expression": "0"
+  },
+  {
+    "name": "permitted_out_4",
+    "expression": "0"
+  },
+  {
+    "name": "permitted_out_5",
+    "expression": "0"
+  }
+]

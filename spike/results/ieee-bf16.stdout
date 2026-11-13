@@ -1,0 +1,1 @@
+PASSED IEEE_BF16 h0/h1 parallel45 forms FP16/BF16/FP32/FP64 source flags; h2 full IEEE flags; scalar BF16 illegal all3

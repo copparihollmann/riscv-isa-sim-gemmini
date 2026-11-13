@@ -1,0 +1,55 @@
+--- a/riscv/sim.cc
++++ b/riscv/sim.cc
+@@ -4,6 +4,8 @@
+ #include "dtb_discovery.h"
+ #include "sim.h"
+ #include "iris_timing_adapter.h"
++#include "iris_clocked_device.h"
++extern "C" uint64_t iris_device_clock_abi_v1() { return 1; }
+ #include "../../../board/iris_boot.hpp"
+ #include "../../../board/physical_map.hpp"
+ #include "mmu.h"
+@@ -431,6 +433,10 @@
+       procs[i]->get_state()->mcycle->advance_time(after / clock.divider - before / clock.divider);
+   }
+   uint64_t ticks = after / profile.rtc_divider - before / profile.rtc_divider;
++  for (auto& device : devices) {
++    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get()))
++      clocked->iris_advance_model_clock(before, after, profile.base_hz);
++  }
+   // All device time advances from the model clock, never instruction retirement.
+   for (auto& device : devices) device->tick(ticks);
+ }
+@@ -452,6 +458,14 @@
+     edge += (ticks - 1) * divider;
+     if (!earliest || edge < *earliest) earliest = edge;
+   }
++  for (const auto& device : devices) {
++    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get())) {
++      auto edge = clocked->iris_next_model_event(now, iris_timing->profile().base_hz);
++      if (edge && *edge <= now)
++        throw std::runtime_error("IRIS_DEVICE_INVALID_DEADLINE: device event must be future");
++      if (edge && (!earliest || *edge < *earliest)) earliest = edge;
++    }
++  }
+   return earliest;
+ }
+ 
+--- /dev/null
++++ b/riscv/iris_clocked_device.h
+@@ -0,0 +1,15 @@
++#pragma once
++#include <cstdint>
++#include <optional>
++extern "C" uint64_t iris_device_clock_abi_v1();
++
++// Optional independent interface: ordinary Spike devices retain their ABI.
++// Times are absolute ticks of the selected modeled base clock, never host time.
++class iris_clocked_device_t {
++ public:
++  virtual ~iris_clocked_device_t() = default;
++  virtual void iris_advance_model_clock(uint64_t before, uint64_t after,
++                                      uint64_t base_hz) = 0;
++  virtual std::optional<uint64_t> iris_next_model_event(uint64_t now,
++                                                       uint64_t base_hz) const = 0;
++};

@@ -1,0 +1,147 @@
+{
+  "module": "FPUDecoder_2",
+  "module_first_line": 2006219,
+  "module_lines": 2627,
+  "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+  "snapshot_sha256": "fd8b23d796dbfcd245acf9a5bfe270d014502408cb1249b6ec4e88c85458ecbe",
+  "wflags_pla_terms": [
+    {
+      "mask": "0x73",
+      "value": "0x43"
+    },
+    {
+      "mask": "0x7bf0007f",
+      "value": "0x40100053"
+    },
+    {
+      "mask": "0x7df0007f",
+      "value": "0x40200053"
+    },
+    {
+      "mask": "0x7fd0007f",
+      "value": "0x42000053"
+    },
+    {
+      "mask": "0x7fe0007f",
+      "value": "0x44000053"
+    },
+    {
+      "mask": "0xe200007f",
+      "value": "0x53"
+    },
+    {
+      "mask": "0xe400007f",
+      "value": "0x53"
+    },
+    {
+      "mask": "0xebc0007f",
+      "value": "0xc0000053"
+    },
+    {
+      "mask": "0xedc0007f",
+      "value": "0xc0000053"
+    },
+    {
+      "mask": "0xfa00507f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfa00607f",
+      "value": "0x28000053"
+    },
+    {
+      "mask": "0xfa00607f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfbf0007f",
+      "value": "0x58000053"
+    },
+    {
+      "mask": "0xfc00507f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfc00607f",
+      "value": "0x28000053"
+    },
+    {
+      "mask": "0xfc00607f",
+      "value": "0xa0000053"
+    },
+    {
+      "mask": "0xfdf0007f",
+      "value": "0x58000053"
+    }
+  ],
+  "cases": [
+    {
+      "instruction": "vfmin.vf",
+      "match": "0x10005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfmax.vf",
+      "match": "0x18005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfsgnj.vf",
+      "match": "0x20005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfsgnjn.vf",
+      "match": "0x24005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vfsgnjx.vf",
+      "match": "0x28005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmfeq.vf",
+      "match": "0x60005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmfne.vf",
+      "match": "0x70005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmflt.vf",
+      "match": "0x6c005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmfle.vf",
+      "match": "0x64005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmfgt.vf",
+      "match": "0x74005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    },
+    {
+      "instruction": "vmfge.vf",
+      "match": "0x7c005057",
+      "mask": "0xfc00707f",
+      "wflags_true_terms": []
+    }
+  ],
+  "source_image_association_verified": false,
+  "rtl_executed": false
+}

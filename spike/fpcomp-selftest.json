@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "handler_executions": 12672,
+  "operation_cases": 8448,
+  "forms": 22,
+  "illegal_sew8_cases": 132,
+  "generic_semantics_cases": 9,
+  "core_priority_cases": 6,
+  "vector_config_refusals": 2,
+  "source_selected_chunk_flags": true,
+  "mask_tail_checked": true,
+  "source_altfmt_checked": true,
+  "rtl_certified": false,
+  "log_sha256": "8e21d2ca7e19a3715a5b559078cc2df4f4a197f4de0321913bc70ec19e626797"
+}

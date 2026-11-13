@@ -1,0 +1,73 @@
+{
+  "cases": 2208,
+  "checks": 55636,
+  "compiled_source_ID_and_call_table_order_independently_verified": true,
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "hardware_reference_available": false,
+  "input_sha256": {
+    "benchmarks/campaign_buffered/main_reordered.c": "307685150954194c6594c22f03626d712e9f871a0617da4e5c6b6289628166a4",
+    "benchmarks/golden.py": "827d50d52f1c417e671f53f3f70408d6c7f5799f6456c07971119125081aa1dc",
+    "benchmarks/memory_routes/cases.py": "0d254ad610d5b26208d49b244a73fd39f93268c921d34757266c7edb9b6bc356",
+    "benchmarks/v2/cases.py": "bfcba12b24c27145ba1a669dd44b449899ec7ea87a0cf7b263fc81c927eab1f3",
+    "build/campaign-buffered-priority-v2-final/build.json": "dcf8f299de55c35abbcca2f2874c3321879aa2f8d787be16f9a39cc7db2bd05b",
+    "build/campaign-buffered-priority-v2-final/campaign.elf": "30598c1a89abaa2e7bd0a52b3734e3cf268ab35ecabbdab652ab9bc7b29e4ff3",
+    "build/campaign-buffered-priority-v2-final/corpus.json": "eedd67b79cb5489f2ad31763a99795b29c8ebd8ed621e8785443cb8867bd2c57",
+    "build/campaign-buffered-priority-v2-final/readback-layout.json": "b6cb36edb46719174c7939722fe84ca515e893a734d6f8eca55e9bf40fdfc8f3",
+    "calibration/empirical-priority-v2/policy.json": "aafcd41fe165be8567a37e31e89fe5c3df8c63abe6ef7f2be324491848af2f44",
+    "calibration/empirical-v1/split.json": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c",
+    "timing/empirical_buffered_review.py": "d7296f098f1eec1f1297a6b7f42fd6088a707d6474d4ec27f00db081705744d2",
+    "timing/empirical_buffered_strict_review.py": "c084b23691365b20c4ae8237dd2c0966b41f24ceab42dc76a2c4dce8f8faa48d",
+    "timing/empirical_priority_review.py": "7321b8ebf2d0285a3e3072359360618f10fb1830594dc820939dbafe5916dcb7"
+  },
+  "negative_controls": [
+    {
+      "control": "golden",
+      "rejected": true
+    },
+    {
+      "control": "reordered",
+      "rejected": true
+    },
+    {
+      "control": "unknown_field",
+      "rejected": true
+    },
+    {
+      "control": "boolean_trial",
+      "rejected": true
+    },
+    {
+      "control": "wrong_dataset",
+      "rejected": true
+    },
+    {
+      "control": "measured_order",
+      "rejected": true
+    }
+  ],
+  "numeric_functional_execution_claimed": false,
+  "old_reference_timings_imported": false,
+  "ordering_uses_measured_cycles": false,
+  "priority_prefix_cases": 1989,
+  "priority_prefix_regions": 3633,
+  "regions": 4050,
+  "schema": "iris.empirical_priority_independent_review.v2",
+  "source_preservation": [
+    {
+      "kernel_preparation_and_measured_window_byte_equal": true,
+      "suite": "baseline"
+    },
+    {
+      "kernel_preparation_and_measured_window_byte_equal": true,
+      "suite": "distribution"
+    },
+    {
+      "kernel_preparation_and_measured_window_byte_equal": true,
+      "suite": "memory"
+    }
+  ],
+  "split_sha256": "63b0013d8a28e5d25537c83a3e19412c7567f77a0d5799860ca9207798527158",
+  "status": "source_goldens_static_order_split_passed_functional_reference_pending",
+  "typed_canonical_goldens_all_active_harts_verified": true
+}

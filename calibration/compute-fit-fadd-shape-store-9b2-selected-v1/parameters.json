@@ -1,0 +1,444 @@
+{
+  "actual_calibrated_native_replay_completed": false,
+  "actual_parameter_fit_performed": true,
+  "base_hz": 500000000,
+  "branch": {
+    "0": 5.0,
+    "1": 5.0,
+    "2": 2.0
+  },
+  "cache": {
+    "0": {
+      "dirty_extra": 0.0,
+      "l1_miss": 16.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 0.0,
+      "write_base": 0.0
+    },
+    "1": {
+      "dirty_extra": 0.0,
+      "l1_miss": 16.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 0.0,
+      "write_base": 0.0
+    },
+    "2": {
+      "dirty_extra": 0.0,
+      "l1_miss": 16.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126,
+      "read_base": 0.0,
+      "write_base": 0.0
+    }
+  },
+  "calibration_identity": "iris-empirical-compute-fadd-shape-store-9b2-v1",
+  "cost_semantics": {
+    "L1_miss": "Additional effective data cache miss response, not instruction service; private hits unchanged.",
+    "async": "Positive integer extra backend durations over current RVV/VME source/scoped-work baseline, applied only at runtime opcode/config features.",
+    "read_base": "Effective conservative scalar DRAM read/coherence-fallback service; private integer L1-hit load front bypasses it. No physical L1/NoC latency claim.",
+    "scalar_FADD": "Source-qualified fixed EX/write phases, precise late FPR/flags/FS publication; not an empirical fitted coefficient.",
+    "vector": "Generic contiguous ATL load/store response costs; directL2, no L1D allocation; cache outer reservation retained."
+  },
+  "counter_policy": "source-ungated-stall",
+  "families": [
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 2.82381997945,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 0.874004811306,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 25.9971767292,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 24.9011827571,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 19.6722366578,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 16.7280607069,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 2.82381997945,
+      "work": 0.0
+    },
+    {
+      "family": "memory.LOCAL_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 0.874004811306,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 25.9971767292,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 24.9011827571,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 19.6722366578,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 16.7280607069,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 24.8732838867,
+      "work": 0.0
+    },
+    {
+      "family": "memory.REMOTE_TCM.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.tcm.target0",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 20.7416664692,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 28.4389526314,
+      "work": 0.0
+    },
+    {
+      "family": "memory.SCRATCHPAD.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.scratchpad",
+      "scope": "unqualified prior28 path transfer",
+      "setup": 25.6839264739,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 93.5252639517,
+      "work": 3.25488191609
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vme0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vme0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 93.5252639517,
+      "work": 3.25488191609
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vectorFP1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 2.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.integer",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.fp8",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vme1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "vme.row_move",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vme1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.store",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.vector-memory2",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 88.2517635872,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp16",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 4.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp32",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 4.0,
+      "work": 0.0
+    },
+    {
+      "family": "rvv.fadd.fp64",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.sharedFPU2",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 1.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 0,
+      "interval": 1,
+      "resource": "fit.compute.vector-load0",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 20.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 1,
+      "interval": 1,
+      "resource": "fit.compute.vector-load1",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 20.0,
+      "work": 0.0
+    },
+    {
+      "family": "memory.vector.load",
+      "hart": 2,
+      "interval": 1,
+      "resource": "fit.compute.vector-load2",
+      "scope": "own9b2 positive TRAIN effective cost",
+      "setup": 20.0,
+      "work": 0.0
+    }
+  ],
+  "full_2pct_certified": false,
+  "full_model_certified": false,
+  "global_heldout_timings_consumed": false,
+  "instruction": {
+    "0": {
+      "l1_miss": 0.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    },
+    "1": {
+      "l1_miss": 0.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    },
+    "2": {
+      "l1_miss": 47.0,
+      "outer_interval": 461.0,
+      "outer_miss": 545.732041126
+    }
+  },
+  "native_binary_sha256": "9b2a9053b2c62e4ca3deaa5c860d5d3f275d788488a20cc708cfb1c17db0317e",
+  "own_epoch_training_selection": {
+    "candidate_objectives": {
+      "initial": 0.019932023928675813,
+      "outer": 0.08459421568633427,
+      "read0-miss0": 0.019908271170473422,
+      "read0-miss16": 0.018161781503980956,
+      "read0-miss6": 0.01942716614505851,
+      "read16-miss0": 0.018610368749466102,
+      "read16-miss16": 0.018277852589547276,
+      "read16-miss6": 0.018985190689604248,
+      "read32-miss0": 0.01869453826630988,
+      "read32-miss16": 0.019482788624657566,
+      "read32-miss6": 0.018993717786370372,
+      "read8-miss0": 0.019080963354142156,
+      "read8-miss16": 0.018717645173146117,
+      "read8-miss6": 0.018874216379486074
+    },
+    "chosen": "read0-miss16",
+    "internal_validation_used_for_selection": false,
+    "objective": "TRAIN parent/hart trial-median relative MSE; no internal-validation selection"
+  },
+  "owned_store_front": "owned-dirty-L1-COM-v1;bounded-typed-CPU-completion-receipt;approximate-coherence",
+  "parameter_packet_frozen_before_final_identity_replay": true,
+  "prior_memory_parameters": {
+    "path": "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/parameters.json",
+    "qualified_for_new_native": false,
+    "sha256": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258"
+  },
+  "raw_parameters_sha256": "eab156f715e163b8ccd45a76fd860c748ff54b25f387799ce4d38a35f903926d",
+  "rtc_divider": 1000,
+  "scalar_FADD_source_phase": "source-HSD-pipeline-v1;EX-write4Shuttle/3Rocket;no-family-override",
+  "schema": "iris.empirical_compute_parameters.v1",
+  "source_image_association_verified": false,
+  "uart_library_sha256": "4f51c75ba72aa3d6a3258a5a680960d887d588348313ac9c4c100c6e1895d7d2",
+  "unqualified": [
+    "Source frontend strict uninitialized-RAS refusal remains on some actual Merlin ELFs; no fallback or seed has been admitted.",
+    "Optional aligned M-mode owned integer-store front uses approximate intent-time tags; atomic/polling/otherstore/scalar-FP paths retain structural errors.",
+    "Approximate LRU/coherence and effective service queues are not full source cache/NoC/SerialTL timing.",
+    "Outer545.732/461 and TCM/scratch values retain separately bound prior28 provenance and are unqualified transfers to this native.",
+    "No BF16/FP8 vector-FADD timing fit, arbitrary shapes, wholeZephyr/end-to-end or universal2percent qualification.",
+    "Known actualFPGA vector-transport hangs and unsupportedVMEcolumn semantics are not modeled."
+  ],
+  "vme_work": "source-shape-subtiles-v1"
+}

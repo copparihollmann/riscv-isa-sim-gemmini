@@ -1,0 +1,8 @@
+native_fp8_integer_oracle=20480 pass
+wide_fp8_exact_oracle=11520 pass
+native_fp8_handlers=20480 wide_cases=11520 reduction_cases=640 forms=23+18+4 formats=2 rm=5 lmul=4 mask/tails pass
+ieee_fma_integer_oracle=23360 pass
+ieee_fma_handlers=23360 reduction_cases=1120 forms=45 formats=4 rm=5 mask/tails scalar_bf16_illegal=6 hart2_ieee_flags pass
+shared_fma_integer_oracle=21000 reductions=1200 pass
+shared_fma_handlers=21000 reductions=1200 forms=45 masked_flags VFboxing vstart FS pass
+fpcomp_handlers=12672 oracle_cases=8448 forms=22 all3harts source_flags signed_zero mask_tail altfmt FS vstart illegal_sew8=132 generic_semantics=9 core_priority=6 config_refusals=2 pass

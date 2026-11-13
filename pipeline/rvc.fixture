@@ -1,0 +1,17 @@
+# Explicit sequential-frontend subset fixture, never fitted Iris timing.
+purpose uncalibrated-integration-fixture
+source source-Shuttle-RVC-EX-MEM-COM-WB-sequential-frontend-fixture
+shuttle_pipeline pure-integer-rvc-sequential-frontend
+base_hz 100000000
+rtc_divider 200
+max_cycles 100000000
+trap_cycles 4
+hart 0 1 1
+hart 1 1 1
+hart 2 2 1
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+rule 0 0 0 scalar0 3 1 serialized-boundary base_cycles
+rule 1 0 0 scalar1 3 1 serialized-boundary base_cycles
+rule 2 0 0 scalar2 3 1 Rocket-fixture base_cycles

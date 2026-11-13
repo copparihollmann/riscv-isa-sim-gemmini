@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "status": "match",
+  "compared_leaf_fields": 31,
+  "differences": [],
+  "reference": "User-pasted Ethan config_runtime YAML in conversation",
+  "actual_source": "/scratch/eygao/iris-cy/sims/firesim/deploy/config_runtime.yaml",
+  "actual_sha256": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02",
+  "interpretation": "These fields describe manager runtime options; link_latency/net_bandwidth must not be assumed to specify Iris internal serial-TL parameters."
+}

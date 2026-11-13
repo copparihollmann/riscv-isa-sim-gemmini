@@ -1,0 +1,4289 @@
+diff --git a/riscv/cfg.h b/riscv/cfg.h
+index ea3219ad..1d87d040 100644
+--- a/riscv/cfg.h
++++ b/riscv/cfg.h
+@@ -7,6 +7,7 @@
+ #include "decode.h"
+ #include <cassert>
+ #include <map>
++#include <string>
+ class abstract_sim_if_t;
+ 
+ typedef enum {
+@@ -82,6 +83,17 @@ public:
+   std::pair<reg_t, reg_t> initrd_bounds;
+   const char *            bootargs;
+   const char *            isa;
++  // Iris fork: explicit heterogeneous ISA overrides keyed by architectural hart ID.
++  std::map<size_t, std::string> hart_isa;
++  bool                    iris_vme = false;
++  std::string             iris_timing_fixture;
++  std::string             iris_timing_trace;
++  std::string             iris_bootrom_file;
++  std::optional<uint64_t>  iris_schedule_seed;
++  const char* isa_for_hart(size_t id) const {
++    auto it = hart_isa.find(id);
++    return it == hart_isa.end() ? isa : it->second.c_str();
++  }
+   const char *            priv;
+   endianness_t            endianness;
+   reg_t                   pmpregions;
+diff --git a/riscv/clint.cc b/riscv/clint.cc
+index e16ebddc..d92e4b59 100644
+--- a/riscv/clint.cc
++++ b/riscv/clint.cc
+@@ -5,10 +5,24 @@
+ #include "simif.h"
+ #include "sim.h"
+ #include "dts.h"
++#include "../../../board/iris_clint.hpp"
++#include <stdexcept>
+ 
+ clint_t::clint_t(const simif_t* sim, uint64_t freq_hz, bool real_time)
+   : sim(sim), freq_hz(freq_hz), real_time(real_time), mtime(0)
+ {
++  if (!sim->get_cfg().iris_bootrom_file.empty()) {
++    if (real_time || sim->get_cfg().hartids != std::vector<size_t>({0, 1, 2}))
++      throw std::runtime_error("Iris CLINT requires deterministic harts 0,1,2");
++    iris_timer = std::make_shared<iris_board::TimerRegisters>(3);
++    iris_timer->on_interrupt([this](unsigned hart, bool software, std::optional<bool> timer) {
++      auto* state = this->sim->get_harts().at(hart)->get_state();
++      state->mip->backdoor_write_with_mask(MIP_MSIP | MIP_MTIP,
++        (software ? MIP_MSIP : 0) | (timer.value_or(false) ? MIP_MTIP : 0));
++    });
++    tick(0);
++    return;
++  }
+   struct timeval base;
+ 
+   gettimeofday(&base, NULL);
+@@ -34,6 +48,7 @@ clint_t::clint_t(const simif_t* sim, uint64_t freq_hz, bool real_time)
+ 
+ bool clint_t::load(reg_t addr, size_t len, uint8_t* bytes)
+ {
++  if (iris_timer) return iris_timer->load(addr, len, bytes);
+   if (len > 8)
+     return false;
+ 
+@@ -66,6 +81,11 @@ bool clint_t::load(reg_t addr, size_t len, uint8_t* bytes)
+ 
+ bool clint_t::store(reg_t addr, size_t len, const uint8_t* bytes)
+ {
++  if (iris_timer) {
++    bool accepted = iris_timer->store(addr, len, bytes);
++    if (accepted) tick(0);
++    return accepted;
++  }
+   if (len > 8)
+     return false;
+ 
+@@ -101,6 +121,12 @@ bool clint_t::store(reg_t addr, size_t len, const uint8_t* bytes)
+ 
+ void clint_t::tick(reg_t rtc_ticks)
+ {
++  if (iris_timer) {
++    iris_timer->advance_rtc(rtc_ticks);
++    for (const auto& [id, hart] : sim->get_harts())
++      hart->get_state()->time->sync(iris_timer->mtime());
++    return;
++  }
+   if (real_time) {
+    struct timeval now;
+    uint64_t diff_usecs;
+@@ -118,6 +144,22 @@ void clint_t::tick(reg_t rtc_ticks)
+   }
+ }
+ 
++uint64_t clint_t::get_mtime() { return iris_timer ? iris_timer->mtime() : mtime; }
++std::optional<uint64_t> clint_t::timer_compare(reg_t hartid) {
++  return iris_timer ? iris_timer->compare(hartid) : std::optional<uint64_t>(mtimecmp[hartid]);
++}
++uint64_t clint_t::get_mtimecmp(reg_t hartid) {
++  auto value = timer_compare(hartid);
++  if (!value) throw std::runtime_error("IRIS_CLINT_UNKNOWN_COMPARE hart=" + std::to_string(hartid));
++  return *value;
++}
++void clint_t::validate_iris_interrupts(unsigned hart, bool read_pending) const {
++  if (iris_timer && !iris_timer->compare(hart) &&
++      (read_pending || (sim->get_harts().at(hart)->get_state()->mie->read() & MIP_MTIP)))
++    throw std::runtime_error("IRIS_CLINT_UNKNOWN_MTIP hart=" + std::to_string(hart) +
++      " initialize all mtimecmp bytes before enabling MTIE or reading mip");
++}
++
+ clint_t* clint_parse_from_fdt(const void* fdt, const sim_t* sim, reg_t* base,
+     const std::vector<std::string>& sargs UNUSED) {
+   if (fdt_parse_clint(fdt, base, "riscv,clint0") == 0 || fdt_parse_clint(fdt, base, "sifive,clint0") == 0)
+diff --git a/riscv/csr_init.cc b/riscv/csr_init.cc
+index cd0d57f9..68d92f79 100644
+--- a/riscv/csr_init.cc
++++ b/riscv/csr_init.cc
+@@ -57,10 +57,12 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
+   minstret = std::make_shared<wide_counter_csr_t>(proc, CSR_MINSTRET, minstretcfg);
+   mcycle = std::make_shared<wide_counter_csr_t>(proc, CSR_MCYCLE, mcyclecfg);
+   time = std::make_shared<time_counter_csr_t>(proc, CSR_TIME);
+-  if (proc->extension_enabled_const(EXT_ZICNTR)) {
++  if (proc->VU.iris_mode || proc->extension_enabled_const(EXT_ZICNTR)) {
+     add_csr(CSR_INSTRET, std::make_shared<counter_proxy_csr_t>(proc, CSR_INSTRET, minstret));
+     add_csr(CSR_CYCLE, std::make_shared<counter_proxy_csr_t>(proc, CSR_CYCLE, mcycle));
+-    add_csr(CSR_TIME, time_proxy = std::make_shared<counter_proxy_csr_t>(proc, CSR_TIME, time));
++    // Iris exposes cycle/instret, but not CSR_TIME; RTC is CLINT mtime MMIO.
++    if (!proc->VU.iris_mode)
++      add_csr(CSR_TIME, time_proxy = std::make_shared<counter_proxy_csr_t>(proc, CSR_TIME, time));
+   }
+   if (xlen == 32) {
+     csr_t_p minstreth, mcycleh;
+@@ -101,7 +103,8 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
+     add_csr(which_mcounter, mcounter);
+ 
+     auto counter = std::make_shared<counter_proxy_csr_t>(proc, which_counter, mcounter);
+-    add_const_ext_csr(EXT_ZIHPM, which_counter, counter);
++    if (proc->VU.iris_mode) add_csr(which_counter,counter);
++    else add_const_ext_csr(EXT_ZIHPM, which_counter, counter);
+ 
+     if (xlen == 32) {
+       add_csr(which_mevent, std::make_shared<rv32_low_csr_t>(proc, which_mevent, mevent[i]));
+@@ -195,7 +198,9 @@ void state_t::csr_init(processor_t* const proc, reg_t max_isa)
+   } else {
+     add_supervisor_csr(CSR_MIDELEG, mideleg);
+   }
+-  const reg_t counteren_mask = (proc->extension_enabled_const(EXT_ZICNTR) ? 0x7UL : 0x0) | (proc->extension_enabled_const(EXT_ZIHPM) ? 0xfffffff8ULL : 0x0);
++  // All3 Iris CSRFiles have counters[0]; only CY/TM/IR survive read masks.
++  const reg_t counteren_mask = proc->VU.iris_mode ? 0x7UL :
++    (proc->extension_enabled_const(EXT_ZICNTR) ? 0x7UL : 0x0) | (proc->extension_enabled_const(EXT_ZIHPM) ? 0xfffffff8ULL : 0x0);
+   add_user_csr(CSR_MCOUNTEREN, mcounteren = std::make_shared<masked_csr_t>(proc, CSR_MCOUNTEREN, counteren_mask, 0));
+   add_csr(CSR_MCOUNTINHIBIT, mcountinhibit = std::make_shared<masked_csr_t>(proc, CSR_MCOUNTINHIBIT, counteren_mask & (~MCOUNTEREN_TIME), 0));
+   add_supervisor_csr(CSR_SCOUNTEREN, scounteren = std::make_shared<masked_csr_t>(proc, CSR_SCOUNTEREN, counteren_mask, 0));
+diff --git a/riscv/csrs.cc b/riscv/csrs.cc
+index 4e99a20d..b5dd5549 100644
+--- a/riscv/csrs.cc
++++ b/riscv/csrs.cc
+@@ -1344,16 +1344,21 @@ bool wide_counter_csr_t::unlogged_write(const reg_t val) noexcept {
+ 
+ // Returns true if counting is not inhibited by Smcntrpmf.
+ // Note that minstretcfg / mcyclecfg / mhpmevent* share the same inhibit bits.
+-bool wide_counter_csr_t::is_counting_enabled() const noexcept {
+-  auto prv = state->prv_changed ? state->prev_prv : state->prv;
+-  auto v = state->v_changed ? state->prev_v : state->v;
++void wide_counter_csr_t::advance_time(const reg_t cycles) noexcept {
++  if (!(state->mcountinhibit->read() & MCOUNTINHIBIT_CY) && is_counting_enabled(true))
++    val += cycles;
++}
++
++bool wide_counter_csr_t::is_counting_enabled(bool current_time) const noexcept {
++  auto prv = !current_time && state->prv_changed ? state->prev_prv : state->prv;
++  auto v = !current_time && state->v_changed ? state->prev_v : state->v;
+   auto mask = MHPMEVENT_MINH;
+   if (prv == PRV_S) {
+     mask = v ? MHPMEVENT_VSINH : MHPMEVENT_SINH;
+   } else if (prv == PRV_U) {
+     mask = v ? MHPMEVENT_VUINH : MHPMEVENT_UINH;
+   }
+-  return (config_csr->read_prev() & mask) == 0;
++  return ((current_time ? config_csr->read() : config_csr->read_prev()) & mask) == 0;
+ }
+ 
+ // implement class time_counter_csr_t
+@@ -1440,6 +1445,8 @@ mevent_csr_t::mevent_csr_t(processor_t* const proc, const reg_t addr):
+ }
+ 
+ bool mevent_csr_t::unlogged_write(const reg_t val) noexcept {
++  // Source nPerfCounters=0: every mhpmevent slot is padded zero and WI.
++  if (proc->VU.iris_mode) return basic_csr_t::unlogged_write(0);
+   const reg_t mask = proc->extension_enabled(EXT_SSCOFPMF) ? MHPMEVENT_OF | MHPMEVENT_MINH
+     | (proc->extension_enabled_const('U') ? MHPMEVENT_UINH : 0)
+     | (proc->extension_enabled_const('S') ? MHPMEVENT_SINH : 0)
+diff --git a/riscv/csrs.h b/riscv/csrs.h
+index 3f6a8d79..c1f91301 100644
+--- a/riscv/csrs.h
++++ b/riscv/csrs.h
+@@ -582,10 +582,11 @@ class wide_counter_csr_t: public csr_t {
+   // Always returns full 64-bit value
+   virtual reg_t read() const noexcept override;
+   void bump(const reg_t howmuch) noexcept;
++  void advance_time(const reg_t cycles) noexcept;
+  protected:
+   virtual bool unlogged_write(const reg_t val) noexcept override;
+  private:
+-  bool is_counting_enabled() const noexcept;
++  bool is_counting_enabled(bool current_time = false) const noexcept;
+   reg_t val;
+   bool written;
+   smcntrpmf_csr_t_p config_csr;
+diff --git a/riscv/devices.h b/riscv/devices.h
+index 9a09df52..48df970d 100644
+--- a/riscv/devices.h
++++ b/riscv/devices.h
+@@ -10,6 +10,10 @@
+ #include <vector>
+ #include <utility>
+ #include <cassert>
++#include <memory>
++#include <optional>
++
++namespace iris_board { class TimerRegisters; }
+ 
+ class processor_t;
+ class simif_t;
+@@ -98,8 +102,10 @@ class clint_t : public abstract_device_t {
+   bool store(reg_t addr, size_t len, const uint8_t* bytes) override;
+   reg_t size() override { return CLINT_SIZE; }
+   void tick(reg_t rtc_ticks) override;
+-  uint64_t get_mtimecmp(reg_t hartid) { return mtimecmp[hartid]; }
+-  uint64_t get_mtime() { return mtime; }
++  uint64_t get_mtimecmp(reg_t hartid);
++  std::optional<uint64_t> timer_compare(reg_t hartid);
++  uint64_t get_mtime();
++  void validate_iris_interrupts(unsigned hart, bool read_pending) const;
+  private:
+   typedef uint64_t mtime_t;
+   typedef uint64_t mtimecmp_t;
+@@ -111,6 +117,7 @@ class clint_t : public abstract_device_t {
+   uint64_t real_time_ref_usecs;
+   mtime_t mtime;
+   std::map<size_t, mtimecmp_t> mtimecmp;
++  std::shared_ptr<iris_board::TimerRegisters> iris_timer;
+ };
+ 
+ #define PLIC_MAX_DEVICES 1024
+@@ -130,14 +137,20 @@ struct plic_context_t {
+   uint32_t claimed[PLIC_MAX_DEVICES/32] {};
+ };
+ 
++namespace iris_board { class PlicRegisters; }
++
+ class plic_t : public abstract_device_t, public abstract_interrupt_controller_t {
+  public:
+   plic_t(const simif_t*, uint32_t ndev);
+   bool load(reg_t addr, size_t len, uint8_t* bytes) override;
+   bool store(reg_t addr, size_t len, const uint8_t* bytes) override;
+   void set_interrupt_level(uint32_t id, int lvl) override;
+-  reg_t size() override { return PLIC_SIZE; }
++  reg_t size() override { return iris_plic_ ? 0x4000000 : PLIC_SIZE; }
++  void tick(reg_t rtc_ticks) override;
++  void validate_iris_interrupts(unsigned hart, bool read_pending) const;
+  private:
++  const simif_t* iris_sim_ = nullptr;
++  std::shared_ptr<iris_board::PlicRegisters> iris_plic_;
+   std::vector<plic_context_t> contexts;
+   uint32_t num_ids;
+   uint32_t num_ids_word;
+diff --git a/riscv/dts.cc b/riscv/dts.cc
+index 74c8bf28..c9225337 100644
+--- a/riscv/dts.cc
++++ b/riscv/dts.cc
+@@ -7,6 +7,7 @@
+ #include <cassert>
+ #include <iostream>
+ #include <sstream>
++#include <stdexcept>
+ #include <signal.h>
+ #include <unistd.h>
+ #include <sys/wait.h>
+@@ -15,14 +16,13 @@
+ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
+                      const cfg_t* cfg,
+                      std::vector<std::pair<reg_t, abstract_mem_t*>> mems,
+-                     std::string device_nodes)
++                     std::string device_nodes, std::vector<size_t> hart_clock_hz)
+ {
+   reg_t initrd_start = cfg->initrd_bounds.first;
+   reg_t initrd_end = cfg->initrd_bounds.second;
+   const char* bootargs = cfg->bootargs;
+   reg_t pmpregions = cfg->pmpregions;
+   reg_t pmpgranularity = cfg->pmpgranularity;
+-  isa_parser_t isa(cfg->isa, cfg->priv);
+   auto emit_addr = [](std::stringstream& s, reg_t addr) {
+     s << "0x" << std::hex << (addr >> 32) << " 0x" << (addr & (uint32_t)-1) << std::dec;
+   };
+@@ -65,16 +65,26 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
+          "    #size-cells = <0>;\n"
+          "    timebase-frequency = <" << (cpu_hz/insns_per_rtc_tick) << ">;\n";
+     for (size_t i = 0; i < cfg->nprocs(); i++) {
++    isa_parser_t isa(cfg->isa_for_hart(cfg->hartids[i]), cfg->priv);
++    const bool iris_layout = cfg->iris_vme || !cfg->iris_bootrom_file.empty();
++    const auto hart = cfg->hartids[i];
++    if (iris_layout && (hart > 2 || isa.get_max_xlen() != 64))
++      throw std::invalid_argument("Iris CPU layout requires RV64 architectural harts 0,1,2");
++    // Shuttle Parameters.scala: pgLevels3/nPMPs0. RocketCore.scala:
++    // pgLevels3/nPMPs8. The saved Iris DTS also records hart2's 4-byte grain.
++    const auto hart_pmpregions = iris_layout ? (hart < 2 ? 0 : 8) : pmpregions;
++    const auto hart_pmpgranularity = iris_layout ? 4 : pmpgranularity;
++    const char* mmu = iris_layout ? "sv39" : (isa.get_max_xlen() <= 32 ? "sv32" : "sv57");
+     s << "    CPU" << i << ": cpu@" << i << " {\n"
+          "      device_type = \"cpu\";\n"
+          "      reg = <" << cfg->hartids[i] << ">;\n"
+          "      status = \"okay\";\n"
+          "      compatible = \"riscv\";\n"
+          "      riscv,isa = \"" << isa.get_isa_string() << "\";\n"
+-         "      mmu-type = \"riscv," << (isa.get_max_xlen() <= 32 ? "sv32" : "sv57") << "\";\n"
+-         "      riscv,pmpregions = <" << pmpregions << ">;\n"
+-         "      riscv,pmpgranularity = <" << pmpgranularity << ">;\n"
+-         "      clock-frequency = <" << cpu_hz << ">;\n"
++         "      mmu-type = \"riscv," << mmu << "\";\n"
++         "      riscv,pmpregions = <" << hart_pmpregions << ">;\n"
++         "      riscv,pmpgranularity = <" << hart_pmpgranularity << ">;\n"
++         "      clock-frequency = <" << (hart_clock_hz.empty() ? cpu_hz : hart_clock_hz.at(i)) << ">;\n"
+          "      CPU" << i << "_intc: interrupt-controller {\n"
+          "        #address-cells = <2>;\n"
+          "        #interrupt-cells = <1>;\n"
+diff --git a/riscv/dts.h b/riscv/dts.h
+index 730dea77..8b8830f9 100644
+--- a/riscv/dts.h
++++ b/riscv/dts.h
+@@ -9,7 +9,8 @@
+ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
+                      const cfg_t* cfg,
+                      std::vector<std::pair<reg_t, abstract_mem_t*>> mems,
+-                     std::string device_nodes);
++                     std::string device_nodes,
++                     std::vector<size_t> hart_clock_hz = {});
+ 
+ std::string dts_to_dtb(const std::string& dtc_input);
+ std::string dtb_to_dts(const std::string& dtc_input);
+diff --git a/riscv/encoding.h b/riscv/encoding.h
+index ed887a1e..26bb0c1f 100644
+--- a/riscv/encoding.h
++++ b/riscv/encoding.h
+@@ -3689,12 +3689,12 @@
+ #define MASK_VSUXEI64_V 0x1c00707f
+ #define MATCH_VSUXEI8_V 0x4000027
+ #define MASK_VSUXEI8_V 0x1c00707f
+-#define MATCH_VTDISCARD 0x43c06057
+-#define MASK_VTDISCARD 0xffffffff
+-#define MATCH_VTFMM_ALT_TVV 0xf20010f7
+-#define MASK_VTFMM_ALT_TVV 0xfe0071ff
+-#define MATCH_VTFMM_TVV 0xf2001077
+-#define MASK_VTFMM_TVV 0xfe0071ff
++#define MATCH_VTDISCARD 0x41c06057
++#define MASK_VTDISCARD 0xfdfff07f
++#define MATCH_VTFMM_ALT_TVV 0xf00010f7
++#define MASK_VTFMM_ALT_TVV 0xfc0070ff
++#define MATCH_VTFMM_TVV 0xf0001077
++#define MASK_VTFMM_TVV 0xfc0070ff
+ #define MATCH_VTLE16 0x32007007
+ #define MASK_VTLE16 0xfe007fff
+ #define MATCH_VTLE32 0x52007007
+@@ -3703,14 +3703,14 @@
+ #define MASK_VTLE64 0xfe007fff
+ #define MATCH_VTLE8 0x12007007
+ #define MASK_VTLE8 0xfe007fff
+-#define MATCH_VTMMS_TVV 0xf20000f7
+-#define MASK_VTMMS_TVV 0xfe0071ff
+-#define MATCH_VTMMU_TVV 0xf2000077
+-#define MASK_VTMMU_TVV 0xfe0071ff
+-#define MATCH_VTMV_T_V 0x5e006057
+-#define MASK_VTMV_T_V 0xfe007fff
+-#define MATCH_VTMV_V_T 0x43f06057
+-#define MASK_VTMV_V_T 0xfff0707f
++#define MATCH_VTMMS_TVV 0xf00000f7
++#define MASK_VTMMS_TVV 0xfc0070ff
++#define MATCH_VTMMU_TVV 0xf0000077
++#define MASK_VTMMU_TVV 0xfc0070ff
++#define MATCH_VTMV_T_V 0x5c006057
++#define MASK_VTMV_T_V 0xfc00707f
++#define MATCH_VTMV_V_T 0x41f06057
++#define MASK_VTMV_V_T 0xfdf0707f
+ #define MATCH_VTSE16 0x32007027
+ #define MASK_VTSE16 0xfe007fff
+ #define MATCH_VTSE32 0x52007027
+@@ -3719,8 +3719,8 @@
+ #define MASK_VTSE64 0xfe007fff
+ #define MATCH_VTSE8 0x12007027
+ #define MASK_VTSE8 0xfe007fff
+-#define MATCH_VTZERO 0x43e06057
+-#define MASK_VTZERO 0xfffff0ff
++#define MATCH_VTZERO 0x41e06057
++#define MASK_VTZERO 0xfdfff07f
+ #define MATCH_VUNZIPE_V 0x4805a057
+ #define MASK_VUNZIPE_V 0xfc0ff07f
+ #define MATCH_VUNZIPO_V 0x4807a057
+diff --git a/riscv/execute.cc b/riscv/execute.cc
+index 7e2888a4..1054331e 100644
+--- a/riscv/execute.cc
++++ b/riscv/execute.cc
+@@ -6,6 +6,91 @@
+ #include "disasm.h"
+ #include "decode_macros.h"
+ #include <cassert>
++#include <cstdlib>
++#include <sstream>
++#include <stdexcept>
++
++// The launcher resolves explicit fatal-handler symbols from the guest ELF.
++// Recoverable architectural traps are still delivered normally to the guest.
++static void check_iris_fatal_pc(processor_t* p, reg_t pc)
++{
++  static const std::vector<reg_t> fatal_pcs = [] {
++    std::vector<reg_t> result;
++    if (const char* raw = std::getenv("IRIS_FATAL_PCS")) {
++      std::stringstream stream(raw);
++      std::string token;
++      while (std::getline(stream, token, ',')) {
++        size_t used = 0;
++        reg_t address = std::stoull(token, &used, 0);
++        if (used != token.size()) throw std::runtime_error("invalid IRIS_FATAL_PCS");
++        result.push_back(address);
++      }
++    }
++    return result;
++  }();
++  for (reg_t fatal_pc : fatal_pcs) if (pc == fatal_pc) {
++    auto* state = p->get_state();
++    std::ostringstream error;
++    error << "IRIS_FATAL hart=" << p->get_id() << " pc=0x" << std::hex << pc
++      << " cause=0x" << state->mcause->read() << " epc=0x" << state->mepc->read()
++      << " tval=0x" << state->mtval->read() << std::dec
++      << " cycle=" << state->mcycle->read();
++    throw std::runtime_error(error.str());
++  }
++}
++
++static void check_iris_datatype(processor_t* p, reg_t pc, insn_t insn)
++{
++  if (!p->get_cfg().iris_vme) return;
++  const uint32_t raw = insn.bits(), opcode = raw & 127, f3 = (raw >> 12) & 7;
++  if (raw == 0x30500073 && p->get_id() == 2 && p->get_state()->prv == PRV_M) {
++    std::ostringstream message;
++    message << "IRIS_UNSUPPORTED_CORE_INSTRUCTION hart=2 pc=0x" << std::hex << pc
++      << " instruction=0x30500073 reason=Rocket CEASE halt-until-reset behavior is not modeled";
++    throw std::runtime_error(message.str());
++  }
++  const char* unsupported = nullptr;
++  if ((raw & MASK_FCVT_BF16_S) == MATCH_FCVT_BF16_S ||
++      (raw & MASK_FCVT_S_BF16) == MATCH_FCVT_S_BF16)
++    throw trap_illegal_instruction(insn.bits());
++  if (opcode == 0x57 && (f3 == 1 || f3 == 5)) {
++    const unsigned cmp_f6=raw>>26;
++    const bool known_fpcomp=cmp_f6==4||cmp_f6==5||cmp_f6==6||cmp_f6==7||cmp_f6==8||cmp_f6==9||cmp_f6==10||cmp_f6==0x18||cmp_f6==0x19||cmp_f6==0x1b||cmp_f6==0x1c||(f3==5&&(cmp_f6==0x1d||cmp_f6==0x1f));
++    if (known_fpcomp && p->VU.vsew==8) throw trap_illegal_instruction(insn.bits());
++    if ((!known_fpcomp || p->VU.vsew==8) && p->get_id() >= 2 && (p->VU.vsew == 8 || (p->VU.vsew == 16 && p->VU.altfmt)))
++      unsupported = "hart 2 has no Mx BF16/FP8 arithmetic or conversion datapath";
++    if (p->VU.vsew == 8) {
++      const unsigned f6 = raw >> 26;
++      const bool conversion =
++        (raw & MASK_VFWCVTBF16_F_F_V) == MATCH_VFWCVTBF16_F_F_V ||
++        (raw & MASK_VFNCVTBF16_F_F_W) == MATCH_VFNCVTBF16_F_F_W ||
++        (raw & MASK_VFNCVTBF16_SAT_F_F_W) == MATCH_VFNCVTBF16_SAT_F_F_W;
++      const bool implemented_fma = f6 == 0 || f6 == 1 || f6 == 2 || f6 == 3 ||
++        f6 == 0x31 || f6 == 0x33 || f6 == 0x24 || f6 == 0x27 ||
++        (f6 >= 0x28 && f6 <= 0x2f) || f6 == 0x30 || f6 == 0x32 ||
++        f6 == 0x34 || f6 == 0x36 || f6 == 0x38 || f6 >= 0x3c;
++      if (!conversion && !implemented_fma)
++        unsupported = "vector-FP8 reduction/divide/comparison or other unverified datapath";
++    } else if (p->VU.vsew == 16 && p->VU.altfmt) {
++      // Source-backed BF16 FMA/conversion paths; comparison/division datapaths
++      // do not select BF16. Do not silently emulate idealized BF16 semantics.
++      const unsigned f6 = raw >> 26;
++      const bool fma = f6 == 0 || f6 == 1 || f6 == 2 || f6 == 3 || f6 == 0x31 || f6 == 0x33 ||
++        f6 == 0x24 || f6 == 0x27 ||
++        (f6 >= 0x28 && f6 <= 0x2f) || f6 == 0x30 || f6 == 0x32 ||
++        f6 == 0x34 || f6 == 0x36 || f6 == 0x38 || (f6 >= 0x3c);
++      const bool fpcomp=f6==4||f6==5||f6==6||f6==7||f6==8||f6==9||f6==10||f6==0x18||f6==0x19||f6==0x1b||f6==0x1c||(f3==5&&(f6==0x1d||f6==0x1f));
++      if (!fma && !fpcomp && f6 != 0x12)
++        unsupported = "BF16 comparison/division or other non-FMA datapath has no verified BF16 format selection";
++    }
++  }
++  if (unsupported) {
++    std::ostringstream message;
++    message << "IRIS_UNSUPPORTED_DATATYPE hart=" << p->get_id() << " pc=0x" << std::hex << pc
++      << " instruction=0x" << raw << " reason=" << unsupported;
++    throw std::runtime_error(message.str());
++  }
++}
+ 
+ static void commit_log_reset(processor_t* p)
+ {
+@@ -159,10 +244,16 @@ inline void processor_t::update_histogram(reg_t pc)
+ // These two functions are expected to be inlined by the compiler separately in
+ // the processor_t::step() loop. The logged variant is used in the slow path
+ static inline reg_t execute_insn_fast(processor_t* p, reg_t pc, insn_fetch_t fetch) {
++  p->iris_validate_interrupts();
++  check_iris_fatal_pc(p, pc);
++  check_iris_datatype(p, pc, fetch.insn);
+   return fetch.func(p, fetch.insn, pc);
+ }
+ static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t fetch)
+ {
++  p->iris_validate_interrupts();
++  check_iris_fatal_pc(p, pc);
++  check_iris_datatype(p, pc, fetch.insn);
+   if (p->get_log_commits_enabled()) {
+     commit_log_reset(p);
+     commit_log_stash_privilege(p);
+@@ -199,7 +290,8 @@ static inline reg_t execute_insn_logged(processor_t* p, reg_t pc, insn_fetch_t f
+ bool processor_t::slow_path() const
+ {
+   return debug || state.single_step != state.STEP_NONE || state.debug_mode ||
+-         log_commits_enabled || histogram_enabled || is_waiting_for_interrupt() || check_triggers_icount;
++         log_commits_enabled || histogram_enabled || is_waiting_for_interrupt() || check_triggers_icount ||
++         !cfg->iris_timing_fixture.empty();
+ }
+ 
+ // fetch/decode/execute loop
+@@ -240,7 +332,8 @@ void processor_t::step(size_t n)
+ 
+     try
+     {
+-      take_pending_interrupt();
++      // An already issued instruction completes before newly pending interrupts.
++      if (!sim->iris_completion_fetch(id)) take_pending_interrupt();
+ 
+       check_if_lpad_required();
+ 
+@@ -273,7 +366,9 @@ void processor_t::step(size_t n)
+           if (unlikely(is_waiting_for_interrupt()))
+             return;
+ 
+-          insn_fetch_t fetch = mmu->load_insn(pc);
++          const auto* prepared = sim->iris_completion_fetch(id);
++          insn_fetch_t fetch = prepared ? *prepared : mmu->load_insn(pc);
++          if (!prepared) sim->iris_issue(id, pc, fetch);
+           if (debug && !state.serialized)
+             disasm(fetch.insn);
+           pc = execute_insn_logged(this, pc, fetch);
+@@ -311,6 +406,12 @@ void processor_t::step(size_t n)
+         }
+       }
+     }
++    catch(iris_timing_wait&)
++    {
++      // Fetch/issue has occurred, but no instruction side effects may run until
++      // the shared scheduler grants the completion event.
++      n = instret;
++    }
+     catch(trap_t& t)
+     {
+       take_trap(t, pc);
+@@ -349,10 +450,13 @@ void processor_t::step(size_t n)
+     }
+ 
+ serialize:
++    sim->iris_retired(id, instret);
+     state.minstret->bump((state.mcountinhibit->read() & MCOUNTINHIBIT_IR) ? 0 : instret);
+ 
+-    // Model a hart whose CPI is 1.
+-    state.mcycle->bump((state.mcountinhibit->read() & MCOUNTINHIBIT_CY) ? 0 : instret);
++    // In timing mode the shared clock advances mcycle, including stall/idle time.
++    // A zero bump still resolves explicit counter-write serialization semantics.
++    state.mcycle->bump(!cfg->iris_timing_fixture.empty() ||
++                      (state.mcountinhibit->read() & MCOUNTINHIBIT_CY) ? 0 : instret);
+ 
+     n -= instret;
+   }
+diff --git a/riscv/insn_template.h b/riscv/insn_template.h
+index 7a9aadd8..e1b3fc4e 100644
+--- a/riscv/insn_template.h
++++ b/riscv/insn_template.h
+@@ -4,6 +4,11 @@
+ #include "arith.h"
+ #include "mmu.h"
+ #include "softfloat.h"
++#include "iris_fp8.hpp"
++#include "iris_native_fp8.hpp"
++#include "iris_ieee_fma.hpp"
++#include "iris_shared_fma.hpp"
++#include "iris_fpcomp.hpp"
+ #include "internals.h"
+ #include "specialize.h"
+ #include "tracer.h"
+diff --git a/riscv/insns/fcvt_bf16_s.h b/riscv/insns/fcvt_bf16_s.h
+index d625df89..25280e22 100644
+--- a/riscv/insns/fcvt_bf16_s.h
++++ b/riscv/insns/fcvt_bf16_s.h
+@@ -1,3 +1,5 @@
++// No scalar BF16 decode exists in pinned Iris Rocket/Shuttle RTL, despite ISA advertisement.
++if (P.VU.iris_mode) throw trap_illegal_instruction(insn.bits());
+ require_extension(EXT_ZFBFMIN);
+ require_fp;
+ softfloat_roundingMode = RM;
+diff --git a/riscv/insns/fcvt_s_bf16.h b/riscv/insns/fcvt_s_bf16.h
+index 59a55cb1..28eca203 100644
+--- a/riscv/insns/fcvt_s_bf16.h
++++ b/riscv/insns/fcvt_s_bf16.h
+@@ -1,3 +1,5 @@
++// No scalar BF16 decode exists in pinned Iris Rocket/Shuttle RTL, despite ISA advertisement.
++if (P.VU.iris_mode) throw trap_illegal_instruction(insn.bits());
+ require_extension(EXT_ZFBFMIN);
+ require_fp;
+ softfloat_roundingMode = RM;
+diff --git a/riscv/insns/iris_fp8_reduction_body.h b/riscv/insns/iris_fp8_reduction_body.h
+new file mode 100644
+index 00000000..92030c9a
+--- /dev/null
++++ b/riscv/insns/iris_fp8_reduction_body.h
+@@ -0,0 +1,44 @@
++// Source-order reduction: fixed DLEN128 lane accumulators then halving folds.
++if(P.get_id()>=2)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart 2 has no Mx FP8 reduction");
++require_extension(EXT_ZVFOFP8MIN);
++const unsigned iris_f6=insn.bits()>>26;
++const bool iris_wide=iris_f6>=0x30,iris_ordered=(iris_f6&2)!=0;
++VI_CHECK_REDUCTION(iris_wide);
++const unsigned iris_rm=STATE.frm->read();
++if(iris_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE FP8 reduction");
++const reg_t iris_vl=P.VU.vl->read();
++if(iris_vl){
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: FP8 reduction write requires mstatus.FS > 0");
++ const unsigned lanes=iris_wide?8:16; // Audited compute DLEN128, never VLEN.
++ uint16_t accum[16]={};
++ accum[0]=iris_wide?P.VU.elt<uint16_t>(insn.rs1(),0):P.VU.elt<uint8_t>(insn.rs1(),0);
++ uint8_t iris_flags=0;
++ auto add=[&](uint16_t a,uint16_t b,unsigned lane,bool narrow_b){
++  if(!iris_wide){const auto r=iris_fp8::fma(uint8_t(a),P.VU.altfmt?0x3c:0x38,uint8_t(b),P.VU.altfmt,iris_rm,0,lane&7);iris_flags|=r.flags;return r.bits;}
++  IrisSoftfloatScope scope(iris_rm);
++  if(narrow_b)b=uint16_t(iris_fp8_to_f32(uint8_t(b),P.VU.altfmt)>>16);
++  auto quiet=[&](uint16_t raw){return uint16_t(!(lane&3)&&(raw&0x7f80)==0x7f80&&(raw&127)?0x7fc0:raw);};
++  const uint16_t result=bf16_add(float16_t{quiet(a)},float16_t{quiet(b)}).v;
++  iris_flags|=bool(softfloat_exceptionFlags&softfloat_flag_invalid);
++  return result;
++ };
++ for(reg_t i=0;i<iris_vl;++i){
++  if(!insn.v_vm()&&!P.VU.mask_elt(0,i))continue;
++  const unsigned lane=iris_ordered?0:unsigned(i%lanes);
++  accum[lane]=add(accum[lane],P.VU.elt<uint8_t>(insn.rs2(),i),lane,true);
++ }
++ if(iris_ordered){
++  // acc_copy is an FADD with acc_init=+0, not a raw bit-copy.
++  accum[0]=add(accum[0],0,0,false);
++ }else{
++  for(unsigned offset=lanes/2;offset;offset/=2){
++   // Non-final folds issue every physical lane. Final fold writes only lane0.
++   const unsigned count=offset==1?1:lanes;
++   for(unsigned lane=0;lane<count;++lane)accum[lane]=add(accum[lane],lane<offset?accum[lane+offset]:0,lane,false);
++  }
++ }
++ if(iris_wide)P.VU.elt<uint16_t>(insn.rd(),0,true)=accum[0];
++ else P.VU.elt<uint8_t>(insn.rd(),0,true)=uint8_t(accum[0]);
++ STATE.fflags->write(STATE.fflags->read()|iris_flags);
++}
++VECTOR_END;
+diff --git a/riscv/insns/iris_fpcomp_body.h b/riscv/insns/iris_fpcomp_body.h
+new file mode 100644
+index 00000000..dcfe6a28
+--- /dev/null
++++ b/riscv/insns/iris_fpcomp_body.h
+@@ -0,0 +1,52 @@
++// FPCompPipe inspects H chunks for SEW16/32 and S chunks for SEW64,
++// independent of mask/tail and even on sign injection.
++require_vector_vs;
++require(!P.VU.vill);
++if(insn.funct3()==5)require_fp;
++if(P.VU.vstart->read()!=0)throw trap_illegal_instruction(pc);
++require_vector(true);
++if(P.VU.VLEN!=256||P.VU.ELEN!=64)throw std::runtime_error("IRIS_UNSUPPORTED_VECTOR_CONFIG: FPComp requires audited VLEN256 ELEN64");
++const unsigned cmp_width=P.VU.vsew,cmp_f6=insn.bits()>>26;
++const bool cmp_vf=insn.funct3()==5,cmp_reduction=cmp_f6==5||cmp_f6==7,cmp_mask=cmp_f6>=0x18;
++if(cmp_vf)require_fp;
++require(cmp_width==16||cmp_width==32||cmp_width==64);
++// FPComp does not read altfmt: each accepted width always uses H/S/D.
++require((cmp_width==16&&p->extension_enabled(EXT_ZVFH))||(cmp_width==32&&p->get_isa().get_zvf())||(cmp_width==64&&p->get_isa().get_zvd()));
++if(cmp_reduction){VI_CHECK_REDUCTION(false);}else if(cmp_mask){VI_CHECK_MSS(!cmp_vf);}else{VI_CHECK_SSS(!cmp_vf);}
++const reg_t cmp_vl=P.VU.vl->read();
++const unsigned cmp_lanes=(P.get_id()==2?256:128)/cmp_width;
++auto read=[&](unsigned reg,reg_t i)->uint64_t{if(cmp_width==16)return P.VU.elt<uint16_t>(reg,i);if(cmp_width==32)return P.VU.elt<uint32_t>(reg,i);return P.VU.elt<uint64_t>(reg,i);};
++auto write=[&](reg_t i,uint64_t value){if(cmp_width==16)P.VU.elt<uint16_t>(insn.rd(),i,true)=value;else if(cmp_width==32)P.VU.elt<uint32_t>(insn.rd(),i,true)=value;else P.VU.elt<uint64_t>(insn.rd(),i,true)=value;};
++if(cmp_vl){
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: FPComp flags require mstatus.FS > 0");
++ const unsigned count=((cmp_vl+cmp_lanes-1)/cmp_lanes)*cmp_lanes;
++ uint64_t src2[128]={},src1[128]={};bool active[128]={};
++ for(unsigned i=0;i<count;++i){src2[i]=read(insn.rs2(),i);src1[i]=cmp_vf?READ_FREG(insn.rs1()).v[0]&iris_cmp::mask(cmp_width):cmp_reduction?0:read(insn.rs1(),i);active[i]=i<cmp_vl&&(insn.v_vm()||P.VU.mask_elt(0,i));}
++ uint8_t flags=0;
++ if(cmp_reduction){
++  uint64_t acc[16]={},b[16]={},a[16]={};
++  const uint64_t initial=iris_cmp::infinity(cmp_width)|(cmp_f6==7?iris_cmp::sign(cmp_width):0);
++  for(unsigned lane=0;lane<cmp_lanes;++lane)acc[lane]=initial;
++  acc[0]=read(insn.rs1(),0);
++  for(unsigned base=0;base<count;base+=cmp_lanes){
++   flags|=iris_cmp::flags(src2+base,acc,cmp_lanes,cmp_width);
++   for(unsigned lane=0;lane<cmp_lanes;++lane)if(active[base+lane])acc[lane]=iris_cmp::element(src2[base+lane],acc[lane],cmp_width,cmp_f6);
++  }
++  for(unsigned offset=cmp_lanes/2;offset;offset/=2){
++   for(unsigned lane=0;lane<cmp_lanes;++lane){a[lane]=acc[lane];b[lane]=lane<offset?acc[lane+offset]:0;}
++   flags|=iris_cmp::flags(a,b,cmp_lanes,cmp_width);
++   for(unsigned lane=0;lane<(offset==1?1:cmp_lanes);++lane)acc[lane]=iris_cmp::element(a[lane],b[lane],cmp_width,cmp_f6);
++  }
++  write(0,acc[0]);
++ }else{
++  for(unsigned base=0;base<count;base+=cmp_lanes){
++   flags|=iris_cmp::flags(src2+base,src1+base,cmp_lanes,cmp_width);
++   for(unsigned lane=0;lane<cmp_lanes;++lane)if(active[base+lane]){
++    const auto value=iris_cmp::element(src2[base+lane],src1[base+lane],cmp_width,cmp_f6);
++    if(cmp_mask)P.VU.set_mask_elt(insn.rd(),base+lane,value);else write(base+lane,value);
++   }
++  }
++ }
++ STATE.fflags->write(STATE.fflags->read()|flags);
++}else if(cmp_vf)STATE.fflags->write(STATE.fflags->read());
++VECTOR_END;
+diff --git a/riscv/insns/iris_ieee_fma_body.h b/riscv/insns/iris_ieee_fma_body.h
+new file mode 100644
+index 00000000..73b81307
+--- /dev/null
++++ b/riscv/insns/iris_ieee_fma_body.h
+@@ -0,0 +1,41 @@
++if(P.get_id()==2){
++#include "iris_shared_fma_body.h"
++}else{
++// Compute-hart source SegmentedFMAPipe: physical input NaNs and flags bit0.
++require_vector(true);
++const bool iris_vf=insn.funct3()==5;
++if(iris_vf)require_fp;
++const unsigned iris_f6=insn.bits()>>26,iris_rm=STATE.frm->read();
++if(iris_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE compute IEEE/BF16 FMA");
++const bool iris_wide=iris_f6>=0x30,iris_wide_input=iris_f6==0x34||iris_f6==0x36;
++const iris_fma::Kind iris_in=P.VU.vsew==64?iris_fma::D:P.VU.vsew==32?iris_fma::S:P.VU.altfmt?iris_fma::BF:iris_fma::H;
++const iris_fma::Kind iris_out=iris_wide?(iris_in==iris_fma::S?iris_fma::D:iris_fma::S):iris_in;
++require(P.VU.vsew==16||P.VU.vsew==32||P.VU.vsew==64);
++if(P.VU.altfmt&&P.VU.vsew>=32)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: no segmented FMA output selection for wide alternate format");
++require((P.VU.vsew==16&&p->extension_enabled(P.VU.altfmt?EXT_ZVFBFA:EXT_ZVFH))||(P.VU.vsew==32&&p->get_isa().get_zvf())||(P.VU.vsew==64&&p->get_isa().get_zvd()));
++if(iris_wide){if(iris_wide_input){VI_CHECK_DDS(!iris_vf);}else{VI_CHECK_DSS(!iris_vf);}}else{VI_CHECK_SSS(!iris_vf);}
++auto read=[&](unsigned reg,reg_t i,iris_fma::Kind kind)->uint64_t{switch(iris_fma::width(kind)){case 16:return P.VU.elt<uint16_t>(reg,i);case 32:return P.VU.elt<uint32_t>(reg,i);default:return P.VU.elt<uint64_t>(reg,i);}};
++auto write=[&](reg_t i,uint64_t value){switch(iris_fma::width(iris_out)){case 16:P.VU.elt<uint16_t>(insn.rd(),i,true)=uint16_t(value);break;case 32:P.VU.elt<uint32_t>(insn.rd(),i,true)=uint32_t(value);break;default:P.VU.elt<uint64_t>(insn.rd(),i,true)=value;}};
++uint8_t iris_flags=0;bool iris_wrote=false;
++for(reg_t i=P.VU.vstart->read();i<P.VU.vl->read();++i){
++ if(!insn.v_vm()&&!P.VU.mask_elt(0,i))continue;
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: compute FPFMA write requires mstatus.FS > 0");
++ uint64_t a,b,c;
++ // Conversion flags are not connected to vector fflags. All conversions are
++ // exact except NaN quieting; clear them before fused() measures FMA invalid.
++ {IrisSoftfloatScope scope(iris_rm);
++  const uint64_t source1=iris_vf?READ_FREG(insn.rs1()).v[0]:read(insn.rs1(),i,iris_in);
++  a=iris_fma::input(read(insn.rs2(),i,iris_wide_input?iris_out:iris_in),iris_wide_input?iris_out:iris_in,iris_out,i);
++  b=iris_fma::input(source1,iris_in,iris_out,i);
++  c=iris_fma::input(read(insn.rd(),i,iris_out),iris_out,iris_out,i);
++ }
++ unsigned cmd=0;
++ if(iris_f6==0||iris_f6==2||iris_f6==0x27||iris_f6==0x30||iris_f6==0x32||iris_wide_input){c=b;b=iris_fma::one(iris_out);cmd=(iris_f6==2||iris_f6==0x32||iris_f6==0x36)?1:iris_f6==0x27?2:0;}
++ else if(iris_f6==0x24||iris_f6==0x38)c=(a^b)&iris_fma::signbit(iris_out);
++ else{const unsigned cmds[4]={0,3,1,2};cmd=cmds[iris_f6&3];if(!iris_wide&&iris_f6<0x2c){const uint64_t t=a;a=c;c=t;}}
++ write(i,iris_fma::fused(a,b,c,iris_out,iris_rm,cmd,iris_flags));iris_wrote=true;
++}
++if(iris_wrote)STATE.fflags->write(STATE.fflags->read()|iris_flags);
++VECTOR_END;
++
++}
+diff --git a/riscv/insns/iris_ieee_reduction_body.h b/riscv/insns/iris_ieee_reduction_body.h
+new file mode 100644
+index 00000000..d7944143
+--- /dev/null
++++ b/riscv/insns/iris_ieee_reduction_body.h
+@@ -0,0 +1,33 @@
++if(P.get_id()==2){
++#include "iris_shared_reduction_body.h"
++}else{
++// Compute SegmentedFMAPipe reduction order and non-FP8 flag wiring.
++const unsigned iris_f6=insn.bits()>>26,iris_rm=STATE.frm->read();
++const bool iris_wide=iris_f6>=0x30,iris_ordered=(iris_f6&2)!=0;
++VI_CHECK_REDUCTION(iris_wide);
++require(P.VU.vsew==16||P.VU.vsew==32||P.VU.vsew==64);
++if(P.VU.altfmt&&P.VU.vsew>=32)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: no segmented FMA output selection for wide alternate format");
++require((P.VU.vsew==16&&p->extension_enabled(P.VU.altfmt?EXT_ZVFBFA:EXT_ZVFH))||(P.VU.vsew==32&&p->get_isa().get_zvf())||(P.VU.vsew==64&&p->get_isa().get_zvd()));
++if(iris_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE compute reduction");
++const iris_fma::Kind iris_in=P.VU.vsew==64?iris_fma::D:P.VU.vsew==32?iris_fma::S:P.VU.altfmt?iris_fma::BF:iris_fma::H;
++const iris_fma::Kind iris_out=iris_wide?(iris_in==iris_fma::S?iris_fma::D:iris_fma::S):iris_in;
++auto read=[&](unsigned reg,reg_t i,iris_fma::Kind kind)->uint64_t{switch(iris_fma::width(kind)){case 16:return P.VU.elt<uint16_t>(reg,i);case 32:return P.VU.elt<uint32_t>(reg,i);default:return P.VU.elt<uint64_t>(reg,i);}};
++const reg_t iris_vl=P.VU.vl->read();
++if(iris_vl){
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: compute reduction write requires mstatus.FS > 0");
++ const unsigned lanes=128/iris_fma::width(iris_out);
++ uint64_t accum[8]={};accum[0]=read(insn.rs1(),0,iris_out);uint8_t iris_flags=0;
++ auto add=[&](uint64_t a,uint64_t b,unsigned lane,bool narrow){
++  uint64_t aa,bb;
++  {IrisSoftfloatScope scope(iris_rm);aa=iris_fma::input(a,iris_out,iris_out,lane);bb=iris_fma::input(b,narrow?iris_in:iris_out,iris_out,lane);}
++  return iris_fma::fused(aa,iris_fma::one(iris_out),bb,iris_out,iris_rm,0,iris_flags);
++ };
++ for(reg_t i=0;i<iris_vl;++i){if(!insn.v_vm()&&!P.VU.mask_elt(0,i))continue;const unsigned lane=iris_ordered?0:unsigned(i%lanes);accum[lane]=add(accum[lane],read(insn.rs2(),i,iris_in),lane,true);}
++ if(iris_ordered)accum[0]=add(accum[0],0,0,false);
++ else for(unsigned offset=lanes/2;offset;offset/=2){const unsigned count=offset==1?1:lanes;for(unsigned lane=0;lane<count;++lane)accum[lane]=add(accum[lane],lane<offset?accum[lane+offset]:0,lane,false);}
++ switch(iris_fma::width(iris_out)){case 16:P.VU.elt<uint16_t>(insn.rd(),0,true)=uint16_t(accum[0]);break;case 32:P.VU.elt<uint32_t>(insn.rd(),0,true)=uint32_t(accum[0]);break;default:P.VU.elt<uint64_t>(insn.rd(),0,true)=accum[0];}
++ STATE.fflags->write(STATE.fflags->read()|iris_flags);
++}
++VECTOR_END;
++
++}
+diff --git a/riscv/insns/iris_native_fp8_body.h b/riscv/insns/iris_native_fp8_body.h
+new file mode 100644
+index 00000000..aa85f41a
+--- /dev/null
++++ b/riscv/insns/iris_native_fp8_body.h
+@@ -0,0 +1,38 @@
++// Native FP8 FMA-class operations, source-matched flags and physical-lane NaNs.
++if (P.get_id() >= 2)
++  throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart 2 has no Mx FP8 arithmetic datapath");
++require_vector(true);
++require_extension(EXT_ZVFOFP8MIN);
++const bool iris_vf = insn.funct3() == 5;
++if (iris_vf) require_fp;
++VI_CHECK_SSS(!iris_vf);
++const unsigned iris_rm = STATE.frm->read();
++if (iris_rm > 4) throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE native FP8");
++const unsigned iris_f6 = insn.bits() >> 26;
++const reg_t iris_vl = P.VU.vl->read();
++uint8_t iris_flags = 0;
++bool iris_wrote = false;
++for (reg_t i = P.VU.vstart->read(); i < iris_vl; ++i) {
++  if (!insn.v_vm() && !P.VU.mask_elt(0, i)) continue;
++  // Native FPFMA writes fcsr_flags.valid even when E4 flags are zero.
++  if (!STATE.sstatus->enabled(MSTATUS_FS))
++    throw std::runtime_error("IRIS_RTL_ASSERT: native FP8 write requires mstatus.FS > 0");
++  const uint8_t vs2 = P.VU.elt<uint8_t>(insn.rs2(), i);
++  const uint8_t vs1 = iris_vf ? uint8_t(READ_FREG(insn.rs1()).v[0]) : P.VU.elt<uint8_t>(insn.rs1(), i);
++  auto& dest = P.VU.elt<uint8_t>(insn.rd(), i, true);
++  uint8_t a=vs2,b=vs1,c=dest;
++  unsigned cmd=0;
++  if (iris_f6 == 0 || iris_f6 == 2 || iris_f6 == 0x27) {
++    b=P.VU.altfmt?0x3c:0x38;c=vs1;
++    cmd=iris_f6==2?1:iris_f6==0x27?2:0;
++  } else if (iris_f6 == 0x24) {
++    c=(a^b)&128;
++  } else {
++    const unsigned cmds[4]={0,3,1,2};cmd=cmds[iris_f6&3];
++    if (iris_f6 < 0x2c) {a=dest;c=vs2;}
++  }
++  const auto result=iris_fp8::fma(a,b,c,P.VU.altfmt,iris_rm,cmd,i&7);
++  dest=uint8_t(result.bits);iris_flags|=result.flags;iris_wrote=true;
++}
++if (iris_wrote) STATE.fflags->write(STATE.fflags->read()|iris_flags);
++VECTOR_END;
+diff --git a/riscv/insns/iris_shared_fma_body.h b/riscv/insns/iris_shared_fma_body.h
+new file mode 100644
+index 00000000..a42bfc5b
+--- /dev/null
++++ b/riscv/insns/iris_shared_fma_body.h
+@@ -0,0 +1,39 @@
++// PipelinedFaultCheck rejects non-memory instructions with nonzero vstart
++// before ExecuteSequencer. Its tval is the instruction PC, not encoding bits.
++if(P.VU.vstart->read()!=0)throw trap_illegal_instruction(pc);
++require_vector(true);
++const bool shared_vf=insn.funct3()==5;
++if(shared_vf)require_fp;
++const unsigned shared_rm=STATE.frm->read(),shared_f6=insn.bits()>>26;
++if(shared_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE shared FPU");
++require(P.VU.vsew==16||P.VU.vsew==32||P.VU.vsew==64);
++if(P.VU.altfmt)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart2 has no alternate-format shared FPU");
++require((P.VU.vsew==16&&p->extension_enabled(EXT_ZVFH))||(P.VU.vsew==32&&p->get_isa().get_zvf())||(P.VU.vsew==64&&p->get_isa().get_zvd()));
++const bool shared_wide=shared_f6>=0x30,shared_wide_input=shared_f6==0x34||shared_f6==0x36;
++if(shared_wide){if(shared_wide_input){VI_CHECK_DDS(!shared_vf);}else{VI_CHECK_DSS(!shared_vf);}}else{VI_CHECK_SSS(!shared_vf);}
++const iris_fma::Kind shared_in=P.VU.vsew==64?iris_fma::D:P.VU.vsew==32?iris_fma::S:iris_fma::H;
++const iris_fma::Kind shared_out=shared_wide?(shared_in==iris_fma::S?iris_fma::D:iris_fma::S):shared_in;
++auto read=[&](unsigned reg,reg_t i,iris_fma::Kind kind)->uint64_t{switch(iris_fma::width(kind)){case 16:return P.VU.elt<uint16_t>(reg,i);case 32:return P.VU.elt<uint32_t>(reg,i);default:return P.VU.elt<uint64_t>(reg,i);}};
++uint8_t shared_flags=0;
++if(P.VU.vl->read()){
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: shared FPU flags require mstatus.FS > 0");
++ for(reg_t i=0;i<P.VU.vl->read();++i){
++  const uint64_t a=read(insn.rs2(),i,shared_wide_input?shared_out:shared_in);
++  const uint64_t b=shared_vf?READ_FREG(insn.rs1()).v[0]:read(insn.rs1(),i,shared_in);
++  const uint64_t c=read(insn.rd(),i,shared_out);
++  const auto value=iris_shared::operation(shared_f6,shared_in,a,b,c,shared_rm,shared_flags);
++  // Hardware issues the FPU request for masked elements as well. Only the
++  // write mask is suppressed; scalar FPU exception flags still reach the CSR.
++  if(insn.v_vm()||P.VU.mask_elt(0,i))switch(iris_fma::width(shared_out)){
++   case 16:P.VU.elt<uint16_t>(insn.rd(),i,true)=uint16_t(value);break;
++   case 32:P.VU.elt<uint32_t>(insn.rd(),i,true)=uint32_t(value);break;
++   default:P.VU.elt<uint64_t>(insn.rd(),i,true)=value;break;
++  }
++ }
++ STATE.fflags->write(STATE.fflags->read()|shared_flags);
++} else if(shared_vf) {
++ // Rocket still executes its scalar-FPR extraction on VF with VL=0. The
++ // elaborated decoder has wflags=0 there, but FPToInt reports valid zero flags.
++ STATE.fflags->write(STATE.fflags->read());
++}
++VECTOR_END;
+diff --git a/riscv/insns/iris_shared_reduction_body.h b/riscv/insns/iris_shared_reduction_body.h
+new file mode 100644
+index 00000000..2b8d1fa4
+--- /dev/null
++++ b/riscv/insns/iris_shared_reduction_body.h
+@@ -0,0 +1,25 @@
++const unsigned shared_rm=STATE.frm->read(),shared_f6=insn.bits()>>26;
++const bool shared_wide=shared_f6>=0x30;
++if(P.VU.vstart->read()!=0)throw trap_illegal_instruction(pc);
++VI_CHECK_REDUCTION(shared_wide);
++require(P.VU.vsew==16||P.VU.vsew==32||P.VU.vsew==64);
++if(P.VU.altfmt)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart2 has no alternate-format shared FPU");
++require((P.VU.vsew==16&&p->extension_enabled(EXT_ZVFH))||(P.VU.vsew==32&&p->get_isa().get_zvf())||(P.VU.vsew==64&&p->get_isa().get_zvd()));
++if(shared_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE shared reduction");
++const iris_fma::Kind shared_in=P.VU.vsew==64?iris_fma::D:P.VU.vsew==32?iris_fma::S:iris_fma::H;
++const iris_fma::Kind shared_out=shared_wide?(shared_in==iris_fma::S?iris_fma::D:iris_fma::S):shared_in;
++auto read=[&](unsigned reg,reg_t i,iris_fma::Kind kind)->uint64_t{switch(iris_fma::width(kind)){case 16:return P.VU.elt<uint16_t>(reg,i);case 32:return P.VU.elt<uint32_t>(reg,i);default:return P.VU.elt<uint64_t>(reg,i);}};
++if(P.VU.vl->read()){
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: shared reduction flags require mstatus.FS > 0");
++ uint64_t accum=read(insn.rs1(),0,shared_out);uint8_t flags=0;
++ // Both reduction opcodes are forced Elementwise by SharedScalarFPFMAFactory.
++ for(reg_t i=0;i<P.VU.vl->read();++i){
++  const auto result=iris_shared::add(accum,read(insn.rs2(),i,shared_in),shared_in,shared_out,shared_rm,flags);
++  if(insn.v_vm()||P.VU.mask_elt(0,i))accum=result;
++ }
++ // ExecuteSequencer acc_copy always performs one final add of acc_init=+0.
++ accum=iris_shared::add(accum,0,shared_out,shared_out,shared_rm,flags);
++ switch(iris_fma::width(shared_out)){case 16:P.VU.elt<uint16_t>(insn.rd(),0,true)=uint16_t(accum);break;case 32:P.VU.elt<uint32_t>(insn.rd(),0,true)=uint32_t(accum);break;default:P.VU.elt<uint64_t>(insn.rd(),0,true)=accum;}
++ STATE.fflags->write(STATE.fflags->read()|flags);
++}
++VECTOR_END;
+diff --git a/riscv/insns/iris_vtfmm_body.h b/riscv/insns/iris_vtfmm_body.h
+new file mode 100644
+index 00000000..4bdeae0f
+--- /dev/null
++++ b/riscv/insns/iris_vtfmm_body.h
+@@ -0,0 +1,30 @@
++// Included in each generated Spike instruction handler (P/STATE/insn are in scope).
++ZVT_MTD(4);
++ZVT_CHECK_ALIGN_RS1;
++ZVT_CHECK_ALIGN_RS2;
++ZVT_CHECK_RS1_EMUL;
++ZVT_CHECK_RS2_EMUL;
++require_extension(EXT_ZVTOFP8FMM);
++require(P.VU.vsew == 8 && P.VU.widen == 4);
++const unsigned iris_rm = STATE.frm->read();
++if (iris_rm > 4)
++  throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE: reserved frm for VME FP8");
++{
++  IrisSoftfloatScope iris_scope(iris_rm);
++  for (size_t m = 0; m < P.VU.tm; ++m) {
++    for (size_t n = 0; n < P.VU.tn(); ++n) {
++      if (!P.VU.tk) continue; // Zero K is a no-op; do not read an unknown tile.
++      auto& cell = P.VU.mt_elt<uint32_t>(td, m, n);
++      P.VU.iris_cell(cell, false);
++      for (size_t k = 0; k < P.VU.tk; ++k) {
++        const uint8_t a = P.VU.elt<uint8_t>(insn.rs2() + 2*k, m);
++        const uint8_t b = P.VU.elt<uint8_t>(insn.rs1() + 2*k, n);
++        cell = f32_mulAdd(float32_t{iris_fp8_to_f32(a, insn.rd() & 1)},
++          float32_t{iris_fp8_to_f32(b, P.VU.altfmt)}, float32_t{cell}).v;
++      }
++    }
++  }
++}
++// No require_fp/set_fp_exceptions: actual OP-VE FP8 uses VS and raw frm, with
++// no FS legality gate and no connection to the backend's fflags collection.
++ZVT_END;
+diff --git a/riscv/insns/iris_wide_fp8_body.h b/riscv/insns/iris_wide_fp8_body.h
+new file mode 100644
+index 00000000..57d600ff
+--- /dev/null
++++ b/riscv/insns/iris_wide_fp8_body.h
+@@ -0,0 +1,34 @@
++// Widening FP8 arithmetic writes BF16; source io.widen forces out_altfmt=true.
++if(P.get_id()>=2)throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart 2 has no Mx widening FP8");
++require_vector(true);
++require_extension(EXT_ZVFOFP8MIN);
++const bool iris_vf=insn.funct3()==5;
++if(iris_vf)require_fp;
++const unsigned iris_rm=STATE.frm->read(),iris_f6=insn.bits()>>26;
++if(iris_f6==0x34||iris_f6==0x36){VI_CHECK_DDS(!iris_vf);}else{VI_CHECK_DSS(!iris_vf);}
++if(iris_rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE widening FP8");
++if(iris_f6==0x34||iris_f6==0x36)require_align(insn.rs2(),2*P.VU.vflmul);
++uint8_t iris_flags=0;bool iris_wrote=false;
++for(reg_t i=P.VU.vstart->read();i<P.VU.vl->read();++i){
++ if(!insn.v_vm()&&!P.VU.mask_elt(0,i))continue;
++ if(!STATE.sstatus->enabled(MSTATUS_FS))throw std::runtime_error("IRIS_RTL_ASSERT: widening FP8 write requires mstatus.FS > 0");
++ IrisSoftfloatScope iris_scope(iris_rm);
++ auto wide8=[&](uint8_t raw){return uint16_t(iris_fp8_to_f32(raw,P.VU.altfmt)>>16);};
++ // BF16 destination physical pipes [D,BF16,S,BF16] quiet same-format input
++ // sNaNs only on lane0 modulo4 (D); S shares exp8 and preserves signaling.
++ auto bf16_input=[&](uint16_t raw){return uint16_t(!(i&3)&&(raw&0x7f80)==0x7f80&&(raw&127)?0x7fc0:raw);};
++ const uint8_t vs1=iris_vf?uint8_t(READ_FREG(insn.rs1()).v[0]):P.VU.elt<uint8_t>(insn.rs1(),i);
++ auto& dest=P.VU.elt<uint16_t>(insn.rd(),i,true);
++ uint16_t a=(iris_f6==0x34||iris_f6==0x36)?bf16_input(P.VU.elt<uint16_t>(insn.rs2(),i)):wide8(P.VU.elt<uint8_t>(insn.rs2(),i));
++ uint16_t b=wide8(vs1),c=bf16_input(dest);unsigned cmd=0;
++ if(iris_f6==0x30||iris_f6==0x32||iris_f6==0x34||iris_f6==0x36){c=b;b=0x3f80;cmd=(iris_f6==0x32||iris_f6==0x36)?1:0;}
++ else if(iris_f6==0x38)c=(a^b)&0x8000;
++ else{const unsigned cmds[4]={0,3,1,2};cmd=cmds[iris_f6&3];}
++ if(cmd&2)a^=0x8000;if(cmd&1)c^=0x8000;
++ dest=bf16_mulAdd(float16_t{a},float16_t{b},float16_t{c}).v;
++ // Source FPFMAPipe.scala371 wires invalidExc Bool to flags (bit0), discarding
++ // other rounding exceptions. This unusual behavior is intentional here.
++ iris_flags|=bool(softfloat_exceptionFlags&softfloat_flag_invalid);iris_wrote=true;
++}
++if(iris_wrote)STATE.fflags->write(STATE.fflags->read()|iris_flags);
++VECTOR_END;
+diff --git a/riscv/insns/msetmtype.h b/riscv/insns/msetmtype.h
+index e868099d..88c710d4 100644
+--- a/riscv/insns/msetmtype.h
++++ b/riscv/insns/msetmtype.h
+@@ -3,4 +3,6 @@ require_vector_novtype(false);
+ 
+ P.VU.msetmtype(RS1, RS2);
+ 
++if (P.VU.iris_mode) WRITE_RD(0);
++
+ VECTOR_END;
+diff --git a/riscv/insns/msetmtypei.h b/riscv/insns/msetmtypei.h
+index 80cbf35f..762f0251 100644
+--- a/riscv/insns/msetmtypei.h
++++ b/riscv/insns/msetmtypei.h
+@@ -6,4 +6,6 @@ reg_t vtype = insn.i_imm() & 0x118;
+ 
+ P.VU.msetmtype(mtype, vtype);
+ 
++if (P.VU.iris_mode) WRITE_RD(0);
++
+ VECTOR_END;
+diff --git a/riscv/insns/msettk.h b/riscv/insns/msettk.h
+index 1ae74452..9e74e54b 100644
+--- a/riscv/insns/msettk.h
++++ b/riscv/insns/msettk.h
+@@ -1,6 +1,6 @@
+ require_extension(EXT_ZVTBASE);
+ require_vector_novtype(false);
+-require(P.VU.widen);
++require(P.VU.iris_mode || P.VU.widen);
+ 
+ WRITE_RD(P.VU.msettk(RS1));
+ 
+diff --git a/riscv/insns/msettm.h b/riscv/insns/msettm.h
+index e3801ef8..f0db6dcc 100644
+--- a/riscv/insns/msettm.h
++++ b/riscv/insns/msettm.h
+@@ -1,6 +1,6 @@
+ require_extension(EXT_ZVTBASE);
+ require_vector_novtype(false);
+-require(P.VU.widen);
++require(P.VU.iris_mode || P.VU.widen);
+ 
+ WRITE_RD(P.VU.msettm(RS1));
+ 
+diff --git a/riscv/insns/vfadd_vf.h b/riscv/insns/vfadd_vf.h
+index be3bd9a0..7761c376 100644
+--- a/riscv/insns/vfadd_vf.h
++++ b/riscv/insns/vfadd_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfadd.vf vd, vs2, rs1
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_add(rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfadd_vv.h b/riscv/insns/vfadd_vv.h
+index 67ddd5cf..6b2d65a4 100644
+--- a/riscv/insns/vfadd_vv.h
++++ b/riscv/insns/vfadd_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfadd.vv vd, vs2, vs1
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_add(vs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfmacc_vf.h b/riscv/insns/vfmacc_vf.h
+index 293a06b7..36bdcd6e 100644
+--- a/riscv/insns/vfmacc_vf.h
++++ b/riscv/insns/vfmacc_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmacc.vf vd, rs1, vs2, vm    # vd[i] = +(vs2[i] * x[rs1]) + vd[i]
+ 
+ require_zvfbfa
+@@ -12,3 +17,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(rs1, vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfmacc_vv.h b/riscv/insns/vfmacc_vv.h
+index 3fadb667..1e3f5dff 100644
+--- a/riscv/insns/vfmacc_vv.h
++++ b/riscv/insns/vfmacc_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmacc.vv vd, rs1, vs2, vm    # vd[i] = +(vs2[i] * vs1[i]) + vd[i]
+ 
+ require_zvfbfa
+@@ -12,3 +17,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(vs1, vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfmadd_vf.h b/riscv/insns/vfmadd_vf.h
+index 258e6204..fb06527d 100644
+--- a/riscv/insns/vfmadd_vf.h
++++ b/riscv/insns/vfmadd_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmadd: vd[i] = +(vd[i] * f[rs1]) + vs2[i]
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(vd, rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfmadd_vv.h b/riscv/insns/vfmadd_vv.h
+index 42ece0a4..ce5a6a54 100644
+--- a/riscv/insns/vfmadd_vv.h
++++ b/riscv/insns/vfmadd_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmadd: vd[i] = +(vd[i] * vs1[i]) + vs2[i]
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(vd, vs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfmax_vf.h b/riscv/insns/vfmax_vf.h
+index 3bd8013d..25fe9af4 100644
+--- a/riscv/insns/vfmax_vf.h
++++ b/riscv/insns/vfmax_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfmax
+ 
+ require_zvfbfa
+@@ -12,3 +15,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_max(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfmax_vv.h b/riscv/insns/vfmax_vv.h
+index 4801b867..0bd7e063 100644
+--- a/riscv/insns/vfmax_vv.h
++++ b/riscv/insns/vfmax_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfmax
+ 
+ require_zvfbfa
+@@ -12,3 +15,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_max(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfmin_vf.h b/riscv/insns/vfmin_vf.h
+index efae5a1b..3b26605f 100644
+--- a/riscv/insns/vfmin_vf.h
++++ b/riscv/insns/vfmin_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfmin vd, vs2, rs1
+ 
+ require_zvfbfa
+@@ -12,3 +15,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_min(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfmin_vv.h b/riscv/insns/vfmin_vv.h
+index 9e2bee21..3494b36c 100644
+--- a/riscv/insns/vfmin_vv.h
++++ b/riscv/insns/vfmin_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfmin vd, vs2, vs1
+ 
+ require_zvfbfa
+@@ -12,3 +15,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_min(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfmsac_vf.h b/riscv/insns/vfmsac_vf.h
+index 2251e93b..44921bc6 100644
+--- a/riscv/insns/vfmsac_vf.h
++++ b/riscv/insns/vfmsac_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmsac: vd[i] = +(f[rs1] * vs2[i]) - vd[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(rs1, vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfmsac_vv.h b/riscv/insns/vfmsac_vv.h
+index 3b9cf12e..3b467d29 100644
+--- a/riscv/insns/vfmsac_vv.h
++++ b/riscv/insns/vfmsac_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmsac: vd[i] = +(vs1[i] * vs2[i]) - vd[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(vs1, vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfmsub_vf.h b/riscv/insns/vfmsub_vf.h
+index 5ce6a447..853bead0 100644
+--- a/riscv/insns/vfmsub_vf.h
++++ b/riscv/insns/vfmsub_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmsub: vd[i] = +(vd[i] * f[rs1]) - vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(vd, rs1, f64(vs2.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfmsub_vv.h b/riscv/insns/vfmsub_vv.h
+index bedc9343..32b57862 100644
+--- a/riscv/insns/vfmsub_vv.h
++++ b/riscv/insns/vfmsub_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmsub: vd[i] = +(vd[i] * vs1[i]) - vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(vd, vs1, f64(vs2.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfmul_vf.h b/riscv/insns/vfmul_vf.h
+index 93ca2164..51e0b1c5 100644
+--- a/riscv/insns/vfmul_vf.h
++++ b/riscv/insns/vfmul_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmul.vf vd, vs2, rs1, vm
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mul(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfmul_vv.h b/riscv/insns/vfmul_vv.h
+index 75daad6b..9e94fe5e 100644
+--- a/riscv/insns/vfmul_vv.h
++++ b/riscv/insns/vfmul_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfmul.vv vd, vs1, vs2, vm
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mul(vs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfnmacc_vf.h b/riscv/insns/vfnmacc_vf.h
+index e9688ea2..48154691 100644
+--- a/riscv/insns/vfnmacc_vf.h
++++ b/riscv/insns/vfnmacc_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmacc: vd[i] = -(f[rs1] * vs2[i]) - vd[i]
+ 
+ 
+@@ -14,3 +19,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(rs1, f64(vs2.v ^ F64_SIGN), f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfnmacc_vv.h b/riscv/insns/vfnmacc_vv.h
+index c8f22be8..505034d8 100644
+--- a/riscv/insns/vfnmacc_vv.h
++++ b/riscv/insns/vfnmacc_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmacc: vd[i] = -(vs1[i] * vs2[i]) - vd[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(f64(vs2.v ^ F64_SIGN), vs1, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfnmadd_vf.h b/riscv/insns/vfnmadd_vf.h
+index 32754c35..f775d6c4 100644
+--- a/riscv/insns/vfnmadd_vf.h
++++ b/riscv/insns/vfnmadd_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmadd: vd[i] = -(vd[i] * f[rs1]) - vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(f64(vd.v ^ F64_SIGN), rs1, f64(vs2.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfnmadd_vv.h b/riscv/insns/vfnmadd_vv.h
+index d71f9edd..bdbb903e 100644
+--- a/riscv/insns/vfnmadd_vv.h
++++ b/riscv/insns/vfnmadd_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmadd: vd[i] = -(vd[i] * vs1[i]) - vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(f64(vd.v ^ F64_SIGN), vs1, f64(vs2.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfnmsac_vf.h b/riscv/insns/vfnmsac_vf.h
+index a69603f4..6681149f 100644
+--- a/riscv/insns/vfnmsac_vf.h
++++ b/riscv/insns/vfnmsac_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmsac: vd[i] = -(f[rs1] * vs2[i]) + vd[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(rs1, f64(vs2.v ^ F64_SIGN), vd);
+ })
++
++}
+diff --git a/riscv/insns/vfnmsac_vv.h b/riscv/insns/vfnmsac_vv.h
+index f150641f..f9e929ad 100644
+--- a/riscv/insns/vfnmsac_vv.h
++++ b/riscv/insns/vfnmsac_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmsac.vv vd, vs1, vs2, vm   # vd[i] = -(vs2[i] * vs1[i]) + vd[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(f64(vs1.v ^ F64_SIGN), vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfnmsub_vf.h b/riscv/insns/vfnmsub_vf.h
+index 55be4d14..7dc4ac5c 100644
+--- a/riscv/insns/vfnmsub_vf.h
++++ b/riscv/insns/vfnmsub_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmsub: vd[i] = -(vd[i] * f[rs1]) + vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_mulAdd(f64(vd.v ^ F64_SIGN), rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfnmsub_vv.h b/riscv/insns/vfnmsub_vv.h
+index a9ff58ce..c26207f6 100644
+--- a/riscv/insns/vfnmsub_vv.h
++++ b/riscv/insns/vfnmsub_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfnmsub: vd[i] = -(vd[i] * vs1[i]) + vs2[i]
+ 
+ require_zvfbfa
+@@ -13,3 +18,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_mulAdd(f64(vd.v ^ F64_SIGN), vs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfredmax_vs.h b/riscv/insns/vfredmax_vs.h
+index f19ec597..aaaffd1d 100644
+--- a/riscv/insns/vfredmax_vs.h
++++ b/riscv/insns/vfredmax_vs.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfredmax vd, vs2, vs1
+ bool is_propagate = false;
+ VI_VFP_VV_LOOP_REDUCTION
+@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP_REDUCTION
+ {
+   vd_0 = f64_max(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfredmin_vs.h b/riscv/insns/vfredmin_vs.h
+index e3cf1513..21ceb11c 100644
+--- a/riscv/insns/vfredmin_vs.h
++++ b/riscv/insns/vfredmin_vs.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfredmin vd, vs2, vs1
+ bool is_propagate = false;
+ VI_VFP_VV_LOOP_REDUCTION
+@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP_REDUCTION
+ {
+   vd_0 = f64_min(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfredosum_vs.h b/riscv/insns/vfredosum_vs.h
+index 2438a7ba..74566ae0 100644
+--- a/riscv/insns/vfredosum_vs.h
++++ b/riscv/insns/vfredosum_vs.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_fp8_reduction_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_reduction_body.h"
++} else {
+ // vfredosum: vd[0] =  sum( vs2[*] , vs1[0] )
+ bool is_propagate = false;
+ VI_VFP_VV_LOOP_REDUCTION
+@@ -10,3 +15,5 @@ VI_VFP_VV_LOOP_REDUCTION
+ {
+   vd_0 = f64_add(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfredusum_vs.h b/riscv/insns/vfredusum_vs.h
+index bad7308e..342be43c 100644
+--- a/riscv/insns/vfredusum_vs.h
++++ b/riscv/insns/vfredusum_vs.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_fp8_reduction_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_reduction_body.h"
++} else {
+ // vfredsum: vd[0] =  sum( vs2[*] , vs1[0] )
+ bool is_propagate = true;
+ VI_VFP_VV_LOOP_REDUCTION
+@@ -10,3 +15,5 @@ VI_VFP_VV_LOOP_REDUCTION
+ {
+   vd_0 = f64_add(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfrsub_vf.h b/riscv/insns/vfrsub_vf.h
+index 2ae5f7cc..40316979 100644
+--- a/riscv/insns/vfrsub_vf.h
++++ b/riscv/insns/vfrsub_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfsub.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP
+ ({
+@@ -9,3 +14,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_sub(rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnj_vf.h b/riscv/insns/vfsgnj_vf.h
+index c84361aa..8ef754b5 100644
+--- a/riscv/insns/vfsgnj_vf.h
++++ b/riscv/insns/vfsgnj_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnj vd, vs2, vs1
+ VI_VFP_VF_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = fsgnj64(vs2.v, rs1.v, false, false);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnj_vv.h b/riscv/insns/vfsgnj_vv.h
+index a31c8ba6..53449e4f 100644
+--- a/riscv/insns/vfsgnj_vv.h
++++ b/riscv/insns/vfsgnj_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnj
+ VI_VFP_VV_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = fsgnj64(vs2.v, vs1.v, false, false);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnjn_vf.h b/riscv/insns/vfsgnjn_vf.h
+index 9313cf32..89f1773c 100644
+--- a/riscv/insns/vfsgnjn_vf.h
++++ b/riscv/insns/vfsgnjn_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnn
+ VI_VFP_VF_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = fsgnj64(vs2.v, rs1.v, true, false);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnjn_vv.h b/riscv/insns/vfsgnjn_vv.h
+index 3b6b2705..cfa92446 100644
+--- a/riscv/insns/vfsgnjn_vv.h
++++ b/riscv/insns/vfsgnjn_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnn
+ VI_VFP_VV_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = fsgnj64(vs2.v, vs1.v, true, false);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnjx_vf.h b/riscv/insns/vfsgnjx_vf.h
+index 081f7970..bdc53da2 100644
+--- a/riscv/insns/vfsgnjx_vf.h
++++ b/riscv/insns/vfsgnjx_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnx
+ VI_VFP_VF_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = fsgnj64(vs2.v, rs1.v, false, true);
+ })
++
++}
+diff --git a/riscv/insns/vfsgnjx_vv.h b/riscv/insns/vfsgnjx_vv.h
+index db054397..7f85e3cb 100644
+--- a/riscv/insns/vfsgnjx_vv.h
++++ b/riscv/insns/vfsgnjx_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vfsgnx
+ VI_VFP_VV_LOOP
+ ({
+@@ -10,3 +13,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = fsgnj64(vs2.v, vs1.v, false, true);
+ })
++
++}
+diff --git a/riscv/insns/vfsub_vf.h b/riscv/insns/vfsub_vf.h
+index a011ae89..0f5577ce 100644
+--- a/riscv/insns/vfsub_vf.h
++++ b/riscv/insns/vfsub_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfsub.vf vd, vs2, rs1
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VF_LOOP
+ {
+   vd = f64_sub(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfsub_vv.h b/riscv/insns/vfsub_vv.h
+index db4cd5ee..c34ce5f1 100644
+--- a/riscv/insns/vfsub_vv.h
++++ b/riscv/insns/vfsub_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_native_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfsub.vv vd, vs2, vs1
+ require_zvfbfa
+ 
+@@ -11,3 +16,5 @@ VI_VFP_VV_LOOP
+ {
+   vd = f64_sub(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwadd_vf.h b/riscv/insns/vfwadd_vf.h
+index b8249001..af7947c6 100644
+--- a/riscv/insns/vfwadd_vf.h
++++ b/riscv/insns/vfwadd_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwadd.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_add(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwadd_vv.h b/riscv/insns/vfwadd_vv.h
+index 9dd56a2c..9a4559c2 100644
+--- a/riscv/insns/vfwadd_vv.h
++++ b/riscv/insns/vfwadd_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwadd.vv vd, vs2, vs1
+ 
+ require_zvfbfa
+@@ -9,3 +14,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_add(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwadd_wf.h b/riscv/insns/vfwadd_wf.h
+index 021b17f0..d2bd9b1c 100644
+--- a/riscv/insns/vfwadd_wf.h
++++ b/riscv/insns/vfwadd_wf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwadd.wf vd, vs2, vs1
+ VI_VFP_WF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_WF_LOOP_WIDE
+ {
+   vd = f64_add(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwadd_wv.h b/riscv/insns/vfwadd_wv.h
+index c1ed0389..cb73c841 100644
+--- a/riscv/insns/vfwadd_wv.h
++++ b/riscv/insns/vfwadd_wv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwadd.wv vd, vs2, vs1
+ VI_VFP_WV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_WV_LOOP_WIDE
+ {
+   vd = f64_add(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwmacc_vf.h b/riscv/insns/vfwmacc_vf.h
+index 441fa0a7..5dd45f6a 100644
+--- a/riscv/insns/vfwmacc_vf.h
++++ b/riscv/insns/vfwmacc_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmacc.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_mulAdd(rs1, vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfwmacc_vv.h b/riscv/insns/vfwmacc_vv.h
+index a654198b..1266ce67 100644
+--- a/riscv/insns/vfwmacc_vv.h
++++ b/riscv/insns/vfwmacc_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmacc.vv vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_mulAdd(vs1, vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfwmsac_vf.h b/riscv/insns/vfwmsac_vf.h
+index 18010ff4..05f57f6c 100644
+--- a/riscv/insns/vfwmsac_vf.h
++++ b/riscv/insns/vfwmsac_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmsac.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_mulAdd(rs1, vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfwmsac_vv.h b/riscv/insns/vfwmsac_vv.h
+index 9dc4073f..51a5a28a 100644
+--- a/riscv/insns/vfwmsac_vv.h
++++ b/riscv/insns/vfwmsac_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmsac.vv  vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_mulAdd(vs1, vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfwmul_vf.h b/riscv/insns/vfwmul_vf.h
+index 2bb543f6..0cb46b56 100644
+--- a/riscv/insns/vfwmul_vf.h
++++ b/riscv/insns/vfwmul_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmul.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_mul(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwmul_vv.h b/riscv/insns/vfwmul_vv.h
+index 2ce38e62..e054d22e 100644
+--- a/riscv/insns/vfwmul_vv.h
++++ b/riscv/insns/vfwmul_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwmul.vv vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_mul(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwnmacc_vf.h b/riscv/insns/vfwnmacc_vf.h
+index 038bda08..3c0387bd 100644
+--- a/riscv/insns/vfwnmacc_vf.h
++++ b/riscv/insns/vfwnmacc_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwnmacc.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_mulAdd(f64(rs1.v ^ F64_SIGN), vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfwnmacc_vv.h b/riscv/insns/vfwnmacc_vv.h
+index bf863e04..902e9479 100644
+--- a/riscv/insns/vfwnmacc_vv.h
++++ b/riscv/insns/vfwnmacc_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwnmacc.vv vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_mulAdd(f64(vs1.v ^ F64_SIGN), vs2, f64(vd.v ^ F64_SIGN));
+ })
++
++}
+diff --git a/riscv/insns/vfwnmsac_vf.h b/riscv/insns/vfwnmsac_vf.h
+index 1e288e1b..61218b6c 100644
+--- a/riscv/insns/vfwnmsac_vf.h
++++ b/riscv/insns/vfwnmsac_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwnmacc.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_mulAdd(f64(rs1.v ^ F64_SIGN), vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfwnmsac_vv.h b/riscv/insns/vfwnmsac_vv.h
+index ce97749e..c4c46e00 100644
+--- a/riscv/insns/vfwnmsac_vv.h
++++ b/riscv/insns/vfwnmsac_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwnmsac.vv vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_mulAdd(f64(vs1.v ^ F64_SIGN), vs2, vd);
+ })
++
++}
+diff --git a/riscv/insns/vfwredosum_vs.h b/riscv/insns/vfwredosum_vs.h
+index 1f42d8ff..7e4fd70c 100644
+--- a/riscv/insns/vfwredosum_vs.h
++++ b/riscv/insns/vfwredosum_vs.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_fp8_reduction_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_reduction_body.h"
++} else {
+ // vfwredosum.vs vd, vs2, vs1
+ bool is_propagate = false;
+ VI_VFP_VV_LOOP_WIDE_REDUCTION
+@@ -7,3 +12,5 @@ VI_VFP_VV_LOOP_WIDE_REDUCTION
+ {
+   vd_0 = f64_add(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfwredusum_vs.h b/riscv/insns/vfwredusum_vs.h
+index 4ef28969..f4e0d618 100644
+--- a/riscv/insns/vfwredusum_vs.h
++++ b/riscv/insns/vfwredusum_vs.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_fp8_reduction_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_reduction_body.h"
++} else {
+ // vfwredsum.vs vd, vs2, vs1
+ bool is_propagate = true;
+ VI_VFP_VV_LOOP_WIDE_REDUCTION
+@@ -7,3 +12,5 @@ VI_VFP_VV_LOOP_WIDE_REDUCTION
+ {
+   vd_0 = f64_add(vd_0, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vfwsub_vf.h b/riscv/insns/vfwsub_vf.h
+index 8c376884..f16a6b77 100644
+--- a/riscv/insns/vfwsub_vf.h
++++ b/riscv/insns/vfwsub_vf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwsub.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VF_LOOP_WIDE
+ {
+   vd = f64_sub(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwsub_vv.h b/riscv/insns/vfwsub_vv.h
+index ce08e36a..ac75abaf 100644
+--- a/riscv/insns/vfwsub_vv.h
++++ b/riscv/insns/vfwsub_vv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwsub.vv vd, vs2, vs1
+ VI_VFP_VV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_VV_LOOP_WIDE
+ {
+   vd = f64_sub(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwsub_wf.h b/riscv/insns/vfwsub_wf.h
+index f6f47ca5..ce25d385 100644
+--- a/riscv/insns/vfwsub_wf.h
++++ b/riscv/insns/vfwsub_wf.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwsub.wf vd, vs2, rs1
+ VI_VFP_WF_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_WF_LOOP_WIDE
+ {
+   vd = f64_sub(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vfwsub_wv.h b/riscv/insns/vfwsub_wv.h
+index eef904dc..36305a59 100644
+--- a/riscv/insns/vfwsub_wv.h
++++ b/riscv/insns/vfwsub_wv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode && P.VU.vsew == 8) {
++#include "iris_wide_fp8_body.h"
++} else if (P.VU.iris_mode) {
++#include "iris_ieee_fma_body.h"
++} else {
+ // vfwsub.wv vd, vs2, vs1
+ VI_VFP_WV_LOOP_WIDE
+ ({
+@@ -6,3 +11,5 @@ VI_VFP_WV_LOOP_WIDE
+ {
+   vd = f64_sub(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfeq_vf.h b/riscv/insns/vmfeq_vf.h
+index adb5d0a4..813923c0 100644
+--- a/riscv/insns/vmfeq_vf.h
++++ b/riscv/insns/vmfeq_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfeq.vf vd, vs2, fs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = f64_eq(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfeq_vv.h b/riscv/insns/vmfeq_vv.h
+index 97b7a0d6..109b5256 100644
+--- a/riscv/insns/vmfeq_vv.h
++++ b/riscv/insns/vmfeq_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfeq.vv vd, vs2, vs1
+ require_zvfbfa
+ 
+@@ -11,3 +14,5 @@ VI_VFP_VV_LOOP_CMP
+ {
+   res = f64_eq(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfge_vf.h b/riscv/insns/vmfge_vf.h
+index eb4bdce2..7524d1c2 100644
+--- a/riscv/insns/vmfge_vf.h
++++ b/riscv/insns/vmfge_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfge.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = f64_le(rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vmfgt_vf.h b/riscv/insns/vmfgt_vf.h
+index bfcf2516..afdcaf79 100644
+--- a/riscv/insns/vmfgt_vf.h
++++ b/riscv/insns/vmfgt_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfgt.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = f64_lt(rs1, vs2);
+ })
++
++}
+diff --git a/riscv/insns/vmfle_vf.h b/riscv/insns/vmfle_vf.h
+index 9415516d..e015fb0e 100644
+--- a/riscv/insns/vmfle_vf.h
++++ b/riscv/insns/vmfle_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfle.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = f64_le(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfle_vv.h b/riscv/insns/vmfle_vv.h
+index 5fe2d449..767e0653 100644
+--- a/riscv/insns/vmfle_vv.h
++++ b/riscv/insns/vmfle_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfle.vv vd, vs2, rs1
+ require_zvfbfa
+ 
+@@ -11,3 +14,5 @@ VI_VFP_VV_LOOP_CMP
+ {
+   res = f64_le(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vmflt_vf.h b/riscv/insns/vmflt_vf.h
+index 62173bb1..9391ca58 100644
+--- a/riscv/insns/vmflt_vf.h
++++ b/riscv/insns/vmflt_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmflt.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = f64_lt(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vmflt_vv.h b/riscv/insns/vmflt_vv.h
+index b019b9c5..7b406174 100644
+--- a/riscv/insns/vmflt_vv.h
++++ b/riscv/insns/vmflt_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmflt.vv vd, vs2, vs1
+ require_zvfbfa
+ 
+@@ -11,3 +14,5 @@ VI_VFP_VV_LOOP_CMP
+ {
+   res = f64_lt(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfne_vf.h b/riscv/insns/vmfne_vf.h
+index 74b788fe..1142ef91 100644
+--- a/riscv/insns/vmfne_vf.h
++++ b/riscv/insns/vmfne_vf.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfne.vf vd, vs2, rs1
+ VI_VFP_VF_LOOP_CMP
+ ({
+@@ -9,3 +12,5 @@ VI_VFP_VF_LOOP_CMP
+ {
+   res = !f64_eq(vs2, rs1);
+ })
++
++}
+diff --git a/riscv/insns/vmfne_vv.h b/riscv/insns/vmfne_vv.h
+index 017206c7..e1689338 100644
+--- a/riscv/insns/vmfne_vv.h
++++ b/riscv/insns/vmfne_vv.h
+@@ -1,3 +1,6 @@
++if(P.VU.iris_mode){
++#include "iris_fpcomp_body.h"
++}else{
+ // vmfne.vv vd, vs2, rs1
+ require_zvfbfa
+ 
+@@ -11,3 +14,5 @@ VI_VFP_VV_LOOP_CMP
+ {
+   res = !f64_eq(vs2, vs1);
+ })
++
++}
+diff --git a/riscv/insns/vtdiscard.h b/riscv/insns/vtdiscard.h
+index 9c479aab..6b76781a 100644
+--- a/riscv/insns/vtdiscard.h
++++ b/riscv/insns/vtdiscard.h
+@@ -1,5 +1,8 @@
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xffffffff) == 0x43c06057));
+ require_extension(EXT_ZVTBASE);
+ require_vector(false);
++if (!P.VU.iris_mode) {
+ require(STATE.sstatus->enabled(SSTATUS_MS));
+ require(P.VU.vstart->read() == 0);
+ 
+@@ -8,4 +11,6 @@ STATE.mstatus->write((STATE.mstatus->read() & ~SSTATUS_MS) | (SSTATUS_MS & (SSTA
+ // set vsstatus.MS to Initial if V=1
+ STATE.sstatus->write((STATE.sstatus->read() & ~SSTATUS_MS) | (SSTATUS_MS & (SSTATUS_MS >> 1)));
+ 
++}
++
+ VECTOR_END;
+diff --git a/riscv/insns/vtfmm_alt_tvv.h b/riscv/insns/vtfmm_alt_tvv.h
+index a8c92d8e..8c162228 100644
+--- a/riscv/insns/vtfmm_alt_tvv.h
++++ b/riscv/insns/vtfmm_alt_tvv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode) {
++#include "iris_vtfmm_body.h"
++} else {
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfe0071ff) == 0xf20010f7));
+ ZVT_MTD(8);
+ ZVT_CHECK_ALIGN_RS1;
+ ZVT_CHECK_ALIGN_RS2;
+@@ -90,3 +95,5 @@ if (P.VU.vsew == 16 && P.VU.widen == 2 && P.VU.altfmt) {
+ }
+ 
+ set_fp_exceptions;
++
++}
+diff --git a/riscv/insns/vtfmm_tvv.h b/riscv/insns/vtfmm_tvv.h
+index 8b9c0214..67c43924 100644
+--- a/riscv/insns/vtfmm_tvv.h
++++ b/riscv/insns/vtfmm_tvv.h
+@@ -1,3 +1,8 @@
++if (P.VU.iris_mode) {
++#include "iris_vtfmm_body.h"
++} else {
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfe0071ff) == 0xf2001077));
+ ZVT_MTD(8);
+ ZVT_CHECK_ALIGN_RS1;
+ ZVT_CHECK_ALIGN_RS2;
+@@ -120,3 +125,5 @@ if (P.VU.vsew == 64 && P.VU.widen == 1 && !P.VU.altfmt) {
+ }
+ 
+ set_fp_exceptions;
++
++}
+diff --git a/riscv/insns/vtmms_tvv.h b/riscv/insns/vtmms_tvv.h
+index 9f267b39..df2f02f7 100644
+--- a/riscv/insns/vtmms_tvv.h
++++ b/riscv/insns/vtmms_tvv.h
+@@ -1,3 +1,5 @@
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfe0071ff) == 0xf20000f7));
+ ZVT_MTD(4);
+ ZVT_CHECK_ALIGN_RS1;
+ ZVT_CHECK_ALIGN_RS2;
+@@ -12,7 +14,9 @@ if (P.VU.vsew == 8 && P.VU.widen == 4 && !P.VU.altfmt) {
+     auto a = P.VU.mt_vector<int8_t>(insn.rs2(), m);
+     auto b = P.VU.mt_vector<uint8_t>(insn.rs1(), n);
+   
+-    P.VU.mt_elt<int32_t>(td, m, n) += dot_product<int32_t>(a.data(), b.data(), P.VU.tk);
++    auto& cell = P.VU.mt_elt<int32_t>(td, m, n);
++    P.VU.iris_cell(cell, false);
++    cell = uint32_t(cell) + uint32_t(dot_product<int32_t>(a.data(), b.data(), P.VU.tk));
+   })
+ } else if (P.VU.vsew == 8 && P.VU.widen == 4 && P.VU.altfmt) {
+   require_extension(EXT_ZVTI8I32MM);
+@@ -22,7 +26,9 @@ if (P.VU.vsew == 8 && P.VU.widen == 4 && !P.VU.altfmt) {
+     auto a = P.VU.mt_vector<int8_t>(insn.rs2(), m);
+     auto b = P.VU.mt_vector<int8_t>(insn.rs1(), n);
+   
+-    P.VU.mt_elt<int32_t>(td, m, n) += dot_product<int32_t>(a.data(), b.data(), P.VU.tk);
++    auto& cell = P.VU.mt_elt<int32_t>(td, m, n);
++    P.VU.iris_cell(cell, false);
++    cell = uint32_t(cell) + uint32_t(dot_product<int32_t>(a.data(), b.data(), P.VU.tk));
+   })
+ } else {
+   require(false);
+diff --git a/riscv/insns/vtmmu_tvv.h b/riscv/insns/vtmmu_tvv.h
+index f8646834..ebd90465 100644
+--- a/riscv/insns/vtmmu_tvv.h
++++ b/riscv/insns/vtmmu_tvv.h
+@@ -1,3 +1,5 @@
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfe0071ff) == 0xf2000077));
+ ZVT_MTD(4);
+ ZVT_CHECK_ALIGN_RS1;
+ ZVT_CHECK_ALIGN_RS2;
+@@ -12,7 +14,9 @@ if (P.VU.vsew == 8 && P.VU.widen == 4 && !P.VU.altfmt) {
+     auto a = P.VU.mt_vector<uint8_t>(insn.rs2(), m);
+     auto b = P.VU.mt_vector<uint8_t>(insn.rs1(), n);
+   
+-    P.VU.mt_elt<int32_t>(td, m, n) += dot_product<int32_t>(a.data(), b.data(), P.VU.tk);
++    auto& cell = P.VU.mt_elt<int32_t>(td, m, n);
++    P.VU.iris_cell(cell, false);
++    cell = uint32_t(cell) + uint32_t(dot_product<int32_t>(a.data(), b.data(), P.VU.tk));
+   })
+ } else if (P.VU.vsew == 8 && P.VU.widen == 4 && P.VU.altfmt) {
+   require_extension(EXT_ZVTI8I32MM);
+@@ -22,7 +26,9 @@ if (P.VU.vsew == 8 && P.VU.widen == 4 && !P.VU.altfmt) {
+     auto a = P.VU.mt_vector<uint8_t>(insn.rs2(), m);
+     auto b = P.VU.mt_vector<int8_t>(insn.rs1(), n);
+   
+-    P.VU.mt_elt<int32_t>(td, m, n) += dot_product<int32_t>(a.data(), b.data(), P.VU.tk);
++    auto& cell = P.VU.mt_elt<int32_t>(td, m, n);
++    P.VU.iris_cell(cell, false);
++    cell = uint32_t(cell) + uint32_t(dot_product<int32_t>(a.data(), b.data(), P.VU.tk));
+   })
+ } else {
+   require(false);
+diff --git a/riscv/insns/vtmv_t_v.h b/riscv/insns/vtmv_t_v.h
+index 26a170c9..64d16cf5 100644
+--- a/riscv/insns/vtmv_t_v.h
++++ b/riscv/insns/vtmv_t_v.h
+@@ -1,7 +1,10 @@
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfe007fff) == 0x5e006057));
+ ZVT_BASE;
+ ZVT_CHECK_ALIGN_RS2;
++require(!P.VU.iris_mode || (P.VU.vsew == 32 && P.VU.widen == 1));
+ 
+-#define LOOP(type) for (size_t i = 0; i < P.VU.tn(); i++) P.VU.tss_elt<type>(RS1, i) = P.VU.elt<type>(insn.rs2(), i)
++#define LOOP(type) for (size_t i = 0; i < P.VU.tn(); i++) { auto& cell = P.VU.tss_elt<type>(RS1, i); cell = P.VU.elt<type>(insn.rs2(), i); P.VU.iris_cell(cell, true); }
+ 
+ switch (P.VU.vsew) {
+   case e8: require_extension(EXT_ZVT8E); LOOP(uint8_t); break;
+diff --git a/riscv/insns/vtmv_v_t.h b/riscv/insns/vtmv_v_t.h
+index 80c9bc43..fcc438cc 100644
+--- a/riscv/insns/vtmv_v_t.h
++++ b/riscv/insns/vtmv_v_t.h
+@@ -1,7 +1,13 @@
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfff0707f) == 0x43f06057));
+ ZVT_BASE;
+ ZVT_CHECK_ALIGN_RD;
++if (P.VU.iris_mode && (RS1 & (reg_t(1) << 24)))
++  throw std::runtime_error("IRIS_UNSUPPORTED_COLUMN_MOVE hart=" + std::to_string(P.get_id()) +
++    " pc=" + std::to_string(pc) + " capability=column-move-out; elaborated OPU has no column readout datapath");
++require(!P.VU.iris_mode || (P.VU.vsew == 32 && P.VU.widen == 1));
+ 
+-#define LOOP(type) for (size_t i = 0; i < P.VU.tn(); i++) P.VU.elt<type>(insn.rd(), i, true) = P.VU.tss_elt<type>(RS1, i)
++#define LOOP(type) for (size_t i = 0; i < P.VU.tn(); i++) { auto& cell = P.VU.tss_elt<type>(RS1, i); P.VU.iris_cell(cell, false); P.VU.elt<type>(insn.rd(), i, true) = cell; }
+ 
+ switch (P.VU.vsew) {
+   case e8: require_extension(EXT_ZVT8E); LOOP(uint8_t); break;
+diff --git a/riscv/insns/vtzero.h b/riscv/insns/vtzero.h
+index 9edcd5fb..61c839b0 100644
+--- a/riscv/insns/vtzero.h
++++ b/riscv/insns/vtzero.h
+@@ -1,11 +1,14 @@
+-ZVT_MTD(16);
++// Iris fork: preserve strict upstream matching outside --iris-vme.
++require(P.VU.iris_mode || ((insn.bits() & 0xfffff0ff) == 0x43e06057));
++ZVT_MTD(P.VU.iris_mode ? 4 : 16);
++require(!P.VU.iris_mode || P.VU.tew() == 32);
+ 
+ ZVT_MN_LOOP
+ ({
+   switch (tew) {
+     case 8: P.VU.mt_elt<uint8_t>(td, m, n) = 0; break;
+     case 16: P.VU.mt_elt<uint16_t>(td, m, n) = 0; break;
+-    case 32: P.VU.mt_elt<uint32_t>(td, m, n) = 0; break;
++    case 32: { auto& cell = P.VU.mt_elt<uint32_t>(td, m, n); cell = 0; P.VU.iris_cell(cell, true); break; }
+     case 64: P.VU.mt_elt<uint64_t>(td, m, n) = 0; break;
+     default: abort();
+   }
+diff --git a/riscv/iris_clocked_device.h b/riscv/iris_clocked_device.h
+new file mode 100644
+index 00000000..0bdb0907
+--- /dev/null
++++ b/riscv/iris_clocked_device.h
+@@ -0,0 +1,15 @@
++#pragma once
++#include <cstdint>
++#include <optional>
++extern "C" uint64_t iris_device_clock_abi_v1();
++
++// Optional independent interface: ordinary Spike devices retain their ABI.
++// Times are absolute ticks of the selected modeled base clock, never host time.
++class iris_clocked_device_t {
++ public:
++  virtual ~iris_clocked_device_t() = default;
++  virtual void iris_advance_model_clock(uint64_t before, uint64_t after,
++                                      uint64_t base_hz) = 0;
++  virtual std::optional<uint64_t> iris_next_model_event(uint64_t now,
++                                                       uint64_t base_hz) const = 0;
++};
+diff --git a/riscv/iris_event_graph.cc b/riscv/iris_event_graph.cc
+new file mode 100644
+index 00000000..405faf01
+--- /dev/null
++++ b/riscv/iris_event_graph.cc
+@@ -0,0 +1,2 @@
++// Project-owned scheduler; source digests are included by spike/build.py.
++#include "../../../timing/iris_timing.cpp"
+diff --git a/riscv/iris_fp8.hpp b/riscv/iris_fp8.hpp
+new file mode 100644
+index 00000000..98c1dc2f
+--- /dev/null
++++ b/riscv/iris_fp8.hpp
+@@ -0,0 +1,46 @@
++// Iris OPU source contract: OFP8 widening followed by sequential FP32 FMA.
++// Saturn536774bd4c5e3bcd7813a4a0dc72fc87e5818532:
++// exu/fp/fp8ToE5M3.scala8-29; exu/OuterProductUnit.scala84-110.
++#ifndef IRIS_FP8_HPP
++#define IRIS_FP8_HPP
++#include <cstdint>
++#include "softfloat.h"
++
++static inline uint32_t iris_fp8_to_f32(uint8_t input, bool e5m2)
++{
++  const uint32_t sign = uint32_t(input & 128) << 24;
++  const unsigned fraction_bits = e5m2 ? 2 : 3;
++  const unsigned exponent = (input & 127) >> fraction_bits;
++  const unsigned fraction = input & ((1u << fraction_bits) - 1);
++  if (e5m2 && exponent == 31)
++    return fraction ? 0x7fc00000 : sign | 0x7f800000;
++  if (!e5m2 && exponent == 15 && fraction == 7) return 0x7fc00000;
++  if (!exponent) {
++    if (!fraction) return sign;
++    unsigned leading = 0;
++    while ((1u << (leading + 1)) <= fraction) ++leading;
++    const int unbiased = (e5m2 ? -16 : -9) + int(leading);
++    return sign | (uint32_t(unbiased + 127) << 23) |
++      ((fraction - (1u << leading)) << (23 - leading));
++  }
++  return sign | ((exponent + (e5m2 ? 112 : 120)) << 23) |
++    (fraction << (23 - fraction_bits));
++}
++
++// OPU FMA exception outputs are unwired; preserve all guest and library flags.
++struct IrisSoftfloatScope {
++  uint_fast8_t mode = softfloat_roundingMode;
++  uint_fast8_t flags = softfloat_exceptionFlags;
++  uint_fast8_t tininess = softfloat_detectTininess;
++  explicit IrisSoftfloatScope(unsigned rounding) {
++    softfloat_roundingMode = rounding;
++    softfloat_exceptionFlags = 0;
++    softfloat_detectTininess = softfloat_tininess_afterRounding;
++  }
++  ~IrisSoftfloatScope() {
++    softfloat_roundingMode = mode;
++    softfloat_exceptionFlags = flags;
++    softfloat_detectTininess = tininess;
++  }
++};
++#endif
+diff --git a/riscv/iris_fpcomp.hpp b/riscv/iris_fpcomp.hpp
+new file mode 100644
+index 00000000..5df35ffc
+--- /dev/null
++++ b/riscv/iris_fpcomp.hpp
+@@ -0,0 +1,44 @@
++#ifndef IRIS_FPCOMP_HPP
++#define IRIS_FPCOMP_HPP
++#include <cstdint>
++#include <stdexcept>
++namespace iris_cmp {
++inline uint64_t mask(unsigned w){return w==64?~uint64_t(0):(uint64_t(1)<<w)-1;}
++inline uint64_t sign(unsigned w){return uint64_t(1)<<(w-1);}
++inline unsigned fraction(unsigned w){return w==16?10:w==32?23:52;}
++inline uint64_t infinity(unsigned w){return (mask(w)>>1)&~((uint64_t(1)<<fraction(w))-1);}
++inline bool nan(uint64_t v,unsigned w){return (v&infinity(w))==infinity(w)&&(v&((uint64_t(1)<<fraction(w))-1));}
++inline bool equal(uint64_t a,uint64_t b,unsigned w){return a==b||((a&~sign(w))==0&&(b&~sign(w))==0);}
++inline bool less(uint64_t a,uint64_t b,unsigned w){
++ if(equal(a,b,w))return false;
++ if((a^b)&sign(w))return a&sign(w);
++ return a&sign(w)?a>b:a<b;
++}
++inline uint64_t element(uint64_t a,uint64_t b,unsigned w,unsigned f6){
++ a&=mask(w);b&=mask(w);const bool an=nan(a,w),bn=nan(b,w),eq=equal(a,b,w),lt=less(a,b,w);
++ if(f6==4||f6==5||f6==6||f6==7){
++  if(an&&bn)return infinity(w)|(uint64_t(1)<<(fraction(w)-1));
++  if(an)return b;if(bn)return a;
++  return ((f6<6&&lt)||(f6>=6&&!lt&&!eq))?a:b;
++ }
++ if(f6>=8&&f6<=10){
++  const uint64_t s=f6==8?(b&sign(w)):f6==9?(~b&sign(w)):((a^b)&sign(w));
++  return (a&~sign(w))|s;
++ }
++ if(f6==0x1c)return an||bn||!eq;
++ if(an||bn)return 0;
++ if(f6==0x18)return eq;
++ if(f6==0x1b)return lt;
++ if(f6==0x19)return lt||eq;
++ if(f6==0x1d)return !lt&&!eq;
++ if(f6==0x1f)return !lt;
++ throw std::runtime_error("IRIS_UNSUPPORTED_FPCOMP opcode");
++}
++inline uint8_t flags(const uint64_t* a,const uint64_t* b,unsigned lanes,unsigned w){
++ const unsigned fw=w==64?32:16;const auto fm=mask(fw);
++ for(unsigned i=0;i<lanes;++i)for(unsigned j=0;j<w;j+=fw)
++  if(nan((a[i]>>j)&fm,fw)||nan((b[i]>>j)&fm,fw))return 16;
++ return 0;
++}
++}
++#endif
+diff --git a/riscv/iris_ieee_fma.hpp b/riscv/iris_ieee_fma.hpp
+new file mode 100644
+index 00000000..f1bee821
+--- /dev/null
++++ b/riscv/iris_ieee_fma.hpp
+@@ -0,0 +1,47 @@
++#ifndef IRIS_IEEE_FMA_HPP
++#define IRIS_IEEE_FMA_HPP
++// Source-exact compute SegmentedFMAPipe IEEE/BF16 behavior. SoftFloat performs
++// the one final fused rounding; physical widening is exact for finite operands.
++// Saturn536774bd4c5e3bcd7813a4a0dc72fc87e5818532 FPFMAPipe.scala199-375.
++namespace iris_fma {
++enum Kind { H, BF, S, D };
++inline unsigned width(Kind k){return k==D?64:k==S?32:16;}
++inline unsigned exponent(Kind k){return k==D?11:k==S||k==BF?8:5;}
++inline unsigned fraction(Kind k){return width(k)-exponent(k)-1;}
++inline uint64_t signbit(Kind k){return uint64_t(1)<<(width(k)-1);}
++inline uint64_t one(Kind k){return k==D?0x3ff0000000000000ULL:k==S?0x3f800000:k==BF?0x3f80:0x3c00;}
++inline bool nan(uint64_t v,Kind k){const unsigned m=fraction(k),e=exponent(k);return ((v>>m)&((1u<<e)-1))==((1u<<e)-1)&&(v&((uint64_t(1)<<m)-1));}
++inline uint64_t canonical(Kind k){return (((uint64_t(1)<<exponent(k))-1)<<fraction(k))|(uint64_t(1)<<(fraction(k)-1));}
++inline Kind physical(Kind out,unsigned lane){
++ // Per64bit segments [D,H,S,H], [D,BF,S,BF], [D,S], [D].
++ if(out==D)return D;
++ if(out==S)return lane%2?S:D;
++ switch(lane%4){case 0:return D;case 2:return S;default:return out;}
++}
++inline uint64_t input(uint64_t raw,Kind in,Kind out,unsigned lane){
++ // RecFNToRecFN same-exp widening shifts recoded bits without quieting;
++ // different-exp widening canonicalizes NaNs and ignores its invalid flag.
++ if(nan(raw,in)&&exponent(in)!=exponent(physical(out,lane)))raw=canonical(in);
++ if(in==out)return raw;
++ if(in==BF&&out==S)return raw<<16; // same exp8; preserve signalingness.
++ if(in==H&&out==S)return f16_to_f32(float16_t{uint16_t(raw)}).v;
++ if(in==S&&out==D)return f32_to_f64(float32_t{uint32_t(raw)}).v;
++ throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: unverified compute FMA conversion");
++}
++inline uint64_t fused(uint64_t a,uint64_t b,uint64_t c,Kind out,unsigned rm,unsigned cmd,uint8_t& flags){
++ IrisSoftfloatScope scope(rm);
++ if(cmd&2)a^=signbit(out);if(cmd&1)c^=signbit(out);
++ uint64_t bits;
++ switch(out){
++  case H:bits=f16_mulAdd(float16_t{uint16_t(a)},float16_t{uint16_t(b)},float16_t{uint16_t(c)}).v;break;
++  case BF:bits=bf16_mulAdd(float16_t{uint16_t(a)},float16_t{uint16_t(b)},float16_t{uint16_t(c)}).v;break;
++  case S:bits=f32_mulAdd(float32_t{uint32_t(a)},float32_t{uint32_t(b)},float32_t{uint32_t(c)}).v;break;
++  default:bits=f64_mulAdd(float64_t{a},float64_t{b},float64_t{c}).v;break;
++ }
++ // SegmentedFMAPipe wires narrower.io.invalidExc (Bool), not exceptionFlags,
++ // into UInt5. Hence invalid becomes bit0 and all rounding flags disappear.
++ flags|=bool(softfloat_exceptionFlags&softfloat_flag_invalid);
++ return bits;
++}
++}
++#endif
+diff --git a/riscv/iris_memory_adapter.cc b/riscv/iris_memory_adapter.cc
+new file mode 100644
+index 00000000..be44cb0b
+--- /dev/null
++++ b/riscv/iris_memory_adapter.cc
+@@ -0,0 +1,3 @@
++// Project-owned memory timing; all included inputs belong in source provenance.
++#include "../../../timing/memory_path.cpp"
++#include "../../../timing/scalar_memory.cpp"
+diff --git a/riscv/iris_native_fp8.hpp b/riscv/iris_native_fp8.hpp
+new file mode 100644
+index 00000000..56020d7f
+--- /dev/null
++++ b/riscv/iris_native_fp8.hpp
+@@ -0,0 +1,90 @@
++#ifndef IRIS_NATIVE_FP8_HPP
++#define IRIS_NATIVE_FP8_HPP
++// Exact integer implementation of Saturn SegmentedFMAPipe + rawUnroundedToFp8.
++// Source pins: Saturn536774bd4c5e3bcd7813a4a0dc72fc87e5818532,
++// HardFloat0ecaef097ce2accbd16a61613699450ed5533f29. No host FP or intermediate rounding.
++#include <cstdint>
++#include <algorithm>
++#include <stdexcept>
++namespace iris_fp8 {
++using U = unsigned __int128;
++using S = __int128;
++struct Number { bool sign; unsigned mant; int power; bool inf, nan, signaling; };
++struct Result { uint16_t bits; uint8_t flags; };
++inline Number decode(uint8_t x, bool e5) {
++  const unsigned m=e5?2:3, e=(x&127)>>m, f=x&((1u<<m)-1);
++  const bool nan=e5?(e==31&&f):(e==15&&f==7);
++  return {bool(x&128), e?((1u<<m)|f):f, (e?int(e):1)-(e5?15:7)-int(m),
++          e5&&e==31&&!f,nan,e5&&e==31&&f==1};
++}
++inline unsigned top(U v) {unsigned b=0;while(v>>1){v>>=1;++b;}return b;}
++inline Result ieee(S value,int power,bool negative_zero,unsigned eb,unsigned mb,unsigned rm,
++                   bool is_inf=false,bool is_nan=false,bool invalid=false,bool special_sign=false) {
++  const unsigned emax=(1u<<eb)-1,bias=(1u<<(eb-1))-1,signbit=eb+mb;
++  if(is_nan||invalid)return {uint16_t((emax<<mb)|(1u<<(mb-1))),uint8_t(invalid?16:0)};
++  if(is_inf)return {uint16_t((unsigned(special_sign)<<signbit)|(emax<<mb)),0};
++  if(!value)return {uint16_t(unsigned(negative_zero)<<signbit),0};
++  const bool sign=value<0;U mag=sign?U(-value):U(value);
++  const int exponent=int(top(mag))+power;
++  const int target=std::max(exponent-int(mb),1-int(bias)-int(mb));
++  const int drop=target-power;
++  U kept,rem=0;
++  if(drop>0) {kept=mag>>drop;rem=mag-(kept<<drop);
++    const U half=U(1)<<(drop-1);
++    const bool inc=rm==0?(rem>half||(rem==half&&(kept&1))):rm==2?(rem&&sign):rm==3?(rem&&!sign):rm==4?rem>=half:false;
++    kept+=inc;
++  }else kept=mag<<(-drop);
++  const unsigned sig=unsigned(sign)<<signbit;
++  if(kept&&int(top(kept))+target>int(bias)) {
++    const bool inf=rm==0||rm==4||(rm==2&&sign)||(rm==3&&!sign);
++    return {uint16_t(sig|(inf?(emax<<mb):((emax<<mb)-1))),5};
++  }
++  const bool tiny=!kept||int(top(kept))+target<1-int(bias);
++  const uint8_t flags=rem?(tiny?3:1):0;
++  if(!kept)return {uint16_t(sig),flags};
++  if(tiny)return {uint16_t(sig|unsigned(kept<<(target-(1-int(bias)-int(mb))))),flags};
++  const unsigned high=top(kept);
++  const unsigned fraction=unsigned(high>mb?kept>>(high-mb):kept<<(mb-high))&((1u<<mb)-1);
++  const unsigned exp=int(high)+target+int(bias);
++  return {uint16_t(sig|(exp<<mb)|fraction),flags};
++}
++inline Result fma(uint8_t ax,uint8_t bx,uint8_t cx,bool e5,unsigned rm,unsigned op=0,unsigned lane=1) {
++  if(rm>4)throw std::runtime_error("IRIS_UNSUPPORTED_ROUNDING_MODE native FP8");
++  auto a=decode(ax,e5),b=decode(bx,e5),c=decode(cx,e5);
++  // Physical [D,H,BF16,E5M3,S,H,BF16,E5M3] pipes. Same-exp H widening
++  // preserves sNaN; different-exp widening quiets it and drops conversion flags.
++  const bool preserve_signaling=(lane&1)!=0;
++  const bool ps=a.sign^b.sign^bool(op&2),cs=c.sign^bool(op&1);
++  const bool invalid=(preserve_signaling&&(a.signaling||b.signaling||c.signaling)) ||
++    (a.inf&&!b.nan&&!b.inf&&!b.mant)||(b.inf&&!a.nan&&!a.inf&&!a.mant)||
++    (!a.nan&&!b.nan&&(a.inf||b.inf)&&c.inf&&(ps!=cs));
++  const bool nan=a.nan||b.nan||c.nan;
++  const bool inf=!nan&&!invalid&&(a.inf||b.inf||c.inf);
++  const bool inf_sign=(a.inf||b.inf)?ps:cs;
++  S sum=0;int q=0;bool zs=false;
++  if(!nan&&!invalid&&!inf) {
++    q=std::min(a.power+b.power,c.power);
++    const U product=U(a.mant)*b.mant;
++    const S p=S(product<<(a.power+b.power-q)),cv=S(U(c.mant)<<(c.power-q));
++    sum=(ps?-p:p)+(cs?-cv:cv);
++    zs=!product&&!c.mant&&ps==cs?ps:rm==2;
++  }
++  if(e5) {
++    auto result=ieee(sum,q,zs,5,2,rm,inf,nan,invalid,inf_sign);
++    if((result.bits&0x7c)==0x7c&&(result.bits&3))result.bits=0x7f;
++    return result;
++  }
++  // E4M3 uses independently rounded IEEE E4M3 and IEEE E5M3, never sequential
++  // conversion. Reproduce assembleOFPE4M3 exactly; all flags are hardwired zero.
++  const auto r4=ieee(sum,q,zs,4,3,rm,inf,nan,invalid,inf_sign);
++  const auto r5=ieee(sum,q,zs,5,3,rm,inf,nan,invalid,inf_sign);
++  const unsigned exp=(r5.bits>>3)&31,frac=r5.bits&7;
++  const bool special=(exp>>3)==3,overflow=exp==23;
++  if(special||overflow) {
++    if((special&&frac)||special||frac==7)return {0x7f,0};
++    return {uint16_t((r4.bits&128)|0x78|frac),0};
++  }
++  return {r4.bits,0};
++}
++}
++#endif
+diff --git a/riscv/iris_shared_fma.hpp b/riscv/iris_shared_fma.hpp
+new file mode 100644
+index 00000000..6ab1eac2
+--- /dev/null
++++ b/riscv/iris_shared_fma.hpp
+@@ -0,0 +1,48 @@
++#ifndef IRIS_SHARED_FMA_HPP
++#define IRIS_SHARED_FMA_HPP
++// Saturn SharedFPFMA.scala: one scalar-FPU request per element, ignored
++// widening-converter exceptions, full FPU flags even when VRF wmask is zero.
++namespace iris_shared {
++using iris_fma::Kind;
++using iris_fma::H;using iris_fma::S;using iris_fma::D;
++inline uint64_t input(uint64_t raw,Kind in,Kind out,unsigned rm) {
++  IrisSoftfloatScope ignored_conversion_flags(rm);
++  if(in==out)return in==H?uint16_t(raw):in==S?uint32_t(raw):raw;
++  if(in==H&&out==S)return f16_to_f32(float16_t{uint16_t(raw)}).v;
++  if(in==S&&out==D)return f32_to_f64(float32_t{uint32_t(raw)}).v;
++  throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: unverified shared-FPU conversion");
++}
++inline uint64_t fused(uint64_t a,uint64_t b,uint64_t c,Kind out,unsigned rm,unsigned cmd,uint8_t& flags) {
++  IrisSoftfloatScope scope(rm);
++  if(cmd&2)a^=iris_fma::signbit(out);
++  if(cmd&1)c^=iris_fma::signbit(out);
++  uint64_t result;
++  if(out==H)result=f16_mulAdd(float16_t{uint16_t(a)},float16_t{uint16_t(b)},float16_t{uint16_t(c)}).v;
++  else if(out==S)result=f32_mulAdd(float32_t{uint32_t(a)},float32_t{uint32_t(b)},float32_t{uint32_t(c)}).v;
++  else if(out==D)result=f64_mulAdd(float64_t{a},float64_t{b},float64_t{c}).v;
++  else throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart2 has no BF16 shared FPU");
++  flags|=softfloat_exceptionFlags;
++  return result;
++}
++inline uint64_t operation(unsigned f6,Kind in,uint64_t raw_a,uint64_t raw_b,uint64_t raw_c,unsigned rm,uint8_t& flags) {
++  const bool wide=f6>=0x30,wide_input=f6==0x34||f6==0x36;
++  if(in==iris_fma::BF||(wide&&in==D))
++    throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: unsupported shared-FPU width");
++  const Kind out=wide?(in==S?D:S):in;
++  uint64_t a=iris_shared::input(raw_a,wide_input?out:in,out,rm),b=iris_shared::input(raw_b,in,out,rm),c=iris_shared::input(raw_c,out,out,rm);
++  unsigned cmd=0;
++  if(f6==0||f6==2||f6==0x27||f6==0x30||f6==0x32||wide_input) {
++    c=b;b=iris_fma::one(out);cmd=(f6==2||f6==0x32||f6==0x36)?1:f6==0x27?2:0;
++  } else if(f6==0x24||f6==0x38)c=(a^b)&iris_fma::signbit(out);
++  else {
++    const unsigned cmds[4]={0,3,1,2};cmd=cmds[f6&3];
++    if(!wide&&f6<0x2c){const auto old=a;a=c;c=old;}
++  }
++  return iris_shared::fused(a,b,c,out,rm,cmd,flags);
++}
++inline uint64_t add(uint64_t accum,uint64_t value,Kind in,Kind out,unsigned rm,uint8_t& flags) {
++  const auto a=iris_shared::input(accum,out,out,rm),b=iris_shared::input(value,in,out,rm);
++  return iris_shared::fused(a,iris_fma::one(out),b,out,rm,0,flags);
++}
++}
++#endif
+diff --git a/riscv/iris_timing_adapter.cc b/riscv/iris_timing_adapter.cc
+new file mode 100644
+index 00000000..c26c2084
+--- /dev/null
++++ b/riscv/iris_timing_adapter.cc
+@@ -0,0 +1,270 @@
++#include "iris_timing_adapter.h"
++#include <fstream>
++#include <iomanip>
++#include <limits>
++#include <set>
++#include <sstream>
++#include <stdexcept>
++
++namespace {
++uint64_t number(const std::string& text) {
++  size_t used = 0;
++  if (text.empty() || text[0] == '-') throw std::runtime_error("negative/empty timing parameter");
++  uint64_t value = std::stoull(text, &used, 0);
++  if (used != text.size() || value == std::numeric_limits<uint64_t>::max())
++    throw std::runtime_error("invalid timing parameter: " + text);
++  return value;
++}
++}
++
++iris_timing_adapter::Profile iris_timing_adapter::Profile::load(const std::string& path, size_t count) {
++  std::ifstream input(path);
++  if (!input) throw std::runtime_error("cannot open timing fixture: " + path);
++  Profile p; p.harts.resize(count);
++  std::string line; unsigned lineno = 0;
++  std::set<std::string> singleton, resource_names;
++  bool purpose = false;
++  while (std::getline(input, line)) {
++    ++lineno; line = line.substr(0, line.find('#'));
++    std::istringstream stream(line); std::vector<std::string> f;
++    for (std::string token; stream >> token;) f.push_back(token);
++    if (f.empty()) continue;
++    try {
++      const auto& key = f[0];
++      if (key == "purpose" && f.size() == 2) {
++        if (!singleton.insert(key).second || f[1] != "uncalibrated-integration-fixture")
++          throw std::runtime_error("only explicit uncalibrated integration fixtures are accepted");
++        purpose = true;
++      } else if (key == "source" && f.size() == 2) {
++        if (!singleton.insert(key).second) throw std::runtime_error("duplicate source");
++        p.source = f[1];
++      } else if ((key == "base_hz" || key == "rtc_divider" || key == "max_cycles" || key == "trap_cycles") && f.size() == 2) {
++        if (!singleton.insert(key).second) throw std::runtime_error("duplicate parameter");
++        auto value = number(f[1]);
++        if (!value) throw std::runtime_error("positive parameter required");
++        if (key == "base_hz") p.base_hz = value;
++        else if (key == "rtc_divider") p.rtc_divider = value;
++        else if (key == "max_cycles") p.max_cycles = value;
++        else p.trap_cycles = value;
++      } else if (key == "hart" && f.size() == 4) {
++        auto id = number(f[1]), divider = number(f[2]), idle = number(f[3]);
++        if (id >= count || !divider || idle > 1 || p.harts[id].divider)
++          throw std::runtime_error("invalid/duplicate hart clock");
++        p.harts[id] = {divider, bool(idle)};
++      } else if (key == "resource" && f.size() == 3) {
++        auto lanes = number(f[2]);
++        if (!lanes || lanes > 1024 || !resource_names.insert(f[1]).second)
++          throw std::runtime_error("invalid/duplicate resource");
++        p.resources.emplace_back(f[1], unsigned(lanes));
++      } else if (key == "memory_port" && f.size() == 4) {
++        const auto lanes=number(f[2]);
++        if (!lanes || lanes>1024 || !resource_names.insert(f[1]).second)
++          throw std::runtime_error("invalid/duplicate memory port");
++        p.memory_ports.push_back({f[1],unsigned(lanes),f[3]});
++      } else if (key == "memory_region" && f.size() == 7) {
++        const auto hart=number(f[1]);
++        if (hart>=count) throw std::runtime_error("memory region hart out of range");
++        p.memory_regions.push_back({unsigned(hart),number(f[2]),number(f[3]),number(f[4]),number(f[5]),f[6]});
++      } else if (key == "memory_stage" && f.size() == 12) {
++        if (f[11]!="base_cycles" || !number(f[10])) throw std::runtime_error("memory stage requires explicit clock and base_cycles units");
++        const bool dynamic=f[6]=="access";
++        p.memory_stages[f[1]].push_back({{f[2],f[3],number(f[4]),number(f[5]),dynamic?0:number(f[6]),
++                                       number(f[7]),number(f[8]),f[9],number(f[10])},dynamic});
++      } else if (key == "rule" && f.size() == 9) {
++        auto hart = number(f[1]), mask = number(f[2]), match = number(f[3]);
++        auto latency = number(f[5]), interval = number(f[6]);
++        if (hart >= count || mask > UINT32_MAX || match > UINT32_MAX || (match & ~mask) ||
++            !latency || !interval || f[8] != "base_cycles")
++          throw std::runtime_error("invalid rule");
++        p.rules.push_back({unsigned(hart), uint32_t(mask), uint32_t(match), f[4], latency, interval, f[7]});
++      } else throw std::runtime_error("unknown field or incorrect field count");
++    } catch (const std::exception& error) {
++      throw std::runtime_error(path + ":" + std::to_string(lineno) + ": " + error.what());
++    }
++  }
++  if (!purpose || p.source.empty() || !p.base_hz || !p.rtc_divider || !p.max_cycles || !p.trap_cycles)
++    throw std::runtime_error("incomplete timing integration fixture");
++  for (unsigned hart = 0; hart < count; ++hart) {
++    if (!p.harts[hart].divider || p.base_hz % p.harts[hart].divider)
++      throw std::runtime_error("missing/non-integral hart clock");
++    bool found = false;
++    for (const auto& rule : p.rules) {
++      if (!resource_names.count(rule.resource)) throw std::runtime_error("rule resource missing");
++      found |= rule.hart == hart;
++    }
++    if (!found) throw std::runtime_error("timing rules missing for hart");
++  }
++  if (p.base_hz % p.rtc_divider) throw std::runtime_error("non-integral RTC frequency");
++  return p;
++}
++
++iris_timing_adapter::iris_timing_adapter(Profile profile, std::vector<processor_t*> cores,
++    std::function<void(Cycle, Cycle)> advance,
++    std::function<std::optional<Cycle>()> timer_deadline,
++    std::function<bool()> host_request, std::optional<uint64_t> schedule_seed)
++    : profile_(std::move(profile)), cores_(std::move(cores)),
++      clock_(cores_.size(), profile_.rtc_divider), pending_(cores_.size()),
++      previous_(cores_.size()), blocked_(cores_.size(), false),
++      timer_deadline_(std::move(timer_deadline)), host_request_(std::move(host_request)),
++      retired_(cores_.size(), 0), seed_(schedule_seed), rng_(schedule_seed.value_or(0)) {
++  for (const auto& resource : profile_.resources) clock_.configure_resource(resource.first, resource.second);
++  if (!profile_.memory_ports.empty() || !profile_.memory_regions.empty() || !profile_.memory_stages.empty()) {
++    for (const auto* core:cores_)
++      if (core->get_const_xlen()!=64)
++        throw std::runtime_error("IRIS_TIMING_SCALAR_MEMORY_REQUIRES_RV64");
++    std::set<std::string> ports;
++    for (const auto& port:profile_.memory_ports) ports.insert(port.resource);
++    for (const auto& path:profile_.memory_stages) for (const auto& stage:path.second)
++      if (!ports.count(stage.stage.resource)) throw std::runtime_error("memory stage port missing");
++    memory_routes_=std::make_unique<iris::ScalarMemoryRoutes>(cores_.size(),profile_.memory_regions,profile_.memory_stages);
++    memory_paths_=std::make_unique<iris::MemoryPaths>(clock_,profile_.memory_ports);
++  }
++  for (size_t i = 0; i < cores_.size(); ++i) {
++    order_.push_back(i);
++    if (cores_[i]->get_id() != i) throw std::runtime_error("timing adapter requires contiguous architectural hart IDs");
++    clock_.configure_resource("trap" + std::to_string(i), 1);
++  }
++  clock_.on_advance(std::move(advance));
++}
++void iris_timing_adapter::retired(unsigned hart, size_t count) { retired_.at(hart) += count; }
++
++const insn_fetch_t* iris_timing_adapter::completion_fetch(unsigned hart) const {
++  if (!completing_ || *completing_ != hart) return nullptr;
++  if (!pending_.at(hart)) throw std::logic_error("timing completion has no fetched instruction");
++  return &pending_[hart]->fetch;
++}
++
++void iris_timing_adapter::issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) {
++  if (blocked_.at(hart)) throw std::logic_error("second in-flight instruction in conservative adapter");
++  const Rule* selected = nullptr;
++  auto instruction = fetch.insn;
++  for (const auto& rule : profile_.rules)
++    if (rule.hart == hart && (uint32_t(instruction.bits()) & rule.mask) == rule.match) { selected = &rule; break; }
++  if (!selected) throw std::runtime_error("IRIS_TIMING_UNMODELED_INSTRUCTION hart=" + std::to_string(hart));
++  iris::ScalarAccess access;
++  if (memory_routes_) {
++    std::array<uint64_t,32> registers;
++    const auto* state=cores_[hart]->get_state();
++    for (unsigned i=0;i<32;++i) registers[i]=state->XPR[i];
++    access=iris::scalar_memory_access(uint32_t(instruction.bits()),registers);
++    if (access.decode==iris::MemoryDecode::vector || access.decode==iris::MemoryDecode::unresolved)
++      throw std::runtime_error("IRIS_TIMING_MEMORY_OPERATION_UNMODELED hart="+std::to_string(hart));
++    if (access.decode==iris::MemoryDecode::scalar &&
++        (state->prv!=PRV_M || state->v || state->debug_mode || (state->mstatus->read()&MSTATUS_MPRV)))
++      throw std::runtime_error("IRIS_TIMING_TRANSLATED_MEMORY_UNMODELED hart="+std::to_string(hart));
++  }
++  pending_[hart] = Pending{pc, fetch}; blocked_[hart] = true;
++  iris::Op op{hart, selected->name, selected->resource, selected->latency, selected->interval};
++  op.pc = pc; op.retires = false; op.issue_period = profile_.harts[hart].divider;
++  if (previous_[hart]) op.deps.push_back(*previous_[hart]);
++  op.on_complete = [this, hart] {
++    if (cores_[hart]->get_state()->pc != pending_[hart]->pc)
++      throw std::runtime_error("IRIS_TIMING_PC_CHANGED_DURING_FLIGHT");
++    completing_ = hart;
++    const auto retired_before = retired_[hart];
++    try { cores_[hart]->step(1); }
++    catch (...) { completing_.reset(); throw; }
++    completing_.reset(); pending_[hart].reset(); blocked_[hart] = false; ++completions_;
++    if (retired_[hart] == retired_before) queue_trap(hart);
++  };
++  if (access.decode==iris::MemoryDecode::scalar) {
++    // Validate address routing before adding any nodes or executing effects.
++    auto request=memory_routes_->request(hart,access,pc,profile_.harts[hart].divider,{},op.on_complete);
++    op.on_complete={};
++    const auto address_generation=clock_.issue(std::move(op));
++    request.dependencies={address_generation};
++    auto transfer=memory_paths_->submit(std::move(request));
++    previous_[hart]=transfer.nodes.back();
++    memory_transfers_.push_back({hart,access.kind,std::move(transfer)});
++  } else previous_[hart] = clock_.issue(std::move(op));
++  throw iris_timing_wait{};
++}
++
++void iris_timing_adapter::dispatch_ready() {
++  if (seed_) std::shuffle(order_.begin(), order_.end(), rng_);
++  for (unsigned hart : order_) {
++    if (blocked_[hart]) continue;
++    auto* core = cores_[hart]; auto* state = core->get_state();
++    if (core->is_waiting_for_interrupt() && !(state->mip->read() & state->mie->read())) continue;
++    core->step(1);
++    if (blocked_[hart] || core->is_waiting_for_interrupt()) continue;
++    // A fetch/interrupt/architectural trap can happen before instruction issue.
++    // Its state transition is local; the handler cannot run until this event ends.
++    queue_trap(hart);
++  }
++}
++void iris_timing_adapter::queue_trap(unsigned hart) {
++  blocked_[hart] = true;
++  iris::Op entry{hart, "trap-entry", "trap" + std::to_string(hart), profile_.trap_cycles, 1};
++  entry.retires = false; entry.pc = cores_[hart]->get_state()->pc;
++  entry.issue_period = profile_.harts[hart].divider;
++  if (previous_[hart]) entry.deps.push_back(*previous_[hart]);
++  entry.on_complete = [this, hart] { blocked_[hart] = false; ++completions_; };
++  previous_[hart] = clock_.issue(std::move(entry));
++}
++
++void iris_timing_adapter::step(size_t budget) {
++  uint64_t before = completions_;
++  while (completions_ - before < budget) {
++    dispatch_ready();
++    auto event = clock_.next_event_cycle();
++    auto timer = timer_deadline_();
++    if (timer && (!event || *timer < *event)) event = timer;
++    if (!event) {
++      // Give HTIF one opportunity to consume an exit request already stored by
++      // the guest. Repeated absence of events is an explicit deadlock diagnostic.
++      if (yielded_without_event_)
++        throw std::runtime_error("IRIS_TIMING_NO_EVENT: all harts parked without a modeled wakeup");
++      yielded_without_event_ = true;
++      return;
++    }
++    yielded_without_event_ = false;
++    if (*event > profile_.max_cycles) {
++      clock_.run_until(profile_.max_cycles);
++      throw std::runtime_error("IRIS_TIMING_MAX_CYCLES");
++    }
++    clock_.run_until(*event);
++    if (host_request_()) return;
++  }
++}
++
++void iris_timing_adapter::write_json(const std::string& path) const {
++  if (path.empty()) return;
++  std::ofstream out(path);
++  if (!out) throw std::runtime_error("cannot open timing graph output: " + path);
++  std::ostringstream graph; clock_.write_json(graph, true);
++  auto text = graph.str(); text.pop_back();
++  out << text << ",\"timing_mode\":\"uncalibrated-integration-fixture\",\"base_clock_hz\":"
++      << profile_.base_hz << ",\"clock_source\":" << std::quoted(profile_.source)
++      << ",\"completed_events\":" << completions_ << ",\"hart_cycle_dividers\":[";
++  for (size_t i = 0; i < profile_.harts.size(); ++i) { if (i) out << ','; out << profile_.harts[i].divider; }
++  out << "],\"retired_instructions\":[";
++  for (size_t i = 0; i < retired_.size(); ++i) { if (i) out << ','; out << retired_[i]; }
++  out << "],\"schedule_seed\":" << (seed_ ? std::to_string(*seed_) : "null")
++      << ",\"traffic_accounting\":\"not_instrumented\",\"arithmetic_accounting\":\"not_instrumented\",\"memory_transactions\":[";
++  for (size_t i=0;i<memory_transfers_.size();++i) {
++    if (i) out<<',';
++    const auto& row=memory_transfers_[i];const auto& t=row.transfer;
++    out<<"{\"hart\":"<<row.hart<<",\"address\":"<<t.address<<",\"access_bytes\":"<<t.access_bytes
++       <<",\"kind\":"<<std::quoted(row.kind==iris::AccessKind::load?"load":row.kind==iris::AccessKind::store?"store":
++            row.kind==iris::AccessKind::lr?"lr":row.kind==iris::AccessKind::sc?"sc":"amo")
++       <<",\"path\":"<<std::quoted(t.path)<<",\"stages\":[";
++    for (size_t j=0;j<t.nodes.size();++j) {
++      if (j) out<<',';
++      const auto& p=t.parameters[j];const auto& s=p.parameters;
++      const auto& node=clock_.nodes().at(t.nodes[j]);
++      out<<"{\"node\":"<<t.nodes[j]<<",\"name\":"<<std::quoted(s.name)<<",\"resource\":"<<std::quoted(s.resource)
++         <<",\"state\":"<<std::quoted(node.completed?"completed":node.issued?"inflight":"pending")
++         <<",\"included_in_events\":"<<((node.completed||(node.issued&&node.start<clock_.now()))?"true":"false")
++         <<",\"scheduled_start\":"<<(node.issued?std::to_string(node.start):"null")
++         <<",\"scheduled_end\":"<<(node.issued?std::to_string(node.end):"null")
++         <<",\"first_beat_latency\":"<<s.first_beat_latency<<",\"launch_interval\":"<<s.launch_interval
++         <<",\"bytes\":"<<s.bytes<<",\"beat_bytes\":"<<s.beat_bytes<<",\"beat_interval\":"<<s.beat_interval
++         <<",\"issue_period\":"<<s.issue_period
++         <<",\"derived_latency\":"<<p.derived_latency<<",\"derived_interval\":"<<p.derived_interval
++         <<",\"source\":"<<std::quoted(s.source)<<",\"port_source\":"<<std::quoted(p.port_source)<<'}';
++    }
++    out<<"]}";
++  }
++  out<<"]}\n";
++}
+diff --git a/riscv/iris_timing_adapter.h b/riscv/iris_timing_adapter.h
+new file mode 100644
+index 00000000..a9830230
+--- /dev/null
++++ b/riscv/iris_timing_adapter.h
+@@ -0,0 +1,69 @@
++#pragma once
++
++#include "mmu.h"
++#include "../../../timing/iris_timing.hpp"
++#include "../../../timing/scalar_memory.hpp"
++#include <functional>
++#include <memory>
++#include <optional>
++#include <random>
++#include <string>
++#include <vector>
++
++// This adapter is an explicitly uncalibrated integration mode. It establishes
++// causal execution/counter/device hooks; it is not an Iris performance profile.
++class iris_timing_adapter {
++ public:
++  using Cycle = iris::Cycle;
++  struct Rule {
++    unsigned hart; uint32_t mask, match; std::string resource;
++    Cycle latency, interval; std::string name;
++  };
++  struct Hart { Cycle divider = 0; bool count_wfi = true; };
++  struct Profile {
++    uint64_t base_hz = 0, rtc_divider = 0, max_cycles = 0, trap_cycles = 0;
++    std::string source;
++    std::vector<Hart> harts;
++    std::vector<std::pair<std::string, unsigned>> resources;
++    std::vector<Rule> rules;
++    std::vector<iris::MemoryPort> memory_ports;
++    std::vector<iris::AddressRoute> memory_regions;
++    std::map<std::string,std::vector<iris::RoutedStage>> memory_stages;
++    static Profile load(const std::string& path, size_t harts);
++  };
++  iris_timing_adapter(Profile profile, std::vector<processor_t*> cores,
++      std::function<void(Cycle, Cycle)> advance,
++      std::function<std::optional<Cycle>()> timer_deadline,
++      std::function<bool()> host_request,
++      std::optional<uint64_t> schedule_seed);
++  void step(size_t completions);
++  void issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch);
++  void retired(unsigned hart, size_t count);
++  const insn_fetch_t* completion_fetch(unsigned hart) const;
++  Cycle now() const { return clock_.now(); }
++  const Profile& profile() const { return profile_; }
++  void write_json(const std::string& path) const;
++ private:
++  struct Pending { reg_t pc; insn_fetch_t fetch; };
++  Profile profile_;
++  std::vector<processor_t*> cores_;
++  iris::Machine clock_;
++  std::unique_ptr<iris::MemoryPaths> memory_paths_;
++  std::unique_ptr<iris::ScalarMemoryRoutes> memory_routes_;
++  struct RoutedAccess { unsigned hart; iris::AccessKind kind; iris::MemoryTransfer transfer; };
++  std::vector<RoutedAccess> memory_transfers_;
++  std::vector<std::optional<Pending>> pending_;
++  std::vector<std::optional<iris::NodeId>> previous_;
++  std::vector<bool> blocked_;
++  std::optional<unsigned> completing_;
++  std::function<std::optional<Cycle>()> timer_deadline_;
++  std::function<bool()> host_request_;
++  uint64_t completions_ = 0;
++  bool yielded_without_event_ = false;
++  std::vector<uint64_t> retired_;
++  std::vector<unsigned> order_;
++  std::optional<uint64_t> seed_;
++  std::mt19937_64 rng_;
++  void dispatch_ready();
++  void queue_trap(unsigned hart);
++};
+diff --git a/riscv/mmu.cc b/riscv/mmu.cc
+index 0a284a0b..210a958e 100644
+--- a/riscv/mmu.cc
++++ b/riscv/mmu.cc
+@@ -87,11 +87,16 @@ reg_t mmu_t::translate(mem_access_info_t access_info, reg_t len)
+   }
+   if (!pmp_ok(paddr, len, access_info.flags.ss_access ? STORE : type, mode, access_info.flags.hlvx))
+     throw_access_exception(virt, addr, access_info.flags.ss_access ? STORE : type);
++  const reg_t original_paddr = paddr;
++  paddr = iris_storage_address(paddr);
++  iris_last_translation_aliased = paddr != original_paddr;
++  iris_check_pma(access_info.vaddr, paddr, len, access_info.flags.ss_access ? STORE : type, access_info.flags);
+   return paddr;
+ }
+ 
+ inline mmu_t::insn_parcel_t mmu_t::perform_intrapage_fetch(reg_t vaddr, uintptr_t host_addr, reg_t paddr)
+ {
++  iris_check_pma(vaddr, paddr, sizeof(insn_parcel_t), FETCH);
+   insn_parcel_t res;
+ 
+   if (host_addr)
+@@ -223,6 +228,7 @@ void mmu_t::check_triggers(triggers::operation_t operation, reg_t address, bool
+ 
+ inline void mmu_t::perform_intrapage_load(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, uint8_t* bytes, xlate_flags_t xlate_flags)
+ {
++  iris_check_pma(vaddr, paddr, len, xlate_flags.ss_access ? STORE : LOAD, xlate_flags);
+   if (host_addr) {
+     memcpy(bytes, (char*)host_addr, len);
+   } else if (!mmio_load(paddr, len, bytes)) {
+@@ -250,7 +256,9 @@ void mmu_t::load_slow_path_intrapage(reg_t len, uint8_t* bytes, mem_access_info_
+       refill_tlb(vaddr, paddr, (char*)host_addr, LOAD);
+   }
+ 
+-  if (access_info.flags.lr && !sim->reservable(paddr)) {
++  if (access_info.flags.lr && (!sim->reservable(paddr) ||
++      !iris_pma(paddr, len, iris_board::Access::Atomic) ||
++      (sim->get_cfg().iris_vme && paddr >= 0x580000000ULL && paddr - 0x580000000ULL < 0x20000))) {
+     throw trap_load_access_fault(access_info.effective_virt, access_info.transformed_vaddr, 0, 0);
+   }
+ 
+@@ -258,6 +266,7 @@ void mmu_t::load_slow_path_intrapage(reg_t len, uint8_t* bytes, mem_access_info_
+ 
+   if (access_info.flags.lr) {
+     load_reservation_address = paddr;
++    load_reservation_size = len;
+   }
+ }
+ 
+@@ -313,8 +322,24 @@ void mmu_t::load_slow_path(reg_t original_addr, std::size_t len,
+     proc->state.log_mem_read.push_back(std::make_tuple(original_addr, 0, len));
+ }
+ 
++void mmu_t::invalidate_peer_reservations(reg_t paddr, size_t len)
++{
++  if (!sim->get_cfg().iris_vme) return;
++  for (const auto& entry : sim->get_harts()) {
++    auto* peer = entry.second->get_mmu();
++    const reg_t reserved = peer->load_reservation_address;
++    if (reserved == reg_t(-1) || !peer->load_reservation_size) continue;
++    // Overlapping physical bytes must invalidate LR/SC on another hart.
++    // Wider implementation reservation granules remain a calibration input.
++    const bool overlap = paddr <= reserved ? reserved - paddr < len :
++      paddr - reserved < peer->load_reservation_size;
++    if (overlap) peer->yield_load_reservation();
++  }
++}
++
+ inline void mmu_t::perform_intrapage_store(reg_t vaddr, uintptr_t host_addr, reg_t paddr, reg_t len, const uint8_t* bytes, xlate_flags_t xlate_flags)
+ {
++  iris_check_pma(vaddr, paddr, len, STORE, xlate_flags);
+   if (host_addr) {
+      memcpy((char*)host_addr, bytes, len);
+   } else if (!mmio_store(paddr, len, bytes)) {
+@@ -322,6 +347,8 @@ inline void mmu_t::perform_intrapage_store(reg_t vaddr, uintptr_t host_addr, reg
+     throw trap_store_access_fault(access_info.effective_virt, access_info.transformed_vaddr, 0, 0);
+   }
+ 
++  invalidate_peer_reservations(paddr, len);
++
+   if (tracer.interested_in_range(paddr, paddr + len, STORE))
+     tracer.trace(paddr, len, STORE);
+ }
+@@ -446,6 +473,7 @@ tlb_entry_t mmu_t::refill_tlb(reg_t vaddr, reg_t paddr, char* host_addr, access_
+   tlb_entry_t entry = {uintptr_t(host_addr) - (vaddr % PGSIZE), paddr - (vaddr % PGSIZE)};
+ 
+   if (in_mprv()
++      || iris_last_translation_aliased
+       || !pmp_homogeneous(base_paddr, PGSIZE)
+       || (proc && proc->get_log_commits_enabled()))
+     return entry;
+diff --git a/riscv/mmu.h b/riscv/mmu.h
+index 055fbe90..b735fbdf 100644
+--- a/riscv/mmu.h
++++ b/riscv/mmu.h
+@@ -13,6 +13,8 @@
+ #include "../fesvr/byteorder.h"
+ #include "triggers.h"
+ #include "cfg.h"
++#include "../../../board/physical_map.hpp"
++#include "../../../board/addressing.hpp"
+ 
+ #include <algorithm>
+ #include <cassert>
+@@ -96,6 +98,21 @@ class mmu_t
+ private:
+   reg_t get_pmlen(bool effective_virt, reg_t effective_priv, xlate_flags_t flags) const;
+   mem_access_info_t generate_access_info(reg_t addr, access_type type, xlate_flags_t xlate_flags);
++  reg_t iris_storage_address(reg_t address) const {
++    return proc && (sim->get_cfg().iris_vme || !sim->get_cfg().iris_bootrom_file.empty())
++      ? iris_board::storage_address(proc->get_id(), address) : address;
++  }
++  bool iris_pma(reg_t paddr, size_t bytes, iris_board::Access access) const {
++    return sim->get_cfg().iris_bootrom_file.empty() || iris_board::permits(paddr, bytes, access);
++  }
++  void iris_check_pma(reg_t vaddr, reg_t paddr, size_t bytes, access_type type, xlate_flags_t flags = {}) {
++    auto access = type == FETCH ? iris_board::Access::Execute :
++                  type == STORE ? iris_board::Access::Write : iris_board::Access::Read;
++    if (!iris_pma(paddr, bytes, access)) {
++      auto info = generate_access_info(vaddr, type, flags);
++      throw_access_exception(info.effective_virt, info.transformed_vaddr, type);
++    }
++  }
+ 
+ public:
+   mmu_t(simif_t* sim, endianness_t endianness, processor_t* proc, reg_t cache_blocksz);
+@@ -105,9 +122,10 @@ public:
+   T ALWAYS_INLINE load(reg_t addr, xlate_flags_t xlate_flags = {}) {
+     target_endian<T> res;
+     bool aligned = (addr & (sizeof(T) - 1)) == 0;
+-    auto [tlb_hit, host_addr, _] = access_tlb(tlb_load, addr);
++    auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_load, addr);
+ 
+     if (likely(!xlate_flags.is_special_access() && aligned && tlb_hit)) {
++      iris_check_pma(addr, paddr, sizeof(T), LOAD, xlate_flags);
+       res = *(target_endian<T>*)host_addr;
+     } else {
+       load_slow_path(addr, sizeof(T), (uint8_t*)&res, xlate_flags);
+@@ -145,10 +163,12 @@ public:
+   void ALWAYS_INLINE store(reg_t addr, T val, xlate_flags_t xlate_flags = {}) {
+     MMU_OBSERVE_STORE(addr, val, sizeof(T));
+     bool aligned = (addr & (sizeof(T) - 1)) == 0;
+-    auto [tlb_hit, host_addr, _] = access_tlb(tlb_store, addr);
++    auto [tlb_hit, host_addr, paddr] = access_tlb(tlb_store, addr);
+ 
+     if (!xlate_flags.is_special_access() && likely(aligned && tlb_hit)) {
++      iris_check_pma(addr, paddr, sizeof(T), STORE, xlate_flags);
+       *(target_endian<T>*)host_addr = to_target(val);
++      invalidate_peer_reservations(paddr, sizeof(T));
+     } else {
+       target_endian<T> target_val = to_target(val);
+       store_slow_path(addr, sizeof(T), (const uint8_t*)&target_val, xlate_flags, true, false);
+@@ -190,9 +210,20 @@ public:
+     return true;
+   }
+ 
++  void check_iris_atomic(reg_t addr, size_t size) {
++    if (!sim->get_cfg().iris_vme && sim->get_cfg().iris_bootrom_file.empty()) return;
++    const auto info = generate_access_info(addr, STORE, {});
++    const reg_t physical = translate(info, size);
++    // IrisConfig system-bus scratchpad 0x580000000..0x58001ffff (128 KiB).
++    if (!iris_pma(physical, size, iris_board::Access::Atomic) ||
++        (physical >= 0x580000000ULL && physical - 0x580000000ULL < 0x20000))
++      throw trap_store_access_fault(info.effective_virt, info.transformed_vaddr, 0, 0);
++  }
++
+   // template for functions that perform an atomic memory operation
+   template<typename T, typename op>
+   T amo(reg_t addr, op f) {
++    check_iris_atomic(addr, sizeof(T));
+     convert_load_traps_to_store_traps({
+       store_slow_path(addr, sizeof(T), nullptr, {}, false, enforce_amo_alignment(addr, sizeof(T)));
+       auto lhs = load<T>(addr);
+@@ -204,6 +235,7 @@ public:
+   // for shadow stack amoswap
+   template<typename T>
+   T ssamoswap(reg_t addr, reg_t value) {
++    check_iris_atomic(addr, sizeof(T));
+     convert_load_traps_to_store_traps({
+       store_slow_path(addr, sizeof(T), nullptr, {.ss_access=true}, false, true);
+       auto data = load<T>(addr, {.ss_access=true});
+@@ -214,6 +246,7 @@ public:
+ 
+   template<typename T>
+   T amo_compare_and_swap(reg_t addr, T comp, T swap) {
++    check_iris_atomic(addr, sizeof(T));
+     convert_load_traps_to_store_traps({
+       store_slow_path(addr, sizeof(T), nullptr, {}, false, enforce_amo_alignment(addr, sizeof(T)));
+       auto lhs = load<T>(addr);
+@@ -230,6 +263,7 @@ public:
+     check_triggers(triggers::OPERATION_STORE, transformed_addr, false, blocksz);
+ 
+     reg_t paddr = translate(access_info, 1) - (transformed_addr & (blocksz - 1));
++    iris_check_pma(addr, paddr, blocksz, STORE);
+     if (auto host_addr = sim->addr_to_mem(paddr)) {
+       if (tracer.interested_in_range(paddr, paddr + blocksz, STORE))
+         tracer.trace(paddr, blocksz, STORE);
+@@ -260,6 +294,10 @@ public:
+     load_reservation_address = (reg_t)-1;
+   }
+ 
++  // Iris online scheduling cannot rely on the upstream 5000-instruction
++  // round-robin yield to invalidate other harts' LR reservations.
++  void invalidate_peer_reservations(reg_t paddr, size_t len);
++
+   inline bool check_load_reservation(reg_t vaddr, size_t size)
+   {
+     if (vaddr & (size-1)) {
+@@ -271,6 +309,12 @@ public:
+     if (!tlb_hit)
+       paddr = translate(generate_access_info(vaddr, STORE, {}), 1);
+ 
++    if (!iris_pma(paddr, size, iris_board::Access::Atomic) ||
++        (sim->get_cfg().iris_vme && paddr >= 0x580000000ULL && paddr - 0x580000000ULL < 0x20000)) {
++      auto info = generate_access_info(vaddr, STORE, {});
++      throw trap_store_access_fault(info.effective_virt, info.transformed_vaddr, 0, 0);
++    }
++
+     if (sim->reservable(paddr))
+       return load_reservation_address == paddr;
+ 
+@@ -382,9 +426,11 @@ public:
+ 
+ private:
+   simif_t* sim;
++  bool iris_last_translation_aliased = false;
+   processor_t* proc;
+   memtracer_list_t tracer;
+   reg_t load_reservation_address;
++  size_t load_reservation_size = 0;
+   reg_t blocksz;
+ 
+   // implement an instruction cache for simulator performance
+@@ -471,13 +517,17 @@ private:
+ 
+   template<typename T> inline reg_t pte_load(reg_t pte_paddr, reg_t addr, bool virt, access_type trap_type)
+   {
+-    if (auto [hit, pte] = pte_cache_access(pte_paddr); hit)
+-      return pte;
+-
+     const size_t ptesize = sizeof(T);
+ 
++    // PMP sees the core's original physical address before the tile-local
++    // routing adjustment. RAM/PMA and reservations see the shared storage.
+     if (!pmp_ok(pte_paddr, ptesize, LOAD, PRV_S, false))
+       throw_access_exception(virt, addr, trap_type);
++    pte_paddr = iris_storage_address(pte_paddr);
++    if (!iris_pma(pte_paddr, ptesize, iris_board::Access::Read))
++      throw_access_exception(virt, addr, trap_type);
++    if (auto [hit, pte] = pte_cache_access(pte_paddr); hit)
++      return pte;
+ 
+     void* host_pte_addr = sim->addr_to_mem(pte_paddr);
+     target_endian<T> target_pte;
+@@ -498,6 +548,9 @@ private:
+ 
+     if (!pmp_ok(pte_paddr, ptesize, STORE, PRV_S, false))
+       throw_access_exception(virt, addr, trap_type);
++    pte_paddr = iris_storage_address(pte_paddr);
++    if (!iris_pma(pte_paddr, ptesize, iris_board::Access::Write))
++      throw_access_exception(virt, addr, trap_type);
+ 
+     void* host_pte_addr = sim->addr_to_mem(pte_paddr);
+     target_endian<T> target_pte = to_target((T)new_pte);
+diff --git a/riscv/plic.cc b/riscv/plic.cc
+index 03105385..519d5355 100644
+--- a/riscv/plic.cc
++++ b/riscv/plic.cc
+@@ -5,6 +5,7 @@
+ #include "simif.h"
+ #include "sim.h"
+ #include "dts.h"
++#include "../../../board/iris_plic.hpp"
+ 
+ #define PLIC_MAX_CONTEXTS 15872
+ 
+@@ -77,6 +78,29 @@ plic_t::plic_t(const simif_t* sim, uint32_t ndev)
+   : num_ids(ndev + 1), num_ids_word(((ndev + 1) + (32 - 1)) / 32),
+   max_prio((1UL << PLIC_PRIO_BITS) - 1), priority{}, level{}
+ {
++  if (!sim->get_cfg().iris_bootrom_file.empty()) {
++    const auto& harts = sim->get_harts();
++    if (ndev != 1 || harts.size() != 3 || !harts.count(0) || !harts.count(1) || !harts.count(2))
++      throw std::runtime_error("Iris PLIC requires one source and architectural harts 0/1/2");
++    for (const auto& pair : harts)
++      if (!pair.second->extension_enabled_const('S'))
++        throw std::runtime_error("Iris PLIC requires M/S contexts on every hart");
++    iris_sim_ = sim;
++    iris_plic_ = std::make_shared<iris_board::PlicRegisters>();
++    iris_plic_->on_interrupt([this, sim](unsigned, unsigned hart, bool supervisor,
++                                 iris_board::PlicRegisters::Line line) {
++      const reg_t mask = supervisor ? MIP_SEIP : MIP_MEIP;
++      // Unknown line values remain guarded at instruction/CSR observation.
++      // Clear the placeholder bit so an unknown cannot enter a guest handler
++      // before validate_iris_interrupts() reports the missing initialization.
++      sim->get_harts().at(hart)->get_state()->mip->backdoor_write_with_mask(
++          mask, line.value_or(false) ? mask : 0);
++      // A parked WFI hart might not execute another instruction before an
++      // external source changes. Reject an enabled unknown immediately too.
++      if (!line.has_value()) validate_iris_interrupts(hart, false);
++    });
++    return;
++  }
+   // PLIC contexts are contiguous in memory even if harts are discontiguous.
+   for (const auto& [hart_id, hart] : sim->get_harts()) {
+     contexts.push_back(plic_context_t(hart, true));
+@@ -289,6 +313,10 @@ bool plic_t::context_write(plic_context_t *c,
+ 
+ void plic_t::set_interrupt_level(uint32_t id, int lvl)
+ {
++  if (iris_plic_) {
++    iris_plic_->set_interrupt_level(id, lvl);
++    return;
++  }
+   if (id <= 0 || num_ids <= id) {
+     return;
+   }
+@@ -329,6 +357,7 @@ void plic_t::set_interrupt_level(uint32_t id, int lvl)
+ 
+ bool plic_t::load(reg_t addr, size_t len, uint8_t* bytes)
+ {
++  if (iris_plic_) return iris_plic_->load(addr, len, bytes);
+   bool ret = false;
+   uint32_t val = 0;
+ 
+@@ -369,6 +398,7 @@ bool plic_t::load(reg_t addr, size_t len, uint8_t* bytes)
+ 
+ bool plic_t::store(reg_t addr, size_t len, const uint8_t* bytes)
+ {
++  if (iris_plic_) return iris_plic_->store(addr, len, bytes);
+   bool ret = false;
+   uint32_t val = 0;
+ 
+@@ -403,6 +433,27 @@ bool plic_t::store(reg_t addr, size_t len, const uint8_t* bytes)
+   return ret;
+ }
+ 
++void plic_t::tick(reg_t UNUSED rtc_ticks)
++{
++  // A functional gateway sampling opportunity at each device update. This is
++  // not a calibrated PLIC bus/fan-in/interrupt pipeline latency.
++  if (iris_plic_) iris_plic_->advance_gateway();
++}
++
++void plic_t::validate_iris_interrupts(unsigned hart, bool read_pending) const
++{
++  if (!iris_plic_) return;
++  const auto* state = iris_sim_->get_harts().at(hart)->get_state();
++  for (unsigned kind = 0; kind < 2; ++kind) {
++    const unsigned context = 2 * hart + kind;
++    const reg_t mask = kind ? MIP_SEIP : MIP_MEIP;
++    if (!iris_plic_->irq(context).has_value() && (read_pending || (state->mie->read() & mask)))
++      throw std::runtime_error("IRIS_PLIC_UNKNOWN_MIP hart=" + std::to_string(hart) +
++          " context=" + std::to_string(context) +
++          " initialize priority, enable and threshold before enabling external interrupts or reading mip");
++  }
++}
++
+ std::string plic_generate_dts(const sim_t* sim, const std::vector<std::string>& sargs UNUSED)
+ {
+   std::stringstream s;
+diff --git a/riscv/processor.cc b/riscv/processor.cc
+index ebf3cce0..74acaa59 100644
+--- a/riscv/processor.cc
++++ b/riscv/processor.cc
+@@ -20,6 +20,7 @@
+ #include <assert.h>
+ #include <limits.h>
+ #include <stdexcept>
++#include <sstream>
+ #include <string>
+ #include <algorithm>
+ 
+@@ -42,7 +43,10 @@ processor_t::processor_t(const char* isa_str, const char* priv_str,
+   impl_table(256, false), extension_enable_table(isa.get_extension_table()),
+   last_pc(1), executions(1), TM(cfg->trigger_count)
+ {
++  if (cfg->iris_vme && id == 2 && isa.extension_enabled(EXT_ZVTBASE))
++    throw std::invalid_argument("Iris hart 2 must not advertise VME/Zvt; supply a non-VME --hart-isa=2:ISA");
+   VU.p = this;
++  VU.iris_mode = cfg->iris_vme;
+   TM.proc = this;
+ 
+ #ifndef HAVE_INT128
+@@ -100,7 +104,7 @@ processor_t::~processor_t()
+ 
+ void state_t::reset(processor_t* const proc, reg_t max_isa)
+ {
+-  pc = DEFAULT_RSTVEC;
++  pc = proc->get_cfg().iris_bootrom_file.empty() ? DEFAULT_RSTVEC : 0x10000;
+   XPR.reset();
+   FPR.reset();
+ 
+@@ -637,12 +641,20 @@ void processor_t::put_csr(int which, reg_t val)
+ // Note that get_csr is sometimes called when read side-effects should not
+ // be actioned.  In other words, Spike cannot currently support CSRs with
+ // side effects on reads.
++void processor_t::iris_validate_interrupts(bool read_pending) const
++{
++  sim->iris_validate_interrupts(id, read_pending);
++}
++
+ reg_t processor_t::get_csr(int which, insn_t insn, bool write, bool peek)
+ {
+   auto search = state.csrmap.find(which);
+   if (search != state.csrmap.end()) {
+     if (!peek)
+       search->second->verify_permissions(insn, write);
++    // rd=x0 does not expose the pending word. MTIP and external input bits
++    // are read-only, so their unknown placeholders cannot affect a CSR write.
++    if (!peek && which == CSR_MIP && insn.rd() != 0) iris_validate_interrupts(true);
+     return search->second->read();
+   }
+   // If we get here, the CSR doesn't exist.  Unimplemented CSRs always throw
+diff --git a/riscv/processor.h b/riscv/processor.h
+index 05d4479e..11292b69 100644
+--- a/riscv/processor.h
++++ b/riscv/processor.h
+@@ -237,6 +237,9 @@ public:
+ 
+   const isa_parser_t &get_isa() const & { return isa; }
+   const cfg_t &get_cfg() const & { return *cfg; }
++  void iris_validate_interrupts(bool read_pending = false) const;
++  // Decode without execution, for the online model adapter and handler corpus.
++  insn_func_t decode_for_model(insn_t insn) { return decode_insn(insn); }
+ 
+   void set_debug(bool value);
+   void set_histogram(bool value);
+diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
+index 4a041c89..723b7932 100644
+--- a/riscv/riscv.mk.in
++++ b/riscv/riscv.mk.in
+@@ -53,6 +53,9 @@ riscv_precompiled_hdrs = \
+ 	insn_template.h \
+ 
+ riscv_srcs = \
++	iris_timing_adapter.cc \
++	iris_event_graph.cc \
++	iris_memory_adapter.cc \
+ 	processor.cc \
+ 	execute.cc \
+ 	dts.cc \
+diff --git a/riscv/sim.cc b/riscv/sim.cc
+index 2738ac87..0ed4d683 100644
+--- a/riscv/sim.cc
++++ b/riscv/sim.cc
+@@ -3,6 +3,11 @@
+ #include "config.h"
+ #include "dtb_discovery.h"
+ #include "sim.h"
++#include "iris_timing_adapter.h"
++#include "iris_clocked_device.h"
++extern "C" uint64_t iris_device_clock_abi_v1() { return 1; }
++#include "../../../board/iris_boot.hpp"
++#include "../../../board/physical_map.hpp"
+ #include "mmu.h"
+ #include "dts.h"
+ #include "remote_bitbang.h"
+@@ -17,6 +22,7 @@
+ #include <climits>
+ #include <cstdlib>
+ #include <cassert>
++#include <algorithm>
+ #include <signal.h>
+ #include <unistd.h>
+ #include <sys/wait.h>
+@@ -98,10 +104,20 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+ 
+   debug_mmu = new mmu_t(this, cfg->endianness, NULL, cfg->cache_blocksz);
+ 
++  std::optional<iris_timing_adapter::Profile> timing_profile;
++  if (!cfg->iris_timing_fixture.empty()) {
++    if (!dtb_enabled || cfg->real_time_clint || halted)
++      throw std::runtime_error("timing integration requires DTB and deterministic non-halted devices");
++    timing_profile = iris_timing_adapter::Profile::load(cfg->iris_timing_fixture, cfg->nprocs());
++    if (!cfg->iris_bootrom_file.empty() &&
++        timing_profile->base_hz / timing_profile->rtc_divider != iris_board::mtime_hz)
++      throw std::runtime_error("Iris physical boot requires its 500kHz timebase");
++  }
++
+   // When running without using a dtb, skip the fdt-based configuration steps
+   if (!dtb_enabled) {
+     for (size_t i = 0; i < cfg->nprocs(); i++) {
+-      procs.push_back(new processor_t(cfg->isa, cfg->priv,
++      procs.push_back(new processor_t(cfg->isa_for_hart(cfg->hartids[i]), cfg->priv,
+                                       cfg, this, cfg->hartids[i], halted,
+                                       log_file.get(), sout_));
+       harts[cfg->hartids[i]] = procs[i];
+@@ -147,7 +163,14 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+       const std::vector<std::string>& sargs = factory_sargs.second;
+       device_nodes.append(factory->generate_dts(this, sargs));
+     }
+-    dts = make_dts(INSNS_PER_RTC_TICK, CPU_HZ, cfg, mems, device_nodes);
++    // Explicit plugin nodes must be present before parsing their devices.
++    for (const auto& factory_sargs : plugin_device_factories)
++      device_nodes.append(factory_sargs.first->generate_dts(this, factory_sargs.second));
++    std::vector<size_t> hart_clocks;
++    if (timing_profile)
++      for (const auto& hart : timing_profile->harts) hart_clocks.push_back(timing_profile->base_hz / hart.divider);
++    dts = make_dts(timing_profile ? timing_profile->rtc_divider : INSNS_PER_RTC_TICK,
++                   timing_profile ? timing_profile->base_hz : CPU_HZ, cfg, mems, device_nodes, hart_clocks);
+     dtb = dts_to_dtb(dts);
+   }
+ 
+@@ -164,6 +187,13 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+   }
+ 
+   void *fdt = (void *)dtb.c_str();
++  if (timing_profile && dtb_file) {
++    const int cpus_node = fdt_path_offset(fdt, "/cpus");
++    int length = 0;
++    const auto* timebase = static_cast<const fdt32_t*>(fdt_getprop(fdt, cpus_node, "timebase-frequency", &length));
++    if (!timebase || length != 4 || fdt32_to_cpu(*timebase) != timing_profile->base_hz / timing_profile->rtc_divider)
++      throw std::runtime_error("supplied DTB timebase disagrees with timing fixture");
++  }
+ 
+   // per core attribute
+   int cpu_offset = 0, cpu_map_offset, rc;
+@@ -195,11 +225,20 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+     // handle hartid
+     uint32_t hartid;
+     rc = fdt_parse_hartid(fdt, cpu_offset, &hartid);
++    if (timing_profile && dtb_file && rc == 0) {
++      int length = 0;
++      const auto* frequency = static_cast<const fdt32_t*>(fdt_getprop(fdt, cpu_offset, "clock-frequency", &length));
++      if (hartid >= timing_profile->harts.size()) throw std::runtime_error("DTB hart absent from timing fixture");
++      if (frequency && (length != 4 || (fdt32_to_cpu(*frequency) != 0 &&
++          fdt32_to_cpu(*frequency) != timing_profile->base_hz / timing_profile->harts[hartid].divider)))
++        throw std::runtime_error("supplied DTB CPU clock disagrees with timing fixture");
++    }
+     if (rc != 0) {
+       std::cerr << "core (" << cpu_idx << ") has an invalid or missing `reg` (hartid)\n";
+       exit(1);
+     }
+ 
++    if (cfg->hart_isa.count(hartid)) isa_str = cfg->isa_for_hart(hartid);
+     procs.push_back(new processor_t(isa_str, cfg->priv,
+                                     cfg, this, hartid, halted,
+                                     log_file.get(), sout_));
+@@ -262,6 +301,33 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+                           plugin_device_factories.begin(),
+                           plugin_device_factories.end());
+ 
++  if (!cfg->iris_bootrom_file.empty()) {
++    // A physical board run must not turn a hole/MMIO aperture into ordinary RAM
++    // through a permissive upstream -m argument, or silently remove real RAM.
++    using Range = std::pair<reg_t, reg_t>;
++    auto normalize = [](std::vector<Range> ranges) {
++      std::sort(ranges.begin(), ranges.end());
++      std::vector<Range> result;
++      for (const auto& range : ranges) {
++        if (!range.second || range.second > UINT64_MAX - range.first)
++          throw std::runtime_error("invalid Iris physical RAM range");
++        if (!result.empty() && range.first < result.back().first + result.back().second)
++          throw std::runtime_error("overlapping Iris physical RAM ranges");
++        if (!result.empty() && range.first == result.back().first + result.back().second)
++          result.back().second += range.second;
++        else result.push_back(range);
++      }
++      return result;
++    };
++    std::vector<Range> expected, actual;
++    for (const auto& region : iris_board::regions)
++      if (std::string(region.name).rfind("memory@", 0) == 0)
++        expected.emplace_back(region.base, region.size);
++    for (const auto& memory : mems) actual.emplace_back(memory.first, memory.second->size());
++    if (normalize(actual) != normalize(expected))
++      throw std::runtime_error("IRIS_PHYSICAL_RAM_MAP_MISMATCH: exact elaborated DRAM/TCM/scratchpad ranges required");
++  }
++
+   for (auto& x : mems)
+   {
+       bus.add_device(x.first, x.second);
+@@ -291,10 +357,25 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
+   }
+ 
+   for (auto& pair : harts) {
+-    if (auto pc = cfg->start_pc.get(pair.first)) {
++    if (auto pc = cfg->start_pc.get(pair.first); pc && cfg->iris_bootrom_file.empty()) {
+       pair.second->get_state()->pc = *pc;
+     }
+   }
++  if (timing_profile) {
++    if (!clint) throw std::runtime_error("timing integration requires a CLINT");
++    iris_timing = std::make_unique<iris_timing_adapter>(std::move(*timing_profile), procs,
++      [this](uint64_t from, uint64_t to) { iris_advance_clock(from, to); },
++      [this] { return iris_next_timer_event(); },
++      [this] {
++        auto address = get_tohost_addr();
++        if (address && ((address & 7) || !dynamic_cast<abstract_mem_t*>(bus.find_device(address, 8).second)))
++          throw std::runtime_error("IRIS_TIMING_INVALID_TOHOST: aligned 8-byte RAM symbol required");
++        auto* data = address ? addr_to_mem(address) : nullptr;
++        if (!data) return false;
++        for (unsigned i = 0; i < 8; ++i) if (data[i]) return true;
++        return false;
++      }, cfg->iris_schedule_seed);
++  }
+ }
+ 
+ sim_t::~sim_t()
+@@ -313,25 +394,107 @@ int sim_t::run()
+ 
+   // htif_t::run() will repeatedly call back into sim_t::idle(), each
+   // invocation of which will advance target time
+-  return htif_t::run();
++  try {
++    int result = htif_t::run();
++    if (iris_timing) iris_timing->write_json(cfg->iris_timing_trace);
++    return result;
++  } catch (...) {
++    if (iris_timing) iris_timing->write_json(cfg->iris_timing_trace);
++    throw;
++  }
++}
++
++const insn_fetch_t* sim_t::iris_completion_fetch(unsigned hart) const {
++  return iris_timing ? iris_timing->completion_fetch(hart) : nullptr;
++}
++void sim_t::iris_issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) {
++  if (iris_timing) iris_timing->issue(hart, pc, fetch);
++}
++void sim_t::iris_retired(unsigned hart, size_t count) {
++  if (iris_timing) iris_timing->retired(hart, count);
++}
++void sim_t::iris_validate_interrupts(unsigned hart, bool read_pending) const {
++  if (clint) clint->validate_iris_interrupts(hart, read_pending);
++  if (plic) plic->validate_iris_interrupts(hart, read_pending);
++}
++bool sim_t::reservable(reg_t paddr) {
++  // Rocket/Shuttle TLBs allow LR/SC only on AcquireB-capable cacheable RAM.
++  // TCM supports arithmetic/logical AMOs but is not cacheable; its aliases
++  // resolve to the same non-reservable backing storage before reaching here.
++  if (cfg->iris_vme || !cfg->iris_bootrom_file.empty())
++    return paddr >= 0x80000000ULL && paddr - 0x80000000ULL < 0x100000000ULL && addr_to_mem(paddr);
++  return addr_to_mem(paddr);
++}
++void sim_t::iris_advance_clock(uint64_t before, uint64_t after) {
++  const auto& profile = iris_timing->profile();
++  for (size_t i = 0; i < procs.size(); ++i) {
++    const auto& clock = profile.harts[i];
++    if (clock.count_wfi || !procs[i]->is_waiting_for_interrupt())
++      procs[i]->get_state()->mcycle->advance_time(after / clock.divider - before / clock.divider);
++  }
++  uint64_t ticks = after / profile.rtc_divider - before / profile.rtc_divider;
++  for (auto& device : devices) {
++    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get()))
++      clocked->iris_advance_model_clock(before, after, profile.base_hz);
++  }
++  // All device time advances from the model clock, never instruction retirement.
++  for (auto& device : devices) device->tick(ticks);
++}
++std::optional<uint64_t> sim_t::iris_next_timer_event() {
++  const auto now = iris_timing->now(), divider = iris_timing->profile().rtc_divider;
++  const uint64_t current = clint->get_mtime(), max = UINT64_MAX;
++  std::optional<uint64_t> earliest;
++  for (const auto& pair : harts) {
++    auto known_compare = clint->timer_compare(pair.first);
++    if (!known_compare) continue;
++    uint64_t compare = *known_compare;
++    if (current >= compare && compare == 0) continue;
++    // Include timer deassertion on unsigned mtime wrap.
++    uint64_t ticks = current < compare ? compare - current : max - current + 1;
++    uint64_t first = divider - now % divider;
++    if (first >= max - now) continue;
++    uint64_t edge = now + first;
++    if (ticks - 1 > (max - 1 - edge) / divider) continue;
++    edge += (ticks - 1) * divider;
++    if (!earliest || edge < *earliest) earliest = edge;
++  }
++  for (const auto& device : devices) {
++    if (auto* clocked = dynamic_cast<iris_clocked_device_t*>(device.get())) {
++      auto edge = clocked->iris_next_model_event(now, iris_timing->profile().base_hz);
++      if (edge && *edge <= now)
++        throw std::runtime_error("IRIS_DEVICE_INVALID_DEADLINE: device event must be future");
++      if (edge && (!earliest || *edge < *earliest)) earliest = edge;
++    }
++  }
++  return earliest;
+ }
+ 
+ void sim_t::step(size_t n)
+ {
++  if (iris_timing) { iris_timing->step(n); return; }
++  if (iris_hart_order.empty()) {
++    for (size_t hart = 0; hart < procs.size(); ++hart) iris_hart_order.push_back(hart);
++    if (cfg->iris_schedule_seed) {
++      iris_schedule_rng.seed(*cfg->iris_schedule_seed);
++      std::shuffle(iris_hart_order.begin(), iris_hart_order.end(), iris_schedule_rng);
++    }
++  }
+   for (size_t i = 0, steps = 0; i < n; i += steps)
+   {
+     steps = std::min(n - i, INTERLEAVE - current_step);
+-    procs[current_proc]->step(steps);
++    procs[iris_hart_order[current_proc]]->step(steps);
+ 
+     current_step += steps;
+     if (current_step == INTERLEAVE)
+     {
+       current_step = 0;
+-      procs[current_proc]->get_mmu()->yield_load_reservation();
++      procs[iris_hart_order[current_proc]]->get_mmu()->yield_load_reservation();
+       if (++current_proc == procs.size()) {
+         current_proc = 0;
+         reg_t rtc_ticks = INTERLEAVE / INSNS_PER_RTC_TICK;
+         for (auto &dev : devices) dev->tick(rtc_ticks);
++        if (cfg->iris_schedule_seed)
++          std::shuffle(iris_hart_order.begin(), iris_hart_order.end(), iris_schedule_rng);
+       }
+     }
+   }
+@@ -466,8 +629,22 @@ const char* sim_t::get_symbol(uint64_t paddr)
+ 
+ void sim_t::reset()
+ {
+-  if (dtb_enabled)
+-    set_rom();
++  if (cfg->iris_bootrom_file.empty()) {
++    if (dtb_enabled) set_rom();
++    return;
++  }
++  if (!dtb_enabled || !clint || cfg->hartids != std::vector<size_t>({0, 1, 2}))
++    throw std::runtime_error("Iris physical boot requires DTB, CLINT and harts 0/1/2");
++  auto rom = std::make_shared<iris_board::ReadOnlyBootROM>(
++      iris_board::read_binary(cfg->iris_bootrom_file), std::vector<char>(dtb.begin(), dtb.end()));
++  auto bootreg = std::make_shared<iris_board::BootAddressRegister>();
++  add_device(iris_board::rom_base, rom); add_device(iris_board::bootreg_base, bootreg);
++  reg_t entry = cfg->start_pc.get(0).value_or(get_entry_point());
++  uint8_t address[8];
++  for (unsigned i = 0; i < 8; ++i) address[i] = uint8_t(entry >> (8 * i));
++  if (!bootreg->store(0, 8, address)) throw std::runtime_error("Iris boot address write failed");
++  const uint8_t release[4] = {1, 0, 0, 0};
++  if (!clint->store(0, 4, release)) throw std::runtime_error("Iris boot release failed");
+ }
+ 
+ void sim_t::idle()
+@@ -519,6 +696,10 @@ void sim_t::proc_reset(unsigned id)
+ {
+   debug_module.proc_reset(id);
+   if (harts.count(id)) {
++    if (!cfg->iris_bootrom_file.empty()) {
++      harts[id]->get_state()->pc = iris_board::reset_pc;
++      return;
++    }
+     if (auto pc = cfg->start_pc.get(id)) {
+       harts[id]->get_state()->pc = *pc;
+     }
+diff --git a/riscv/sim.h b/riscv/sim.h
+index b0540f7d..25871ce8 100644
+--- a/riscv/sim.h
++++ b/riscv/sim.h
+@@ -4,6 +4,7 @@
+ #define _RISCV_SIM_H
+ 
+ #include "cfg.h"
++#include <random>
+ #include "debug_module.h"
+ #include "devices.h"
+ #include "common.h"
+@@ -22,6 +23,7 @@
+ class mmu_t;
+ class remote_bitbang_t;
+ class socketif_t;
++class iris_timing_adapter;
+ 
+ // Type for holding a pair of device factory and device specialization arguments.
+ using device_factory_sargs_t = std::pair<const device_factory_t*, std::vector<std::string>>;
+@@ -62,9 +64,14 @@ public:
+   abstract_interrupt_controller_t* get_intctrl() const { assert(plic.get()); return plic.get(); }
+   virtual const cfg_t &get_cfg() const override { return *cfg; }
+   virtual bool is_debug_module_access(reg_t paddr, size_t len) override;
++  bool reservable(reg_t paddr) override;
+ 
+   virtual const std::map<size_t, processor_t*>& get_harts() const override { return harts; }
+   const bus_t& get_bus() const {  return bus;}
++  const insn_fetch_t* iris_completion_fetch(unsigned hart) const override;
++  void iris_issue(unsigned hart, reg_t pc, const insn_fetch_t& fetch) override;
++  void iris_retired(unsigned hart, size_t count) override;
++  void iris_validate_interrupts(unsigned hart, bool read_pending = false) const override;
+ 
+   // Callback for processors to let the simulation know they were reset.
+   virtual void proc_reset(unsigned id) override;
+@@ -75,6 +82,9 @@ public:
+ 
+ private:
+   const cfg_t * const cfg;
++  std::unique_ptr<iris_timing_adapter> iris_timing;
++  void iris_advance_clock(uint64_t before, uint64_t after);
++  std::optional<uint64_t> iris_next_timer_event();
+   std::vector<std::pair<reg_t, abstract_mem_t*>> mems;
+   std::vector<processor_t*> procs;
+   std::map<size_t, processor_t*> harts;
+@@ -100,6 +110,8 @@ private:
+   processor_t* get_core(const std::string& i);
+   void step(size_t n); // step through simulation
+   size_t current_step;
++  std::vector<size_t> iris_hart_order;
++  std::mt19937_64 iris_schedule_rng;
+   size_t current_proc;
+   bool debug;
+   bool histogram_enabled; // provide a histogram of PCs
+diff --git a/riscv/simif.h b/riscv/simif.h
+index ca545e21..f9854a30 100644
+--- a/riscv/simif.h
++++ b/riscv/simif.h
+@@ -9,6 +9,8 @@
+ 
+ class processor_t;
+ class mmu_t;
++struct insn_fetch_t;
++struct iris_timing_wait {};
+ 
+ // this is the interface to the simulator used by the processors and memory
+ class simif_t
+@@ -24,6 +26,10 @@ public:
+   virtual bool is_debug_module_access(reg_t, size_t) { return false; }
+   // Callback for processors to let the simulation know they were reset.
+   virtual void proc_reset(unsigned id) = 0;
++  virtual const insn_fetch_t* iris_completion_fetch(unsigned) const { return nullptr; }
++  virtual void iris_issue(unsigned, reg_t, const insn_fetch_t&) {}
++  virtual void iris_retired(unsigned, size_t) {}
++  virtual void iris_validate_interrupts(unsigned, bool = false) const {}
+ 
+   virtual const cfg_t &get_cfg() const = 0;
+   virtual const std::map<size_t, processor_t*>& get_harts() const = 0;
+diff --git a/riscv/v_ext_macros.h b/riscv/v_ext_macros.h
+index 293a0a30..f4247852 100644
+--- a/riscv/v_ext_macros.h
++++ b/riscv/v_ext_macros.h
+@@ -1473,6 +1473,8 @@ VI_VX_ULOOP({ \
+ // vector: vfp helper
+ //
+ #define VI_VFP_BASE \
++  if (P.VU.iris_mode && P.get_id() >= 2 && (P.VU.vsew == 8 || (P.VU.vsew == 16 && P.VU.altfmt))) \
++    throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart 2 has no Mx floating datapath"); \
+   require_fp; \
+   require_vector(true); \
+   reg_t UNUSED vl = P.VU.vl->read(); \
+@@ -2300,13 +2302,14 @@ c_t generic_dot_product(const std::vector<a_t>& a, const std::vector<b_t>& b, c_
+   require_extension(EXT_ZVTBASE); \
+   require_vector(false); \
+   require(P.VU.widen > 0); \
+-  require(STATE.sstatus->enabled(SSTATUS_MS))
++  require(P.VU.iris_mode || STATE.sstatus->enabled(SSTATUS_MS))
+ 
+ #define ZVT_END \
+-  STATE.sstatus->dirty(SSTATUS_MS); \
++  if (!P.VU.iris_mode) STATE.sstatus->dirty(SSTATUS_MS); \
+   VECTOR_END
+ 
+ #define ZVT_LDST(type, is_store) \
++  require(!P.VU.iris_mode); \
+   ZVT_LDST_BASE; \
+   reg_t base = RS1; \
+   reg_t tss = RS2; \
+diff --git a/riscv/vector_unit.cc b/riscv/vector_unit.cc
+index d0fe10a9..42a042ce 100644
+--- a/riscv/vector_unit.cc
++++ b/riscv/vector_unit.cc
+@@ -25,6 +25,7 @@ void vectorUnit_t::vectorUnit_t::reset()
+   mtype = std::make_shared<vector_csr_t>(p, CSR_MTYPE, 0);
+   if (TE) {
+     mt.resize(16 * TE * TE);
++    iris_initialized.assign(mt.size() / 4, 0);
+     state->add_csr(CSR_MTYPE, mtype);
+   }
+ 
+@@ -34,6 +35,36 @@ void vectorUnit_t::vectorUnit_t::reset()
+ 
+ void vectorUnit_t::msetmtype(reg_t newMType, reg_t newVType)
+ {
++  if (iris_mode) {
++    // Matrix.scala msetmtypeNewType/update: use the NEW configuration and
++    // clear tm/tk. The Iris stand-in implemented subset has 32-bit tile cells.
++    reg_t tw = (reg_t(1) << (newMType & 3)) >> 1;
++    reg_t sew = reg_t(8) << ((newVType >> 3) & 7);
++    if (tw == 0) {
++      set_vl(0, 1, 0, newVType & reg_t(0x1ff));
++      return;
++    }
++    if (!((tw == 4 && sew == 8) || (tw == 1 && sew == 32))) {
++      set_vl(0, 1, 0, reg_t(-1));
++      widen = tm = tk = 0;
++      mtype->write_raw(read_mtype());
++      return;
++    }
++    const reg_t km = 32 / sew;
++    const reg_t eve_new = VLEN / sew;
++    const reg_t lm = std::max(reg_t(1), std::min(reg_t(8) / km,
++      std::min(reg_t(8) / tw, (TE + eve_new - 1) / eve_new)));
++    reg_t log_lm = 0;
++    while ((reg_t(1) << log_lm) < lm) ++log_lm;
++    // Matrix altfmt is legal independently of ordinary RVV altfmt extensions.
++    const reg_t matrix_alt = newVType & reg_t(0x100);
++    set_vl(0, 1, 0, (newVType & reg_t(0xf8)) | log_lm | 0xc0);
++    if (!vill) { altfmt = matrix_alt != 0; vtype->write_raw(vtype->read() | matrix_alt); }
++    widen = vill ? 0 : tw;
++    tm = tk = 0;
++    mtype->write_raw(read_mtype());
++    return;
++  }
+   reg_t twiden = widen = (1 << extract64(newMType, 0, 2)) >> 1;
+ 
+   if (twiden) {
+@@ -65,6 +96,10 @@ reg_t vectorUnit_t::read_mtype() const
+ 
+ reg_t vectorUnit_t::msettn(reg_t atn)
+ {
++  if (iris_mode && (!widen || vill)) {
++    set_vl(0, 1, 0, reg_t(-1));
++    return 0;
++  }
+   if (widen) {
+     reg_t tn = std::min(atn, std::min(reg_t(vflmul) * eve(), ete()));
+     vl->write_raw(tn);
+@@ -76,6 +111,10 @@ reg_t vectorUnit_t::msettn(reg_t atn)
+ 
+ reg_t vectorUnit_t::msettm(reg_t atm)
+ {
++  if (iris_mode && (!widen || vill)) {
++    set_vl(0, 1, 0, reg_t(-1));
++    return 0;
++  }
+   tm = std::min(atm, std::min(reg_t(vflmul) * eve(), ete()));
+   mtype->write_raw(read_mtype());
+   return tm;
+@@ -83,6 +122,10 @@ reg_t vectorUnit_t::msettm(reg_t atm)
+ 
+ reg_t vectorUnit_t::msettk(reg_t atk)
+ {
++  if (iris_mode && (!widen || vill)) {
++    set_vl(0, 1, 0, reg_t(-1));
++    return 0;
++  }
+   tk = std::min(atk, kmax());
+   mtype->write_raw(read_mtype());
+   return tk;
+@@ -103,7 +146,10 @@ reg_t vectorUnit_t::vectorUnit_t::set_vl(int rd, int rs1, reg_t reqVL, reg_t new
+ 
+     bool ill_altfmt = true;
+     if (altfmt) {
+-      if (p->extension_enabled(EXT_ZVQWBDOTA8I) && vsew == 8)
++      // Pinned Rocket VType.fromUInt never gates altfmt by ISA extensions.
++      // Individual Iris datapaths either consume or ignore that field.
++      if (iris_mode) ill_altfmt = false;
++      else if (p->extension_enabled(EXT_ZVQWBDOTA8I) && vsew == 8)
+         ill_altfmt = false;
+       else if (p->extension_enabled(EXT_ZVQWBDOTA16I) && vsew == 16)
+         ill_altfmt = false;
+diff --git a/riscv/vector_unit.h b/riscv/vector_unit.h
+index 05b910b0..8fc79234 100644
+--- a/riscv/vector_unit.h
++++ b/riscv/vector_unit.h
+@@ -4,6 +4,7 @@
+ 
+ #include <array>
+ #include <cstdint>
++#include <stdexcept>
+ 
+ #include "decode.h"
+ #include "csrs.h"
+@@ -87,6 +88,18 @@ using EGU8x16_t = std::array<uint8_t, 16>;
+ class vectorUnit_t
+ {
+ public:
++
++  // Iris MRF cells are not reset by RTL. Guard reads until software writes them.
++  bool iris_mode = false;
++  std::vector<uint8_t> iris_initialized;
++  template<typename T> void iris_cell(T& cell, bool write) {
++    if (!iris_mode) return;
++    if (sizeof(T) != 4) throw std::runtime_error("Iris VME supports 32-bit tile cells only");
++    const size_t index = (reinterpret_cast<char*>(&cell) - mt.data()) / 4;
++    if (index >= iris_initialized.size()) throw std::runtime_error("Iris VME cell out of range");
++    if (write) iris_initialized[index] = 1;
++    else if (!iris_initialized[index]) throw std::runtime_error("Iris VME read of uninitialized tile cell; explicitly zero or load tile first");
++  }
+   processor_t* p = nullptr;
+   void *reg_file = nullptr;
+   int setvl_count = 0;
+diff --git a/softfloat/e5m2_to_bf16.c b/softfloat/e5m2_to_bf16.c
+index 6b4db1fb..2f4222c8 100644
+--- a/softfloat/e5m2_to_bf16.c
++++ b/softfloat/e5m2_to_bf16.c
+@@ -64,7 +64,8 @@ float16_t e5m2_to_bf16( float8_t a )
+     *------------------------------------------------------------------------*/
+     if ( exp == 0x1F ) {
+         if ( frac ) {
+-            /* NaN */
++            /* HardFloat widening raises invalid for an E5M2 signaling NaN. */
++            if (frac == 1) softfloat_raiseFlags(softfloat_flag_invalid);
+             softfloat_E5M2UIToCommonNaN( uiA, &commonNaN );
+             uiZ = softfloat_commonNaNToBF16UI( &commonNaN );
+         } else {
+diff --git a/softfloat/e5m2_to_f16.c b/softfloat/e5m2_to_f16.c
+index d0d9acf4..b447dbd1 100644
+--- a/softfloat/e5m2_to_f16.c
++++ b/softfloat/e5m2_to_f16.c
+@@ -43,56 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ float16_t e5m2_to_f16( float8_t a )
+ {
+-    union ui8_f8 uA;
+-    uint_fast8_t uiA;
+-    bool sign;
+-    int_fast8_t exp;
+-    uint_fast8_t frac;
+-    struct commonNaN commonNaN;
+-    uint_fast16_t uiZ;
+-    struct exp8_sig8 normExpSig;
+-    union ui16_f16 uZ;
+-
+-    /*------------------------------------------------------------------------
+-    *------------------------------------------------------------------------*/
+-    uA.f = a;
+-    uiA = uA.ui;
+-    sign = signE5M2UI( uiA );
+-    exp  = expE5M2UI( uiA );
+-    frac = fracE5M2UI( uiA );
+-    /*------------------------------------------------------------------------
+-    *------------------------------------------------------------------------*/
+-    if ( exp == 0xF ) {
+-        if ( frac ) {
+-            /* NaN */
+-            softfloat_E5M2UIToCommonNaN( uiA, &commonNaN );
+-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
+-        } else {
+-            /* Inf */
+-            uiZ = packToF16UI( sign, 0x1F, 0 );
+-        }
+-        goto uiZ;
+-    }
+-    /*------------------------------------------------------------------------
+-    *------------------------------------------------------------------------*/
+-    if ( ! exp ) {
+-        if ( ! frac ) {
+-            /* zero */
+-            uiZ = packToF16UI( sign, 0, 0 );
+-            goto uiZ;
+-        }
+-        /* subnormal */
+-        normExpSig = softfloat_normSubnormalE5M2Sig( frac );
+-        //TODO: might be unnecessary to implement a dedicated function
+-        exp = normExpSig.exp - 1;
+-        frac = normExpSig.sig;
++    // E5M2 and binary16 share their five-bit exponent and bias. Every finite
++    // input (including subnormals) is an exact eight-bit left shift.
++    const uint8_t raw = a.v;
++    if ((raw & 0x7c) == 0x7c && (raw & 3)) {
++        if ((raw & 3) == 1) softfloat_raiseFlags(softfloat_flag_invalid);
++        return (float16_t){ .v = 0x7e00 };
+     }
+-    /*------------------------------------------------------------------------
+-    *------------------------------------------------------------------------*/
+-    uiZ = packToF16UI( sign, exp, (uint_fast16_t) frac<<8);
+- uiZ:
+-    uZ.ui = uiZ;
+-    return uZ.f;
+-
++    return (float16_t){ .v = (uint16_t)raw << 8 };
+ }
+-
+diff --git a/spike_main/spike.cc b/spike_main/spike.cc
+index d769d4e8..241d1769 100644
+--- a/spike_main/spike.cc
++++ b/spike_main/spike.cc
+@@ -43,6 +43,12 @@ static void help(int exit_code = 1)
+   fprintf(stderr, "  --log=<name>          File name for option -l\n");
+   fprintf(stderr, "  --debug-cmd=<name>    Read commands from file (use with -d)\n");
+   fprintf(stderr, "  --isa=<name>          RISC-V ISA string [default %s]\n", DEFAULT_ISA);
++  fprintf(stderr, "  --hart-isa=<H:ISA>    Override ISA for one hart (repeatable)\n");
++  fprintf(stderr, "  --iris-vme            Enable Iris VME subset semantics (experimental)\n");
++  fprintf(stderr, "  --iris-timing-fixture=<file>  Enable uncalibrated event-clock integration test mode\n");
++  fprintf(stderr, "  --iris-timing-trace=<file>    Write the online dependency graph\n");
++  fprintf(stderr, "  --iris-bootrom=<file>         Use Iris physical reset ROM and boot protocol\n");
++  fprintf(stderr, "  --iris-schedule-seed=<n>  Shuffle hart visitation per round reproducibly\n");
+   fprintf(stderr, "  --pmpregions=<n>      Number of PMP regions [default 16]\n");
+   fprintf(stderr, "  --pmpgranularity=<n>  PMP Granularity in bytes [default 4]\n");
+   fprintf(stderr, "  --priv=<m|mu|msu>     RISC-V privilege modes supported [default %s]\n", DEFAULT_PRIV);
+@@ -413,6 +419,31 @@ int main(int argc, char** argv)
+   parser.option(0, "big-endian", 0, [&](const char UNUSED *s){cfg.endianness = endianness_big;});
+   parser.option(0, "log-cache-miss", 0, [&](const char UNUSED *s){log_cache = true;});
+   parser.option(0, "isa", 1, [&](const char* s){cfg.isa = s;});
++  parser.option(0, "iris-vme", 0, [&](const char*){cfg.iris_vme = true;});
++  parser.option(0, "iris-timing-fixture", 1, [&](const char* path){cfg.iris_timing_fixture = path;});
++  parser.option(0, "iris-timing-trace", 1, [&](const char* path){cfg.iris_timing_trace = path;});
++  parser.option(0, "iris-bootrom", 1, [&](const char* path){cfg.iris_bootrom_file = path;});
++  parser.option(0, "iris-schedule-seed", 1, [&](const char* raw){
++    std::string value(raw); size_t used = 0;
++    try {
++      const auto seed = std::stoull(value, &used, 0);
++      if (value.empty() || value[0] == '-' || used != value.size()) throw std::invalid_argument("seed");
++      cfg.iris_schedule_seed = seed;
++    } catch (...) { std::cerr << "Invalid --iris-schedule-seed\n"; exit(1); }
++  });
++  parser.option(0, "hart-isa", 1, [&](const char* s){
++    std::string arg(s);
++    auto colon = arg.find(':');
++    if (colon == std::string::npos || colon == 0 || colon + 1 == arg.size()) {
++      std::cerr << "--hart-isa requires H:ISA\n"; exit(1);
++    }
++    size_t used = 0, id = 0;
++    try { id = std::stoull(arg.substr(0, colon), &used); }
++    catch (...) { std::cerr << "Invalid --hart-isa hart ID\n"; exit(1); }
++    if (arg[0] == '-' || used != colon || !cfg.hart_isa.emplace(id, arg.substr(colon + 1)).second) {
++      std::cerr << "Invalid or duplicate --hart-isa hart ID\n"; exit(1);
++    }
++  });
+   parser.option(0, "pmpregions", 1, [&](const char* s){cfg.pmpregions = atoul_safe(s);});
+   parser.option(0, "pmpgranularity", 1, [&](const char* s){cfg.pmpgranularity = atoul_safe(s);});
+   parser.option(0, "priv", 1, [&](const char* s){cfg.priv = s;});
+@@ -541,6 +572,19 @@ int main(int argc, char** argv)
+     cfg.hartids = default_hartids;
+   }
+ 
++  for (const auto& entry : cfg.hart_isa) {
++    if (std::find(cfg.hartids.begin(), cfg.hartids.end(), entry.first) == cfg.hartids.end()) {
++      std::cerr << "--hart-isa refers to absent hart " << entry.first << "\n"; exit(1);
++    }
++  }
++
++  if (cfg.iris_vme && std::find(cfg.hartids.begin(), cfg.hartids.end(), 2) != cfg.hartids.end()) {
++    isa_parser_t dma_isa(cfg.isa_for_hart(2), cfg.priv);
++    if (dma_isa.extension_enabled(EXT_ZVTBASE)) {
++      std::cerr << "Iris hart 2 must not advertise VME/Zvt; supply --hart-isa=2:ISA\n";
++      return 1;
++    }
++  }
+   if (dtb_discovery){
+    if (memory_option) {   std::cerr << "--dtb-discovery option is not compatible with --memory/-m;."<<std::endl; exit(1);}
+    if (!plugin_device_factories.empty()) {   std::cerr << "--dtb-discovery option is not compatible with --device option."<<std::endl; exit(1);}
+@@ -583,7 +627,12 @@ int main(int argc, char** argv)
+   s.configure_log(log, log_commits);
+   s.set_histogram(histogram);
+ 
+-  auto return_code = s.run();
++  int return_code;
++  try { return_code = s.run(); }
++  catch (const std::exception& error) {
++    std::cerr << error.what() << '\n';
++    return 1;
++  }
+ 
+   for (auto& mem : mems)
+     delete mem.second;

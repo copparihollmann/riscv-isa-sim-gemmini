@@ -1,0 +1,4 @@
+IRIS_BITMANIP {"hart":0,"scalar_cases":12,"illegal_cases":0,"vector_sew_cases":4}
+IRIS_BITMANIP {"hart":1,"scalar_cases":12,"illegal_cases":0,"vector_sew_cases":4}
+IRIS_BITMANIP {"hart":2,"scalar_cases":0,"illegal_cases":4,"vector_sew_cases":4}
+PASSED heterogeneous bitmanip

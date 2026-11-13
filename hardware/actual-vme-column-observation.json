@@ -1,0 +1,164 @@
+{
+  "schema": "iris.actual_vme_column_observation.v1",
+  "status": "all_tested_column_encodings_accepted_but_not_mathematical_columns",
+  "observed_date_utc": "2026-11-06",
+  "hardware_executed": true,
+  "job": "/scratch/copparihollmann/iris-model/runs/fpga-vme-column-probe-v1",
+  "elf_sha256": "8819f410f86849f059c52972ba1f3616463173de0d1c8c35b01e877d5e848404",
+  "selected_image": {
+    "name": "corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush",
+    "uri": "file:///scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/firesim.tar.gz",
+    "sha256": "9bbe1f12a2b18091c28b05ea43c001e579f70c8cfef0f528fcb49003212fb776"
+  },
+  "selected_driver_bundle": {
+    "uri": "file:///scratch/copparihollmann/iris-model/firesim/artifacts/archived-build-driver-v1/driver-bundle.tar.gz",
+    "sha256": "5457de1e9c0dd1e3c52efbf5d083bdac7dfa5a5e3124c9887961c08159b03450"
+  },
+  "archive_sha256": "1f36640e9d2b09af7068686f6f4f19c42000b72d04b4c8a8fd309bfe58755777",
+  "archive_analysis_sha256": "7446be9f8449cd517a2e3ff16c7c6ecd9d529396e391e0855a59a00fcba776dd",
+  "coverage": {
+    "harts": [
+      0,
+      1
+    ],
+    "all_harts_booted": [
+      0,
+      1,
+      2
+    ],
+    "indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "patterns": 2,
+    "trials": 3,
+    "known_row_controls": 768,
+    "raw_column_observations": 384
+  },
+  "observations": {
+    "illegal": 0,
+    "accepted_mathematical_column": 0,
+    "accepted_other_data": 384,
+    "mismatching_words_per32_min": 30,
+    "mismatching_words_per32_max": 32,
+    "row_controls_passed_before_and_after": true,
+    "normalized_output_shape_identical_across_all12conditions_for_each_index": true,
+    "all_column_words_retained": true,
+    "individual_row_words_in_console": false
+  },
+  "source_pins": {
+    "chipyard": {
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd"
+    },
+    "saturn": {
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b"
+    },
+    "rocket-chip": {
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "shuttle": {
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "lifecycle": [
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 23.306450873147696,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "infrasetup",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 114.65484040835872,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "runworkload",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 68.12109152600169,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": true,
+      "host_elapsed_seconds": 23.483938896097243,
+      "returncode": 0,
+      "timed_out": false
+    }
+  ],
+  "cleanup_status": "passed",
+  "shared_lock_absent_after_cleanup": true,
+  "post_cleanup_complete_idle_inspection": true,
+  "native_policy": "Explicit unsupported-column capability refusal retained; no fabricated architectural illegal trap.",
+  "environment_sources_frozen_before_launch": {
+    "/scratch/eygao/iris-cy/sims/firesim/sourceme-manager.sh": "0a18a154bc8d040a4d526c9e60712e56c9a0090f798e636344c3fc167c235d27",
+    "/scratch/eygao/iris-cy/sims/firesim/env.sh": "c0093b0a370e6adf3e44a75372ee93abb407899a1f18ab63d690b7bffbd9168d",
+    "/scratch/eygao/iris-cy/env.sh": "dcdeaffa22275ae99faa2026ffa91f66e35c3f7ec33b85c84bdff1259b23bd7f"
+  },
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/runs/fpga-vme-column-probe-v1/run.json": "e40e2344e7e7f52ab95388cdfa7f597ea221ad6b773eef7d96e679d66bdeb32f",
+    "/scratch/copparihollmann/iris-model/build/fpga-vme-column-probe-v1-archive-analysis/report.json": "7446be9f8449cd517a2e3ff16c7c6ecd9d529396e391e0855a59a00fcba776dd",
+    "/scratch/copparihollmann/iris-model/build/fpga-vme-column-probe-v1-archive-analysis/column-observations.json": "fb8e264411778ab6a199e8f82c9439ffb1fa355f9ed2b954256052efc95583f8",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1/build.json": "cb693d187e9b7514ae63e693499d7dca6c84cb544fc81e6370394885815d830c",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1/corpus.json": "6460f0ae81cbe37d498c51575d03b990c632378b7e08f88165a87f360ee37cfa",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1-parser-admission/report.json": "8b4b75965db24c66e51a7548bf907ddf693a03aa013bccb4bd4b3ca6b5c78b29",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1-native-refusal-seed0/report.json": "c5b528fcb3d2097eb64083546909d3ad9856e6b1be6484d5a8706ef07bd77675",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1-native-refusal-seed0/stderr": "a5bf7940e304d5dc93b68d8c8153a05727218a599648c411671beaa119b12f45",
+    "/scratch/copparihollmann/iris-model/hardware/manifest.json": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+    "/scratch/copparihollmann/iris-model/hardware/dtypes.json": "606d9eb073abc06cddeb626fb5fc6c3796b7bb94931d5a95bad9c619bb60025e",
+    "/scratch/copparihollmann/iris-model/build/fpga-vme-column-post-cleanup-v1.json": "47f088db98f6417b384dc2eceec6d100256ea3332aa2a444e30f6aa9fac050f9",
+    "/scratch/copparihollmann/iris-model/build/vme-column-probe-v1/post-cleanup-shared-lock.json": "2db8cabe762adc4b15a59635b42ad0bd168280b38780ca3bf80737a42f5c37a0"
+  },
+  "qualification": "Observed unusable mathematical column readout for this encoding/program on selected image, consistent with source missing horizontal datapath. Does not establish complete source-to-image equivalence or arbitrary timing-dependent fallback semantics.",
+  "full_functional_certified": false,
+  "source_image_association_verified": false,
+  "loaded_image_readback_verified": false,
+  "timing_certified": false,
+  "calibration_usable": false
+}

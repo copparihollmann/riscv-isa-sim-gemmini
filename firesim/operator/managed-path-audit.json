@@ -1,0 +1,144 @@
+{
+  "schema": "iris.local_managed_privilege_audit.v1",
+  "hardware_contacted": false,
+  "remote_install_performed": false,
+  "observation_time_utc": "2026-11-06T06:10:40.921970+00:00",
+  "source_revision": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+  "source_scope": "observed dirty manager tree; not a build or loaded-image attestation",
+  "input_sha256": {
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/run_farm_deploy_managers.py": "c347a4652fb2b777d015ae30886ff3263aaf45252bf565861fd388a39550ec62",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/runtime_config.py": "e40e29881d5cdba1b7965e14c813b074554d7a74dcf4ce9b3cd947365c485dd4",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/utils.py": "cef5eef5c16b56879d6af4077a662b797437fda4c4db68e11939eb167106b046",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/firesim_topology_elements.py": "04c950f2d6f78ac6749327904a5786f895d9177ec7554b9bb5b5cab002286dee",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/config_runtime.yaml": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02",
+    "/scratch/copparihollmann/iris-model/firesim/source-clones.json": "2361ce2edc24b93b142ee1b432576b94e51ea29c39dde9c8fc640a9525592cdf",
+    "/scratch/copparihollmann/iris-model/firesim/firesim-observed-dirty.patch": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+    "/scratch/copparihollmann/iris-model/build/access-privilege-details-20261106/report.json": "924366ac04ee038def127ca1b81615978fde946efc614377a33b0568a1f96679",
+    "/scratch/copparihollmann/iris-model/firesim/operator/audit_managed_path.py": "4a28a2524dd99c9f150775478e0472e1436104a86bce8d0690cc80b1a99c075d",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-remove-xdma-module": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-load-xdma-module": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-chmod-xdma-perm": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505",
+    "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-change-pcie-perms": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db",
+    "/scratch/eygao/iris-cy/sims/firesim/platforms/corigine_mimicturbo_gt/scripts/firesim-fpga-util.py": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1"
+  },
+  "active_helpers": [
+    {
+      "name": "firesim-remove-xdma-module",
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-remove-xdma-module",
+      "sha256": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d",
+      "remote_observation": {
+        "path": "/usr/local/bin/firesim-remove-xdma-module",
+        "uid": 0,
+        "gid": 1001,
+        "mode": "0o755",
+        "regular": true,
+        "sha256": "7efd7707022414ab69f70816f42bf215c6914c74302040155c16336a3f55f77d"
+      },
+      "route": "manager sudo /usr/local/bin/firesim-remove-xdma-module"
+    },
+    {
+      "name": "firesim-load-xdma-module",
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-load-xdma-module",
+      "sha256": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445",
+      "remote_observation": {
+        "path": "/usr/local/bin/firesim-load-xdma-module",
+        "uid": 0,
+        "gid": 1001,
+        "mode": "0o755",
+        "regular": true,
+        "sha256": "c2c30920a3f51b40d92e3a661d6323c5669c204d6122dead10ef0717ebfbe445"
+      },
+      "route": "manager sudo /usr/local/bin/firesim-load-xdma-module"
+    },
+    {
+      "name": "firesim-chmod-xdma-perm",
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-chmod-xdma-perm",
+      "sha256": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505",
+      "remote_observation": {
+        "path": "/usr/local/bin/firesim-chmod-xdma-perm",
+        "uid": 0,
+        "gid": 1001,
+        "mode": "0o755",
+        "regular": true,
+        "sha256": "e7d3ff33eb4b1b4301062295352dd312486dea4a625dd83b8dccf90583d00505"
+      },
+      "route": "manager sudo /usr/local/bin/firesim-chmod-xdma-perm"
+    },
+    {
+      "name": "firesim-change-pcie-perms",
+      "source": "/scratch/eygao/iris-cy/sims/firesim/deploy/sudo-scripts/firesim-change-pcie-perms",
+      "sha256": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db",
+      "remote_observation": {
+        "path": "/usr/local/bin/firesim-change-pcie-perms",
+        "uid": 0,
+        "gid": 1001,
+        "mode": "0o755",
+        "regular": true,
+        "sha256": "eb128d6157b076c685a8d04db68659b1cc3b9d94ab23090f571f6e79ae11d1db"
+      },
+      "route": "manager sudo /usr/local/bin/firesim-change-pcie-perms"
+    },
+    {
+      "name": "firesim-fpga-util.py",
+      "source": "/scratch/eygao/iris-cy/sims/firesim/platforms/corigine_mimicturbo_gt/scripts/firesim-fpga-util.py",
+      "sha256": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1",
+      "remote_observation": {
+        "path": "/usr/local/bin/firesim-fpga-util.py",
+        "uid": 0,
+        "gid": 1001,
+        "mode": "0o755",
+        "regular": true,
+        "sha256": "ffcf025a4a9c418d274c8957d1c245c4156ba8b6df9ac29f51af849aab0c11e1"
+      },
+      "route": "utility self-execs /usr/bin/sudo absolute protected helper"
+    }
+  ],
+  "infrasetup_order": [
+    "copy slot infrastructure",
+    "extract matching driver",
+    "remove XDMA if loaded",
+    "program installed utility",
+    "load XDMA",
+    "chmod XDMA",
+    "change PCIe permissions"
+  ],
+  "source_locations": {
+    "Corigine inheritance": "run_farm_deploy_managers.py:1393",
+    "load/remove/chmod": "run_farm_deploy_managers.py:1077",
+    "flash installed utility": "run_farm_deploy_managers.py:1175",
+    "PCIe permission helper": "run_farm_deploy_managers.py:1187",
+    "infrasetup sequence": "run_farm_deploy_managers.py:1220",
+    "helper comparison": "utils.py:200",
+    "generic sudo predicate": "utils.py:23",
+    "non-AWS driver launch": "runtime_config.py:515",
+    "non-AWS kill": "runtime_config.py:594",
+    "utility sudo exec": "firesim-fpga-util.py:153"
+  },
+  "generic_noninteractive_sudo": {
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "sudo: interactive authentication is required\n"
+  },
+  "unsupported_generic_sudo_branches": [
+    "AWS NBD/module/package/rootfs operations",
+    "AWS boot/kill and shared-memory removal",
+    "privileged network-pipe start/kill"
+  ],
+  "inactive_in_private_baremetal_no_net_jobs": [
+    "AWS instance deploy manager",
+    "rootfs mounts (common_rootfs null)",
+    "switch/pipe topology"
+  ],
+  "generic_has_sudo_is_not_helper_capability": true,
+  "root_helper_nested_insmod": "firesim-load-xdma-module internally invokes sudo insmod while already root; this does not grant callers generic sudo",
+  "remaining_requirements": [
+    "operator installs reviewed fixed inspector",
+    "complete current all-user inspection",
+    "genuine exclusive operator allocation",
+    "held shared lock and full lifecycle",
+    "root driver/image pairing decision"
+  ],
+  "managed_setup_tested_under_new_privileges": false,
+  "loaded_image_verified": false,
+  "calibration_usable": false
+}

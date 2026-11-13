@@ -1,0 +1,7712 @@
+[
+  {
+    "cycles_by_repeat": [
+      2086,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n1024",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      2082,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n1024",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      782,
+      52,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n16",
+    "raw_range_cycles": 734
+  },
+  {
+    "cycles_by_repeat": [
+      750,
+      60,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n16",
+    "raw_range_cycles": 714
+  },
+  {
+    "cycles_by_repeat": [
+      694,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n16",
+    "raw_range_cycles": 639
+  },
+  {
+    "cycles_by_repeat": [
+      550,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      546,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n256",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      172,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n64",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      162,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n64",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      259,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off0.n64",
+    "raw_range_cycles": 60
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      76,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n16",
+    "raw_range_cycles": 28
+  },
+  {
+    "cycles_by_repeat": [
+      76,
+      52,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      203,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off10.n64",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      2056,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n1024",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      56,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n16",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      76,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n16",
+    "raw_range_cycles": 28
+  },
+  {
+    "cycles_by_repeat": [
+      70,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      47,
+      52
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n16",
+    "raw_range_cycles": 25
+  },
+  {
+    "cycles_by_repeat": [
+      77,
+      47,
+      57
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n16",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      523,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n256",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n64",
+    "raw_range_cycles": 10
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n64",
+    "raw_range_cycles": 10
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off14.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      66,
+      68,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n16",
+    "raw_range_cycles": 20
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      48,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      58,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      40,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n16",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      40,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n16",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      56,
+      40
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      52,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off2.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      52,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n16",
+    "raw_range_cycles": 20
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      136,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n64",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      136,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n64",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off20.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      56,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off22.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      48,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      48,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2056,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n1024",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      52,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      52,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      520,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n256",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off26.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      80,
+      48,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n16",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      84,
+      52,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n16",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      70,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      136,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n64",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off28.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n16",
+    "raw_range_cycles": 18
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off30.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      62,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n16",
+    "raw_range_cycles": 26
+  },
+  {
+    "cycles_by_repeat": [
+      58,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n16",
+    "raw_range_cycles": 22
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off32.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      80,
+      56,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n16",
+    "raw_range_cycles": 44
+  },
+  {
+    "cycles_by_repeat": [
+      80,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off34.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      92,
+      48,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n16",
+    "raw_range_cycles": 56
+  },
+  {
+    "cycles_by_repeat": [
+      80,
+      56,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n16",
+    "raw_range_cycles": 44
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off36.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      52,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n16",
+    "raw_range_cycles": 28
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      56,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n16",
+    "raw_range_cycles": 28
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      520,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n256",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off4.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      60,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      73,
+      68,
+      68
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      149,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n64",
+    "raw_range_cycles": 17
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off40.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      76,
+      36,
+      56
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n16",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      76,
+      36,
+      52
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n16",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      148,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n64",
+    "raw_range_cycles": 16
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off42.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      48,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n16",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      48,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n16",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      70,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      78,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n16",
+    "raw_range_cycles": 42
+  },
+  {
+    "cycles_by_repeat": [
+      74,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n16",
+    "raw_range_cycles": 38
+  },
+  {
+    "cycles_by_repeat": [
+      58,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off48.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      48,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n16",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      48,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n16",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off50.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      52,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n16",
+    "raw_range_cycles": 16
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n16",
+    "raw_range_cycles": 20
+  },
+  {
+    "cycles_by_repeat": [
+      70,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off52.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2094,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n1024",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      2090,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      3138,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      603,
+      57,
+      47
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n16",
+    "raw_range_cycles": 556
+  },
+  {
+    "cycles_by_repeat": [
+      602,
+      62,
+      37
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n16",
+    "raw_range_cycles": 565
+  },
+  {
+    "cycles_by_repeat": [
+      601,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n16",
+    "raw_range_cycles": 545
+  },
+  {
+    "cycles_by_repeat": [
+      558,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n256",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      554,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      834,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      173,
+      144,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n64",
+    "raw_range_cycles": 39
+  },
+  {
+    "cycles_by_repeat": [
+      152,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n64",
+    "raw_range_cycles": 18
+  },
+  {
+    "cycles_by_repeat": [
+      258,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off54.n64",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      2092,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n1024",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      2088,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      94,
+      44,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n16",
+    "raw_range_cycles": 50
+  },
+  {
+    "cycles_by_repeat": [
+      92,
+      48,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n16",
+    "raw_range_cycles": 56
+  },
+  {
+    "cycles_by_repeat": [
+      124,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n16",
+    "raw_range_cycles": 69
+  },
+  {
+    "cycles_by_repeat": [
+      556,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n256",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      552,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      172,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n64",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      168,
+      140,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n64",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      256,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off56.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      2085,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n1024",
+    "raw_range_cycles": 33
+  },
+  {
+    "cycles_by_repeat": [
+      2081,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n1024",
+    "raw_range_cycles": 29
+  },
+  {
+    "cycles_by_repeat": [
+      3138,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      101,
+      36,
+      56
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n16",
+    "raw_range_cycles": 65
+  },
+  {
+    "cycles_by_repeat": [
+      97,
+      36,
+      56
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n16",
+    "raw_range_cycles": 61
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      56,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n16",
+    "raw_range_cycles": 76
+  },
+  {
+    "cycles_by_repeat": [
+      549,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n256",
+    "raw_range_cycles": 33
+  },
+  {
+    "cycles_by_repeat": [
+      553,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n256",
+    "raw_range_cycles": 37
+  },
+  {
+    "cycles_by_repeat": [
+      834,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      165,
+      144,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n64",
+    "raw_range_cycles": 33
+  },
+  {
+    "cycles_by_repeat": [
+      161,
+      136,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n64",
+    "raw_range_cycles": 29
+  },
+  {
+    "cycles_by_repeat": [
+      258,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off58.n64",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3080,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      48,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n16",
+    "raw_range_cycles": 10
+  },
+  {
+    "cycles_by_repeat": [
+      53,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      776,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off6.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2087,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n1024",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      2083,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n1024",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      669,
+      60,
+      40
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n16",
+    "raw_range_cycles": 629
+  },
+  {
+    "cycles_by_repeat": [
+      673,
+      48,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n16",
+    "raw_range_cycles": 629
+  },
+  {
+    "cycles_by_repeat": [
+      665,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n16",
+    "raw_range_cycles": 610
+  },
+  {
+    "cycles_by_repeat": [
+      551,
+      520,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n256",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      547,
+      520,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n256",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      167,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n64",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      163,
+      136,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n64",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      256,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off60.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      2089,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n1024",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      2085,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n1024",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      3137,
+      3080,
+      3080
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      112,
+      37,
+      62
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n16",
+    "raw_range_cycles": 75
+  },
+  {
+    "cycles_by_repeat": [
+      109,
+      43,
+      58
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n16",
+    "raw_range_cycles": 66
+  },
+  {
+    "cycles_by_repeat": [
+      130,
+      59,
+      56
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n16",
+    "raw_range_cycles": 74
+  },
+  {
+    "cycles_by_repeat": [
+      552,
+      523,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      549,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n256",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      833,
+      776,
+      776
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      168,
+      143,
+      133
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n64",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      165,
+      134,
+      139
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n64",
+    "raw_range_cycles": 31
+  },
+  {
+    "cycles_by_repeat": [
+      257,
+      200,
+      200
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off62.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      48,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      48,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      58,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.compact.off8.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2,
+      2,
+      2
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.noop.off8.n0",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2,
+      2,
+      2
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.noop.off8.n0",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1,
+      1,
+      1
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.noop.off8.n0",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2086,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n1024",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      2084,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n1024",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      106,
+      56,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n16",
+    "raw_range_cycles": 62
+  },
+  {
+    "cycles_by_repeat": [
+      106,
+      52,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n16",
+    "raw_range_cycles": 70
+  },
+  {
+    "cycles_by_repeat": [
+      121,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n16",
+    "raw_range_cycles": 66
+  },
+  {
+    "cycles_by_repeat": [
+      550,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      546,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n256",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      166,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n64",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      172,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n64",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      256,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off0.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2059,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n1024",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      77,
+      37,
+      62
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n16",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      82,
+      53,
+      53
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n16",
+    "raw_range_cycles": 29
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      138,
+      144,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n64",
+    "raw_range_cycles": 10
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off10.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      46,
+      36,
+      41
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n16",
+    "raw_range_cycles": 10
+  },
+  {
+    "cycles_by_repeat": [
+      41,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      521,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n256",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off12.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3071,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n1024",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      3071,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n1024",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n16",
+    "raw_range_cycles": 7
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n16",
+    "raw_range_cycles": 7
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      75,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      767,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n256",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      767,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n256",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      191,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n64",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      191,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n64",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off14.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      44,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n16",
+    "raw_range_cycles": 8
+  },
+  {
+    "cycles_by_repeat": [
+      40,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n16",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off16.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      74,
+      71,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off18.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      87,
+      37,
+      52
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n16",
+    "raw_range_cycles": 50
+  },
+  {
+    "cycles_by_repeat": [
+      87,
+      53,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n16",
+    "raw_range_cycles": 39
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      75,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      133,
+      149,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n64",
+    "raw_range_cycles": 16
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      139,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n64",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off2.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      41,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      41,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      52,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off20.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      79,
+      70,
+      61
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n16",
+    "raw_range_cycles": 18
+  },
+  {
+    "cycles_by_repeat": [
+      93,
+      65,
+      56
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n16",
+    "raw_range_cycles": 37
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      203,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n64",
+    "raw_range_cycles": 11
+  },
+  {
+    "cycles_by_repeat": [
+      196,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n64",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off22.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      52,
+      36,
+      44
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n16",
+    "raw_range_cycles": 16
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      36,
+      40
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n16",
+    "raw_range_cycles": 20
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off24.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      43,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off26.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      45,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n16",
+    "raw_range_cycles": 9
+  },
+  {
+    "cycles_by_repeat": [
+      49,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      52,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off28.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      103,
+      63,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n16",
+    "raw_range_cycles": 55
+  },
+  {
+    "cycles_by_repeat": [
+      93,
+      65,
+      60
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n16",
+    "raw_range_cycles": 33
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      783,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n256",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      204,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off30.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      100,
+      52,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n16",
+    "raw_range_cycles": 64
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      52,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n16",
+    "raw_range_cycles": 42
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      138
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n64",
+    "raw_range_cycles": 6
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off32.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      71,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off34.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      49,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      49,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      58,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off36.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      63,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      63,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      68,
+      71,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off38.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      41,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      41,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n16",
+    "raw_range_cycles": 5
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n16",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off4.n64",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      80,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n16",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      92,
+      56,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n16",
+    "raw_range_cycles": 56
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off40.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2054,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      51,
+      38,
+      38
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      518,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      134,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off42.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      49,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      49,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n16",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n16",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off44.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      63,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      63,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      192,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off46.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      94,
+      52,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n16",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      92,
+      44,
+      44
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n16",
+    "raw_range_cycles": 48
+  },
+  {
+    "cycles_by_repeat": [
+      55,
+      58,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n16",
+    "raw_range_cycles": 3
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n64",
+    "raw_range_cycles": 12
+  },
+  {
+    "cycles_by_repeat": [
+      199,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off48.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2094,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n1024",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      2090,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      4161,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      603,
+      37,
+      58
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n16",
+    "raw_range_cycles": 566
+  },
+  {
+    "cycles_by_repeat": [
+      603,
+      42,
+      58
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n16",
+    "raw_range_cycles": 561
+  },
+  {
+    "cycles_by_repeat": [
+      602,
+      75,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n16",
+    "raw_range_cycles": 531
+  },
+  {
+    "cycles_by_repeat": [
+      536,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n256",
+    "raw_range_cycles": 18
+  },
+  {
+    "cycles_by_repeat": [
+      554,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      1089,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      147,
+      139,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n64",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      157,
+      134,
+      134
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n64",
+    "raw_range_cycles": 23
+  },
+  {
+    "cycles_by_repeat": [
+      329,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off50.n64",
+    "raw_range_cycles": 66
+  },
+  {
+    "cycles_by_repeat": [
+      2098,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n1024",
+    "raw_range_cycles": 46
+  },
+  {
+    "cycles_by_repeat": [
+      2088,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      107,
+      46,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n16",
+    "raw_range_cycles": 71
+  },
+  {
+    "cycles_by_repeat": [
+      99,
+      41,
+      56
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n16",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      115,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n16",
+    "raw_range_cycles": 60
+  },
+  {
+    "cycles_by_repeat": [
+      529,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n256",
+    "raw_range_cycles": 13
+  },
+  {
+    "cycles_by_repeat": [
+      552,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      178,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n64",
+    "raw_range_cycles": 46
+  },
+  {
+    "cycles_by_repeat": [
+      168,
+      137,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n64",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      256,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off52.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      3108,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      3104,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n1024",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      4161,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      698,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n16",
+    "raw_range_cycles": 650
+  },
+  {
+    "cycles_by_repeat": [
+      770,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n16",
+    "raw_range_cycles": 722
+  },
+  {
+    "cycles_by_repeat": [
+      621,
+      71,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n16",
+    "raw_range_cycles": 550
+  },
+  {
+    "cycles_by_repeat": [
+      804,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      800,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n256",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      1089,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      228,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n64",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      224,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n64",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      321,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off54.n64",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      2086,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n1024",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      2090,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n1024",
+    "raw_range_cycles": 38
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      106,
+      60,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n16",
+    "raw_range_cycles": 70
+  },
+  {
+    "cycles_by_repeat": [
+      102,
+      36,
+      56
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n16",
+    "raw_range_cycles": 66
+  },
+  {
+    "cycles_by_repeat": [
+      113,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n16",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      550,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      556,
+      524,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n256",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      166,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n64",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      162,
+      136,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n64",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      256,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off56.n64",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      2088,
+      2054,
+      2054
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n1024",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      2092,
+      2054,
+      2054
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n1024",
+    "raw_range_cycles": 38
+  },
+  {
+    "cycles_by_repeat": [
+      4161,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      116,
+      48,
+      58
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n16",
+    "raw_range_cycles": 68
+  },
+  {
+    "cycles_by_repeat": [
+      112,
+      37,
+      57
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n16",
+    "raw_range_cycles": 75
+  },
+  {
+    "cycles_by_repeat": [
+      144,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n16",
+    "raw_range_cycles": 73
+  },
+  {
+    "cycles_by_repeat": [
+      552,
+      518,
+      518
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      548,
+      518,
+      518
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n256",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      1089,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      168,
+      134,
+      134
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n64",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      169,
+      139,
+      139
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n64",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      321,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off58.n64",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3072,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      4103,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      87,
+      48,
+      67
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n16",
+    "raw_range_cycles": 39
+  },
+  {
+    "cycles_by_repeat": [
+      87,
+      48,
+      65
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n16",
+    "raw_range_cycles": 39
+  },
+  {
+    "cycles_by_repeat": [
+      86,
+      74,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n16",
+    "raw_range_cycles": 15
+  },
+  {
+    "cycles_by_repeat": [
+      768,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      772,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n256",
+    "raw_range_cycles": 4
+  },
+  {
+    "cycles_by_repeat": [
+      1031,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      201,
+      199,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n64",
+    "raw_range_cycles": 9
+  },
+  {
+    "cycles_by_repeat": [
+      203,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n64",
+    "raw_range_cycles": 11
+  },
+  {
+    "cycles_by_repeat": [
+      263,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off6.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2086,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n1024",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      2090,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n1024",
+    "raw_range_cycles": 38
+  },
+  {
+    "cycles_by_repeat": [
+      3136,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n1024",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      75,
+      36,
+      36
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n16",
+    "raw_range_cycles": 39
+  },
+  {
+    "cycles_by_repeat": [
+      71,
+      36,
+      36
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n16",
+    "raw_range_cycles": 35
+  },
+  {
+    "cycles_by_repeat": [
+      451,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n16",
+    "raw_range_cycles": 396
+  },
+  {
+    "cycles_by_repeat": [
+      550,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n256",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      546,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n256",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      832,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n256",
+    "raw_range_cycles": 57
+  },
+  {
+    "cycles_by_repeat": [
+      166,
+      132,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n64",
+    "raw_range_cycles": 34
+  },
+  {
+    "cycles_by_repeat": [
+      162,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n64",
+    "raw_range_cycles": 30
+  },
+  {
+    "cycles_by_repeat": [
+      257,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off60.n64",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      3108,
+      3072,
+      3072
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n1024",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      3104,
+      3072,
+      3072
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n1024",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      4161,
+      4103,
+      4103
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n1024",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      88,
+      48,
+      48
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n16",
+    "raw_range_cycles": 40
+  },
+  {
+    "cycles_by_repeat": [
+      84,
+      48,
+      48
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n16",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      127,
+      71,
+      71
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n16",
+    "raw_range_cycles": 56
+  },
+  {
+    "cycles_by_repeat": [
+      804,
+      768,
+      768
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n256",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      800,
+      768,
+      768
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n256",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      1089,
+      1031,
+      1031
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n256",
+    "raw_range_cycles": 58
+  },
+  {
+    "cycles_by_repeat": [
+      228,
+      192,
+      192
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n64",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      224,
+      192,
+      192
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n64",
+    "raw_range_cycles": 32
+  },
+  {
+    "cycles_by_repeat": [
+      322,
+      263,
+      263
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off62.n64",
+    "raw_range_cycles": 59
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      2052,
+      2052,
+      2052
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      3079,
+      3079,
+      3079
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n1024",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      36,
+      52
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n16",
+    "raw_range_cycles": 36
+  },
+  {
+    "cycles_by_repeat": [
+      72,
+      48,
+      52
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n16",
+    "raw_range_cycles": 24
+  },
+  {
+    "cycles_by_repeat": [
+      56,
+      55,
+      55
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n16",
+    "raw_range_cycles": 1
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      516,
+      516,
+      516
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      775,
+      775,
+      775
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n256",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      140,
+      132
+    ],
+    "hart": 0,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n64",
+    "raw_range_cycles": 8
+  },
+  {
+    "cycles_by_repeat": [
+      132,
+      132,
+      132
+    ],
+    "hart": 1,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n64",
+    "raw_range_cycles": 0
+  },
+  {
+    "cycles_by_repeat": [
+      200,
+      199,
+      199
+    ],
+    "hart": 2,
+    "parent_case_id": "cpu.layout.v2.wide.off8.n64",
+    "raw_range_cycles": 1
+  }
+]

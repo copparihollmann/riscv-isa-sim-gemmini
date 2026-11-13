@@ -1,0 +1,28 @@
+{
+  "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+  "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+  "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+  "rocket_chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+  "firesim": "e1bdea8bb042b900995436ecc3d7c44100eb9da0",
+  "open_nic_shell_board_files": "940907fc99fc8d73dbea0028b3a23095a660a42a",
+  "physical_memory": "U250 DDR4",
+  "target_memory_model": "FASED FRFCFS16GBQuadRank (DDR3 model, not LatencyPipe)",
+  "host_fpga_frequency_MHz": 60,
+  "target_memory_clock_MHz": 1000,
+  "target_DDR_bytes": 17179869184,
+  "VME_dtype": "INT8 only: useOpu=true,useMxOPU=false",
+  "harts": 2,
+  "VLEN": 256,
+  "DLEN": 128,
+  "system_bus_bits": 128,
+  "tile_beat_bytes": 16,
+  "new_build_completed": false,
+  "clock_gate_patch_apply_check_passed": true,
+  "file_sha256": {
+    "VMEDualShuttleConfigs.scala": "f5ef4b382dc93f5e5f77b01bef6a9b8d72cad1610e991bb6e0ba6271548a5956",
+    "FireSimVMEDualShuttleConfigs.scala": "1871dc5ac29dd285675cf3ab75be7ad9488804c23be7f32e3bbcc5bb3fd093a0",
+    "config_build_recipes_vme_u250.yaml": "73be6b723bae4f52c61189385b087a5b2f0d08e00b24b15e74f5d2b4819c740e",
+    "config_build_vme_u250.yaml.template": "27fbe9f4f15df5cc8cb61c89b81c474fb9c2c364496c96a80037be668b99f685",
+    "saturn-firesim-clockgate.patch": "656bc60460e86f1f387c89a4c810bb1cc5f316a0e976e7927281a176bcc6148d"
+  }
+}

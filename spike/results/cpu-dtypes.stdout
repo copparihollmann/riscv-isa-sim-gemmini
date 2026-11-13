@@ -1,0 +1,1 @@
+PASSED CPU_DTYPES scalar/vector FP16/FP32/FP64 on 3 harts; compute BF16/OFP8 conversion

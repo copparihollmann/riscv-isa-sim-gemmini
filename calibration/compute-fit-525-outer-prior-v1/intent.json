@@ -1,0 +1,14 @@
+{
+  "schema": "iris.compute_new_epoch_starting_intent.v1",
+  "calibration_identity": "compute-v1-525-outer-prior-v1",
+  "native_binary_sha256": "525cc4afafa8a235c036d70b68abdb34ee35b4b343dfff80d14442ed9c971a03",
+  "uart_library_sha256": "62eff3025bcfa77c4d272d096947c0675eb65060f97ce3224675e3212bbb2e84",
+  "fixture_sha256": "2d9e27763b190bbef696dce9fb37c4484fecf4e8b6d0c566942e7b552a05fe96",
+  "source_shape_zero_flag": "source-shape-subtiles-v1",
+  "initial_parameter_source": "/scratch/copparihollmann/iris-model/calibration/compute-fit-523-outer-prior-v1/base.fixture",
+  "initial_parameter_source_sha256": "335eb4e646fb67bca7b98f45c2432468b90fee1038ec0f0b1fa01e7d5b3fca55",
+  "actual_525_parameter_fit_performed": false,
+  "old_qualification_transferred": false,
+  "global_heldout_timings_consumed": false,
+  "full_2pct_certified": false
+}

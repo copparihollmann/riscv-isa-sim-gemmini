@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-11-12T09:34:01.451930+00:00",
+  "mode": "parallel",
+  "frequencies": {
+    "15": {
+      "manager": "/scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/sims/firesim",
+      "cpu_affinity": "0-11",
+      "jobs": 12
+    },
+    "25": {
+      "manager": "/scratch/copparihollmann/u250-vme-20261112/parallel-25mhz/firesim",
+      "cpu_affinity": "12-23",
+      "jobs": 12
+    }
+  },
+  "frozen_input_manifest": "/scratch/copparihollmann/u250-vme-20261112/parallel-25mhz/frozen-inputs.json",
+  "original_15_mhz_build_uninterrupted": true
+}

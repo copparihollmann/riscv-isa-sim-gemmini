@@ -1,0 +1,4 @@
+IRIS_CPUCONFIG {"hart":0,"pmp_entries":0,"pmp_illegal_cases":2,"padded_pmp_read_zero_write_ignored":false,"sv39":true,"sv48_rejected":true}
+IRIS_CPUCONFIG {"hart":1,"pmp_entries":0,"pmp_illegal_cases":2,"padded_pmp_read_zero_write_ignored":false,"sv39":true,"sv48_rejected":true}
+IRIS_CPUCONFIG {"hart":2,"pmp_entries":8,"pmp_illegal_cases":0,"padded_pmp_read_zero_write_ignored":true,"sv39":true,"sv48_rejected":true}
+PASSED heterogeneous CPU configuration

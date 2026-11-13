@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "status": "verified_source_board_facts",
+  "zephyr_url": "https://github.com/ucb-bar/zephyr.git",
+  "zephyr_sha": "cd45a528d3bf81f9c7aa2a63f9fe512eee0881b0",
+  "generator_sha256": "dab3cb84809dd6167305422b557c6771c17ceb09c594f25c7749a8b4dab12f3e",
+  "input_sha256": {
+    "board/evidence/firesim-dts.dts": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+    "hardware/dtypes.json": "606d9eb073abc06cddeb626fb5fc6c3796b7bb94931d5a95bad9c619bb60025e",
+    "hardware/memory-paths.json": "5d8843d3edef31d8cf8be1d078b21714cf43711a85367e69329e178323b96338",
+    "zephyr/boards/chipyard/iris/Kconfig.defconfig": "defb17640d25293b1458996b6a6585140c941229ef413706bfb9fac5e13af0a1",
+    "zephyr/boards/chipyard/iris/Kconfig.iris": "a576c19125c23b6ca8795c1c151bfa504c51dc8167e7971e966159beb32f8525",
+    "zephyr/boards/chipyard/iris/board.yml": "648612f017d1973bf9fa0eaf5933995342cae5461665d42447ece25fbf42d65b",
+    "zephyr/boards/chipyard/iris/ethan-firesim.overlay": "01357df7635cd9f50fa619f2d657b77907d013ab2022c83ab8c6f60e4104052c",
+    "zephyr/boards/chipyard/iris/iris.dts": "be3db1708a3e8c76da6a33fd27bf4f88d35c521163ccba7af43875fbf17c9342",
+    "zephyr/boards/chipyard/iris/iris.yaml": "a2a0abb1fd4ec6eac23c05fde9d35f25a710007345c38ac78ebae18fdb134066",
+    "zephyr/boards/chipyard/iris/iris_defconfig": "bc5036c6911ca5d0a07ced311e600a9498bd1335f64cea87754072b513136621",
+    "zephyr/dts/bindings/cpu/sifive,rocket0.yaml": "d2c702ab14972e3b4c305f1d53c99e97fcad9fa1eaae49d287859f59b3657924",
+    "zephyr/dts/bindings/cpu/ucb-bar,shuttle.yaml": "71397a360aafa56f8b099638a0cb8f9116b1c81b1bab033ee198864bcc23173b",
+    "zephyr/dts/bindings/vendor-prefixes.txt": "c1672eab002cf7802c13791781318db34469511b29811d0cb7c0411d6d969e0f",
+    "zephyr/iris_uart_profile.h": "b8ca28644832c8b5f6f44b1e0a03edce5c0ee25b59f11f4ec361e978775283e0",
+    "zephyr/uart-profile-evidence/BridgeBinders.scala": "317955a03a36b5644270bddfedb5682e64b98e2c5a76964c80877f25175a1535",
+    "zephyr/uart-profile-evidence/UARTBridge.scala": "96bfe1c1a6c182c5afee21076f4028d21b5105e0a1f4d5dd837bd33a19fb237e",
+    "zephyr/uart-profile-evidence/UARTBridgeModule.scala": "53988098293011f3d061c9cca512e1d8dd101d1dad8fae395df44043447c9866",
+    "zephyr/uart-profile-evidence/firesim-clocks.freq-summary": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+    "zephyr/uart-profile-evidence/firesim-target-config.scala": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d",
+    "zephyr/uart-profile-evidence/firesim-uart-annotation.json": "f36c01e8c7dfb21f4eb6e0cb5c7cf5d274693bc4372e7d2b6032a87a5d13dab2",
+    "zephyr/uart-profile-evidence/soc.h": "9e66fea5ee48c94c61bd45a5f01beb26bdfb63864314f53707ee90d961017b6b",
+    "zephyr/uart-profile-evidence/uart_sifive.c": "e6787d7db5a5fadb5a842fbeba9f9ff0772406c8dc7b01b4d1df62ee430598fa",
+    "zephyr/uart-profiles.json": "d40022b339edb4c97dc93c314be7722834541a5635ecefc695f1474094291ad6",
+    "zephyr/uart_profiles.py": "45a8d2a4bc1f3ab0b9d5e249ecf4f951f69c68d594b09ffb130fbb6995bfd4ac"
+  },
+  "zephyr_source_sha256": {
+    "west.yml": "daf97b25f756f6ad8dc684296eacb36aa5ea6f061bb11b2f85446eda89edac96",
+    "arch/riscv/core/reset.S": "e64a3c83e195dc2bb7d1d8cdabffe2302d0fdc04c3d05d52059ac498cee97085",
+    "arch/riscv/core/smp.c": "38689edb921c9816afafab9773ef6a610444066fd229d74469f597f794b95519",
+    "arch/riscv/core/fpu.c": "803b4c1460be8bfe70d031be8a60a44d6cc5a687dfc7a1775f3c5e0ba248a2e6",
+    "arch/riscv/core/isr.S": "915e7f998ceea22f0a3f7f1bfc6a33cfa39dfcb9b95a021310f91e8064d3cdf0",
+    "include/zephyr/arch/riscv/thread.h": "befe8411f8c6f702709887a2258af978f649bf0ee8341a16951de9ad1e202572",
+    "soc/rocketchip/virt_riscv/common/soc.c": "eb356ffbaa8389909fd945c2b780e8f36d42ce409933b18c9d681784739e8e67",
+    "soc/rocketchip/virt_riscv/common/soc.h": "9e66fea5ee48c94c61bd45a5f01beb26bdfb63864314f53707ee90d961017b6b",
+    "drivers/timer/riscv_machine_timer.c": "b42437b89b27259bfd5779045ac4628a27e89de60e90ad20350f59017609d55e",
+    "drivers/interrupt_controller/intc_plic.c": "6e64be802d604ad2f407ccb6361f791cc2e6e5d87bde5a5757abcc50f6fcea2b",
+    "drivers/serial/uart_sifive.c": "e6787d7db5a5fadb5a842fbeba9f9ff0772406c8dc7b01b4d1df62ee430598fa",
+    "drivers/serial/uart_htif.c": "d924e0d2e4cafd06f8c4c2c193a1775ba228b1344c427e1006022e92a1890f95"
+  },
+  "hardware_repositories": {
+    "chipyard": {
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd",
+      "patch": "patches/chipyard.patch"
+    },
+    "saturn": {
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b",
+      "patch": "patches/saturn.patch"
+    },
+    "rocket-chip": {
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/rocket-chip.patch"
+    },
+    "shuttle": {
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/shuttle.patch"
+    },
+    "testchipip": {
+      "commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/testchipip.patch"
+    },
+    "firesim": {
+      "commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+      "patch": "patches/firesim.patch"
+    },
+    "inclusive-cache": {
+      "commit": "27df9284e60136a6f7f1b19224dfbe99d112ea77",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "memory-evidence/inclusive-cache.patch"
+    },
+    "constellation": {
+      "commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "memory-evidence/constellation.patch"
+    }
+  },
+  "harts": [
+    0,
+    1,
+    2
+  ],
+  "pmp_regions": [
+    0,
+    0,
+    8
+  ],
+  "fact_sources": {
+    "harts": {
+      "path": "board/evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "locator": "/cpus/cpu@0,/cpus/cpu@1,/cpus/cpu@2 reg and compatible"
+    },
+    "memory_map": {
+      "path": "board/evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "locator": "/memory@80000000,/memory@70000000,/memory@70020000,/memory@580000000 reg"
+    },
+    "pmp_regions": {
+      "path": "hardware/memory-paths.json",
+      "sha256": "5d8843d3edef31d8cf8be1d078b21714cf43711a85367e69329e178323b96338",
+      "locator": "facts[id=per-hart-pmp] and its source/line evidence"
+    },
+    "mtime_hz": {
+      "path": "board/evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "locator": "/cpus timebase-frequency=500000"
+    },
+    "local_elaboration_hart_hz": {
+      "path": "hardware/memory-paths.json",
+      "sha256": "5d8843d3edef31d8cf8be1d078b21714cf43711a85367e69329e178323b96338",
+      "locator": "facts[id=clock-domains-local-elaboration] and its source/line evidence"
+    },
+    "kernel_policy": {
+      "path": "zephyr/boards/chipyard/iris/iris_defconfig",
+      "sha256": "bc5036c6911ca5d0a07ced311e600a9498bd1335f64cea87754072b513136621",
+      "locator": "SMP/MP_MAX_NUM_CPUS/RISCV_PMP/FPU/FPU_SHARING configuration"
+    },
+    "uart_plic": {
+      "path": "board/evidence/firesim-dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "locator": "/soc/serial@10020000 interrupts=1; /soc/interrupt-controller@c000000"
+    },
+    "completion": {
+      "path": "third_party/zephyr/soc/rocketchip/virt_riscv/common/soc.c",
+      "sha256": "eb356ffbaa8389909fd945c2b780e8f36d42ce409933b18c9d681784739e8e67",
+      "locator": "sys_arch_reboot under CONFIG_UART_HTIF: tohost=((success<<1)|1), success=0"
+    },
+    "vector_context_gap": {
+      "path": "third_party/zephyr/arch/riscv/core/fpu.c",
+      "sha256": "803b4c1460be8bfe70d031be8a60a44d6cc5a687dfc7a1775f3c5e0ba248a2e6",
+      "locator": "z_riscv_vstate_restore modifies input pointer then calls CSR restore; no matrix tile/config state"
+    }
+  },
+  "mtime_hz": 500000,
+  "local_elaboration_hart_hz": [
+    500000000,
+    500000000,
+    500000000
+  ],
+  "uart_deployment_profiles": {
+    "physical": {
+      "overlay": null,
+      "requested_baud": 115200,
+      "expected_divisor": 4339,
+      "physical_bit_edges": 4340,
+      "fixed_bridge_key": null,
+      "scope": "External physical UART115200 or saved-IrisConfig SimUART harness; actual receiver tolerance must be respected.",
+      "name": "physical",
+      "clock_hz": 500000000,
+      "metadata_sha256": "d40022b339edb4c97dc93c314be7722834541a5635ecefc695f1474094291ad6",
+      "hardware_tested": false
+    },
+    "ethan-firesim": {
+      "overlay": "boards/chipyard/iris/ethan-firesim.overlay",
+      "requested_baud": 3676470,
+      "expected_divisor": 135,
+      "physical_bit_edges": 136,
+      "source_init_baud": 3686400,
+      "fixed_bridge_key": 135,
+      "scope": "Inspected Ethan FireSim fixed UART bridge: its TX decoder waits135 token edges then samples on one further edge. Software changing DIV does not reconfigure the bridge.",
+      "name": "ethan-firesim",
+      "clock_hz": 500000000,
+      "metadata_sha256": "d40022b339edb4c97dc93c314be7722834541a5635ecefc695f1474094291ad6",
+      "hardware_tested": false
+    }
+  },
+  "ethan_firesim_uart_hardware_validated": false,
+  "kernel_policy": {
+    "machine_mode": true,
+    "userspace": false,
+    "pmp": false,
+    "scalar_common_isa": "RV64IMAFDC_Zicsr_Zifencei",
+    "fpu_sharing": true,
+    "vector_context_certified": false,
+    "vme_context_certified": false
+  },
+  "binding_adaptations": [
+    "Zephyr PLIC second interrupt cell expresses software priority, physical source remains1",
+    "Existing RISC-V CPU schemas are extended only for actual compatible names/PMP metadata",
+    "Only DRAM is chosen as kernel SRAM; TCM/scratchpad remain explicitly mapped but are not autoallocated"
+  ],
+  "completion_source": "soc/rocketchip/virt_riscv/common/soc.c sys_arch_reboot with CONFIG_UART_HTIF writes tohost=1",
+  "modules_required_for_scalar_build": [],
+  "rtl_certified": false,
+  "timing_certified": false,
+  "remaining": [
+    "Actual FPGA Zephyr validation and source/image association",
+    "VME tile/config save/restore or explicit exclusive ownership contract",
+    "RVV context restore input-pointer mutation needs disassembly/runtime proof before enabling vector sharing",
+    "UART driver uses3bit watermark configuration (current threshold1 is valid in256entry hardware)"
+  ]
+}

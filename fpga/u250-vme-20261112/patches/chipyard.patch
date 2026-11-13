@@ -1,0 +1,58 @@
+diff --git a/build.sbt b/build.sbt
+index f0aa122..c8fb6a3 100644
+--- a/build.sbt
++++ b/build.sbt
+@@ -278,6 +278,15 @@ lazy val chipyard = {
+       }.filter(_.exists)
+   )
+ 
++  // Isolate this pinned dual-Shuttle build from unrelated incompatible examples.
++  cy = cy.settings(
++    Compile / unmanagedSources ~= { files =>
++      files.filterNot { f =>
++        Set("IrisConfigs.scala", "ChipletConfigs.scala").contains(f.getName) ||
++          f.getCanonicalPath.contains("/generators/tacit/chipyard/")
++      }
++    }
++  )
+   cy
+ }
+ 
+diff --git a/generators/firechip/chip/src/main/scala/TargetConfigs.scala b/generators/firechip/chip/src/main/scala/TargetConfigs.scala
+index 8e6b55a..d297855 100644
+--- a/generators/firechip/chip/src/main/scala/TargetConfigs.scala
++++ b/generators/firechip/chip/src/main/scala/TargetConfigs.scala
+@@ -381,13 +381,13 @@ class FireSimLargeBoomSV39CospikeConfig extends Config(
+ class CTCFireSimConfig extends Config(
+   new WithCTCBridge ++
+   new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(
+-    translationParams = testchipip.soc.OutwardAddressTranslatorParams(
++    translationParams = Some(testchipip.soc.OutwardAddressTranslatorParams(
+       // Outward CTC: accesses from this chip to offchipAddr+x are interpreted as going off chip via CTC/accesses are routed to CTC.
+       // The translator strips that local off-chip base value before forwarding, so
+       // the other chip receives onchipAddr+x in its normal Chipyard address map.
+       onchipAddr = 0x0L,
+       offchipAddr = 0x1000000000L,
+-      size = ((1L << 32) - 1)),
++      size = ((1L << 32) - 1))),
+     phyParams = None))) ++
+   new chipyard.iobinders.WithCTCPunchthrough ++ 
+   new FireSimRocketConfig
+diff --git a/generators/gemmini b/generators/gemmini
+--- a/generators/gemmini
++++ b/generators/gemmini
+@@ -1 +1 @@
+-Subproject commit 8c3f9923a44a2fe2c7930587be297d6d4f8c09ca
++Subproject commit 8c3f9923a44a2fe2c7930587be297d6d4f8c09ca-dirty
+diff --git a/generators/saturn b/generators/saturn
+--- a/generators/saturn
++++ b/generators/saturn
+@@ -1 +1 @@
+-Subproject commit 536774bd4c5e3bcd7813a4a0dc72fc87e5818532
++Subproject commit 536774bd4c5e3bcd7813a4a0dc72fc87e5818532-dirty
+diff --git a/sims/firesim b/sims/firesim
+--- a/sims/firesim
++++ b/sims/firesim
+@@ -1 +1 @@
+-Subproject commit e1bdea8bb042b900995436ecc3d7c44100eb9da0
++Subproject commit e1bdea8bb042b900995436ecc3d7c44100eb9da0-dirty

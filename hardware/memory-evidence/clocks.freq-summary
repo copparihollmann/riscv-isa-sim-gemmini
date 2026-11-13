@@ -1,0 +1,8 @@
+
+firesimRationalClockBridge Frequency Summary
+  Input Reference Frequency: 1000.0 MHz
+  Output clock uart_clock, requested: 500.0 MHz, actual: 500.0 MHz (division of 2)
+  Output clock clock_500.0MHz, requested: 500.0 MHz, actual: 500.0 MHz (division of 2)
+  Output clock clock_1000.0MHz, requested: 1000.0 MHz, actual: 1000.0 MHz (division of 1)
+  Output clock clock_100.0MHz, requested: 100.0 MHz, actual: 100.0 MHz (division of 10)
+  Output clock harnessbinder_clock, requested: 100.0 MHz, actual: 100.0 MHz (division of 10)

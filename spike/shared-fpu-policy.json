@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "status": "source-derived-not-rtl-certified",
+  "source_inputs": {
+    "shared-fma": {
+      "path": "third_party/saturn/src/main/scala/exu/fp/SharedFPFMA.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "65c440405300c4df7295d7349c54c5709d33ae27cc02e836c6f3f71d18a871be"
+    },
+    "execute-sequencer": {
+      "path": "third_party/saturn/src/main/scala/backend/ExecuteSequencer.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "1ffdbb4198a5166963b5596ef90bd8fbeb582268e902eb04449d61b698c90c3e"
+    },
+    "backend": {
+      "path": "third_party/saturn/src/main/scala/backend/Backend.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "d4a4df872b47f50bcca1b845890845084deaf884daf0ce4e1c7aa11b8a6b8c96"
+    },
+    "special-sequencer": {
+      "path": "third_party/saturn/src/main/scala/backend/SpecialSequencer.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "461f7f42b46c4590bb88311c0ea04dfaee9359a36997c79035c38964f016c9e7"
+    },
+    "execution-unit": {
+      "path": "third_party/saturn/src/main/scala/exu/ExecutionUnit.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "7549d2bb2f8a9f6680d012486fdce7bed11b09b26f7c5e65c52345d8427db935"
+    },
+    "fault-check": {
+      "path": "third_party/saturn/src/main/scala/frontend/PipelinedFaultCheck.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "66c16595d01edd741eb3bcf6d31ba7987e31873bb9b168cd8a2288e3edb082a3"
+    },
+    "fpu": {
+      "path": "third_party/rocket-chip/src/main/scala/tile/FPU.scala",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a"
+    },
+    "rocket-core": {
+      "path": "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21"
+    },
+    "csr": {
+      "path": "third_party/rocket-chip/src/main/scala/rocket/CSR.scala",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10"
+    },
+    "widening-converter": {
+      "path": "third_party/hardfloat/hardfloat/src/main/scala/RecFNToRecFN.scala",
+      "git_sha": "0ecaef097ce2accbd16a61613699450ed5533f29",
+      "sha256": "97042141693cd2e8aaa90f88ee39d2c3c4177fc76c48f9ad46aaea71fee34f09"
+    },
+    "dispatch": {
+      "path": "third_party/saturn/src/main/scala/frontend/Dispatch.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "8eef32d8a8e9dbe306711026d41da3c90a02e80392ac93f384a8de7af822fe4b"
+    },
+    "instruction-controls": {
+      "path": "third_party/saturn/src/main/scala/insns/Instructions.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c"
+    },
+    "parameters": {
+      "path": "third_party/saturn/src/main/scala/common/Parameters.scala",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332"
+    }
+  },
+  "claims": {
+    "hart2_elementwise_all45_forms": {
+      "source": "shared-fma",
+      "lines": [
+        12,
+        14
+      ],
+      "behavior": "All base FMA instructions, including ordered and unordered reductions, use elementWise.",
+      "also": [
+        "parameters",
+        "instruction-controls"
+      ]
+    },
+    "ignored_widen_conversion_exceptions": {
+      "source": "shared-fma",
+      "lines": [
+        76,
+        103,
+        123,
+        142
+      ],
+      "behavior": "H-to-S/S-to-D RecFNToRecFN outputs feed FPU operands; converter exceptionFlags are unconnected. Finite widening is exact; sNaNs quiet without contributing converter NV."
+    },
+    "masked_elements_still_flags": {
+      "source": "shared-fma",
+      "lines": [
+        64,
+        158,
+        163,
+        165
+      ],
+      "also": [
+        "execution-unit",
+        "fpu"
+      ],
+      "behavior": "Requests are valid independent of write mask; req.wflags is true; every FPU response contributes full IEEE exception bits, including masked elements."
+    },
+    "sequential_reduction_and_final_zero": {
+      "source": "backend",
+      "lines": [
+        340,
+        358
+      ],
+      "also": [
+        "execute-sequencer",
+        "special-sequencer"
+      ],
+      "behavior": "Elementwise reductions take/update accumulator lane0 in increasing eidx; masked operations contribute flags while accumulator write mask is zero. Acc-copy final fold adds +0 for both reduction opcodes."
+    },
+    "vl_zero_drops_vector_execution": {
+      "source": "fault-check",
+      "lines": [
+        215,
+        223
+      ],
+      "behavior": "Non-memory vstart != 0 raises illegal with tval=instruction PC. Dispatch suppresses vector execution for vstart>=vl, so VV VL0 causes no FPU flags/FS write.",
+      "also": [
+        "dispatch"
+      ]
+    },
+    "vf_raw_low_bits_and_zero_flag_extract": {
+      "source": "fpu",
+      "lines": [
+        753,
+        765,
+        878,
+        880,
+        994,
+        1000
+      ],
+      "also": [
+        "rocket-core"
+      ],
+      "behavior": "VF extraction reads FPR with I typeTagIn and S/D store typeTagOut; Saturn receives raw low bits without narrow NaN-box check. Exact elaborated wflags PLA has no intersections with any21 VF/WF forms; extraction still writes valid zero flags, dirtying FS even at VL0."
+    },
+    "fs_off_runtime_assert": {
+      "source": "csr",
+      "lines": [
+        1271,
+        1275
+      ],
+      "behavior": "Any valid FPU flag update asserts FS>0, then makes FS dirty. VF requires enabled scalar FS; VV active/masked VL>0 with FSOff is an explicit model RTL-assert diagnostic."
+    }
+  },
+  "elaborated_vf_decoder_proof": "shared-decoder-proof.json",
+  "rtl_executed": false,
+  "deployed_image_association_verified": false,
+  "independent_oracle": "generate_shared_fma_cases.py integer-only exact fused sum with one final IEEE rounding; no host float or model helper imports",
+  "remaining_gaps": [
+    "Timing, pipeline scheduling, FPU arbitration, and exception temporal visibility are uncalibrated.",
+    "Reserved rounding modes and alternate-format hart2 FMA paths fail closed.",
+    "Only configured FMA-class forms are covered here; other vector FP operations retain separate audit/certification scope."
+  ],
+  "hardware_dtypes_sha256": "606d9eb073abc06cddeb626fb5fc6c3796b7bb94931d5a95bad9c619bb60025e"
+}

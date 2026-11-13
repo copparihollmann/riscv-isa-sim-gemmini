@@ -1,0 +1,5 @@
+{
+  "handoff_relative_path": "../../generators/firechip/chip/src/main/makefrag/firesim",
+  "effective_absolute_path": "/scratch/copparihollmann/u250-vme-20261112/chipyard-vme-u250/generators/firechip/chip/src/main/makefrag/firesim",
+  "reason": "FireSim sim/Makefile includes this path relative to sim directory"
+}

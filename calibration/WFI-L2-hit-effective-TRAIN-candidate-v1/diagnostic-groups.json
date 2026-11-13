@@ -1,0 +1,902 @@
+[
+  {
+    "hart": 0,
+    "footprint_bytes": 2048,
+    "mask": 1,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 2048,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 2048,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 2048,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 16384,
+    "mask": 1,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 15,
+      "l1misses": 1539,
+      "l2hits": 1539,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 16384,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 1536,
+      "l2hits": 1536,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 16384,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 1536,
+      "l2hits": 1536,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 16384,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 1536,
+      "l2hits": 1536,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 131072,
+    "mask": 1,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 15,
+      "l1misses": 12291,
+      "l2hits": 12291,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 131072,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 12288,
+      "l2hits": 12288,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 131072,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 12288,
+      "l2hits": 12288,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 131072,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 12288,
+      "l2hits": 12288,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 1048576,
+    "mask": 1,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 15,
+      "l1misses": 98307,
+      "l2hits": 0,
+      "l2misses": 98307
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 1048576,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 98304,
+      "l2hits": 0,
+      "l2misses": 98304
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 1048576,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 98304,
+      "l2hits": 0,
+      "l2misses": 98304
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 1048576,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 98304,
+      "l2hits": 0,
+      "l2misses": 98304
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 4194304,
+    "mask": 1,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 15,
+      "l1misses": 393219,
+      "l2hits": 0,
+      "l2misses": 393219
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 4194304,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 393216,
+      "l2hits": 0,
+      "l2misses": 393216
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 4194304,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 393216,
+      "l2hits": 0,
+      "l2misses": 393216
+    }
+  },
+  {
+    "hart": 0,
+    "footprint_bytes": 4194304,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 18,
+      "l1misses": 393216,
+      "l2hits": 0,
+      "l2misses": 393216
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 2048,
+    "mask": 2,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 2048,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 2048,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 2048,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 16384,
+    "mask": 2,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 1542,
+      "l2hits": 1542,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 16384,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 1542,
+      "l2hits": 1542,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 16384,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 1542,
+      "l2hits": 1542,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 16384,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 1542,
+      "l2hits": 1542,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 131072,
+    "mask": 2,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 131072,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 131072,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 131072,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 1048576,
+    "mask": 2,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 1048576,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 1048576,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 1048576,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 4194304,
+    "mask": 2,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 4194304,
+    "mask": 3,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 4194304,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 1,
+    "footprint_bytes": 4194304,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 2048,
+    "mask": 4,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 2048,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 2048,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 2048,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 210,
+      "reads": 198,
+      "writes": 12,
+      "l1hits": 210,
+      "l1misses": 0,
+      "l2hits": 0,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 16384,
+    "mask": 4,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 1312,
+      "l1misses": 242,
+      "l2hits": 242,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 16384,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 1307,
+      "l1misses": 247,
+      "l2hits": 247,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 16384,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 1313,
+      "l1misses": 241,
+      "l2hits": 241,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 16384,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 1554,
+      "reads": 1542,
+      "writes": 12,
+      "l1hits": 1318,
+      "l1misses": 236,
+      "l2hits": 236,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 131072,
+    "mask": 4,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 131072,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 131072,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 131072,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 12306,
+      "reads": 12294,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 12294,
+      "l2hits": 12294,
+      "l2misses": 0
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 1048576,
+    "mask": 4,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 1048576,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 1048576,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 1048576,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 98322,
+      "reads": 98310,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 98310,
+      "l2hits": 0,
+      "l2misses": 98310
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 4194304,
+    "mask": 4,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 4194304,
+    "mask": 5,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 4194304,
+    "mask": 6,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  },
+  {
+    "hart": 2,
+    "footprint_bytes": 4194304,
+    "mask": 7,
+    "regions": 6,
+    "model_DRAM_counter_sums": {
+      "accesses": 393234,
+      "reads": 393222,
+      "writes": 12,
+      "l1hits": 12,
+      "l1misses": 393222,
+      "l2hits": 0,
+      "l2misses": 393222
+    }
+  }
+]

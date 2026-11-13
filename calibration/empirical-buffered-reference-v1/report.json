@@ -1,0 +1,42 @@
+{
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "build/campaign-buffered-fit-v1/campaign.elf": "d736892a75e393f2e0627198f5a06e271a391f46b7ae363390f7fb4a59172cc4",
+    "build/campaign-buffered-fit-v1/corpus.json": "adead1d7cddf28a05ebdd28f27aa982d8fe9ce0d125fd909edea4a8178fad08c",
+    "build/fpga-buffered-fit-v1-002-analysis/regions.csv": "e403e180e18c75bdbf950c27b7baa0bd9ab41b3103a553018bbdfd6524d57466",
+    "build/fpga-buffered-fit-v1-002-analysis/report.json": "6a92007ee9d80ea52e983345df72ef47e1107dcac4300e16a76af44977363730",
+    "calibration/empirical-buffered-v1/split.json": "e1f5359565e02a6f90f73378968c92136bbdaba4b3f3ea6c7661d2e38465ba58",
+    "timing/empirical_buffered_observations.py": "4f4aaaee1f750731bac853a79efdd220873fc3774f9372178afb9cdbe44b2610"
+  },
+  "observations_sha256": "206a83dc1092849bf15eed2048817ae13124abc49babd1669bad03743e1f0f6b",
+  "old_ELF_cycles_transferred": false,
+  "reference_archive_sha256": "f9388b26adce3d2b8fc6f236140906ee091c73e0920ff55cf4d4fc79547025a6",
+  "rows": 4050,
+  "runtime_identity": {
+    "driver": {
+      "sha256": "5457de1e9c0dd1e3c52efbf5d083bdac7dfa5a5e3124c9887961c08159b03450",
+      "uri": "file:///scratch/copparihollmann/iris-model/firesim/artifacts/archived-build-driver-v1/driver-bundle.tar.gz"
+    },
+    "hw_config": null,
+    "image": {
+      "name": "corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush",
+      "sha256": "9bbe1f12a2b18091c28b05ea43c001e579f70c8cfef0f528fcb49003212fb776",
+      "uri": "file:///scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/firesim.tar.gz"
+    },
+    "loader_override": {
+      "driver_binary_unchanged": true,
+      "fesvr_step_size_target_cycles": 128,
+      "foreground": true,
+      "remote_wall_watchdog_seconds": 600,
+      "target_cycle_bound": null,
+      "target_cycle_bound_omission_reason": "No target +max-cycles: a successful hardware loader/startup exceeded5billion global driver cycles, so1.9billion can terminate loading; the original driver also uses32-bit atoi. Only the owned foreground wall watchdog bounds this run."
+    },
+    "prepared_manager_sha256": "92b6574227bc852d237ff5a4dc4f0610db94f314c5f3ffca14321e9e5ba9f5ca",
+    "prepared_runtime_sha256": "aa91be80de72a86afe93216609195fca398528e6533dba47a05743bf278f9c49",
+    "runner_sha256": "f43acd060e2fcb7ed08199106a50802355c8a52063c38032e0078559fdbf7967"
+  },
+  "schema": "iris.empirical_buffered_observation_normalization.v1",
+  "source_image_association_verified": false,
+  "status": "passed"
+}

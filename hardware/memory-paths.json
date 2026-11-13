@@ -1,0 +1,4152 @@
+{
+  "schema_version": 1,
+  "scope": "local-elaboration-memory-path-audit",
+  "calibrated": false,
+  "generator_sha256": "ad4f87aea5e2bc8819609a290398c3b771896df70ee7724e953dc34b4c739d8d",
+  "deployed_image_association_verified": false,
+  "hardware_manifest_sha256": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+  "repositories": {
+    "chipyard": {
+      "commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "03f32d1d00ad22b0f976a370632f10496fc0b57792e36dffa228c11d983a2ecd",
+      "patch": "patches/chipyard.patch"
+    },
+    "saturn": {
+      "commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "79e734508b780ddef01ca8eeb726bf5bbf0945f1998b4a4370e83df0ce4df60b",
+      "patch": "patches/saturn.patch"
+    },
+    "rocket-chip": {
+      "commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/rocket-chip.patch"
+    },
+    "shuttle": {
+      "commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/shuttle.patch"
+    },
+    "testchipip": {
+      "commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "patches/testchipip.patch"
+    },
+    "firesim": {
+      "commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "tracked_modified": true,
+      "tracked_diff_sha256": "207d3b6cb1d022ca3d00c3ff9abe465f9e5934e2c7b999348505c3d9da8cd6a0",
+      "patch": "patches/firesim.patch"
+    },
+    "inclusive-cache": {
+      "commit": "27df9284e60136a6f7f1b19224dfbe99d112ea77",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "memory-evidence/inclusive-cache.patch"
+    },
+    "constellation": {
+      "commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+      "tracked_modified": false,
+      "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch": "memory-evidence/constellation.patch"
+    }
+  },
+  "sources": {
+    "iris": {
+      "path": "generators/chipyard/src/main/scala/config/IrisConfigs.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/iris.scala",
+      "sha256": "cdefa071cd16739ecd230ce3739958bcd98ee4450c592ef230fcf6e4e25d5934",
+      "source_state": "identified local working-tree bytes"
+    },
+    "target": {
+      "path": "generators/firechip/chip/src/main/scala/TargetConfigs.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/target.scala",
+      "sha256": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d",
+      "source_state": "identified local working-tree bytes"
+    },
+    "bridge-binders": {
+      "path": "generators/firechip/chip/src/main/scala/BridgeBinders.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/bridge-binders.scala",
+      "sha256": "317955a03a36b5644270bddfedb5682e64b98e2c5a76964c80877f25175a1535",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-tile": {
+      "path": "generators/shuttle/src/main/scala/common/Tile.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-tile.scala",
+      "sha256": "84821c9fe6ac8a38c2b096c7febc582b8cdcf97e289e2e768ecf4c19eb3e2dff",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-offset": {
+      "path": "generators/shuttle/src/main/scala/common/AddressOffsetter.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-offset.scala",
+      "sha256": "497954b6daa62b35d9edaa6f33bd37ad7c89491e9bc7ee157398b757e32bc8ee",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-config": {
+      "path": "generators/shuttle/src/main/scala/common/Configs.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-config.scala",
+      "sha256": "04d646dc789044b8b4402bc783f0cca61be7f39c7d89ea9dcdf279e25bc7e89e",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-icache": {
+      "path": "generators/shuttle/src/main/scala/ifu/ICache.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-icache.scala",
+      "sha256": "4f4c2e5a223443da56f088ad73313ac4c44b94f3a84b4208dfb98c8a08ac4b45",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-pma": {
+      "path": "generators/shuttle/src/main/scala/dmem/PMA.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-pma.scala",
+      "sha256": "5fd3ccfa1813eebe2b5df8a0cba0e5531c613b1af1c4fb651fb1fd922b1b425d",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-tlb": {
+      "path": "generators/shuttle/src/main/scala/dmem/TLB.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-tlb.scala",
+      "sha256": "78580b8a8e9ba4f4930fc7297829f16aef27ad9ed03b891cf7267e14193aea05",
+      "source_state": "identified local working-tree bytes"
+    },
+    "shuttle-core-params": {
+      "path": "generators/shuttle/src/main/scala/common/Parameters.scala",
+      "repository": "shuttle",
+      "repository_commit": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+      "snapshot": "memory-evidence/shuttle-core-params.scala",
+      "sha256": "b4c8d22cd832f1a046ad998f05ac4731b80124edb0ba2e3e541d4bb1853440f6",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-params": {
+      "path": "generators/saturn/src/main/scala/common/Parameters.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-params.scala",
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-rocket": {
+      "path": "generators/saturn/src/main/scala/rocket/Integration.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-rocket.scala",
+      "sha256": "8a6c699bafc9077bad7a37a50991ff9d33cf2f21d047c9aca1e254d8ae84a7f6",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-shuttle": {
+      "path": "generators/saturn/src/main/scala/shuttle/Integration.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-shuttle.scala",
+      "sha256": "b01948a546c9cfc93fdda2edc82630b177f5eb0886d894d58c0f3c781e315373",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-shuttle-config": {
+      "path": "generators/saturn/src/main/scala/shuttle/Configs.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-shuttle-config.scala",
+      "sha256": "74850fbda13a0ad1ed5a215cbfc28485a9dc4e782ecace3dccc336981a61abf8",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-rocket-config": {
+      "path": "generators/saturn/src/main/scala/rocket/Configs.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-rocket-config.scala",
+      "sha256": "f8185e622376b661c8af071b0b40e051f5b1099acc8f5b3c7101bfd6b5a4c21e",
+      "source_state": "identified local working-tree bytes"
+    },
+    "saturn-tl": {
+      "path": "generators/saturn/src/main/scala/mem/TLInterface.scala",
+      "repository": "saturn",
+      "repository_commit": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+      "snapshot": "memory-evidence/saturn-tl.scala",
+      "sha256": "5347f5ffc0f3bf0f03149ae9aa6e7f91dfd1c667f5baff45e30eceb24da5b0b7",
+      "source_state": "identified local working-tree bytes"
+    },
+    "scratch": {
+      "path": "generators/testchipip/src/main/scala/soc/Scratchpad.scala",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "snapshot": "memory-evidence/scratch.scala",
+      "sha256": "162042df69cfa70dc2a4bf6b72d0e4dab9ae0cdd8308dcf4f8df159fe3e93075",
+      "source_state": "identified local working-tree bytes"
+    },
+    "scratch-config": {
+      "path": "generators/testchipip/src/main/scala/soc/Configs.scala",
+      "repository": "testchipip",
+      "repository_commit": "86c9a824fd42b854526018f9111087b0f3d1d31c",
+      "snapshot": "memory-evidence/scratch-config.scala",
+      "sha256": "fcffe6c05889e954d584f994f3f0844fd9897613906d18ae86056bc9281c7993",
+      "source_state": "identified local working-tree bytes"
+    },
+    "replication": {
+      "path": "generators/rocket-chip/src/main/scala/tilelink/RegionReplication.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "snapshot": "memory-evidence/replication.scala",
+      "sha256": "dcf8b3bb82d3bfb464e0bdae2ea3e91133343f6314168eea47b71f0a2803142d",
+      "source_state": "identified local working-tree bytes"
+    },
+    "sram": {
+      "path": "generators/rocket-chip/src/main/scala/tilelink/SRAM.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "snapshot": "memory-evidence/sram.scala",
+      "sha256": "1c9b62d6e8a68114115e9f5ea3aa7fbf6b82f706958a447e32d8733480bac7e4",
+      "source_state": "identified local working-tree bytes"
+    },
+    "buffer": {
+      "path": "generators/rocket-chip/src/main/scala/tilelink/Buffer.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "snapshot": "memory-evidence/buffer.scala",
+      "sha256": "9088bbdd917c223c97384c9d22fdc57730cb7569f4bee24a6e6cff4dc95ebc7c",
+      "source_state": "identified local working-tree bytes"
+    },
+    "async": {
+      "path": "generators/rocket-chip/src/main/scala/tilelink/AsyncCrossing.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "snapshot": "memory-evidence/async.scala",
+      "sha256": "ebda4fad2598d2b9df89271db24d76ffbc1e8d97a8eb49357ec9522990b744cb",
+      "source_state": "identified local working-tree bytes"
+    },
+    "rocket-tlb": {
+      "path": "generators/rocket-chip/src/main/scala/rocket/TLB.scala",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+      "snapshot": "memory-evidence/rocket-tlb.scala",
+      "sha256": "ec5f916e03edd5e54f092288951ffc719892c6d1dc79c857788c01f281cf94a7",
+      "source_state": "identified local working-tree bytes"
+    },
+    "l2-config": {
+      "path": "generators/rocket-chip-inclusive-cache/design/craft/inclusivecache/src/Configs.scala",
+      "repository": "inclusive-cache",
+      "repository_commit": "27df9284e60136a6f7f1b19224dfbe99d112ea77",
+      "snapshot": "memory-evidence/l2-config.scala",
+      "sha256": "32bca2ffe72bbc3b6b793aa586d65365d25a4276d7f1e829213c17e7f6dcd4f3",
+      "source_state": "identified local working-tree bytes"
+    },
+    "l2-params": {
+      "path": "generators/rocket-chip-inclusive-cache/design/craft/inclusivecache/src/Parameters.scala",
+      "repository": "inclusive-cache",
+      "repository_commit": "27df9284e60136a6f7f1b19224dfbe99d112ea77",
+      "snapshot": "memory-evidence/l2-params.scala",
+      "sha256": "0a69988dad71c8b6b41685d40367209206c096a97f52652b62a1e8d783084301",
+      "source_state": "identified local working-tree bytes"
+    },
+    "noc-tl": {
+      "path": "generators/constellation/src/main/scala/protocol/Tilelink.scala",
+      "repository": "constellation",
+      "repository_commit": "c1b42cd0c7c7d6e4fc1ed9bf1f86fbd3b31ac510",
+      "snapshot": "memory-evidence/noc-tl.scala",
+      "sha256": "553ccad32be9b25635cbe4554392e93ff07151517aa955338867bb43b1376c77",
+      "source_state": "identified local working-tree bytes"
+    },
+    "fased-config": {
+      "path": "sims/firesim/sim/midas/src/main/scala/configs/FASEDTargetConfigs.scala",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/fased-config.scala",
+      "sha256": "4f28a517e538ccea9458ffd06cc3d362e9f2a5992c23d272982959039e6fc452",
+      "source_state": "identified local working-tree bytes"
+    },
+    "compiler-config": {
+      "path": "sims/firesim/sim/midas/src/main/scala/configs/CompilerConfigs.scala",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/compiler-config.scala",
+      "sha256": "50298f579644fbfa1d9eee697d42c1063b64766adda3aedda5a7a0a427349496",
+      "source_state": "identified local working-tree bytes"
+    },
+    "latency-pipe": {
+      "path": "sims/firesim/sim/midas/src/main/scala/midas/models/dram/LatencyBandwidthPipe.scala",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/latency-pipe.scala",
+      "sha256": "cfd38e9299b05ff3f2b74b8dbb00b86a89b5770eb26e9ae4dcd02d94243d9779",
+      "source_state": "identified local working-tree bytes"
+    },
+    "fased-driver": {
+      "path": "sims/firesim/sim/midas/src/main/cc/bridges/fased_memory_timing_model.cc",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/fased-driver.cc",
+      "sha256": "c28ef97ffd3dce155efb0d859194bf283bdc2e12ab0bfa41f11ab2cd0cc83ead",
+      "source_state": "identified local working-tree bytes"
+    },
+    "graph0": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.chiptop0.graphml",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/graph0.graphml",
+      "sha256": "51e572d2796406a70129ddd5ae796f7eecc918145e645993253c0f4300e55c7a",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "graph1": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.chiptop1.graphml",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/graph1.graphml",
+      "sha256": "9f7cf05b4d9729714c9150e3e0dac5ed87aff1437edc8db5d6f01cc1fa4f8121",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "l2": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.l2.json",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/l2.json",
+      "sha256": "b96975453b4f25d51305200d769accdb25690ee3cef288bd567fe9d38365d401",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "dts": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.dts",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/dts.dts",
+      "sha256": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "clocks": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.firesimRationalClockBridge.freq-summary",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/clocks.freq-summary",
+      "sha256": "5d8bc08966ae133f3720a73e267ce5b999161ef92c2e6c788dbfd7921e51f70c",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "elaboration-log": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.chisel.log",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/elaboration-log.log",
+      "sha256": "9de2f56b3c9efe03700cb9b5f827bd2b9f225d97d2e5e34ae31b15257f3c4046",
+      "source_state": "local elaboration; build-input/deployed-image association unverified"
+    },
+    "historical-success-argv": {
+      "path": "sims/firesim/deploy/results-workload/2026-11-04--23-20-38-bare/bare0/sim-run.sh",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/historical-success-argv.sh",
+      "sha256": "922885d687b4e0ded7d5c1e5ce9fd8483e79db1caaecca6a647f9750fdae908a",
+      "source_state": "identified local working-tree bytes"
+    },
+    "historical-failed-argv": {
+      "path": "sims/firesim/deploy/results-workload/2026-11-05--04-26-53-bare/bare0/sim-run.sh",
+      "repository": "firesim",
+      "repository_commit": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+      "snapshot": "memory-evidence/historical-failed-argv.sh",
+      "sha256": "922885d687b4e0ded7d5c1e5ce9fd8483e79db1caaecca6a647f9750fdae908a",
+      "source_state": "identified local working-tree bytes"
+    },
+    "clock-annotation": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.anno.json",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/clock-annotation.json",
+      "sha256": "6ecc5fb6bd6da9a531a4a3ce38c22e0ea62651d6afae5722083c47b76fc884da",
+      "source_state": "local elaboration; build-input/deployed-image association unverified",
+      "original_sha256": "62107953cc7ce63438bc36d14b8e5876ad7a11108b218c1dc0659a4d5b7ce18a",
+      "json_selector": {
+        "class": "firesim.lib.bridgeutils.BridgeAnnotation",
+        "target": "~FireSim|RationalClockBridge"
+      }
+    },
+    "fased-annotation": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.anno.json",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/fased-annotation.json",
+      "sha256": "8a957f2efab4229213884a6903836663853802758fc128298ea6a5b75140af46",
+      "source_state": "local elaboration; build-input/deployed-image association unverified",
+      "original_sha256": "62107953cc7ce63438bc36d14b8e5876ad7a11108b218c1dc0659a4d5b7ce18a",
+      "json_selector": {
+        "class": "firesim.lib.bridgeutils.BridgeAnnotation",
+        "target": "~FireSim|FASEDBridge"
+      }
+    },
+    "fir-clocks": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/fir-clocks.txt",
+      "sha256": "2e112af29d1c08aa5bd586445dbc4ccf1e361acef6e864a394cac5f425e215be",
+      "source_state": "local elaboration; build-input/deployed-image association unverified",
+      "original_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "line_ranges": [
+        [
+          2414059,
+          2414144
+        ],
+        [
+          2414218,
+          2414262
+        ],
+        [
+          2414423,
+          2414442
+        ],
+        [
+          2414515,
+          2414515
+        ],
+        [
+          2414547,
+          2414551
+        ],
+        [
+          2415175,
+          2415178
+        ],
+        [
+          2534866,
+          2534868
+        ],
+        [
+          2534933,
+          2534935
+        ],
+        [
+          2534981,
+          2535013
+        ]
+      ],
+      "original_line_mapping": [
+        {
+          "snapshot_first_line": 1,
+          "original_first_line": 2414059,
+          "line_count": 86
+        },
+        {
+          "snapshot_first_line": 87,
+          "original_first_line": 2414218,
+          "line_count": 45
+        },
+        {
+          "snapshot_first_line": 132,
+          "original_first_line": 2414423,
+          "line_count": 20
+        },
+        {
+          "snapshot_first_line": 152,
+          "original_first_line": 2414515,
+          "line_count": 1
+        },
+        {
+          "snapshot_first_line": 153,
+          "original_first_line": 2414547,
+          "line_count": 5
+        },
+        {
+          "snapshot_first_line": 158,
+          "original_first_line": 2415175,
+          "line_count": 4
+        },
+        {
+          "snapshot_first_line": 162,
+          "original_first_line": 2534866,
+          "line_count": 3
+        },
+        {
+          "snapshot_first_line": 165,
+          "original_first_line": 2534933,
+          "line_count": 3
+        },
+        {
+          "snapshot_first_line": 168,
+          "original_first_line": 2534981,
+          "line_count": 33
+        }
+      ]
+    },
+    "fir-alias": {
+      "path": "sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "snapshot": "memory-evidence/fir-alias.txt",
+      "sha256": "366c3c6d41851eea4e4ef66c48212587f20739c037e65b72edeec8d50c65ff6e",
+      "source_state": "local elaboration; build-input/deployed-image association unverified",
+      "original_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "line_ranges": [
+        [
+          422334,
+          422350
+        ],
+        [
+          422476,
+          422485
+        ],
+        [
+          422592,
+          422599
+        ],
+        [
+          1147476,
+          1147485
+        ],
+        [
+          1147558,
+          1147569
+        ],
+        [
+          1992529,
+          1992540
+        ]
+      ],
+      "original_line_mapping": [
+        {
+          "snapshot_first_line": 1,
+          "original_first_line": 422334,
+          "line_count": 17
+        },
+        {
+          "snapshot_first_line": 18,
+          "original_first_line": 422476,
+          "line_count": 10
+        },
+        {
+          "snapshot_first_line": 28,
+          "original_first_line": 422592,
+          "line_count": 8
+        },
+        {
+          "snapshot_first_line": 36,
+          "original_first_line": 1147476,
+          "line_count": 10
+        },
+        {
+          "snapshot_first_line": 46,
+          "original_first_line": 1147558,
+          "line_count": 12
+        },
+        {
+          "snapshot_first_line": 58,
+          "original_first_line": 1992529,
+          "line_count": 12
+        }
+      ]
+    }
+  },
+  "facts": [
+    {
+      "id": "hart-vector-widths-bits",
+      "value": {
+        "0": {
+          "vlen": 256,
+          "dlen": 128,
+          "mlen": 128
+        },
+        "1": {
+          "vlen": 256,
+          "dlen": 128,
+          "mlen": 128
+        },
+        "2": {
+          "vlen": 256,
+          "dlen": 256,
+          "mlen": 256
+        }
+      },
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            278,
+            278
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            286,
+            289
+          ]
+        },
+        {
+          "source": "saturn-shuttle-config",
+          "lines": [
+            26,
+            26
+          ]
+        },
+        {
+          "source": "saturn-rocket-config",
+          "lines": [
+            27,
+            27
+          ]
+        },
+        {
+          "source": "saturn-params",
+          "lines": [
+            433,
+            433
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vector-memory-routing",
+      "value": {
+        "0": "independent TLSplitInterface/atlNode; bypass scalar L1D",
+        "1": "independent TLSplitInterface/atlNode; bypass scalar L1D",
+        "2": "load_use_tl_reg/store_use_tl_reg both true without writers; TLSplitInterface/atlNode; bypass scalar L1D"
+      },
+      "evidence": [
+        {
+          "source": "saturn-shuttle",
+          "lines": [
+            25,
+            26
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            100,
+            109
+          ]
+        },
+        {
+          "source": "saturn-tl",
+          "lines": [
+            62,
+            72
+          ]
+        }
+      ],
+      "interpretation": "The useL1DCache option/comment does not change the constant-true routing registers in this source."
+    },
+    {
+      "id": "vector-aligned-request-bytes",
+      "value": {
+        "0": 16,
+        "1": 16,
+        "2": 32
+      },
+      "evidence": [
+        {
+          "source": "saturn-shuttle-config",
+          "lines": [
+            26,
+            26
+          ]
+        },
+        {
+          "source": "saturn-rocket-config",
+          "lines": [
+            27,
+            27
+          ]
+        },
+        {
+          "source": "saturn-tl",
+          "lines": [
+            24,
+            25
+          ]
+        },
+        {
+          "source": "saturn-tl",
+          "lines": [
+            41,
+            54
+          ]
+        },
+        {
+          "source": "saturn-tl",
+          "lines": [
+            68,
+            68
+          ]
+        }
+      ],
+      "interpretation": "TLInterface issues aligned full-width Get/Put transactions using masks for stores. Narrow uncore links fragment/serialize these requests; DLEN is not the end-to-end bus width or useful bandwidth."
+    },
+    {
+      "id": "scalar-l1-cache-geometry",
+      "value": {
+        "0": {
+          "instruction": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "data": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          }
+        },
+        "1": {
+          "instruction": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "data": {
+            "size_bytes": 8192,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 2
+          }
+        },
+        "2": {
+          "instruction": {
+            "size_bytes": 16384,
+            "sets": 128,
+            "block_bytes": 64,
+            "ways": 2
+          },
+          "data": {
+            "size_bytes": 16384,
+            "sets": 64,
+            "block_bytes": 64,
+            "ways": 4
+          }
+        }
+      },
+      "evidence": [
+        {
+          "source": "dts",
+          "lines": [
+            18,
+            46
+          ]
+        },
+        {
+          "source": "dts",
+          "lines": [
+            46,
+            74
+          ]
+        },
+        {
+          "source": "dts",
+          "lines": [
+            74,
+            94
+          ]
+        }
+      ],
+      "interpretation": "DTS capacity/sets/block size plus the source-backed main manifest identify geometry. No hit/miss cycle cost is inferred."
+    },
+    {
+      "id": "actual-tile-and-uncore-beat-bytes",
+      "value": {
+        "shuttle_tile": 32,
+        "tcm_bank": 32,
+        "scratchpad_bank": 8,
+        "l2_inner_outer": 8,
+        "sbus_tile_master_links": 8,
+        "rocket_master": 8
+      },
+      "evidence": [
+        {
+          "source": "graph0",
+          "lines": [
+            47962,
+            48002
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            24257,
+            24297
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            4205,
+            4245
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            2926,
+            2966
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            67220,
+            68835
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            42324,
+            43107
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            18619,
+            19402
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            97363,
+            98146
+          ]
+        }
+      ],
+      "interpretation": "Widths describe identified elaborated TL ports, not simultaneous useful throughput. The optional WithIrisBusTweaks fragment is commented out."
+    },
+    {
+      "id": "l2-organization",
+      "value": {
+        "capacity_bytes": 524288,
+        "banks": 4,
+        "ways": 4,
+        "sets_per_bank": 512,
+        "block_bytes": 64,
+        "bank_formula": "(address >> 6) & 3",
+        "set_formula": "(address >> 8) & 511",
+        "subbanks_per_bank": 4,
+        "subbank_width_bytes": 8,
+        "bank_address_sets": [
+          [
+            {
+              "base": 2147483648,
+              "mask": 2147483455
+            },
+            {
+              "base": 4294967296,
+              "mask": 2147483455
+            }
+          ],
+          [
+            {
+              "base": 2147483712,
+              "mask": 2147483455
+            },
+            {
+              "base": 4294967360,
+              "mask": 2147483455
+            }
+          ],
+          [
+            {
+              "base": 2147483776,
+              "mask": 2147483455
+            },
+            {
+              "base": 4294967424,
+              "mask": 2147483455
+            }
+          ],
+          [
+            {
+              "base": 2147483840,
+              "mask": 2147483455
+            },
+            {
+              "base": 4294967488,
+              "mask": 2147483455
+            }
+          ]
+        ]
+      },
+      "evidence": [
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tcm-organization",
+      "value": {
+        "bytes_per_hart": 131072,
+        "banks_per_hart": 2,
+        "bank_formula": "(address >> 6) & 1",
+        "bank_masks": [
+          {
+            "base": 1879048192,
+            "mask": 131007
+          },
+          {
+            "base": 1879048256,
+            "mask": 131007
+          }
+        ],
+        "global_bases": [
+          1879048192,
+          1879179264
+        ],
+        "bytes_per_bank": 65536,
+        "atomics": true
+      },
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            191,
+            201
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            47962,
+            48002
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            46495,
+            46535
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scratchpad-organization",
+      "value": {
+        "base": 23622320128,
+        "size_bytes": 131072,
+        "banks": 2,
+        "subbanks": 1,
+        "bank_formula": "(address >> 6) & 1",
+        "bank_masks": [
+          {
+            "base": 23622320128,
+            "mask": 131007
+          },
+          {
+            "base": 23622320192,
+            "mask": 131007
+          }
+        ],
+        "bytes_per_bank": 65536,
+        "atomics": false,
+        "os_dts_status": "disabled"
+      },
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "scratch-config",
+          "lines": [
+            20,
+            21
+          ]
+        },
+        {
+          "source": "scratch",
+          "lines": [
+            52,
+            53
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            4205,
+            4245
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            2926,
+            2966
+          ]
+        },
+        {
+          "source": "dts",
+          "lines": [
+            108,
+            111
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lrsc-versus-amo-permissions",
+      "value": {
+        "lr_sc_cacheable_region_required": true,
+        "dram_lr_sc": true,
+        "tcm_lr_sc": false,
+        "tcm_private_alias_lr_sc": false,
+        "scratchpad_lr_sc": false,
+        "tcm_supported_amo": true,
+        "scratchpad_supported_amo": false,
+        "uncached_lr_exception": "load-access-fault",
+        "uncached_sc_exception": "store-access-fault"
+      },
+      "evidence": [
+        {
+          "source": "shuttle-tlb",
+          "lines": [
+            276,
+            291
+          ]
+        },
+        {
+          "source": "rocket-tlb",
+          "lines": [
+            580,
+            586
+          ]
+        },
+        {
+          "source": "shuttle-pma",
+          "lines": [
+            40,
+            40
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            47962,
+            48002
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            4205,
+            4245
+          ]
+        }
+      ],
+      "interpretation": "A manager arithmetic/logical-atomic bit does not authorize LR/SC. The core TLB separately requires cacheability (AcquireB support)."
+    },
+    {
+      "id": "per-hart-pmp",
+      "value": {
+        "entries": [
+          0,
+          0,
+          8
+        ],
+        "rocket_granularity_bytes": 4
+      },
+      "evidence": [
+        {
+          "source": "shuttle-core-params",
+          "lines": [
+            58,
+            58
+          ]
+        },
+        {
+          "source": "shuttle-tlb",
+          "lines": [
+            49,
+            49
+          ]
+        },
+        {
+          "source": "dts",
+          "lines": [
+            93,
+            94
+          ]
+        }
+      ],
+      "interpretation": "A single global generic Spike PMP configuration does not reproduce the heterogeneous cores."
+    },
+    {
+      "id": "noc-configuration",
+      "value": {
+        "acd_topology": "bidirectional torus/ring,7routers",
+        "be_topology": "unidirectional torus/ring,7routers",
+        "acd_vcs_per_link": 6,
+        "be_vcs_per_link": 4,
+        "buffers_per_vc_flits": 5,
+        "combineRCVA": true,
+        "combineSAST": true,
+        "ingress_nodes_by_hart": [
+          0,
+          3,
+          5
+        ],
+        "tcm_egress_nodes": [
+          0,
+          3
+        ],
+        "scratchpad_egress_node": 1,
+        "l2_egress_node": 2
+      },
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            63,
+            99
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        }
+      ],
+      "interpretation": "Forward A/C/D routes and B/E coherence routes have distinct resources. Hop counts alone are not latency."
+    },
+    {
+      "id": "crossings",
+      "value": {
+        "shuttle_master_slave": "synchronous TLBuffers",
+        "rocket_master_slave": "TLAsyncCrossingSource/Sink",
+        "async_handshake_cost_cycles": null
+      },
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            285,
+            285
+          ]
+        },
+        {
+          "source": "shuttle-config",
+          "lines": [
+            181,
+            185
+          ]
+        },
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            64,
+            70
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            42320,
+            43107
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            18615,
+            19402
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            97359,
+            98146
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            5843,
+            6630
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            5009,
+            5840
+          ]
+        }
+      ],
+      "interpretation": "The Shuttle fragment targets InCluster(0); these elaborated tiles are InSubsystem. Rocket async hardware remains even when clock frequencies match."
+    },
+    {
+      "id": "clock-domains-local-elaboration",
+      "value": {
+        "harts_hz": [
+          500000000,
+          500000000,
+          500000000
+        ],
+        "chiptop0_sbus_l2_scratchpad_mbus_hz": 500000000,
+        "chiptop1_dram_bus_hz": 1000000000,
+        "interchip_serial_clock_hz": 100000000,
+        "mtime_hz": 500000,
+        "fpga_emulation_hz_is_target_frequency": false
+      },
+      "evidence": [
+        {
+          "source": "fir-clocks",
+          "lines": [
+            79,
+            85
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            142,
+            151
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            191,
+            196
+          ]
+        },
+        {
+          "source": "clock-annotation",
+          "lines": [
+            13,
+            30
+          ]
+        },
+        {
+          "source": "clocks",
+          "lines": [
+            3,
+            3
+          ]
+        },
+        {
+          "source": "dts",
+          "lines": [
+            17,
+            17
+          ]
+        }
+      ],
+      "interpretation": "The FIR harness ties the separate Rocket clock input to the same 500MHz source as Iris uncore. This resolves the saved elaboration, not the deployed image association."
+    },
+    {
+      "id": "serial-dram-path",
+      "value": {
+        "iris_port": 1,
+        "bringup_port": 0,
+        "phit_bits": 16,
+        "flit_bits": 16,
+        "serial_hz": 100000000,
+        "dram_endpoint": "chiptop1 AXI4 -> FASEDMemoryTimingModel",
+        "axi_data_bits": 64,
+        "guest_dram_bytes": 4294967296,
+        "fased_kind_from_compiler_config": "LatencyPipeConfig",
+        "source_default_read_latency": 30,
+        "source_default_write_latency": 30,
+        "default_latency_unit": "FASED target endpoint clock cycles (1GHz in local elaboration)",
+        "selected_remote_read_latency": null,
+        "selected_remote_write_latency": null,
+        "effective_payload_bandwidth_bytes_per_second": null
+      },
+      "evidence": [
+        {
+          "source": "target",
+          "lines": [
+            398,
+            442
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            466,
+            466
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        },
+        {
+          "source": "compiler-config",
+          "lines": [
+            126,
+            133
+          ]
+        },
+        {
+          "source": "fased-config",
+          "lines": [
+            15,
+            23
+          ]
+        },
+        {
+          "source": "latency-pipe",
+          "lines": [
+            23,
+            25
+          ]
+        },
+        {
+          "source": "fased-annotation",
+          "lines": [
+            111,
+            135
+          ]
+        }
+      ],
+      "interpretation": "Defaults are not measured Iris miss latency. Include cache/refill, NoC, serializers, CDC, buffering and return path. The 8GiB host FPGA capacity is not the 4GiB guest aperture."
+    },
+    {
+      "id": "historical-memory-runtime-overrides",
+      "value": {
+        "historical_success": "2026-11-04--23-20-38-bare",
+        "historical_failure": "2026-11-05--04-26-53-bare",
+        "mm_plusargs_present": false,
+        "remote_current_settings_verified": false
+      },
+      "evidence": [
+        {
+          "source": "historical-success-argv",
+          "lines": [
+            2,
+            2
+          ]
+        },
+        {
+          "source": "historical-failed-argv",
+          "lines": [
+            2,
+            2
+          ]
+        },
+        {
+          "source": "fased-driver",
+          "lines": [
+            67,
+            92
+          ]
+        },
+        {
+          "source": "fased-driver",
+          "lines": [
+            169,
+            171
+          ]
+        }
+      ],
+      "interpretation": "Saved launch scripts contain no +mm_* overrides. The driver leaves hardware defaults when its user configuration is empty; current image values must be read or matched to build evidence."
+    },
+    {
+      "id": "sram-and-buffer-structural-minima",
+      "value": {
+        "tlram_advertised_min_latency_cycles": 1,
+        "tlram_sramReg_default": false,
+        "shuttle_icache_configured_latency": 2,
+        "complete_cpu_tcm_latency_cycles": null,
+        "complete_cpu_scratchpad_latency_cycles": null
+      },
+      "evidence": [
+        {
+          "source": "sram",
+          "lines": [
+            31,
+            31
+          ]
+        },
+        {
+          "source": "sram",
+          "lines": [
+            56,
+            56
+          ]
+        },
+        {
+          "source": "sram",
+          "lines": [
+            77,
+            101
+          ]
+        },
+        {
+          "source": "buffer",
+          "lines": [
+            19,
+            20
+          ]
+        },
+        {
+          "source": "shuttle-icache",
+          "lines": [
+            163,
+            163
+          ]
+        }
+      ],
+      "interpretation": "Advertised link minima and SRAM pipeline stages are structural bounds in their own domains, not measured load-to-use latency. AMOs, ECC and arbitration may add work."
+    },
+    {
+      "id": "inclusive-cache-outer-latency-meaning",
+      "value": {
+        "configured_outerLatencyCycles": 4,
+        "imposed_dram_latency_cycles": null
+      },
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            218,
+            218
+          ]
+        },
+        {
+          "source": "l2-config",
+          "lines": [
+            65,
+            65
+          ]
+        },
+        {
+          "source": "l2-params",
+          "lines": [
+            160,
+            164
+          ]
+        }
+      ],
+      "interpretation": "memCycles sizes resources. It does not delay external memory responses by four cycles or establish DDR timing."
+    },
+    {
+      "id": "serial-load-warning",
+      "value": {
+        "emitted": true,
+        "warning": "DEADLOCKING DECOUPLED SERIAL PHY; heavy load can deadlock"
+      },
+      "evidence": [
+        {
+          "source": "elaboration-log",
+          "lines": [
+            80,
+            85
+          ]
+        }
+      ],
+      "interpretation": "A calibration that only completes light traffic cannot certify saturation/contention regimes; retain timeout/failure evidence and inspect RTL before changing PHY."
+    }
+  ],
+  "routes": [
+    {
+      "id": "hart0.instruction.tcm0",
+      "hart": 0,
+      "requester": "instruction",
+      "region": "tcm0",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.instruction.tcm1",
+      "hart": 0,
+      "requester": "instruction",
+      "region": "tcm1",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.instruction.scratchpad",
+      "hart": 0,
+      "requester": "instruction",
+      "region": "scratchpad",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.instruction.dram",
+      "hart": 0,
+      "requester": "instruction",
+      "region": "dram",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.scalar_data.tcm0",
+      "hart": 0,
+      "requester": "scalar_data",
+      "region": "tcm0",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.scalar_data.tcm1",
+      "hart": 0,
+      "requester": "scalar_data",
+      "region": "tcm1",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.scalar_data.scratchpad",
+      "hart": 0,
+      "requester": "scalar_data",
+      "region": "scratchpad",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.scalar_data.dram",
+      "hart": 0,
+      "requester": "scalar_data",
+      "region": "dram",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.vector_data.tcm0",
+      "hart": 0,
+      "requester": "vector_data",
+      "region": "tcm0",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.vector_data.tcm1",
+      "hart": 0,
+      "requester": "vector_data",
+      "region": "tcm1",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.vector_data.scratchpad",
+      "hart": 0,
+      "requester": "vector_data",
+      "region": "scratchpad",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart0.vector_data.dram",
+      "hart": 0,
+      "requester": "vector_data",
+      "region": "dram",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        0,
+        1,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        1,
+        0
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.instruction.tcm0",
+      "hart": 1,
+      "requester": "instruction",
+      "region": "tcm0",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.instruction.tcm1",
+      "hart": 1,
+      "requester": "instruction",
+      "region": "tcm1",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.instruction.scratchpad",
+      "hart": 1,
+      "requester": "instruction",
+      "region": "scratchpad",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.instruction.dram",
+      "hart": 1,
+      "requester": "instruction",
+      "region": "dram",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.scalar_data.tcm0",
+      "hart": 1,
+      "requester": "scalar_data",
+      "region": "tcm0",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.scalar_data.tcm1",
+      "hart": 1,
+      "requester": "scalar_data",
+      "region": "tcm1",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.scalar_data.scratchpad",
+      "hart": 1,
+      "requester": "scalar_data",
+      "region": "scratchpad",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.scalar_data.dram",
+      "hart": 1,
+      "requester": "scalar_data",
+      "region": "dram",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.vector_data.tcm0",
+      "hart": 1,
+      "requester": "vector_data",
+      "region": "tcm0",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.vector_data.tcm1",
+      "hart": 1,
+      "requester": "vector_data",
+      "region": "tcm1",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile-local AddressOffsetter/RegionReplicator",
+        "TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": true,
+      "acd_request_router_path": [],
+      "acd_response_router_path": [],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.vector_data.scratchpad",
+      "hart": 1,
+      "requester": "vector_data",
+      "region": "scratchpad",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart1.vector_data.dram",
+      "hart": 1,
+      "requester": "vector_data",
+      "region": "dram",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.instruction.tcm0",
+      "hart": 2,
+      "requester": "instruction",
+      "region": "tcm0",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.instruction.tcm1",
+      "hart": 2,
+      "requester": "instruction",
+      "region": "tcm1",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.instruction.scratchpad",
+      "hart": 2,
+      "requester": "instruction",
+      "region": "scratchpad",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.instruction.dram",
+      "hart": 2,
+      "requester": "instruction",
+      "region": "dram",
+      "frontend": "L1I hit or refill",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.scalar_data.tcm0",
+      "hart": 2,
+      "requester": "scalar_data",
+      "region": "tcm0",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.scalar_data.tcm1",
+      "hart": 2,
+      "requester": "scalar_data",
+      "region": "tcm1",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.scalar_data.scratchpad",
+      "hart": 2,
+      "requester": "scalar_data",
+      "region": "scratchpad",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.scalar_data.dram",
+      "hart": 2,
+      "requester": "scalar_data",
+      "region": "dram",
+      "frontend": "scalar L1D for cacheable DRAM; uncached IO path for TCM/scratchpad",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": null,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.vector_data.tcm0",
+      "hart": 2,
+      "requester": "vector_data",
+      "region": "tcm0",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0
+      ],
+      "acd_response_router_path": [
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.vector_data.tcm1",
+      "hart": 2,
+      "requester": "vector_data",
+      "region": "tcm1",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "target tile slave/crossing -> TCM bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3
+      ],
+      "acd_response_router_path": [
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.vector_data.scratchpad",
+      "hart": 2,
+      "requester": "vector_data",
+      "region": "scratchpad",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "SBUS scratchpad bank"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        6,
+        0,
+        1
+      ],
+      "acd_response_router_path": [
+        1,
+        0,
+        6,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 1",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hart2.vector_data.dram",
+      "hart": 2,
+      "requester": "vector_data",
+      "region": "dram",
+      "frontend": "Saturn TLSplitInterface direct TL; no scalar L1D",
+      "miss_or_uncached_path": [
+        "tile master/crossing",
+        "SBUS A/C/D NoC",
+        "L2 bank hit, or MBUS/SerialTL1 -> bringup SerialTL0 -> AXI4/FASED miss"
+      ],
+      "scalar_l1d_bypassed": true,
+      "local_tcm_shortcut": false,
+      "acd_request_router_path": [
+        5,
+        4,
+        3,
+        2
+      ],
+      "acd_response_router_path": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "be_coherence_network": "unidirectional torus; only when the transaction requires coherence",
+      "bank_selection": "(address >> 6) & 3",
+      "requester_clock_hz": 500000000,
+      "fitted_latency_cycles": null,
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            160,
+            187
+          ]
+        },
+        {
+          "source": "saturn-rocket",
+          "lines": [
+            84,
+            89
+          ]
+        },
+        {
+          "source": "fir-clocks",
+          "lines": [
+            163,
+            164
+          ]
+        },
+        {
+          "source": "iris",
+          "lines": [
+            250,
+            270
+          ]
+        },
+        {
+          "source": "target",
+          "lines": [
+            490,
+            494
+          ]
+        }
+      ]
+    }
+  ],
+  "local_aliases": [
+    {
+      "id": "shuttle-private-tcm-aliases",
+      "harts": [
+        0,
+        1
+      ],
+      "base": 1879572480,
+      "size_bytes": 524288,
+      "mirrors": 4,
+      "mirror_size_bytes": 131072,
+      "canonical_storage_formula": "0x70000000 + hart * 0x20000 + (address & 0x1ffff)",
+      "permissions": {
+        "read": true,
+        "write": true,
+        "execute": true,
+        "atomics": true
+      },
+      "hart2_and_external_access": "not advertised on external SBUS; not a Rocket mapping",
+      "evidence": [
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            115,
+            123
+          ]
+        },
+        {
+          "source": "shuttle-tile",
+          "lines": [
+            136,
+            145
+          ]
+        },
+        {
+          "source": "shuttle-offset",
+          "lines": [
+            16,
+            21
+          ]
+        },
+        {
+          "source": "replication",
+          "lines": [
+            20,
+            20
+          ]
+        },
+        {
+          "source": "replication",
+          "lines": [
+            56,
+            58
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            58453,
+            59176
+          ]
+        },
+        {
+          "source": "graph0",
+          "lines": [
+            34748,
+            35471
+          ]
+        },
+        {
+          "source": "fir-alias",
+          "lines": [
+            54,
+            54
+          ]
+        }
+      ],
+      "required_model_behavior": "Alias accesses share storage and supported AMO effects with that hart's canonical TCM. Both aliases/canonical TCM reject LR/SC because they are uncached. Preserve original guest address for architectural trap reporting; route timing uses local tile path."
+    }
+  ],
+  "calibration_probes": [
+    {
+      "id": "tcm-local-and-remote",
+      "existing_case_ids": [
+        "memory.tcm.4k"
+      ],
+      "helps_identify": [
+        "source baseline local compute-hart TCM loop"
+      ],
+      "remaining_isolation_gaps": [
+        "Explicit remote TCM per requester/hart, pointer chains, read/write/AMO separation, same-bank vs separate-bank, alias/canonical equivalence, all-three contention"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scratchpad",
+      "existing_case_ids": [
+        "memory.scratchpad.4k"
+      ],
+      "helps_identify": [
+        "all-hart uncached scratchpad scalar loops"
+      ],
+      "remaining_isolation_gaps": [
+        "Dependent-load latency, scalar/vector widths, exact bit6 bank conflicts, saturation and read/write mixes; no scratchpad AMOs"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cache-capacity-and-misses",
+      "existing_case_ids": [
+        "memory.dram.4k.h1",
+        "memory.dram.4k.compute",
+        "memory.dram.1m.h1",
+        "memory.pointer.4k",
+        "memory.pointer.1m",
+        "v2.memory.read.warm.4096.mask1",
+        "v2.memory.read.warm.4096.mask3",
+        "v2.memory.read.warm.16384.mask1",
+        "v2.memory.read.warm.16384.mask3",
+        "v2.memory.read.warm.131072.mask1",
+        "v2.memory.read.warm.131072.mask3",
+        "v2.memory.read.warm.1048576.mask1",
+        "v2.memory.read.warm.1048576.mask3",
+        "v2.memory.chase.warm.4096",
+        "v2.memory.chase.warm.65536",
+        "v2.memory.chase.warm.1048576",
+        "v2.memory.read.eviction-attempt.4096.mask1",
+        "v2.memory.read.eviction-attempt.4096.mask3",
+        "v2.memory.read.eviction-attempt.16384.mask1",
+        "v2.memory.read.eviction-attempt.16384.mask3",
+        "v2.memory.read.eviction-attempt.131072.mask1",
+        "v2.memory.read.eviction-attempt.131072.mask3",
+        "v2.memory.read.eviction-attempt.1048576.mask1",
+        "v2.memory.read.eviction-attempt.1048576.mask3",
+        "v2.memory.chase.eviction-attempt.4096",
+        "v2.memory.chase.eviction-attempt.65536",
+        "v2.memory.chase.eviction-attempt.1048576"
+      ],
+      "helps_identify": [
+        "warm/eviction-attempt sizes and scalar dependency chains"
+      ],
+      "remaining_isolation_gaps": [
+        "Source replacement/coherence verification, exact L1/L2 hit identification, targeted L2 set/bank aliases, vector bypass controls, TLB/PTW state"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared-contention",
+      "existing_case_ids": [
+        "v2.contention.private-read.4096.mask1",
+        "v2.contention.private-read.4096.mask2",
+        "v2.contention.private-read.4096.mask4",
+        "v2.contention.private-read.4096.mask3",
+        "v2.contention.private-read.4096.mask5",
+        "v2.contention.private-read.4096.mask6",
+        "v2.contention.private-read.4096.mask7",
+        "v2.contention.shared-read.4096.mask1",
+        "v2.contention.shared-read.4096.mask2",
+        "v2.contention.shared-read.4096.mask4",
+        "v2.contention.shared-read.4096.mask3",
+        "v2.contention.shared-read.4096.mask5",
+        "v2.contention.shared-read.4096.mask6",
+        "v2.contention.shared-read.4096.mask7",
+        "v2.contention.read-plus-hart2-scalar-write.4096.mask5",
+        "v2.contention.read-plus-hart2-vector-write.4096.mask5",
+        "v2.contention.private-read.1048576.mask1",
+        "v2.contention.private-read.1048576.mask2",
+        "v2.contention.private-read.1048576.mask4",
+        "v2.contention.private-read.1048576.mask3",
+        "v2.contention.private-read.1048576.mask5",
+        "v2.contention.private-read.1048576.mask6",
+        "v2.contention.private-read.1048576.mask7",
+        "v2.contention.shared-read.1048576.mask1",
+        "v2.contention.shared-read.1048576.mask2",
+        "v2.contention.shared-read.1048576.mask4",
+        "v2.contention.shared-read.1048576.mask3",
+        "v2.contention.shared-read.1048576.mask5",
+        "v2.contention.shared-read.1048576.mask6",
+        "v2.contention.shared-read.1048576.mask7",
+        "v2.contention.read-plus-hart2-scalar-write.1048576.mask5",
+        "v2.contention.read-plus-hart2-vector-write.1048576.mask5",
+        "v2.contention.atomic.same-counter.mask1",
+        "v2.contention.atomic.same-counter.mask2",
+        "v2.contention.atomic.same-counter.mask4",
+        "v2.contention.atomic.same-counter.mask3",
+        "v2.contention.atomic.same-counter.mask5",
+        "v2.contention.atomic.same-counter.mask6",
+        "v2.contention.atomic.same-counter.mask7",
+        "v2.contention.atomic.false-sharing.mask1",
+        "v2.contention.atomic.false-sharing.mask2",
+        "v2.contention.atomic.false-sharing.mask4",
+        "v2.contention.atomic.false-sharing.mask3",
+        "v2.contention.atomic.false-sharing.mask5",
+        "v2.contention.atomic.false-sharing.mask6",
+        "v2.contention.atomic.false-sharing.mask7",
+        "v2.contention.atomic.separate-lines.mask1",
+        "v2.contention.atomic.separate-lines.mask2",
+        "v2.contention.atomic.separate-lines.mask4",
+        "v2.contention.atomic.separate-lines.mask3",
+        "v2.contention.atomic.separate-lines.mask5",
+        "v2.contention.atomic.separate-lines.mask6",
+        "v2.contention.atomic.separate-lines.mask7"
+      ],
+      "helps_identify": [
+        "all seven hart subsets, shared/private reads, atomic false sharing, hart2 vector writer"
+      ],
+      "remaining_isolation_gaps": [
+        "Dedicated same/different L2 bank sweeps, NoC route conflicts, in-flight queue occupancy, serial-TL saturation, directional load/store traffic"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "instruction-frontends",
+      "existing_case_ids": [
+        "v2.frontend.512b.4",
+        "v2.frontend.512b.16",
+        "v2.frontend.4096b.4",
+        "v2.frontend.4096b.16",
+        "v2.frontend.16384b.4",
+        "v2.frontend.16384b.16"
+      ],
+      "helps_identify": [
+        "exact instruction footprints and reuse"
+      ],
+      "remaining_isolation_gaps": [
+        "I-cache miss-path counters, executable TCM/scratchpad tests by every hart, branch/frontend separation"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "distributed-pipelines",
+      "existing_case_ids": [
+        "v2.pipeline.scalar-vector.rotate0",
+        "v2.pipeline.scalar-vector.rotate1",
+        "v2.pipeline.scalar-vector.rotate2",
+        "v2.pipeline.vme.compute0",
+        "v2.pipeline.vme.compute1"
+      ],
+      "helps_identify": [
+        "producer/vector-compute/consumer rotations and VME pipelines with hart2 producer"
+      ],
+      "remaining_isolation_gaps": [
+        "Zephyr runtime overhead and preemption, real overlap/traces, link-heavy saturation and deadlock observation"
+      ],
+      "ground_truth_collected": false,
+      "evidence": [
+        {
+          "source": "iris",
+          "lines": [
+            222,
+            228
+          ]
+        },
+        {
+          "source": "l2",
+          "lines": [
+            1,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "benchmark_input_sha256": {
+    "benchmarks/calibration-corpus.json": "2b2a38126cbfebdf6e7e242c07bbdbc2b9c3579c111bef250592fb5b7c6719f9",
+    "benchmarks/v2/cases.py": "bfcba12b24c27145ba1a669dd44b449899ec7ea87a0cf7b263fc81c927eab1f3"
+  },
+  "unmeasured_timing_parameters": {
+    "cpu_l1_hit_and_miss_load_to_use": null,
+    "scalar_uncached_tcm": null,
+    "remote_tcm": null,
+    "scratchpad_read_write": null,
+    "l2_hit_and_replacement": null,
+    "l2_bank_and_subbank_contention": null,
+    "noc_router_hop_and_arbitration": null,
+    "serial_transaction_latency": null,
+    "serial_useful_payload_bandwidth": null,
+    "selected_fased_runtime_registers": null,
+    "cdc_queue_round_trip": null,
+    "vector_memory_expansion_and_overlap": null,
+    "zephyr_interrupt_and_scheduler_interference": null
+  },
+  "limitations": [
+    "No actual FPGA/RTL reference runs were collected by this audit.",
+    "Clock/geometry/route facts describe the identified local elaboration, not proven deployed image build inputs.",
+    "No link minimum, static width, source sizing hint or source runtime default is promoted to a calibrated CPU latency.",
+    "Cache hit/miss choice, arbitration, coherence, vector requests and queue/clock state still require an integrated model and validation."
+  ]
+}

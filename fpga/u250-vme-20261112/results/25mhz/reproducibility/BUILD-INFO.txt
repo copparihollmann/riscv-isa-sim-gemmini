@@ -1,0 +1,13 @@
+Pinned dual-Shuttle U250 builds, 2026-11-12
+Requested FPGA host frequencies: 15 MHz and 25 MHz, parallel; 12 cores/jobs each.
+Memory model: FASED FRFCFS16GBQuadRank (detailed DDR3), target memory clock 1000 MHz.
+Target: harts 0/1, VLEN256, DLEN128, INT8 OPU, 16 GiB memory.
+Status: status.json. Tmux: u250-vme-build-20261112 and u250-vme-25mhz-20261112.
+Logs: private-logs (private; do not dump licensing or credential details into chats).
+Results after successful builds: results/15mhz and results/25mhz, hashed manifests.
+Elaboration validation must pass before synthesis.
+Board source: pinned OpenNIC revision 940907fc99fc8d73dbea0028b3a23095a660a42a.
+Only isolated source/build files are changed. This job builds bitstreams on AS3.
+It does not operate an FPGA card. Any later card run must follow the operator rules.
+
+Parallel build plan: provenance/parallel-build-plan.json. 25 MHz uses an immutable hash-verified RTL/driver snapshot and a separate native manager.

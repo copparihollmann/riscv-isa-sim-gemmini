@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+"""Finite first59 software-only replay; OFF parity precedes ON attribution."""
+from pathlib import Path
+import argparse,hashlib,json,sys,os,subprocess,time,re
+R=Path(__file__).resolve().parents[1];sys.path.insert(0,str(R));from iris_model.graph_run_buffered import derive_history,kill_owned
+from iris_model.guest_regions import Instructions
+from spike.empirical_launch_v2 import launcher_text
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--on',action='store_true');a=ap.parse_args();O=a.output.resolve();O.mkdir();P=R/'build/RVV-ASM-C12-ownzero-first59-diagnostic-v1';BASE=R/'build/rvv-compute-asm-C12-ownzero-v1';r=json.loads((P/'run.json').read_text());N=R/'build/spike-C12-async-RRD-wake-v1/spike';U=N.parent/'libsifive_uart.so';F=O/'runtime.fixture';F.write_bytes((P/'full.fixture').read_bytes()+(b'\nempirical_async_rrd_wake h0h1-existing-live-head-eligibility-v1\n'if a.on else b''));commands=O/'commands.txt';commands.write_bytes((P/'commands.txt').read_bytes());launch=O/'spike';launch.write_text(launcher_text(N,sha(N),Path(sys.executable).resolve(),sha(Path(sys.executable).resolve())));launch.chmod(0o755)
+argv=[str(launch)if i==0 else'--debug-cmd='+str(commands)if x.startswith('--debug-cmd=')else'--iris-timing-fixture='+str(F)if x.startswith('--iris-timing-fixture=')else'--iris-timing-trace='+str(O/'graph.json')if x.startswith('--iris-timing-trace=')else'--extlib='+str(U)if x.startswith('--extlib=')else x for i,x in enumerate(r['argv'])];env={k:v for k,v in os.environ.items()if not k.startswith('IRIS_CPU_DIAGNOSTIC_')};env.update(IRIS_EMPIRICAL_FEATURES=str(O/'features.jsonl'),IRIS_EMPIRICAL_ASYNC_TRACE=str(O/'async.jsonl'))
+if a.on:env.update(IRIS_CPU_DIAGNOSTIC_TRACE=str(O/'cpu.jsonl'),IRIS_CPU_DIAGNOSTIC_HART='0',IRIS_CPU_DIAGNOSTIC_MCYCLEROI='3',IRIS_CPU_DIAGNOSTIC_EVENTS='async_backend_complete,scheduler_advance,scheduler_arrival,async_RRD_wake,rrd_accept,rrd_reject,COM_enter,COM_exit')
+report={'schema':'iris.RVV_ASM_async_RRD_wake_first59.v1','status':'running','mode':'ON'if a.on else'OFF','argv':argv,'hardware_contacted':False,'hardware_labels_read':False,'normal_guest_exit_verified':False,'controlled_postmeasurement_partial_stop':True,'input_sha256':{str(p):sha(p)for p in(Path(__file__),P/'run.json',BASE/'run.json',N,U,F,commands,Path(argv[-1]))}};save=lambda:(O/'run.json').write_text(json.dumps(report,indent=2)+'\n');save();start=time.monotonic()
+with(O/'stdout').open('wb')as so,(O/'stderr').open('wb')as se:
+ p=subprocess.Popen(argv,env=env,stdout=so,stderr=se,start_new_session=True);report['owned_pid']=p.pid;save()
+ try:code=p.wait(timeout=180);timed=False
+ except subprocess.TimeoutExpired:kill_owned(p);code=p.returncode;timed=True
+report.update(exit_status=code,timed_out=timed,host_seconds=time.monotonic()-start,status='execution_finished');save();assert code==0 and not timed
+vals=lambda p:[int(x,16)for x in p.read_text().splitlines()if re.fullmatch('0x[0-9a-f]{16}',x)];v=vals(O/'stderr');old=vals(BASE/'stderr');assert len(v)==59*17+3 and len(old)==2+1320*17+2+3;rows0=[json.loads(x)for x in(BASE/'regions.jsonl').read_text().splitlines()][:59];rows=[];prefix=[json.loads(l)for l in(O/'features.jsonl').read_text().splitlines()];lookup={(x['hart'],x['value']):x for x in prefix};code=Instructions(Path(argv[-1]),R/'board/evidence/bootrom.rv64.img')
+for x in prefix:
+ assert all(type(x[k])is int for k in('hart','sequence','value','read_cycle','pc','raw','csr','destination'));assert x['raw']==code.read(x['pc'])and x['csr']==x['raw']>>20 and x['destination']==(x['raw']>>7)&31 and x['csr']in(0xb00,0xc00)and x['result_discarded']is False
+for i,ref in enumerate(rows0):
+ q=v[17*i:17*(i+1)];assert q[0]==i and q[1]==0 and q[8]==q[9]==ref['expected_checksum']and q[10]==0 and q[11]==ref['checked_words']and q[12]==ref['vl']and q[15]==q[16]==0;assert(q[7]-q[5],q[6]-q[5],q[7]-q[6])==tuple(ref[k]for k in('instret_delta','issue_instret_delta','drain_instret_delta'));assert q[2]<q[3]<=q[4];row=dict(ref);row.update(start_cycle=q[2],issue_cycle=q[3],end_cycle=q[4],mtime_before=q[13],mtime_after=q[14]);points=[lookup[0,z]for z in q[2:5]];assert points[0]['sequence']<points[1]['sequence']<points[2]['sequence']
+ for name,x in zip(('begin','issue','drain'),points):row[name+'_pc']=x['pc'];row[name+'_global_read_cycle']=x['read_cycle']
+ rows.append(row)
+if not a.on:
+ assert v[:59*17]==old[2:2+59*17];raw=(O/'features.jsonl').read_bytes();assert raw==b''.join((BASE/'features.jsonl').read_bytes().splitlines(keepends=True)[:len(prefix)]);assert(O/'async.jsonl').read_bytes()==(P/'async.jsonl').read_bytes(),'Exact OFFasync byte parity';report['OFF_full_record_prefix_async_byte_parity']=True
+(O/'rows.json').write_text(json.dumps(rows,indent=2)+'\n');report.update(**{'pass':True},status='first59_numeric_and_CSR_joins_passed',records=59,CSR_joins=177,common_prefix_records=len(prefix),instret_and_numeric_mismatches=0);report['output_sha256']={str(p):sha(p)for p in O.iterdir()if p.is_file()and p.name!='run.json'};save();print(json.dumps({k:report[k]for k in('pass','mode','records','CSR_joins','host_seconds')}))

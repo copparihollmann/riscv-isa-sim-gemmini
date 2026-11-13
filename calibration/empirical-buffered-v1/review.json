@@ -1,0 +1,80 @@
+{
+  "ELF_symbols_record_stride_and_initial_sentinel_independently_checked": true,
+  "canonical_source_cases": {
+    "baseline": 24,
+    "distribution": 208,
+    "memory": 504
+  },
+  "case_count": 2208,
+  "checks": 55636,
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "golden_values_by_active_hart_independently_checked": 4050,
+  "hardware_reference_available": false,
+  "input_sha256": {
+    "benchmarks/calibration-corpus.json": "2b2a38126cbfebdf6e7e242c07bbdbc2b9c3579c111bef250592fb5b7c6719f9",
+    "benchmarks/campaign_buffered/main.c": "d041d76906ac97d998430a989991120040f67a23659be7e0b2f151abd1d6839c",
+    "benchmarks/golden.py": "827d50d52f1c417e671f53f3f70408d6c7f5799f6456c07971119125081aa1dc",
+    "benchmarks/memory_routes/cases.py": "0d254ad610d5b26208d49b244a73fd39f93268c921d34757266c7edb9b6bc356",
+    "benchmarks/v2/cases.py": "bfcba12b24c27145ba1a669dd44b449899ec7ea87a0cf7b263fc81c927eab1f3",
+    "build/campaign-buffered-fit-v1/build.json": "152c97df70595b85e04a2cb4f4bf8fb0c58057f7ef579b8a48406ba244e9657c",
+    "build/campaign-buffered-fit-v1/campaign.elf": "d736892a75e393f2e0627198f5a06e271a391f46b7ae363390f7fb4a59172cc4",
+    "build/campaign-buffered-fit-v1/corpus.json": "adead1d7cddf28a05ebdd28f27aa982d8fe9ce0d125fd909edea4a8178fad08c",
+    "build/campaign-buffered-fit-v1/readback-layout.json": "478fce0658436b2aab4c3591d2fb9757d6986b33d3c277df8524c07086474583",
+    "calibration/empirical-buffered-v1/policy.json": "40b8643818a11e51d45b74b971d4aa11a2d98d7a9039d3a117cfa4ee55c71379",
+    "calibration/empirical-v1/split.json": "38b2405e207c58cf2be0d045684850a94a4948fdfb0bc061c99e8af0d8e3e79c",
+    "timing/empirical_buffered_review.py": "d7296f098f1eec1f1297a6b7f42fd6088a707d6474d4ec27f00db081705744d2"
+  },
+  "negative_controls": [
+    {
+      "field": "expected_checksums",
+      "rejected": true
+    },
+    {
+      "field": "mask",
+      "rejected": true
+    },
+    {
+      "field": "semantic_parent_case_id",
+      "rejected": true
+    },
+    {
+      "field": "trial_id",
+      "rejected": true
+    },
+    {
+      "field": "parent_case_id",
+      "rejected": true
+    }
+  ],
+  "numeric_functional_execution_claimed": false,
+  "old_ELF_reference_timings_imported": false,
+  "partition_region_counts": {
+    "internal_validation": 861,
+    "train": 3189
+  },
+  "region_count": 4050,
+  "schema": "iris.empirical_buffered_independent_review.v1",
+  "source_prefix_and_window_preservation": [
+    {
+      "kernel_preparation_prefix_normalized_byte_equal": true,
+      "measured_run_window_source_byte_equal": true,
+      "prefix_sha256": "42f9595ef56eeb8d078a8d2a06dd6bb1626c8983c76f794c0ab17ee386a977ed",
+      "suite": "baseline"
+    },
+    {
+      "kernel_preparation_prefix_normalized_byte_equal": true,
+      "measured_run_window_source_byte_equal": true,
+      "prefix_sha256": "7cac7bd1e2eb8316f5424ec9ef0a14c086faae8d14d975807322077d46707fe6",
+      "suite": "distribution"
+    },
+    {
+      "kernel_preparation_prefix_normalized_byte_equal": true,
+      "measured_run_window_source_byte_equal": true,
+      "prefix_sha256": "e687a68013e825080b2b03e270c124dff013f9b522898b395fcfcc041b6e1c7c",
+      "suite": "memory"
+    }
+  ],
+  "split_sha256": "e1f5359565e02a6f90f73378968c92136bbdaba4b3f3ea6c7661d2e38465ba58",
+  "status": "source_golden_split_review_passed_functional_and_reference_pending"
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "iris.compute_fit_prior_baseline.v1",
+  "calibration_identity": "compute-v1-523-outer-prior-v1",
+  "new_compute_parameter_fit_performed": false,
+  "new_compute_reference_timings_consumed": false,
+  "global_heldout_timings_consumed": false,
+  "full_2pct_certified": false,
+  "prior_scope": "Prior28sharedouter545.732/461andunusedTCM/scratchpaths only; newsource523cost qualification not transferred. Oldbranch/Icache-L1/vector-store/nonmemoryextras omitted for fresh identification.",
+  "fixture_sha256": "335eb4e646fb67bca7b98f45c2432468b90fee1038ec0f0b1fa01e7d5b3fca55",
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/build/compute-fit-cdee-baseline-input-v1/baseline.fixture": "704f95cdc290bc4a4970af697335cda35a5b828287aca8968ed87ecc248cfda6",
+    "/scratch/copparihollmann/iris-model/calibration/empirical-priority-28a0-runtime-v2/parameters.json": "8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258",
+    "/scratch/copparihollmann/iris-model/build/empirical-rocket-RAS-frozen-52314001/manifest.json": "2109308bfca85b8a052aef712a87fb334cc45bcf301dc3217a94031a6f2fc184"
+  }
+}

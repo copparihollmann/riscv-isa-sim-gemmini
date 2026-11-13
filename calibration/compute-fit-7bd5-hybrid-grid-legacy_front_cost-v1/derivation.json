@@ -1,0 +1,14 @@
+{
+  "schema": "iris.generic_TRAIN_grid_candidate.v1",
+  "parent_parameters_sha256": "54b382b9d5520e9ccc4bae7bef13d7e31dea55c2926b5fcf6f46fe3f3bbf7407",
+  "parameters_sha256": "c3ce107af0a7da1b729edac97eb60f00170562547e939061a0bdd93ff6f23972",
+  "fixture_sha256": "f78ef59af39923bc690b5bd966e4b71bdd807ccf54929b69d0dc9afc0d96bb16",
+  "no_runtime_case_ID_or_PC_lookup": true,
+  "fitting_uses_global_heldout": false,
+  "fitting_uses_CV": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-proposal-v1/parameters.json": "54b382b9d5520e9ccc4bae7bef13d7e31dea55c2926b5fcf6f46fe3f3bbf7407",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-proposal-v1/runtime.fixture": "58377f523808f711feaa388f0f81a7aee1f89d194eb616406f2c85c8d90d6d09",
+    "/scratch/copparihollmann/iris-model/timing/empirical_hybrid_variants_v1.py": "824d50c6371641a1074c9025c24312f9aac8d5586f90a879b37165a4c540c323"
+  }
+}

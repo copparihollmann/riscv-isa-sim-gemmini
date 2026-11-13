@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "status": "source-derived-independent-oracle-tested-not-RTL-certified",
+  "source_inputs": {
+    "third_party/saturn/src/main/scala/exu/fp/FPComp.scala": {
+      "sha256": "eb524711ba0ad3292787a404e974c570220e392c8b348920d3d8367cac38be8c",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/backend/Backend.scala": {
+      "sha256": "d4a4df872b47f50bcca1b845890845084deaf884daf0ce4e1c7aa11b8a6b8c96",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/backend/ExecuteSequencer.scala": {
+      "sha256": "1ffdbb4198a5166963b5596ef90bd8fbeb582268e902eb04449d61b698c90c3e",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/backend/SpecialSequencer.scala": {
+      "sha256": "461f7f42b46c4590bb88311c0ea04dfaee9359a36997c79035c38964f016c9e7",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/exu/ExecutionUnit.scala": {
+      "sha256": "7549d2bb2f8a9f6680d012486fdce7bed11b09b26f7c5e65c52345d8427db935",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/frontend/Dispatch.scala": {
+      "sha256": "8eef32d8a8e9dbe306711026d41da3c90a02e80392ac93f384a8de7af822fe4b",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/frontend/PipelinedFaultCheck.scala": {
+      "sha256": "66c16595d01edd741eb3bcf6d31ba7987e31873bb9b168cd8a2288e3edb082a3",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/frontend/EarlyDecode.scala": {
+      "sha256": "1a207d20a11bd2acc590eadfa56a5bee0d605c7fbb4977eaad26039554163650",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/insns/Instructions.scala": {
+      "sha256": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/insns/Decode.scala": {
+      "sha256": "cef52fd8ca24a2bb70cf234e11793ecb8de3b2d10affa80d1374acf2b26901b9",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/saturn/src/main/scala/common/Parameters.scala": {
+      "sha256": "1169c089a0fd29e1e5c4ebd83c43acc5775a704298dc764c05859162b918b332",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    },
+    "third_party/hardfloat/hardfloat/src/main/scala/CompareRecFN.scala": {
+      "sha256": "b319e37c7e6c455a0bf39490a250e8b5ad8dbe54e22fa434f4f9ada134fe063d",
+      "git_sha": "0ecaef097ce2accbd16a61613699450ed5533f29"
+    },
+    "third_party/rocket-chip/src/main/scala/tile/FPU.scala": {
+      "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/rocket-chip/src/main/scala/rocket/CSR.scala": {
+      "sha256": "9e8dcfe5af2ef6b05626fcacd9878351f3593554ca7c0d0420ed27294bdd6d10",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala": {
+      "sha256": "f48f80d1e1738067bd1ef2c2d4356345c959e97f5b007b1d042c2bc51413cb21",
+      "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    },
+    "third_party/shuttle/src/main/scala/exu/Core.scala": {
+      "sha256": "69d885247add3441c395ab1d8b3e97aaaa4925d97964e1800101fcf8736df7df",
+      "git_sha": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "third_party/shuttle/src/main/scala/exu/FPU.scala": {
+      "sha256": "cf5caed71f33e566efbaa0ee01b8a5c0244552249ea964ebc677e822f369b0c1",
+      "git_sha": "a536ed1df91a0f65770e36758291d02a8cb929c4"
+    },
+    "third_party/saturn/src/main/scala/backend/RegisterFile.scala": {
+      "sha256": "4f21a5f2b8a849571d1c26e6921f76a846d8c460e3cd56b940fbe16361886d4d",
+      "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+    }
+  },
+  "development_base": {
+    "upstream_sha": "72958551566a30f19444bd7e354552824e4d0a98",
+    "base_overlay_sha256": "37decf8fb2ff6daef69199f1f12032993a709fdcf9bc32be6c086248aa5e27a2",
+    "base_package_sha256": "ea430189096e7e25697d7fc081a3ac36dcf00a90bab3cb7676005bd362e63e24",
+    "base_provenance_sha256": "dc9d3fa3ddbb1f3b2b4486f5aff6f344460895ba7f968257f7b7e6d94b48a532",
+    "source_paths": {
+      "saturn/src/main/scala/exu/fp/FPComp.scala": {
+        "sha256": "eb524711ba0ad3292787a404e974c570220e392c8b348920d3d8367cac38be8c",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/backend/Backend.scala": {
+        "sha256": "d4a4df872b47f50bcca1b845890845084deaf884daf0ce4e1c7aa11b8a6b8c96",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/backend/ExecuteSequencer.scala": {
+        "sha256": "1ffdbb4198a5166963b5596ef90bd8fbeb582268e902eb04449d61b698c90c3e",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/backend/SpecialSequencer.scala": {
+        "sha256": "461f7f42b46c4590bb88311c0ea04dfaee9359a36997c79035c38964f016c9e7",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/exu/ExecutionUnit.scala": {
+        "sha256": "7549d2bb2f8a9f6680d012486fdce7bed11b09b26f7c5e65c52345d8427db935",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/frontend/Dispatch.scala": {
+        "sha256": "8eef32d8a8e9dbe306711026d41da3c90a02e80392ac93f384a8de7af822fe4b",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/frontend/PipelinedFaultCheck.scala": {
+        "sha256": "66c16595d01edd741eb3bcf6d31ba7987e31873bb9b168cd8a2288e3edb082a3",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "saturn/src/main/scala/insns/Instructions.scala": {
+        "sha256": "2507afac954314076c174350dee1c4058d7d67675e34f33db104f543f1bc166c",
+        "git_sha": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532"
+      },
+      "hardfloat/hardfloat/src/main/scala/CompareRecFN.scala": {
+        "sha256": "b319e37c7e6c455a0bf39490a250e8b5ad8dbe54e22fa434f4f9ada134fe063d",
+        "git_sha": "0ecaef097ce2accbd16a61613699450ed5533f29"
+      },
+      "rocket-chip/src/main/scala/tile/FPU.scala": {
+        "sha256": "5161b5324c62f887a0d2afd938159d818de43d8d29543d278888eac8b8b35c0a",
+        "git_sha": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+      }
+    },
+    "primary_source_preserved": true,
+    "base_tree": "54269bd869b8bfc247a65c6d6ef9111aafceae44",
+    "numeric_delta_sha256": "506ff15d02c7ae6e8daaf20e4e38fb8617414e8cd8c409dbd0181fae02b09063",
+    "development_full_overlay_sha256": "55e639e4f08bc22c45238ed3af15a2611778acab2d626e8cafba1a11e7de3518"
+  },
+  "claims": {
+    "configured_forms": {
+      "source": "third_party/saturn/src/main/scala/exu/fp/FPComp.scala",
+      "lines": [
+        12,
+        21
+      ],
+      "behavior": "22 configured ordinary/minmax/compare/sign/reduction forms; only SEW16/32/64; no Elementwise override."
+    },
+    "source_selected_exception_chunks": {
+      "source": "third_party/saturn/src/main/scala/exu/fp/FPComp.scala",
+      "lines": [
+        42,
+        98,
+        155,
+        156
+      ],
+      "also": [
+        "third_party/hardfloat/hardfloat/src/main/scala/CompareRecFN.scala"
+      ],
+      "behavior": "CompareRecFN.signaling=true for every instruction. H chunks feed flags for SEW16/32; S chunks feed flags for SEW64. Any NaN in either physical data bus generates NV, including masked elements, tail bytes, and sign-injection instructions."
+    },
+    "minmax_tie_and_nan": {
+      "source": "third_party/saturn/src/main/scala/exu/fp/FPComp.scala",
+      "lines": [
+        66,
+        79
+      ],
+      "behavior": "Both NaN -> canonical QNaN; one NaN -> other operand; otherwise strict comparison chooses vs2 only for strictly smaller/larger and vs1 on ties, including signed zero."
+    },
+    "comparisons_and_sign": {
+      "source": "third_party/saturn/src/main/scala/exu/fp/FPComp.scala",
+      "lines": [
+        81,
+        95,
+        108,
+        138
+      ],
+      "behavior": "NaNs are true only for !=; ordered H/S/D relations and bitwise sign copying/negation/XOR. Selected exception chunks apply independently of output selection."
+    },
+    "masked_tail_full_beat": {
+      "source": "third_party/saturn/src/main/scala/backend/Backend.scala",
+      "lines": [
+        298,
+        329
+      ],
+      "also": [
+        "third_party/saturn/src/main/scala/backend/ExecuteSequencer.scala",
+        "third_party/saturn/src/main/scala/exu/ExecutionUnit.scala"
+      ],
+      "behavior": "Operands are full DLEN128/256 physical groups; write masks restrict active output bytes/bits only. Source exception calculation is unmasked over every issued physical group."
+    },
+    "reduction_graph": {
+      "source": "third_party/saturn/src/main/scala/backend/Backend.scala",
+      "lines": [
+        340,
+        363
+      ],
+      "also": [
+        "third_party/saturn/src/main/scala/backend/SpecialSequencer.scala",
+        "third_party/saturn/src/main/scala/backend/ExecuteSequencer.scala",
+        "third_party/saturn/src/main/scala/common/Parameters.scala"
+      ],
+      "behavior": "DLEN-dependent per-lane accumulator starts at +/-infinity with lane0 replaced by seed. Active elements update matching lanes. Halving folds zero-extend selected upper chunks and update all lanes except last fold writes lane0 only. Every fold still contributes selected physical-chunk flags."
+    },
+    "vf_and_fs": {
+      "source": "third_party/shuttle/src/main/scala/exu/Core.scala",
+      "lines": [
+        223,
+        227,
+        1167,
+        1175
+      ],
+      "also": [
+        "third_party/rocket-chip/src/main/scala/tile/FPU.scala",
+        "third_party/rocket-chip/src/main/scala/rocket/CSR.scala",
+        "third_party/shuttle/src/main/scala/exu/FPU.scala"
+      ],
+      "behavior": "VF extraction uses raw low FPR bits, no narrow NaN-box check. All five elaborated FPU decoder modules have wflags=0 on all11 VF forms; valid zero flags dirty FS even at VL0. VV VL0 does not execute or dirty FS; nonzero VL flags valid asserts if FSOff, including all-masked operations."
+    },
+    "vstart": {
+      "source": "third_party/saturn/src/main/scala/frontend/PipelinedFaultCheck.scala",
+      "lines": [
+        215,
+        223
+      ],
+      "also": [
+        "third_party/rocket-chip/src/main/scala/rocket/RocketCore.scala"
+      ],
+      "behavior": "Non-memory vstart !=0 traps illegal with tval=instruction PC; Dispatch drops VL0 execution."
+    },
+    "altfmt_accepted_ignored": {
+      "source": "third_party/rocket-chip/src/main/scala/rocket/CSR.scala",
+      "lines": [
+        326,
+        360
+      ],
+      "also": [
+        "third_party/saturn/src/main/scala/frontend/EarlyDecode.scala",
+        "third_party/saturn/src/main/scala/exu/fp/FPComp.scala"
+      ],
+      "behavior": "VType.fromUInt accepts altfmt without ISA extension gating, on all harts and widths. Decoder index excludes altfmt; FPComp always interprets accepted SEW16/32/64 operands as physical H/S/D, irrespective of altfmt. This is not ideal BF16 comparison."
+    }
+  },
+  "scalar_vf_decoder_proofs": {
+    "fpcomp-FPUDecoder_3-proof.json": {
+      "sha256": "fb6e98ce34a813db089cf516d19fbf2382e7100b9164320f3e98d15f07be9601",
+      "module": "FPUDecoder_3",
+      "snapshot": "fpcomp-evidence/FPUDecoder_3.fir",
+      "snapshot_sha256": "fc3e09abb1b4641cf309a3a8fe69f58c12e77d4545bb8c0c44bb7e42228fddcb",
+      "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef"
+    },
+    "fpcomp-FPUDecoder_1-proof.json": {
+      "sha256": "919c37c9e85fe2ba643835052648d2b0a26a5df1cf644ffedd9d71ed6a3a26b2",
+      "module": "FPUDecoder_1",
+      "snapshot": "fpcomp-evidence/FPUDecoder_1.fir",
+      "snapshot_sha256": "7c96014e242db6de6f6df85d1a32e55370bf2c11e3114da2e1146352c28848cd",
+      "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef"
+    },
+    "fpcomp-FPUDecoder-proof.json": {
+      "sha256": "28e6c938fe7b8cfbcc60720a4e4450fb1846928083a5e43693f33370b5128ed8",
+      "module": "FPUDecoder",
+      "snapshot": "fpcomp-evidence/FPUDecoder.fir",
+      "snapshot_sha256": "306eaccb0e33a0950c191928f46a72f6c07148bcc5fec3b9b3feed2b3caa2b3b",
+      "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef"
+    },
+    "fpcomp-FPUDecoder_2-proof.json": {
+      "sha256": "e14c4b355d8f7a2e062e03f7a1f5578fd832766bce830bb0dc3f247d6ced17a0",
+      "module": "FPUDecoder_2",
+      "snapshot": "fpcomp-evidence/FPUDecoder_2.fir",
+      "snapshot_sha256": "fd8b23d796dbfcd245acf9a5bfe270d014502408cb1249b6ec4e88c85458ecbe",
+      "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef"
+    },
+    "fpcomp-FPUDecoder_4-proof.json": {
+      "sha256": "0edc6fcd2b99bfcd76c554b1eaf8f80acc7dc291e3ffb1dd51026e5068c9c460",
+      "module": "FPUDecoder_4",
+      "snapshot": "fpcomp-evidence/FPUDecoder_4.fir",
+      "snapshot_sha256": "9c651c4f6eb1d21e7cdbc453171ccf7c6f04052e2cafb756bc9683a957e19b33",
+      "fir_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef"
+    }
+  },
+  "oracle_cases": 8448,
+  "handler_executions": 12672,
+  "forms": 22,
+  "host_float_used": false,
+  "rtl_executed": false,
+  "deployed_image_association_verified": false,
+  "fail_closed": [
+    "SEW8 FPComp is absent from source decoder; all22 opcode forms raise architectural illegal with encoding tval on all3 harts, both alt values.",
+    "FPComp on unaudited VLEN!=256 or ELEN!=64 stops with explicit model capability refusal.",
+    "Other FPDiv/FPConv operations and unverified datatype paths retain separate audit scope and existing explicit refusals.",
+    "Timing and temporal exception visibility remain uncalibrated."
+  ],
+  "illegal_sew8_cases": 132,
+  "generic_semantic_cases": 9,
+  "generic_semantics_preserved": true,
+  "core_trap_priority_cases": 6,
+  "vector_config_refusals": 2,
+  "hardware_manifest_sha256": "aa2feafcdedde5916155bbe3bbdd2cec8eb64f109eb555778ec670c52c96e064",
+  "hardware_dtypes_sha256": "606d9eb073abc06cddeb626fb5fc6c3796b7bb94931d5a95bad9c619bb60025e",
+  "reset_definedness": {
+    "physical_vrf_and_v0_source": {
+      "path": "third_party/saturn/src/main/scala/backend/RegisterFile.scala",
+      "lines": [
+        63,
+        64
+      ],
+      "initialization": "uninitialized Chisel Mem; no reset assignment"
+    },
+    "model_definedness_tracking": false,
+    "model_initial_zero_is_rtl_certified": false,
+    "certified_zero_reset_claim": false,
+    "scope": "Current source-policy numeric tests establish behavior only for explicitly initialized physical source groups, consumed mask bits, scalar operands, destination preservation bytes, and fflags. Unknown reset bits are not certified zeros.",
+    "corpus_initialization_evidence": {
+      "guest": "fpcomp_guest.c: vsetvl256/e8/m8 and vle8.v initialize all256 bytes of v8..15,v16..23,v24..31; vlm initializes every consumed mask bit; fmv.d.x defines scalar64 bits; csrw fflags seeds knownDZ",
+      "native": "fpcomp_handlers_test.cc: each corpus case explicitly writes all256 bytes of each source/destination group,128 mask bits, scalar FPR, seed and fflags",
+      "independent_expected_output": "generate_fpcomp_cases.py consumes all physical source bytes of each issued group, including masked/tail data"
+    },
+    "next_required_work": [
+      "Fail-closed physical VRF/v0 definedness for FPComp operands and selected exception chunks.",
+      "Audit scalar FPR and fflags reset/definedness sources and preserve explicit unknown state."
+    ],
+    "rtl_executed": false
+  }
+}

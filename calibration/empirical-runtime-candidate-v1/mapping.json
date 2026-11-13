@@ -1,0 +1,69 @@
+{
+  "fixture_sha256": "a1da8e8d8d8ce368989705372634f47e2880f1820a315afd936baf8a2a72573f",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "no_doublecharge": [
+    "Regionintercepts omitted.",
+    "GenericDRAMmemoryfamilyresidual replacedbythisservice.",
+    "Peer93.816proxyomittedbecauseactualshared448portserializescontention.",
+    "Dirtyvictimsexposedasworkbutnoadditional448reservation: currentouterfitmayalreadylumpwritebacktraffic."
+  ],
+  "parameter_sha256": {
+    "stream_proxy": "edfd77535706951baf29869c6568daaaf60153c622d4adb9f2fcf342e0002384",
+    "warm_routes": "6b161126f1967b879e329e638087f610870dd16a4d0f07c436b0a695e6fce246"
+  },
+  "runtime_binding_qualified": false,
+  "runtime_native_sha256": null,
+  "schema": "iris.empirical_live_memory_candidate.v1",
+  "selection_evidence": "Trainingprivate1MB/twopass cases: ~29.3Mcy/(2*32768readrefills)=447.1cy/refill, ~44.1M/(3*32768)=448.6; perhartdurationproxy, not commonabsolutehartclock.",
+  "source_image_association_verified": false,
+  "status": "explicit_candidate_runtime_replay_required",
+  "units": "core_cycles_at_500MHz",
+  "unknowns": [
+    "L1replacementLRUapprox, actualcachehistorynotobserved.",
+    "PhysicalL2vsSerialTLvsDRAMclock/backendcontributionsnotseparated.",
+    "ROImedianfit is notliveenginequality.",
+    "Vectorcachebehaviornotyetqualified."
+  ],
+  "values_by_hart": {
+    "0": {
+      "dirty_extra_cycles": 0.0,
+      "dirty_status": "additional_cost_deferred_outer_cost_already_lumped_not_physical_zero",
+      "l1_miss_extra_cycles": 62.92335435794887,
+      "l1_outer_status": "Shuttleproxyfit",
+      "outer_interval_status": "training_aggregate_bandwidth_candidate_not_separately_fit",
+      "outer_launch_interval_cycles": 448.0,
+      "outer_miss_extra_cycles": 596.4022346302061,
+      "read_base_cycles": 1.4945471059680409,
+      "read_status": "effective_proxy_fit",
+      "write_base_cycles": 0.8626398234012906,
+      "write_status": "separate_warmroute_proxy_not_stream_fit"
+    },
+    "1": {
+      "dirty_extra_cycles": 0.0,
+      "dirty_status": "additional_cost_deferred_outer_cost_already_lumped_not_physical_zero",
+      "l1_miss_extra_cycles": 62.92335435794887,
+      "l1_outer_status": "Shuttleproxyfit",
+      "outer_interval_status": "training_aggregate_bandwidth_candidate_not_separately_fit",
+      "outer_launch_interval_cycles": 448.0,
+      "outer_miss_extra_cycles": 596.4022346302061,
+      "read_base_cycles": 1.4945471059680409,
+      "read_status": "effective_proxy_fit",
+      "write_base_cycles": 0.8626398234012906,
+      "write_status": "separate_warmroute_proxy_not_stream_fit"
+    },
+    "2": {
+      "dirty_extra_cycles": 0.0,
+      "dirty_status": "additional_cost_deferred_outer_cost_already_lumped_not_physical_zero",
+      "l1_miss_extra_cycles": 62.92335435794887,
+      "l1_outer_status": "explicit_shared_service_transfer_from_Shuttle_not_Rocket_identified",
+      "outer_interval_status": "training_aggregate_bandwidth_candidate_not_separately_fit",
+      "outer_launch_interval_cycles": 448.0,
+      "outer_miss_extra_cycles": 596.4022346302061,
+      "read_base_cycles": 0.10302279316231863,
+      "read_status": "effective_proxy_fit",
+      "write_base_cycles": 0.0,
+      "write_status": "separate_warmroute_proxy_not_stream_fit"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "source_path": "/scratch/eygao/iris-cy/sims/firesim/sim/generated-src/corigine_mimicturbo_gt/corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/post-bridge-extraction.json",
+  "source_sha256": "029e831c822e98cd627557763d82b7bc523c968ebfe260f372eec57698a36ea9",
+  "annotations": [
+    {
+      "class": "firesim.lib.bridgeutils.BridgeIOAnnotation",
+      "target": "~FireSim|FireSim>ep",
+      "channelMapping": {
+        "reset": "ep_reset",
+        "uart_txd": "ep_uart_txd",
+        "uart_rxd": "ep_uart_rxd"
+      },
+      "widgetClass": "firechip.goldengateimplementations.UARTBridgeModule",
+      "widgetConstructorKey": {
+        "class": "firechip.bridgeinterfaces.UARTKey",
+        "div": 135
+      }
+    }
+  ],
+  "deployed_image_association_verified": false
+}

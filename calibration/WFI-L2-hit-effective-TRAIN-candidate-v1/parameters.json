@@ -1,0 +1,67 @@
+{
+  "schema": "iris.WFI_train_effective_L2_hit_service.v1",
+  "parameters": [
+    {
+      "hart": 0,
+      "read_base": 0,
+      "write_base": 0,
+      "L1_miss_additional_core_cycles": 52.32337048349108,
+      "outer_miss_additional_core_cycles": 493.4086706425089,
+      "outer_launch_interval_core_cycles": 461,
+      "dirty_victim_extra_core_cycles": 0,
+      "train_rows": 96,
+      "train_nonzero_basis_rows": 30,
+      "design_rank": 1,
+      "basis_weighted_squared_norm": 0.0073678981082368035,
+      "status": "EFFECTIVE_TRAIN_TAG_SERVICE_NOT_PHYSICAL_LATENCY"
+    },
+    {
+      "hart": 1,
+      "read_base": 0,
+      "write_base": 0,
+      "L1_miss_additional_core_cycles": 48.85169191685408,
+      "outer_miss_additional_core_cycles": 496.88034920914595,
+      "outer_launch_interval_core_cycles": 461,
+      "dirty_victim_extra_core_cycles": 0,
+      "train_rows": 102,
+      "train_nonzero_basis_rows": 36,
+      "design_rank": 1,
+      "basis_weighted_squared_norm": 0.009487445302416525,
+      "status": "EFFECTIVE_TRAIN_TAG_SERVICE_NOT_PHYSICAL_LATENCY"
+    },
+    {
+      "hart": 2,
+      "read_base": 0,
+      "write_base": 0,
+      "L1_miss_additional_core_cycles": 63.38750567457621,
+      "outer_miss_additional_core_cycles": 482.3445354514238,
+      "outer_launch_interval_core_cycles": 461,
+      "dirty_victim_extra_core_cycles": 0,
+      "train_rows": 102,
+      "train_nonzero_basis_rows": 42,
+      "design_rank": 1,
+      "basis_weighted_squared_norm": 0.006453985912494712,
+      "status": "EFFECTIVE_TRAIN_TAG_SERVICE_NOT_PHYSICAL_LATENCY"
+    }
+  ],
+  "estimator": "Fixed per-hart bounded nonnegative relative least squares; no intercept; x=D.L1miss-D.L2miss; y=HW_mcycle_delta-baseline_mcycle_delta; weights=1/HW_delta^2",
+  "split": "Existing frozen semantic-parent internal_split=train only; all trials/passes stay with parent",
+  "READ_coefficient_fixed_zero_reason": "Warm L1 response returns before READ charge; prefix counts lack charged-READ counter",
+  "Icache_services_unchanged": true,
+  "other_family_costs_unchanged": true,
+  "outer_total_scalar_miss_additional_latency_preserved": true,
+  "physical_L2_latency_identified": false,
+  "source_L2_random_policy_not_implemented": true,
+  "linearized_fit_not_actual_runtime_accuracy": true,
+  "candidate_live_replay_required": true,
+  "internal_validation_used_for_coefficients": false,
+  "global_heldout_data_consumed": false,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/fit_wfi_L2_hit_service_v1.py": "b71a8e12bd93b66a098a52baea8e39b54525c632abdcbd7a9126e04d2f99e40d",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-selected-v1/runtime.fixture": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-hybrid7bd5-comparison-v2/report.json": "e767646bf7bcdf7e6c491a10488bc80387b8fdc850362c01ac46388e980eccf5",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-hybrid7bd5-comparison-v2/regions.jsonl": "8f1ad0493e759a37668e3b2704ba5942d26b13f1657ab5749b89dfb035ef89c0",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-groups-hybrid7bd5-selected-v1/features.jsonl": "0058764ff74ce205df74e9c05ed7dc99b2c6d4b5eadf2987d3991e71fb23d23a",
+    "/scratch/copparihollmann/iris-model/build/memory-footprints-WFI-groups-hybrid7bd5-selected-v1/CSR-endpoint-qualification.json": "cc21a4edc66fe7ce70da8f534b450c7f8347ee7ed43411d32ac43a2259397809"
+  }
+}

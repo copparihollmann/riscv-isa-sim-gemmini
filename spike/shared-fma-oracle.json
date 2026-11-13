@@ -1,0 +1,16 @@
+{
+  "operation_cases": 21000,
+  "reduction_cases": 1200,
+  "forms": 45,
+  "formats": [
+    "FP16",
+    "FP32",
+    "FP64"
+  ],
+  "rounding_modes": 5,
+  "seed": 1397117013,
+  "host_float_used": false,
+  "rtl_executed": false,
+  "header_sha256": "8ab1f282715dea3ffff09fe49a5d668a5c997b6bfaa9ca13ea4b45f77f84021e",
+  "policy": "full IEEE flags including masked elements; ignored widening-converter flags; scalar ascending reduction plus final+0 for both opcodes"
+}

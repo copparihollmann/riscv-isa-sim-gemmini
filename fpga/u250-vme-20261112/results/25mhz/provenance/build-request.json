@@ -1,0 +1,33 @@
+{
+  "source_revisions": {
+    "chipyard": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+    "saturn": "536774bd4c5e3bcd7813a4a0dc72fc87e5818532",
+    "shuttle": "a536ed1df91a0f65770e36758291d02a8cb929c4",
+    "rocket_chip": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "firesim": "e1bdea8bb042b900995436ecc3d7c44100eb9da0"
+  },
+  "host_fpga_clocks_mhz": [
+    15,
+    25
+  ],
+  "target_memory_clock_mhz": 1000,
+  "target_memory_bytes": 17179869184,
+  "platform_config": "FRFCFS16GBQuadRank_BaseXilinxAlveoU250Config",
+  "memory_model": "FASED FirstReadyFCFSConfig",
+  "scheduler_entries": 8,
+  "transaction_entries": 8,
+  "harts": [
+    0,
+    1
+  ],
+  "vlen": 256,
+  "dlen": 128,
+  "dtype": "INT8 OPU",
+  "system_bus_bits": 128,
+  "tile_beat_bytes": 16,
+  "clockgate_patch_sha256": "1575ba1279459901d40a694b0288e17a4325eec7939e8d54212b2e43c66a5125",
+  "recipes": [
+    "alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_15mhz",
+    "alveo_u250_vme_v256d128_dual_int8_ddr3frfcfs_25mhz"
+  ]
+}

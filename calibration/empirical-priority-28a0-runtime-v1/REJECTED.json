@@ -1,0 +1,7 @@
+{
+  "schema": "iris.empirical_candidate_configuration_rejection.v1",
+  "status": "rejected_before_guest_execution",
+  "reason": "Fixture source audit found rule resource declarations duplicated names the native constructor automatically configures. Keep parameters/rawdraft; successor uses explicit fit.* resource aliases.",
+  "hardware_contacted": false,
+  "actual_native_run_attempted": false
+}

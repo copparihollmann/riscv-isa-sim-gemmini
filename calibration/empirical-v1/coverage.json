@@ -1,0 +1,689 @@
+{
+  "families": [
+    {
+      "family": "atomics",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "branches",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "dependent",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 30
+      },
+      "proxy_fit_present": true,
+      "regions": 30,
+      "suite": "baseline"
+    },
+    {
+      "family": "empty",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "ipi",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "local_tcm",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 10
+      },
+      "proxy_fit_present": false,
+      "regions": 10,
+      "suite": "baseline"
+    },
+    {
+      "family": "lrsc",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "pointer_chase",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 20
+      },
+      "proxy_fit_present": false,
+      "regions": 20,
+      "suite": "baseline"
+    },
+    {
+      "family": "refuse_vme",
+      "harts": [
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 5
+      },
+      "proxy_fit_present": false,
+      "regions": 5,
+      "suite": "baseline"
+    },
+    {
+      "family": "scratchpad",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "internal_validation": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "stream",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 3,
+      "partitions": {
+        "internal_validation": 5,
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 20,
+      "suite": "baseline"
+    },
+    {
+      "family": "sync_barrier",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "internal_validation": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "timer",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 15
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "vec_e32_m1",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 10
+      },
+      "proxy_fit_present": false,
+      "regions": 10,
+      "suite": "baseline"
+    },
+    {
+      "family": "vec_e32_m2",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 10
+      },
+      "proxy_fit_present": false,
+      "regions": 10,
+      "suite": "baseline"
+    },
+    {
+      "family": "vec_e8_m1",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "internal_validation": 10,
+        "train": 10
+      },
+      "proxy_fit_present": false,
+      "regions": 20,
+      "suite": "baseline"
+    },
+    {
+      "family": "vec_e8_m2",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 10
+      },
+      "proxy_fit_present": false,
+      "regions": 10,
+      "suite": "baseline"
+    },
+    {
+      "family": "vme_mm",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "internal_validation": 10,
+        "train": 5
+      },
+      "proxy_fit_present": false,
+      "regions": 15,
+      "suite": "baseline"
+    },
+    {
+      "family": "atomic",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 21,
+      "partitions": {
+        "internal_validation": 25,
+        "train": 155
+      },
+      "proxy_fit_present": false,
+      "regions": 180,
+      "suite": "distribution"
+    },
+    {
+      "family": "branch",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 4,
+      "partitions": {
+        "internal_validation": 15,
+        "train": 45
+      },
+      "proxy_fit_present": false,
+      "regions": 60,
+      "suite": "distribution"
+    },
+    {
+      "family": "dependent",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 10,
+      "partitions": {
+        "internal_validation": 45,
+        "train": 60
+      },
+      "proxy_fit_present": true,
+      "regions": 105,
+      "suite": "distribution"
+    },
+    {
+      "family": "frontend",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 6,
+      "partitions": {
+        "internal_validation": 15,
+        "train": 75
+      },
+      "proxy_fit_present": false,
+      "regions": 90,
+      "suite": "distribution"
+    },
+    {
+      "family": "independent",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 10,
+      "partitions": {
+        "internal_validation": 5,
+        "train": 100
+      },
+      "proxy_fit_present": true,
+      "regions": 105,
+      "suite": "distribution"
+    },
+    {
+      "family": "memory",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 54,
+      "partitions": {
+        "internal_validation": 105,
+        "train": 355
+      },
+      "proxy_fit_present": false,
+      "regions": 460,
+      "suite": "distribution"
+    },
+    {
+      "family": "pipeline",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 3,
+      "partitions": {
+        "train": 45
+      },
+      "proxy_fit_present": false,
+      "regions": 45,
+      "suite": "distribution"
+    },
+    {
+      "family": "pipeline_vme",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 30
+      },
+      "proxy_fit_present": false,
+      "regions": 30,
+      "suite": "distribution"
+    },
+    {
+      "family": "row_read",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "internal_validation": 10,
+        "train": 10
+      },
+      "proxy_fit_present": true,
+      "regions": 20,
+      "suite": "distribution"
+    },
+    {
+      "family": "row_write",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 20
+      },
+      "proxy_fit_present": true,
+      "regions": 20,
+      "suite": "distribution"
+    },
+    {
+      "family": "scalar_fp",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 6,
+      "partitions": {
+        "internal_validation": 45,
+        "train": 45
+      },
+      "proxy_fit_present": true,
+      "regions": 90,
+      "suite": "distribution"
+    },
+    {
+      "family": "shared_fpu",
+      "harts": [
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 4,
+      "partitions": {
+        "train": 20
+      },
+      "proxy_fit_present": false,
+      "regions": 20,
+      "suite": "distribution"
+    },
+    {
+      "family": "tile_zero",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 20
+      },
+      "proxy_fit_present": true,
+      "regions": 20,
+      "suite": "distribution"
+    },
+    {
+      "family": "vector_fp",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 19,
+      "partitions": {
+        "internal_validation": 35,
+        "train": 205
+      },
+      "proxy_fit_present": true,
+      "regions": 240,
+      "suite": "distribution"
+    },
+    {
+      "family": "vector_int",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 31,
+      "partitions": {
+        "internal_validation": 85,
+        "train": 335
+      },
+      "proxy_fit_present": true,
+      "regions": 420,
+      "suite": "distribution"
+    },
+    {
+      "family": "vme_fp8",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 16,
+      "partitions": {
+        "internal_validation": 30,
+        "train": 90
+      },
+      "proxy_fit_present": true,
+      "regions": 120,
+      "suite": "distribution"
+    },
+    {
+      "family": "vme_int",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 13,
+      "partitions": {
+        "internal_validation": 10,
+        "train": 100
+      },
+      "proxy_fit_present": true,
+      "regions": 110,
+      "suite": "distribution"
+    },
+    {
+      "family": "vme_memory",
+      "harts": [
+        0,
+        1
+      ],
+      "live_timing_qualified": false,
+      "parents": 2,
+      "partitions": {
+        "train": 20
+      },
+      "proxy_fit_present": false,
+      "regions": 20,
+      "suite": "distribution"
+    },
+    {
+      "family": "vme_refusal",
+      "harts": [
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 1,
+      "partitions": {
+        "train": 5
+      },
+      "proxy_fit_present": false,
+      "regions": 5,
+      "suite": "distribution"
+    },
+    {
+      "family": "route_chase",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 168,
+      "partitions": {
+        "internal_validation": 305,
+        "train": 1135
+      },
+      "proxy_fit_present": true,
+      "regions": 1440,
+      "suite": "memory"
+    },
+    {
+      "family": "route_read",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 168,
+      "partitions": {
+        "internal_validation": 360,
+        "train": 1080
+      },
+      "proxy_fit_present": true,
+      "regions": 1440,
+      "suite": "memory"
+    },
+    {
+      "family": "route_write",
+      "harts": [
+        0,
+        1,
+        2
+      ],
+      "live_timing_qualified": false,
+      "parents": 168,
+      "partitions": {
+        "internal_validation": 290,
+        "train": 1150
+      },
+      "proxy_fit_present": true,
+      "regions": 1440,
+      "suite": "memory"
+    }
+  ],
+  "full_2pct_certified": false,
+  "global_heldout_timings_opened": false,
+  "identifiability": {
+    "cpu_width_and_raw": [
+      "Multipleoperationcounts and dependent/independentstreams support aggregateCPI/criticalchain fit.",
+      "Physicalmispredictpenalty cannotbeidentifiedwithoutmisscounts."
+    ],
+    "memory": [
+      "Local/remoteTCM,scratch,smallcachedDRAM identifiedonlyaseffectiveaddedcosts.",
+      "Largewarm/eviction streams supportlumpedcachemiss+serial+DRAM+dirtyvictimcost andcontention, notphysicalperlevelseparation.",
+      "Trueinitialtagstate,code/datahistory,portarbitration andcoherenceownership remainruntime features."
+    ],
+    "multicore": [
+      "Masks1..7,threeharts,atomicsharing,pipelineproducer/consumer andIPIs present.",
+      "Mostsynchronization/atomic/IRQinteractions remainunfitted ininitial40-modelpacket.",
+      "Perhartmcyclecounterorigins cannotbeusedasglobalwallclock."
+    ],
+    "rvv": [
+      "IntSEW8/16/32/64,LMUL1/2/4;FP16/32/64,LMUL1/2 represented.",
+      "IntfixedN and FPdependent-only designsleaveindividual latency/throughput/intercept coefficientsrankdeficient.",
+      "LMUL8 timingnotrepresented in6750fit."
+    ],
+    "vme": [
+      "Int8/FP8andTK1/4,tilezero/moves represented onharts0/1.",
+      "Fixed32x32tile andFP8TK4 donotidentify allshape-edge latencybehavior.",
+      "FP8formatsemanticsalreadyfunctional;latencyfit sharedunlessactualdata establishesformatcost."
+    ]
+  },
+  "schema": "iris.empirical_coverage.v1",
+  "source_image_association_verified": false,
+  "source_units": {
+    "hart0": {
+      "DLEN": 128,
+      "VLEN": 256,
+      "kind": "Shuttle"
+    },
+    "hart1": {
+      "DLEN": 128,
+      "VLEN": 256,
+      "kind": "Shuttle"
+    },
+    "hart2": {
+      "DLEN": 256,
+      "VLEN": 256,
+      "kind": "Rocket"
+    }
+  }
+}

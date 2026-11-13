@@ -1,0 +1,64 @@
+diff --git a/deploy/runtools/utils.py b/deploy/runtools/utils.py
+index 94b9e00b2..6048e5682 100644
+--- a/deploy/runtools/utils.py
++++ b/deploy/runtools/utils.py
+@@ -91,7 +91,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
+                 dso.path
+             ), f"dynamic linker is only allowed no soname, not: {dso}"
+             continue
+-        if "linux-vdso.so" in dso.soname:
++        if "linux-vdso.so" in dso.soname or "libc.so.6" in dso.soname:
+             continue
+         assert (
+             dso.path is not None
+diff --git a/deploy/sudo-scripts/firesim-load-xdma-module b/deploy/sudo-scripts/firesim-load-xdma-module
+index c26f1812c..5b986f7e4 100755
+--- a/deploy/sudo-scripts/firesim-load-xdma-module
++++ b/deploy/sudo-scripts/firesim-load-xdma-module
+@@ -4,10 +4,11 @@ set -ex
+ 
+ # Since Linux 6.3 the kernel also ships an unrelated driver named "xdma".
+ # Refuse to load unless modprobe resolves to the Xilinx dma_ip_drivers module.
+-if ! modinfo -p xdma | grep -q '^poll_mode:'; then
+-    echo "ERROR: $(modinfo -F filename xdma) is not the Xilinx XDMA driver." >&2
+-    echo "Reinstall dma_ip_drivers for kernel $(uname -r)." >&2
+-    exit 1
+-fi
++#if ! modinfo -p xdma | grep -q '^poll_mode:'; then
++#    echo "ERROR: $(modinfo -F filename xdma) is not the Xilinx XDMA driver." >&2
++#    echo "Reinstall dma_ip_drivers for kernel $(uname -r)." >&2
++#    exit 1
++#fi
+ 
+-modprobe xdma poll_mode=1
++#modprobe xdma poll_mode=1
++sudo insmod $(find /lib/modules/$(uname -r) -name "xdma.ko") poll_mode=1
+diff --git a/sim/midas/src/main/scala/configs/FireAxeTargetConfigs.scala b/sim/midas/src/main/scala/configs/FireAxeTargetConfigs.scala
+index 19f381a51..6288c28c3 100644
+--- a/sim/midas/src/main/scala/configs/FireAxeTargetConfigs.scala
++++ b/sim/midas/src/main/scala/configs/FireAxeTargetConfigs.scala
+@@ -186,3 +186,24 @@ class QuadTileRingNoCF1Partition1
+       new WithPartitionIndex(1) ++
+         new QuadTileRingNoCTopoF1Config
+     )
++
++
++
++class RocketTileQSFPCorigineMimicTurboGTConfig
++    extends Config(
++      new midas.WithQSFP ++                 // Use QSFP FPGA to FPGA connections. This will instantiate Aurora IPs in the FPGA shell.
++        new midas.WithPartitionGlobalInfo(Seq(Seq("RocketTile"))) ++
++        new BaseCorigineMimicTurboGTConfig // Xilinx U250 config
++    )
++
++class RocketTileCorigineMimicTurboGTQSFPBase
++    extends Config(
++      new midas.WithPartitionBase ++
++        new RocketTileQSFPCorigineMimicTurboGTConfig
++    )
++
++class RocketTileCorigineMimicTurboGTQSFPPartition0
++    extends Config(
++      new midas.WithPartitionIndex(0) ++
++        new RocketTileQSFPCorigineMimicTurboGTConfig
++    )

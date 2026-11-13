@@ -1,0 +1,9 @@
+{
+  "schema": "iris.heldout_pipeline_derivation.v1",
+  "parent_sha256": "e77e71e0e98015219a630ac266a9c35ba16196d6785d072ea9b172268a020e90",
+  "derived_sha256": "b6df85b2d898e07e2f9192e61f84c4a40aa6af84dc2f9adea470afb0c053a5c0",
+  "scope": "Five repeated three-input groups; fixed hart2 pipeline interval excludes boot/main thread construction and result printing; same compute kernels, layouts, worker affinities and context contract",
+  "original_unchanged": true,
+  "timing_observed": false,
+  "hardware_contacted": false
+}

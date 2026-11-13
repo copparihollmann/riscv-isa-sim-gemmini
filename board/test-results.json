@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-11-05T22:56:19.244882+00:00",
+  "status": "passed_helper_tests",
+  "exit_status": 0,
+  "core_integration": false,
+  "zephyr_smp_certified": false,
+  "rtl_certified": false,
+  "input_sha256": {
+    "build.py": "c048928e8b47866b80b8ec7d04ae8c369cb096c2cbe8bee421717b3a7f202139",
+    "core-changes.json": "21de95709ac69da502221e36b714c02004ecd3e9a6415c42130d99db3d92e0c9",
+    "evidence/boot-address-register.scala": "cb69e7997221ad6a9b6de097dfd8066f4d761d56f9a284be97b3766f22f4c9b9",
+    "evidence/boot-config.scala": "65f495f847c5ffd09ed96b25890643123556a6ff324c9ba7c7389744777be53d",
+    "evidence/bootrom-linker.ld": "9673f1344bc6b8e4987058eee2d8c957b3da0d1814147c60c4eda0f2a9244c6f",
+    "evidence/bootrom.S": "0741269bb151f738f141362d733c4687310a0f2f9a638d8aa9c537860bd3d923",
+    "evidence/bootrom.rv64.img": "5f6ae520d6612da2b31c2ee70bc872b743a77bbde0abba87bf96aa5fc249a216",
+    "evidence/bootrom.scala": "ec5065ffb153f79bbee5b3f28412076e9c516bf462e5ff63063af88e870ee659",
+    "evidence/clint.scala": "258b4a765a57f230d7833e3242489652e49d101ce26b4d0730fa36fc7a48868b",
+    "evidence/firesim-dts.dts": "0549bada557ad461790fed8579599672f532f5652078efe82b753f774c97d093",
+    "evidence/firesim-memmap.json": "1ac5e83588fc89417f42d1dbc8e6da605f283ff2fe5d52ed35843ba30359c0dd",
+    "evidence/plic.scala": "a15e8990370aefdd294e6678c8e062ef31632f24cb0136070daaef33f88ffda1",
+    "evidence/register-router.scala": "dd716211f9e96825a34ceca2033a5a5ace8d48629cf3bdae3776ef3a1244c940",
+    "evidence/uart-registers.scala": "3524c67cbf81ae819ab28d99f24fef5edb276560960f8f7e879adb6c04ce2520",
+    "evidence/uart.scala": "e99a964e045f67ed1d0c408268202ae06f7ef112fb54946cea07ff01e98a662d",
+    "iris_boot.hpp": "227d4cb27a2c13f50240b79e3fc32e75293e3a7ba9317a12fca04a3e6061ea19",
+    "iris_clint.hpp": "4529d010f5570dfad9c993aa28d3a6d46d10f647fa2de34b142ce828b54e64bd",
+    "manifest.json": "5eff7a84291b86c6347fb4b2e9d1cf8bb8a892c04c29ea321e5673e81825e127",
+    "physical_map.hpp": "6a6e8e60c59a332d5d650a702febfacc796776d5d36b5fd3a5b9e449071e6842",
+    "plugin.cpp": "0cdd5ea8a94b67e65cd11d8388271bc3c7a73a16b1da13931e038238ec48fec5",
+    "prepare.py": "59f42f2a166063614117172e05f69cc32d2540fbef6247479f4a63502dd863db",
+    "propose_core_patch.py": "b8fa696535fdf27cf1dd96bdd260beb843fbf5b3069d272599135e22292d5c21",
+    "run_tests.sh": "847c28aed94dd506ba1b7071d822de25b536c7b1cdc600096cf2bd75970fcbde",
+    "tests/boot_test.cpp": "8da76bc55ff30943dbb59d50082e9048ede611ac1026d67428320428b80de778"
+  },
+  "linked_library_sha256": {
+    "/scratch/copparihollmann/iris-model/spike/build/libriscv.a": "8020649197a02c3d67aa1762b1d42cfedae56f397a3e8c83c8c1d42a2b4f0905",
+    "/scratch/copparihollmann/iris-model/spike/build/libdisasm.a": "05c07ff09facfac617541c6ef805a2476d9728209f2b4de8f2c85854c8c542ca",
+    "/scratch/copparihollmann/iris-model/spike/build/libsoftfloat.a": "db9b66c8f8167721c25b3ed5a2ad2e752175af666de0df6a0ad7507f7d8d6c10",
+    "/scratch/copparihollmann/iris-model/spike/build/libfesvr.a": "4678011ab293adaa4b681468e5456645083414a71bc97fe6c7d717e60d06b8a3",
+    "/scratch/copparihollmann/iris-model/spike/build/libfdt.a": "66f958695de287d8a4ac659568d58eb589ed2cace1774a6c80c86cc85a0b6e09"
+  },
+  "artifacts": {
+    "build/boot_test": "b0108deb11cdb10d20332efe4f88953e22f5c948559f04867af6ac665c9df2ca",
+    "build/libiris_board_boot.so": "257dde23cf51548c9822f0183c02a8b9de2406bdf1b9920a3228d202db3e709f",
+    "build/iris.dtb": "622c099a1dbcc87473d0760b1ec5b366c296d964aec834722d3c5ba0e4a95c78",
+    "build/tests.stdout": "87a9a52fb8abdb1a0ab7852861bd41eebac219ba4dc7a978b84de959b86d0377",
+    "build/tests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build/dtc.log": "6b79f0fc0ea6fc01c4e94a14ac608b4feb341a973a94ed8a85fe06a0afe23547"
+  },
+  "spike_source_revision": "72958551566a30f19444bd7e354552824e4d0a98",
+  "spike_current_diff_sha256": "bd7c9fc94dda89bbc50c30cb429499a7a65121e334408e1969a1c971314864a7",
+  "note": "Native fixtures execute actual ROM on Spike processors; this is not an ordinary Spike/Zephyr board run or timing calibration."
+}

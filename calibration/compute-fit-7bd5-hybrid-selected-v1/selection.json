@@ -1,0 +1,67 @@
+{
+  "schema": "iris.own_hybrid_final_training_selection.v1",
+  "actual_parameter_fit_performed": true,
+  "selected_candidate": {
+    "candidate": "proposal",
+    "TRAIN_all_parent_hart_MSE": 0.051392438366789285,
+    "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-proposal-v1/run.json",
+    "run_sha256": "d916a938e795bf53805f20671e3c96782af953853518b12f4f5fcee2df719399"
+  },
+  "all_candidates": [
+    {
+      "candidate": "proposal",
+      "TRAIN_all_parent_hart_MSE": 0.051392438366789285,
+      "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-proposal-v1/run.json",
+      "run_sha256": "d916a938e795bf53805f20671e3c96782af953853518b12f4f5fcee2df719399"
+    },
+    {
+      "candidate": "grid-half_vector_memory",
+      "TRAIN_all_parent_hart_MSE": 0.06915865453368404,
+      "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-half_vector_memory-v1/run.json",
+      "run_sha256": "bb2fbc6e2b27c15ead8aaa96cf04bf02f30584627fe41bc4c9f6eabdb90f1af3"
+    },
+    {
+      "candidate": "grid-more_vector_load",
+      "TRAIN_all_parent_hart_MSE": 0.05554978998245645,
+      "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-more_vector_load-v1/run.json",
+      "run_sha256": "192a7f2cbb8c2889adce6f2afced4a03404493e3d6ea5a08166e9566f5bb14d9"
+    },
+    {
+      "candidate": "grid-data16",
+      "TRAIN_all_parent_hart_MSE": 0.08221083593326224,
+      "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-data16-v1/run.json",
+      "run_sha256": "47dc04569848453ee21e7402c657e45a79cfd1604dc4b9e6fdec48593474a793"
+    },
+    {
+      "candidate": "grid-legacy_front_cost",
+      "TRAIN_all_parent_hart_MSE": 0.05207846952745127,
+      "run": "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-legacy_front_cost-v1/run.json",
+      "run_sha256": "be3f6eb68717dc2d22cd68fb52a354ac3262982db5f83c59de3e571be1ceac42"
+    }
+  ],
+  "selection_uses_internal_validation": false,
+  "selection_uses_global_heldout": false,
+  "all_TRAIN_families_included": true,
+  "training_regions": 816,
+  "training_parent_hart_groups": 272,
+  "parameters_sha256": "c8b51afb66c6661cdc3d62b3d82a36260ccd65d4f3bb2d2107b4694700d27190",
+  "fixture_sha256": "70c0a5cd5f5296ae6613aa8350cd7eb9d37b1e56dec9ac6e592464aedca4545e",
+  "final_identity_actual_native_validation_pending": true,
+  "input_sha256": {
+    "/scratch/copparihollmann/iris-model/timing/empirical_hybrid_freeze_v1.py": "7e503e108f23b645eb3fc59c2ad16ee6206db81aef69c62070f477165dfc5959",
+    "/scratch/copparihollmann/iris-model/build/fpga-compute-fit-v1-001-analysis/regions.json": "eee1dc7de3555ab527cda27e265d8a368e3a3c25da0d17ec043e8b616ced89c3",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-proposal-v1/run.json": "d916a938e795bf53805f20671e3c96782af953853518b12f4f5fcee2df719399",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-proposal-v1/regions.jsonl": "b05ea77b7c03b240a5e910681ae8e1ba13a8785ae15796c59c21be68279187cf",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-half_vector_memory-v1/run.json": "bb2fbc6e2b27c15ead8aaa96cf04bf02f30584627fe41bc4c9f6eabdb90f1af3",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-half_vector_memory-v1/regions.jsonl": "915203325e87ce2da6d315cee8fa2b1ebb06c8d1f6710d6c5243607f0cd53721",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-more_vector_load-v1/run.json": "192a7f2cbb8c2889adce6f2afced4a03404493e3d6ea5a08166e9566f5bb14d9",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-more_vector_load-v1/regions.jsonl": "49830ab3ee28d7a22e2cb778eaf73a6a7d51e600a7999d2cbbf0bc9991c39604",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-data16-v1/run.json": "47dc04569848453ee21e7402c657e45a79cfd1604dc4b9e6fdec48593474a793",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-data16-v1/regions.jsonl": "5fb8758af79c31e343a1ea5321227c0f547a617f20a0e5ae6e1bca9fb103467c",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-legacy_front_cost-v1/run.json": "be3f6eb68717dc2d22cd68fb52a354ac3262982db5f83c59de3e571be1ceac42",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-7bd5-hybrid-grid-legacy_front_cost-v1/regions.jsonl": "5eda06c3e4cc86ce5314b70bbfe6429bb7bd9bdab1c688ca834f774e219357e6",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-proposal-v1/parameters.json": "54b382b9d5520e9ccc4bae7bef13d7e31dea55c2926b5fcf6f46fe3f3bbf7407",
+    "/scratch/copparihollmann/iris-model/calibration/compute-fit-7bd5-hybrid-proposal-v1/runtime.fixture": "58377f523808f711feaa388f0f81a7aee1f89d194eb616406f2c85c8d90d6d09",
+    "/scratch/copparihollmann/iris-model/build/compute-fit-v3/split.json": "f7c338ed91a1985ad1641e1997a5cd035e7cf1e4c7054c66cd74fd8ab540d3dd"
+  }
+}

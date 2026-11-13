@@ -1,0 +1,76 @@
+{
+  "absolute_PC_or_case_lookup": false,
+  "feature_definition": "[N, N*max(0,distinct_aligned_fetch_words_intersecting_loop - dependency_issue_floor),1]",
+  "fit_rows": "train offsets only; N>=64 and immediate repeats1/2 establish conditioned service; prediction is identical for all repetitions.",
+  "full_2pct_certified": false,
+  "global_heldout_timings_consumed": false,
+  "input_sha256": {
+    "build/fpga-cpu-layout-v2-001-analysis/regions.csv": "c5f85eab0f7fad540dbb36aaaa80a082ce1c8636280dc95d54eb831445106c99",
+    "calibration/cpu-layout-v2/split.json": "1c9901b04717341f6934389ac24ebb0a0588a193a4bd3367cb4744ed6bedcf89",
+    "timing/empirical_cpu_layout_fit.py": "b50218feddeaab64e24b9b24d68f06f5fe9144ca89f7f8de17e73e1cf6473c5a"
+  },
+  "internal_validation_timings_used_for_fit": false,
+  "live_model_binding_available": false,
+  "models": {
+    "rocket": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        3.000122923951046,
+        0.9995492788461539,
+        7.27272727272859
+      ],
+      "dependency_issue_floor": 3,
+      "fetch_word_bytes": 4,
+      "fitting_rows": 264,
+      "rank": 3
+    },
+    "shuttle": {
+      "coefficient_names": [
+        "cycles_per_dependency_iteration",
+        "cycles_per_excess_fetch_word",
+        "region_boundary_cycles_audit_only"
+      ],
+      "coefficients": [
+        2.0002886690562725,
+        0.9952766527238096,
+        4.239027163861398
+      ],
+      "dependency_issue_floor": 2,
+      "fetch_word_bytes": 8,
+      "fitting_rows": 528,
+      "rank": 3
+    }
+  },
+  "region_intercept_may_be_used_per_instruction": false,
+  "schema": "iris.empirical_cpu_layout_parameters.v1",
+  "source_image_association_verified": false,
+  "source_qualification": "Effective event hypothesis from checked original-order loop motif; not a general native pipeline implementation or proved source controller rule.",
+  "training_offset_groups": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    14,
+    16,
+    18,
+    22,
+    24,
+    26,
+    28,
+    32,
+    34,
+    36,
+    38,
+    44,
+    48,
+    50,
+    54,
+    62
+  ]
+}

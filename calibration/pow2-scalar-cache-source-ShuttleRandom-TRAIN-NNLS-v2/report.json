@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "mode": "source-ShuttleRandom",
+  "rows": 180,
+  "parameters_sha256": "280f08da35180c582a7faba09d35d9f69be5814d7215e7777caa3337001d71bb",
+  "fixture_sha256": "52d2a0bca078d7190d6bc47a57a3ead393812fd2d1344885f2bcc73b1e208e6a",
+  "reserved_labels_consumed": false,
+  "actual_runtime_accuracy_qualified": false,
+  "TRAIN_relative_squared_loss_sum": 40.447879587986755
+}

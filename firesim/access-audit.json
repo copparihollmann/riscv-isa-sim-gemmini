@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-11-05T19:20:25.404575+00:00",
+  "manager_hostname": "bwrc-amd6",
+  "remote_hostname": "sohumpc.eecs.berkeley.edu",
+  "remote_user": "agustin",
+  "access_status": "blocked_dns",
+  "ssh_error": "Could not resolve hostname sohumpc.eecs.berkeley.edu: Name or service not known",
+  "fpga_available": null,
+  "fpga_smoke_passed": false,
+  "fire_sim_revision": "69b17767e0b227e31ea341c50899e49f02d6f5ea",
+  "image": {
+    "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/results-build/2026-11-03--03-10-49-corigine_mimicturbo_gt_firesim_iris_tethered_bringup_nocflush/cl_corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig/firesim.tar.gz",
+    "sha256": "9bbe1f12a2b18091c28b05ea43c001e579f70c8cfef0f528fcb49003212fb776",
+    "metadata": "firesim-buildquintuplet:corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig,firesim-deployquintuplet:corigine_mimicturbo_gt-firesim-FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig,firesim-buildtriplet:FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig,firesim-deploytriplet:FireSim-IrisFiresimNOCflushCombinedConfig-BaseCorigineMimicTurboGTConfig,firesim-commit:69b17767e0b227e31ea341c50899e49f02d6f5ea-dirty",
+    "complete_rtl_provenance": false
+  },
+  "files": {
+    "config_runtime.yaml": {
+      "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/config_runtime.yaml",
+      "sha256": "34fb2a577d7352784370bdcf1e8ba79c7e5bd4109f3d9218132406314ff94a02"
+    },
+    "config_hwdb.yaml": {
+      "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/config_hwdb.yaml",
+      "sha256": "4e3a54705c400258c22ba3206c683464e82f182de45a73daeb074d7218791665"
+    },
+    "firesim": {
+      "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/firesim",
+      "sha256": "4227b99b4453e9f26419ff25e01b21e2596ebc1f9c1fa9d3c3495b6eac24e675"
+    },
+    "runtools/workload.py": {
+      "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/runtools/workload.py",
+      "sha256": "abf85272d6c0f72b26b1d7fd6ead35144c4014727eb7d5d4efbf214dc85ee1be"
+    }
+  },
+  "existing_last_run": {
+    "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/results-workload/2026-11-05--04-26-53-bare/bare0/uartlog",
+    "status": "failed",
+    "exit_status": 134,
+    "reason": "FPGA setup assertion fd != -1 in simif_corigine_mimicturbo_gt.cc:280, xdma device open failed"
+  },
+  "manager_integration_findings": [
+    "FireSim CLI changes working directory to its own deploy directory and writes logs there",
+    "Upstream manager disables known-host checking; local launcher must preserve checking",
+    "Upstream manager sets key_filename to ~/firesim.pem; local launcher must use configured key and user",
+    "Current system Python lacks fabric, argcomplete, and cryptography; use Chipyard environment"
+  ],
+  "unknown": [
+    "Remote wrapper content",
+    "Remote FPGA database",
+    "Current remote allocation and occupancy",
+    "Working end-to-end FPGA simulation",
+    "Image full source-input provenance"
+  ],
+  "historical_success": {
+    "path": "/scratch/eygao/iris-cy/sims/firesim/deploy/results-workload/2026-11-04--23-20-38-bare/bare0/uartlog",
+    "sha256": "9a8387587598cc94a9d91d4ff6aabf0d5d25625604bf0f1df337906f1ffc5507",
+    "exit_status": 0,
+    "target_cycles_emulated": 801906002,
+    "note": "Historical artifact, not a newly verified smoke; ELF identity and region measurements not established."
+  },
+  "latest_probe": {
+    "path": "firesim/access-network-recheck.json",
+    "observed_at_utc": "2026-11-05T20:08:11.137859+00:00",
+    "status": "blocked_sandbox_network",
+    "reason": "IPv4/IPv6 TCP and IPv4 UDP socket creation denied with EPERM; DNS still unavailable."
+  }
+}

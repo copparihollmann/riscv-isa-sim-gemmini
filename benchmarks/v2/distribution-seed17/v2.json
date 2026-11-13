@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "command": [
+    "/scratch/copparihollmann/iris-model/spike/bin/spike-iris-functional",
+    "--iris-vme",
+    "--isa=rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "--hart-isa=0:rv64gcv_zfh_zvfh_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=1:rv64gcv_zfh_zvfh_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=2:rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "-p3",
+    "-m0x70000000:0x40000,0x80000000:0x100000000,0x580000000:0x20000",
+    "--extlib=/scratch/copparihollmann/iris-model/spike/bin/libsifive_uart.so",
+    "--device=sifive_uart,0x10020000",
+    "--iris-schedule-seed=17",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/build/batch-v2.elf"
+  ],
+  "exit_status": 0,
+  "elf_sha256": "1242a4faf0cdc2dc3e5f3d5c285e6f9c42640f3c5e9846f5e5899a7af31c77e4",
+  "spike_sha256": "254fc8e4f94b2e859e9522fe9b1992d7e99ec920dc9f209e0e374ecc6b5eaab0",
+  "uart_plugin_sha256": "ab46c1e7f4434991a2f8d2d71a26b2def069370ce3763f7e850433dad500d058",
+  "dtc_sha256": "f95c6cf82ef181aff2fa59ce78f107960142606bf63c684db093d0e0dec37710",
+  "spike_provenance_sha256": "fe189b5777f7e0f5129079d0b22b96241c56b37d09fa1b2d2a8466e492d3bf7c",
+  "corpus_sha256": "c30bd3106bc9e66b4c8b3e339990a68b25c9643a8296bb1873e183f1f509dd9d",
+  "host_elapsed_seconds": 2.1203416739590466,
+  "host_elapsed_is_target_time": false,
+  "stdout_sha256": "11d65973fe49689c39e3860d493b8e2302be9df7ce7cc1cbdc529be7273deaa5",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "timing_certified": false,
+  "cases": 208,
+  "regions": 432,
+  "functional_checks_passed": true,
+  "hart_subsets_tested": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "iris.fadd_shape_store_baseline_intent.v1",
+  "actual_parameter_fit_performed": false,
+  "source_frontend_strict_ON": true,
+  "scalar_FADD_source_phase_ON": true,
+  "shape_ON": true,
+  "owned_store_front_ON": true,
+  "completion_receipt_fix_from_e244": true,
+  "outer_prior_unqualified_for_new_native": true,
+  "global_heldout_timings_consumed": false
+}

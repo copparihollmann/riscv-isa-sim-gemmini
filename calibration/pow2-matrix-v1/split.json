@@ -1,0 +1,71 @@
+{
+  "schema": "iris.pow2_single_matrix_frozen_split.v1",
+  "frozen_before_new_hardware": true,
+  "split_id": "iris-pow2-single-matrix-v1",
+  "grouping": "Exact M/N/K shape across ALL dtypes,harts,trials",
+  "reserved_shapes": [
+    [
+      16,
+      16,
+      16
+    ],
+    [
+      128,
+      128,
+      128
+    ],
+    [
+      32,
+      32,
+      64
+    ]
+  ],
+  "train_shapes": [
+    [
+      8,
+      8,
+      8
+    ],
+    [
+      32,
+      32,
+      32
+    ],
+    [
+      64,
+      64,
+      64
+    ],
+    [
+      256,
+      256,
+      256
+    ],
+    [
+      32,
+      32,
+      8
+    ],
+    [
+      32,
+      32,
+      16
+    ],
+    [
+      32,
+      32,
+      128
+    ],
+    [
+      32,
+      32,
+      256
+    ]
+  ],
+  "reserved_regions": 36,
+  "train_regions": 96,
+  "reserved_timing_labels_root_only": true,
+  "no_reserved_timing_for_parameter_or_model_selection": true,
+  "global_heldout_timings_consumed": false,
+  "hardware_contacted": false
+}

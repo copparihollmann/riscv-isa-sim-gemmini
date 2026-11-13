@@ -1,0 +1,9 @@
+{
+  "schema": "iris.own_native_training_baseline.v1",
+  "source": "/scratch/copparihollmann/iris-model/build/empirical-V8-hybrid28-inputs-v1/hybrid.fixture",
+  "source_sha256": "be06d689ae2c5016aca95c337518cf57885441c622efa8564afab3d3dad495e1",
+  "coefficient_fit_performed": false,
+  "removed": "compute/vector-memory/scalarFP rules and branch extra; instruction L1extra0; allouter/cache/TCM/scratch priors unchanged",
+  "global_heldout_timings_consumed": false,
+  "no_source_mode_changes": true
+}

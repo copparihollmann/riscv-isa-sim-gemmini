@@ -1,0 +1,96 @@
+purpose uncalibrated-integration-fixture
+source experimental-fast-event-baseline-no-RTL-peer-evaluation-unfitted
+base_hz 500000000
+rtc_divider 1000
+max_cycles 100000000000
+trap_cycles 4
+hart 0 1 source
+hart 1 1 source
+hart 2 1 source
+resource scalar0 1
+resource scalar1 1
+resource scalar2 1
+rule 0 0 0 scalar0 3 1 uncalibrated-conservative-boundary base_cycles
+rule 1 0 0 scalar1 3 1 uncalibrated-conservative-boundary base_cycles
+rule 2 0 0 scalar2 3 1 uncalibrated-conservative-boundary base_cycles
+shuttle_pipeline pure-integer-rvc-counter-sequential-frontend
+rocket_pipeline pure-integer-rvc-counter-sequential-frontend
+pipeline_values private-pure-integer
+
+empirical_profile experimental-effective-services iris-compute-fadd-shape-store-9b2-read32-miss16-v1 bounded
+
+empirical_async integer-vme-fadd-nonmemory-v3
+
+counter_policy source-ungated-stall
+
+empirical_icache address-tags-refill-proxy-v1
+empirical_load_front dram-L1-hit-latched-response-v1
+
+shuttle_frontend source-C++-M-mode 1 16
+icache_service empirical-shared-L2 1 1 explicit-unfitted-source-frontend-service
+empirical_rocket_packets source-IBuf-demand-4B-v1
+# Shared outer prior from byte-bound28priority calibration; new523costs unidentified.
+resource fit.scratchpad 1
+resource fit.tcm.target0 1
+empirical_cache_service 0 32 0 16 545.732041126 461 0 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_cache_service 1 32 0 16 545.732041126 461 0 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_cache_service 2 32 0 16 545.732041126 461 0 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 memory.LOCAL_TCM.load fit.tcm.target0 2.82381997945 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 0 memory.LOCAL_TCM.store fit.tcm.target0 0.874004811306 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 0 memory.REMOTE_TCM.load fit.tcm.target0 25.9971767292 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 0 memory.REMOTE_TCM.store fit.tcm.target0 24.9011827571 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 0 memory.SCRATCHPAD.load fit.scratchpad 19.6722366578 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 0 memory.SCRATCHPAD.store fit.scratchpad 16.7280607069 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.LOCAL_TCM.load fit.tcm.target0 2.82381997945 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.LOCAL_TCM.store fit.tcm.target0 0.874004811306 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.REMOTE_TCM.load fit.tcm.target0 25.9971767292 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.REMOTE_TCM.store fit.tcm.target0 24.9011827571 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.SCRATCHPAD.load fit.scratchpad 19.6722366578 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 1 memory.SCRATCHPAD.store fit.scratchpad 16.7280607069 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 2 memory.REMOTE_TCM.load fit.tcm.target0 24.8732838867 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 2 memory.REMOTE_TCM.store fit.tcm.target0 20.7416664692 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 2 memory.SCRATCHPAD.load fit.scratchpad 28.4389526314 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_family 2 memory.SCRATCHPAD.store fit.scratchpad 25.6839264739 0 1 UNIDENTIFIED_523_PATH_PRIOR 8f0add76ad2be372c2602ef0f3947614f3b26e92e9f9a0619b13786d183a3258 core_cycles
+empirical_vme_work source-shape-subtiles-v1
+empirical_scalar_fadd source-HSD-pipeline-v1
+empirical_store_front owned-dirty-L1-COM-v1
+resource fit.compute.sharedFPU2 1
+resource fit.compute.vector-memory0 1
+resource fit.compute.vector-memory1 1
+resource fit.compute.vector-memory2 1
+resource fit.compute.vector0 1
+resource fit.compute.vector1 1
+resource fit.compute.vectorFP0 1
+resource fit.compute.vectorFP1 1
+resource fit.compute.vme0 1
+resource fit.compute.vme1 1
+empirical_instruction_service 0 0 545.732041126 461 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_branch_service 0 5 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_instruction_service 1 0 545.732041126 461 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_branch_service 1 5 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_instruction_service 2 47 545.732041126 461 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_branch_service 2 2 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 memory.vector.store fit.compute.vector-memory0 93.5252639517 3.25488191609 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 rvv.fadd.fp16 fit.compute.vectorFP0 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 rvv.fadd.fp32 fit.compute.vectorFP0 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 rvv.fadd.fp64 fit.compute.vectorFP0 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 rvv.integer fit.compute.vector0 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 vme.fp8 fit.compute.vme0 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 0 vme.row_move fit.compute.vme0 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 memory.vector.store fit.compute.vector-memory1 93.5252639517 3.25488191609 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 rvv.fadd.fp16 fit.compute.vectorFP1 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 rvv.fadd.fp32 fit.compute.vectorFP1 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 rvv.fadd.fp64 fit.compute.vectorFP1 2 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 rvv.integer fit.compute.vector1 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 vme.fp8 fit.compute.vme1 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 1 vme.row_move fit.compute.vme1 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 2 memory.vector.store fit.compute.vector-memory2 88.2517635872 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 2 rvv.fadd.fp16 fit.compute.sharedFPU2 4 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 2 rvv.fadd.fp32 fit.compute.sharedFPU2 4 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+empirical_family 2 rvv.fadd.fp64 fit.compute.sharedFPU2 1 0 1 NEW_COMPUTE_TRAIN_FIT 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+resource fit.compute.vector-load0 1
+empirical_family 0 memory.vector.load fit.compute.vector-load0 20 0 1 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+resource fit.compute.vector-load1 1
+empirical_family 1 memory.vector.load fit.compute.vector-load1 20 0 1 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles
+resource fit.compute.vector-load2 1
+empirical_family 2 memory.vector.load fit.compute.vector-load2 20 0 1 OWN_9B2_TRAIN_GENERIC_SERVICE_CANDIDATE 6cf0f4ba97197ee78e6c3c0e3dcd7b65c83e7ca2a40682adc9319468a553e69a core_cycles

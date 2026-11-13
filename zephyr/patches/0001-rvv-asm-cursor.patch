@@ -1,0 +1,41 @@
+diff --git a/arch/riscv/core/fpu.c b/arch/riscv/core/fpu.c
+index a6b28f3a..14f1c518 100644
+--- a/arch/riscv/core/fpu.c
++++ b/arch/riscv/core/fpu.c
+@@ -93,6 +93,7 @@ void z_riscv_vstate_csr_restore(struct z_riscv_v_context *src)
+ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ {
+ 	unsigned long vl;
++	void *cursor = save_to->vreg;
+ 
+ 	z_riscv_vstate_csr_save(save_to);
+ 	__asm volatile(".option push\n\t"
+@@ -106,14 +107,15 @@ void z_riscv_vstate_save(struct z_riscv_v_context *save_to)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vse8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(save_to->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
+ }
+ 
+ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ {
+ 	unsigned long vl;
++	void *cursor = restore_from->vreg;
+ 
+ 	__asm volatile(".option push\n\t"
+ 		       ".option arch, +v\n\t"
+@@ -126,8 +128,8 @@ void z_riscv_vstate_restore(struct z_riscv_v_context *restore_from)
+ 		       "add		%1, %1, %0\n\t"
+ 		       "vle8.v		v24, (%1)\n\t"
+ 		       ".option pop\n\t"
+-		       : "=&r"(vl)
+-		       : "r"(restore_from->vreg)
++		       : "=&r"(vl), "+&r"(cursor)
++		       :
+ 		       : "memory");
+ 	z_riscv_vstate_csr_restore(restore_from);
+ }

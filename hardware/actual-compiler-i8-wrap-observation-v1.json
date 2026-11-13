@@ -1,0 +1,72 @@
+{
+  "schema": "iris.actual_compiler_i8_wrap_observation.v1",
+  "hardware_executed": true,
+  "archive_validation_passed": true,
+  "job": "/scratch/copparihollmann/iris-model/runs/fpga-compiler-i8-wrap-v1",
+  "elf_sha256": "c644bd0bb648aa3e70e55ee33668a045e03c4d76eb6f154823711014faf94218",
+  "archive_sha256": "29652c8d5d8bc05f7d66d7891e4c25e707e35de699d17c4672415f0effdab528",
+  "analysis_report_sha256": "dca30b682c97b9d78dba60d430999b956be0f2cdf01c07ce3d197f453e48c026",
+  "analysis_repair_report": "/scratch/copparihollmann/iris-model/build/fpga-compiler-i8-wrap-analysis-repair-v1/report.json",
+  "regions": 126,
+  "per_hart": [
+    42,
+    42,
+    42
+  ],
+  "variants": [
+    "vme",
+    "twin"
+  ],
+  "trials": 3,
+  "observed_output_words_matching_independent_goldens": 64152,
+  "active_harts": [
+    0,
+    1,
+    2
+  ],
+  "matrix_harts": [
+    0,
+    1
+  ],
+  "hart2_role": "Concurrent ordinary RVV producer.",
+  "coverage_qualification": "Outputs were not freshly poisoned before every invocation; matching values alone do not rule out omitted stores retaining prior correct values. Independent review found this gap after collection. Preserve this actual measurement and use a fresh poisoned successor plus deliberate no-op negative control for stronger per-invocation write coverage.",
+  "source_image_association_verified": false,
+  "full_functional_certified": false,
+  "timing_calibrated": false,
+  "calibration_usable": false,
+  "managed_lifecycle": [
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 23.106934974901378,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "infrasetup",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 115.8303675642237,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "runworkload",
+      "status": "passed",
+      "cleanup_phase": false,
+      "host_elapsed_seconds": 36.88660823274404,
+      "returncode": 0,
+      "timed_out": false
+    },
+    {
+      "task": "kill",
+      "status": "passed",
+      "cleanup_phase": true,
+      "host_elapsed_seconds": 23.3735686740838,
+      "returncode": 0,
+      "timed_out": false
+    }
+  ],
+  "known_instrumentation": "Guest per-region mcycle/minstret/checksum/failed-word count; available aggregate FASED/heartbeat; no TracerV/AutoCounter/SynthPrint."
+}

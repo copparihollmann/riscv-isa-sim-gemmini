@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "scope": "baremetal exact-three-hart functional distribution",
+  "status": "passed",
+  "acceptance_passed": true,
+  "timing_certified": false,
+  "overall_project_goal_complete": false,
+  "instruction_based_times_are_uncalibrated": true,
+  "seed": 17,
+  "spike_sha256": "254fc8e4f94b2e859e9522fe9b1992d7e99ec920dc9f209e0e374ecc6b5eaab0",
+  "uart_plugin_sha256": "ab46c1e7f4434991a2f8d2d71a26b2def069370ce3763f7e850433dad500d058",
+  "spike_provenance_sha256": "fe189b5777f7e0f5129079d0b22b96241c56b37d09fa1b2d2a8466e492d3bf7c",
+  "v2_elf_sha256": "1242a4faf0cdc2dc3e5f3d5c285e6f9c42640f3c5e9846f5e5899a7af31c77e4",
+  "v2_corpus_sha256": "c30bd3106bc9e66b4c8b3e339990a68b25c9643a8296bb1873e183f1f509dd9d",
+  "v2_compiled_case_table_sha256": "1176320a0eb34d16f4428370293f0b302fb32abbfec9644ac5b375a0f01a9b37",
+  "v2_source_input_sha256": {
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/cases.py": "bfcba12b24c27145ba1a669dd44b449899ec7ea87a0cf7b263fc81c927eab1f3",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/batch.c": "1c8c8513119896663e614252a1f871897b30c7034fa225eaae2b2695cc787ece",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/build.py": "92be2918bd38cbbc4580053cc7446ec2de5864aecd50ce0842d53b0bc8b943fa",
+    "/scratch/copparihollmann/iris-model/benchmarks/runtime.h": "e3da5009740db4f21479441aff26ae1851ea10ffd58749e0066dbe0e1946572a",
+    "/scratch/copparihollmann/iris-model/benchmarks/runtime.c": "f04e050ea5a87f4c379e2f29d44051c1ec9037cb20ca4e24fb328ccf355ffee1",
+    "/scratch/copparihollmann/iris-model/benchmarks/start.S": "7deca903c1063281c810f8c8e13e8b96ed1aad66fc474ff3ff628de7076c130b",
+    "/scratch/copparihollmann/iris-model/benchmarks/link.ld": "b0bee5ac384edfd3f28c309313afdafb01e53d3e0e0e688b8afd957229334626",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/build/cases.inc": "1176320a0eb34d16f4428370293f0b302fb32abbfec9644ac5b375a0f01a9b37",
+    "/scratch/copparihollmann/iris-model/third_party/saturn/benchmarks/common/vme.h": "f340e62fd813406f1eba5635e7476b20ef07cee6c4721f91f65b22b273168208",
+    "/scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/../lib/gcc/riscv64-unknown-elf/16.1.0/libgcc.a": "4bc98dc9bb7a9b5da5fffacc6628be8266849a4e2afa4aa9f16a2711f1eff8fe"
+  },
+  "runner_source_sha256": {
+    "benchmarks/v2/distribution_acceptance.py": "8c6485a88efe578c4a37d80fac8f1ac9cc17f4dd4efd215350a072f4dae55463",
+    "benchmarks/v2/run.py": "d24c4e8fb20ad608f7c59f0787e12a180965fc9bfc3b038112961e31177edb5c",
+    "benchmarks/v2/validate.py": "1300c2cab9d0df44e23466ca7670ab7e67b4ca7aef26f50e0397d734b036b047"
+  },
+  "distribution": {
+    "cases": 208,
+    "regions": 432,
+    "functional_checks_passed": true,
+    "timing_certified": false,
+    "hart_subsets_tested": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "positive_work_regions_per_hart": [
+      164,
+      152,
+      115
+    ],
+    "negative_legality_probes": [
+      {
+        "case_id": "v2.functional.hart2.vme_refusal",
+        "hart": 2,
+        "expected_exception": "illegal_instruction",
+        "observed_trap_count": 1
+      }
+    ],
+    "pipeline_results": [
+      {
+        "case_id": "v2.pipeline.scalar-vector.rotate0",
+        "kind": "pipeline",
+        "producer_hart": 0,
+        "compute_hart": 1,
+        "consumer_hart": 2,
+        "repetitions": 16,
+        "result": "source-bound phase protocol and final checksums passed",
+        "dynamic_dependency_timing_instrumented": false
+      },
+      {
+        "case_id": "v2.pipeline.scalar-vector.rotate1",
+        "kind": "pipeline",
+        "producer_hart": 1,
+        "compute_hart": 2,
+        "consumer_hart": 0,
+        "repetitions": 16,
+        "result": "source-bound phase protocol and final checksums passed",
+        "dynamic_dependency_timing_instrumented": false
+      },
+      {
+        "case_id": "v2.pipeline.scalar-vector.rotate2",
+        "kind": "pipeline",
+        "producer_hart": 2,
+        "compute_hart": 0,
+        "consumer_hart": 1,
+        "repetitions": 16,
+        "result": "source-bound phase protocol and final checksums passed",
+        "dynamic_dependency_timing_instrumented": false
+      },
+      {
+        "case_id": "v2.pipeline.vme.compute0",
+        "kind": "pipeline_vme",
+        "producer_hart": 2,
+        "compute_hart": 0,
+        "consumer_hart": 1,
+        "repetitions": 8,
+        "result": "source-bound phase protocol and final checksums passed",
+        "dynamic_dependency_timing_instrumented": false
+      },
+      {
+        "case_id": "v2.pipeline.vme.compute1",
+        "kind": "pipeline_vme",
+        "producer_hart": 2,
+        "compute_hart": 1,
+        "consumer_hart": 0,
+        "repetitions": 8,
+        "result": "source-bound phase protocol and final checksums passed",
+        "dynamic_dependency_timing_instrumented": false
+      }
+    ],
+    "job_count": 432,
+    "all_seven_nonempty_subsets_verified": true,
+    "dependency_assurance": "Known hashed guest protocol plus independent final results; not a dependency timing trace"
+  },
+  "synchronization": {
+    "cases": 25,
+    "regions": 45,
+    "functional_checks_passed": true,
+    "timing_certified": false,
+    "hart_subsets_tested": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "global_counter_assertions": 11,
+    "families": {
+      "lrsc": [
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "ipi": [
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "fence_messages": [
+        1,
+        2,
+        4,
+        3,
+        5,
+        6,
+        7
+      ],
+      "lrsc_invalidated": [
+        3,
+        5,
+        6,
+        7
+      ]
+    },
+    "fence_assurance": "Explicit fenced messages under the simulator functional ordering; not exhaustive RVWMO certification"
+  },
+  "sync_build": {
+    "command": [
+      "/scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/riscv64-unknown-elf-gcc",
+      "-O2",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-ffreestanding",
+      "-fno-builtin",
+      "-fno-tree-vectorize",
+      "-fno-tree-slp-vectorize",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-mcmodel=medany",
+      "-mabi=lp64d",
+      "-march=rv64gcv_zicsr_zifencei",
+      "-nostdlib",
+      "-static",
+      "-Wl,--build-id=none,--gc-sections",
+      "-DIRIS_HARTS=3",
+      "-I/scratch/copparihollmann/iris-model/benchmarks",
+      "-T",
+      "/scratch/copparihollmann/iris-model/benchmarks/link.ld",
+      "/scratch/copparihollmann/iris-model/benchmarks/start.S",
+      "/scratch/copparihollmann/iris-model/benchmarks/runtime.c",
+      "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution_sync.c",
+      "-lgcc",
+      "-o",
+      "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution-seed17/distribution-sync.elf"
+    ],
+    "compiler_sha256": "4eba3eb299b30d2981ff82d69ae5f90c4e21ddf79694eb5cf1913391e8791d7f",
+    "input_sha256": {
+      "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution_sync.c": "f611579d0af3d704ec8c06525dcb1ff87f30e9f85226afb5c12533d8d084873f",
+      "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution_acceptance.py": "8c6485a88efe578c4a37d80fac8f1ac9cc17f4dd4efd215350a072f4dae55463",
+      "/scratch/copparihollmann/iris-model/benchmarks/runtime.h": "e3da5009740db4f21479441aff26ae1851ea10ffd58749e0066dbe0e1946572a",
+      "/scratch/copparihollmann/iris-model/benchmarks/runtime.c": "f04e050ea5a87f4c379e2f29d44051c1ec9037cb20ca4e24fb328ccf355ffee1",
+      "/scratch/copparihollmann/iris-model/benchmarks/start.S": "7deca903c1063281c810f8c8e13e8b96ed1aad66fc474ff3ff628de7076c130b",
+      "/scratch/copparihollmann/iris-model/benchmarks/link.ld": "b0bee5ac384edfd3f28c309313afdafb01e53d3e0e0e688b8afd957229334626",
+      "/scratch/eygao/iris-cy/.conda-env/riscv-tools/bin/../lib/gcc/riscv64-unknown-elf/16.1.0/libgcc.a": "4bc98dc9bb7a9b5da5fffacc6628be8266849a4e2afa4aa9f16a2711f1eff8fe"
+    },
+    "elf": "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution-seed17/distribution-sync.elf",
+    "elf_sha256": "c2e7c0c52df6dfdfbbc57d1bf2dc781c036e3a234731a6996f3fef06a5ebd49c"
+  },
+  "sync_command": [
+    "/scratch/copparihollmann/iris-model/spike/bin/spike-iris-functional",
+    "--iris-vme",
+    "--isa=rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "--hart-isa=0:rv64gcv_zfh_zvfh_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=1:rv64gcv_zfh_zvfh_zvl256b_zvfofp8min_zvfbfmin_zvfbfa_zvt32t_zvti8i32mm_zvtofp8fmm",
+    "--hart-isa=2:rv64gcv_zfh_zvfh_zvl256b_zvbb",
+    "-p3",
+    "-m0x70000000:0x40000,0x80000000:0x100000000,0x580000000:0x20000",
+    "--extlib=/scratch/copparihollmann/iris-model/spike/bin/libsifive_uart.so",
+    "--device=sifive_uart,0x10020000",
+    "--iris-schedule-seed=17",
+    "/scratch/copparihollmann/iris-model/benchmarks/v2/distribution-seed17/distribution-sync.elf"
+  ],
+  "sync_host_elapsed_seconds": 0.10153622971847653,
+  "host_elapsed_is_target_time": false,
+  "zephyr": {
+    "source_sha256": {
+      "benchmarks/zephyr/src/main.c": "265b0aaad0c1393bdb46893ada6a8b0c2c3d4f08372a0542b81d2e26061cdd9f",
+      "benchmarks/zephyr/Kconfig": "10071176db490e272036463c234593c32b6b18e00366a79dc53acd1d3ca04e8f",
+      "benchmarks/zephyr/prj.conf": "77af214ef68f285573683af3ac42d9a1133283561192fceed3287f8bb8f8ccda",
+      "benchmarks/zephyr/CMakeLists.txt": "a6c21cb227400778a9b6043df5dc6ded5460fb032582eb20ac784e70ef1ec5c0"
+    },
+    "declared_worker_range": [
+      1,
+      3
+    ],
+    "unconditional_hart2_rejection_detected": false,
+    "built": false,
+    "executed": false,
+    "all_three_hart_zephyr_acceptance_passed": false,
+    "limits": [
+      "Board port, exact CPU-index-to-hart mapping and deployed ELF have not been built or exercised here.",
+      "Baremetal all-three-hart acceptance does not establish Zephyr SMP, preemption or vector/tile context handling.",
+      "Source-pattern observations are hints for review, not a Zephyr implementation certification."
+    ]
+  },
+  "output_sha256": {
+    "v2.stdout": "11d65973fe49689c39e3860d493b8e2302be9df7ce7cc1cbdc529be7273deaa5",
+    "v2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sync.stdout": "1af1ff52c0f88a05e668a5b70e11a957de706288db433f6615d2926dc180ac60",
+    "sync.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limits": [
+    "No placement speed ranking or Iris cycle accuracy is certified.",
+    "Static dependency ledgers are checked against known source protocols/results, not dynamic per-edge traces."
+  ]
+}

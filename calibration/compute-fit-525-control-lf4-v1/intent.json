@@ -1,0 +1,11 @@
+{
+  "schema": "iris.compute_new_epoch_starting_intent.v1",
+  "actual_525_fit_replay_pending": true,
+  "old_qualification_transferred": false,
+  "source_shape_zero_flag": "source-shape-subtiles-v1",
+  "reference_archive_sha256": "326faca74b31737342acc176157e4afa2c062b28c43904b7e42cf8a1a4dd77c7",
+  "fit_scope": "Actual525TRAINonlyneighborcheck, noCV/globalchoice",
+  "lf_extra": 4,
+  "conservative_read_extra": 40,
+  "base_fixture_sha256": "1a9367f99f048fcc9dfa70eb4463dab93c5ae87b2c6cdc29d443a6b414f36eec"
+}

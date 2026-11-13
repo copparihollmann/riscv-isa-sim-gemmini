@@ -1,0 +1,39 @@
+mainmenu "Iris SMP profiling workload"
+source "Kconfig.zephyr"
+
+config IRIS_BENCH_WORKERS
+	int "Number of pinned Iris workers"
+	range 1 3
+	default 2
+	help
+	  Must match the number of set bits in IRIS_BENCH_HART_MASK. Scalar work
+	  runs on every selected hart, including the Rocket hart 2.
+
+config IRIS_BENCH_HART_MASK
+	int "Participating hart mask (bit 0/1/2)"
+	range 1 7
+	default 3
+	help
+	  Select any nonempty subset of the three harts. The board port must map
+	  Zephyr CPU indices to the same architectural hart IDs; the app checks
+	  this at runtime. VME runs only on compute harts 0 and 1; hart 2 performs
+	  vector copy work during the mixed VME case.
+
+config IRIS_BENCH_VME
+	bool "Exercise VME (requires verified board vector/tile context support)"
+	default n
+	depends on RISCV_ISA_EXT_V && FPU_SHARING
+	help
+	  Requires the derived Iris Zephyr kernel with RISCV_IRIS_VME_CONTEXT.
+	  Compute workers call iris_vme_enable() explicitly before the measured
+	  VME region; hart 2 runs ordinary RVV. CMake rejects missing context
+	  support. This app yields while tile state is live.
+
+config IRIS_BENCH_EXIT_ON_COMPLETION
+	bool "Signal simulator completion through the board reboot hook"
+	default n
+	depends on REBOOT && UART_HTIF
+	help
+	  Acceptance-run option for the source-backed Iris board: its inherited
+	  RocketChip sys_arch_reboot writes HTIF success to tohost and parks.
+	  Enable only for a verified HTIF completion path, not a reboot loop.

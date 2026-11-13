@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "status": "source_backed_functional_helper",
+  "sources": {
+    "uart-tx.scala": {
+      "snapshot": "uart-evidence/uart-tx.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip-blocks/src/main/scala/devices/uart/UARTTx.scala",
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b",
+      "sha256": "27719c89af1243109af6f3eac1354f0c394f94db5423614cced6503236ae6529",
+      "source_state": "inspected-local-working-tree"
+    },
+    "uart-rx.scala": {
+      "snapshot": "uart-evidence/uart-rx.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip-blocks/src/main/scala/devices/uart/UARTRx.scala",
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b",
+      "sha256": "1716c3c2069433189b3bbbdf5e29b59f2b1716d2a2ee278ab794beae54bf5aad",
+      "source_state": "inspected-local-working-tree"
+    },
+    "regmap-fifo.scala": {
+      "snapshot": "uart-evidence/regmap-fifo.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/rocket-chip-blocks/src/main/scala/util/RegMapFIFO.scala",
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b",
+      "sha256": "ab90b8df1e25fd6d671d5db07679eab21ded30ee8ece930d8138930e7b523a09",
+      "source_state": "inspected-local-working-tree"
+    },
+    "peripheral-fragments.scala": {
+      "snapshot": "uart-evidence/peripheral-fragments.scala",
+      "source_path": "/scratch/eygao/iris-cy/generators/chipyard/src/main/scala/config/fragments/PeripheralFragments.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "65f495f847c5ffd09ed96b25890643123556a6ff324c9ba7c7389744777be53d",
+      "source_state": "inspected-local-working-tree"
+    },
+    "uart.scala": {
+      "snapshot": "evidence/uart.scala",
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b",
+      "sha256": "e99a964e045f67ed1d0c408268202ae06f7ef112fb54946cea07ff01e98a662d"
+    },
+    "uart-registers.scala": {
+      "snapshot": "evidence/uart-registers.scala",
+      "repository": "rocket-chip-blocks",
+      "repository_commit": "f8c7fddbd7639b15fefc968af59fcc4a8f7df73b",
+      "sha256": "3524c67cbf81ae819ab28d99f24fef5edb276560960f8f7e879adb6c04ce2520"
+    },
+    "target-config.scala": {
+      "snapshot": "../hardware/evidence/firesim-target-config.scala",
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "sha256": "210fd83d187810a533b6f1c1c1855e01562c171b0be234b5a3a464b28451ae4d"
+    },
+    "uart-elaborated.fir": {
+      "snapshot": "uart-evidence/uart-elaborated.fir",
+      "sha256": "f9d25b2768684b87a776c4a408a3f3be29e5eff5e1e850d7074773a2b05b166a",
+      "source_artifact": "/scratch/eygao/iris-cy/sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "source_artifact_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "source_lines": [
+        2410990,
+        2412191
+      ],
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "artifact_source_association": "unverified"
+    },
+    "Queue256_UInt8.fir": {
+      "snapshot": "uart-evidence/Queue256_UInt8.fir",
+      "sha256": "35ca51b56f48f45213ba2e2185f9ce7943765157a6f167fd9372389d682a115d",
+      "source_artifact": "/scratch/eygao/iris-cy/sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "source_artifact_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "source_lines": [
+        2411052,
+        2411102
+      ],
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "artifact_source_association": "unverified"
+    },
+    "Queue256_UInt8_1.fir": {
+      "snapshot": "uart-evidence/Queue256_UInt8_1.fir",
+      "sha256": "3347a7ad0fc823d5cae0c7647b031769d68b681337c85e8d412b25065cfe28e9",
+      "source_artifact": "/scratch/eygao/iris-cy/sims/firesim-staging/generated-src/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig/firechip.chip.FireSim.IrisFiresimNOCflushCombinedConfig.fir",
+      "source_artifact_sha256": "c777b9c3189346bd2ecebdecaf5a368ee6ee9b70cf1eba568c9bf91ad0f47fef",
+      "source_lines": [
+        2411198,
+        2411248
+      ],
+      "repository": "chipyard",
+      "repository_commit": "b4542facf6cc9457f6e358e8f80a8b3a0ff5df19",
+      "artifact_source_association": "unverified"
+    },
+    "regmapper.scala": {
+      "snapshot": "plic-evidence/regmapper.scala",
+      "sha256": "8387a9b444dd4509deabf448bb76129ff0623d0192cccb4b59f9d3f5b8b43475",
+      "repository": "rocket-chip",
+      "repository_commit": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0"
+    }
+  },
+  "facts": {
+    "firesim_override": {
+      "value": {
+        "tx_entries": 256,
+        "rx_entries": 256,
+        "requested_baud_rate": 3686400
+      },
+      "evidence": [
+        {
+          "source": "target-config.scala",
+          "lines": [
+            433,
+            435
+          ]
+        }
+      ]
+    },
+    "configured_elaboration": {
+      "value": {
+        "tx_queue": "Queue256_UInt8",
+        "rx_queue": "Queue256_UInt8_1",
+        "data_bits": 8,
+        "divisor_reset": 135,
+        "watermark_bits": 9,
+        "control_bus_bytes": 8
+      },
+      "evidence": [
+        {
+          "source": "uart-elaborated.fir",
+          "lines": [
+            260,
+            278
+          ]
+        },
+        {
+          "source": "uart-elaborated.fir",
+          "lines": [
+            358,
+            377
+          ]
+        }
+      ]
+    },
+    "queue_ram_reset": {
+      "value": "read/write pointers and count state reset; data RAM remains uninitialized and selected RAM byte is visible even when empty",
+      "evidence": [
+        {
+          "source": "Queue256_UInt8_1.fir",
+          "lines": [
+            6,
+            46
+          ]
+        }
+      ]
+    },
+    "fifo_register_semantics": {
+      "value": "TX full status bit31, nonblocking drop and bit31 quash; RX empty bit31, dequeue only when data byte read",
+      "evidence": [
+        {
+          "source": "regmap-fifo.scala",
+          "lines": [
+            8,
+            47
+          ]
+        },
+        {
+          "source": "uart-registers.scala",
+          "lines": [
+            3,
+            13
+          ]
+        }
+      ]
+    },
+    "control_reset_and_irq": {
+      "value": "TX/RX enable, watermarks, interrupt enables and stop-bit selector reset zero; TX count < watermark, RX count > watermark",
+      "evidence": [
+        {
+          "source": "uart.scala",
+          "lines": [
+            135,
+            189
+          ]
+        }
+      ]
+    },
+    "full_field_write_strobe": {
+      "value": "RegMapper requires strobes for all bits of a RegField; nine-bit watermarks need both bytes and divisor needs two bytes",
+      "evidence": [
+        {
+          "source": "uart.scala",
+          "lines": [
+            191,
+            230
+          ]
+        },
+        {
+          "source": "regmapper.scala",
+          "lines": [
+            135,
+            155
+          ]
+        }
+      ]
+    },
+    "tx_counter": {
+      "value": "8bit start/data/stop shifter; new dequeue gated by txen and !busy; current frame continues when txen clears; divisor sampled at each pulse",
+      "evidence": [
+        {
+          "source": "uart-tx.scala",
+          "lines": [
+            52,
+            100
+          ]
+        }
+      ]
+    },
+    "rx_frontend_boundary": {
+      "value": "helper requires explicit frame start/completion; pin sampling/debounce/oversampling are not implemented",
+      "evidence": [
+        {
+          "source": "uart-rx.scala",
+          "lines": [
+            65,
+            216
+          ]
+        }
+      ]
+    }
+  },
+  "core_integrated": false,
+  "rtl_certified": false,
+  "zephyr_certified": false,
+  "calibrated_clock_mapping": null,
+  "limitations": [
+    "Actual source/image build association is unverified.",
+    "MMIO and target clock calls must be ordered by the board scheduler; same-edge bus/FIFO arbitration is not integrated.",
+    "UARTTx assumes source-default uart_tx=1; uart_tx_printf side output is not modeled.",
+    "UARTRx line sampling, debounce, noise and oversampling are outside this helper.",
+    "Uninitialized FIFO data observations fail closed; a fullword initial empty RX poll needs an explicit undefined-data contract."
+  ]
+}

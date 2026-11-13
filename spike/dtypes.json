@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "status": "experimental-functional-coverage",
+  "hardware_capability_source": "../hardware/dtypes.json",
+  "rtl_certified": false,
+  "all_instructions_certified": false,
+  "per_hart": {
+    "0": {
+      "scalar_ieee_fma": [
+        "FP16",
+        "FP32",
+        "FP64"
+      ],
+      "vector_ieee_fma": [
+        "FP16",
+        "FP32",
+        "FP64"
+      ],
+      "vector_bf16": {
+        "fma": "source-matched-ordinary-widening-reduction-subset",
+        "widen_to_fp32": "implemented-basic-exact-case-tested",
+        "all_operations": "not-certified"
+      },
+      "vector_ofp8": {
+        "E4M3_to_BF16": "exhaustive-256-encoding-handler-test",
+        "E5M2_to_BF16": "exhaustive-256-encoding-handler-test",
+        "arithmetic": "source-matched-45-forms-tested",
+        "native_forms": {
+          "ordinary": 23,
+          "widening_to_BF16": 18,
+          "ordered_unordered_reductions": 4
+        },
+        "native_rounding_modes": [
+          "RNE",
+          "RTZ",
+          "RDN",
+          "RUP",
+          "RMM"
+        ],
+        "native_flag_policy": "E4 hardwired zero; E5 IEEE flags with source physical-lane signaling-NaN preservation",
+        "wide_flag_policy": "FPFMAPipe wires only FMA invalid to flags bit0; conversion flags ignored",
+        "reduction_order": "DLEN128 per-lane accumulation and halving folds; ordered final+0 copy"
+      },
+      "vme": {
+        "int8": [
+          "u.u",
+          "s.u",
+          "u.s",
+          "s.s"
+        ],
+        "fp8": [
+          "E4M3.E4M3",
+          "E4M3.E5M2",
+          "E5M2.E4M3",
+          "E5M2.E5M2"
+        ],
+        "fp8_accumulator": "FP32 sequential per-K fused multiply-add",
+        "fp8_rounding_modes": [
+          "RNE",
+          "RTZ",
+          "RDN",
+          "RUP",
+          "RMM"
+        ],
+        "exception_flags": "OPU does not wire exception flags; guest fflags preserved",
+        "tile_bits": 32,
+        "tile_initialization": "required-before-read",
+        "column_move_out": "unconfigured-explicit-capability-refusal"
+      },
+      "vector_ieee_bf16_fma_policy": {
+        "forms": 45,
+        "ordinary": 23,
+        "widening": 18,
+        "ordered_unordered_reductions": 4,
+        "formats": [
+          "FP16",
+          "BF16",
+          "FP32",
+          "FP64"
+        ],
+        "flags": "source SegmentedFMAPipe invalid maps to fflags bit0; rounding OF/UF/NX dropped; input-conversion flags ignored",
+        "input_nan_policy": "physical64bit lanes quiet sNaNs only when widened to a different exponent width",
+        "reductions": "audited DLEN128 accumulators and halving fold; ordered final+0"
+      },
+      "scalar_bf16": "absent-decoder-both-conversion-opcodes-source-proven-illegal",
+      "scalar_bitmanip": [
+        "Zba",
+        "Zbb",
+        "Zbs"
+      ],
+      "vector_bitmanip": [
+        "Zvbb"
+      ],
+      "vector_fpcomp": {
+        "forms": 22,
+        "ordinary_compare_minmax_sign_forms": 20,
+        "minmax_reductions": 2,
+        "formats": [
+          "physical FP16",
+          "physical FP32",
+          "physical FP64"
+        ],
+        "altfmt": "ignored by unit at all3 widths; no ideal BF16/OFP8 semantics implied",
+        "flags": "source-selected full physical chunks, including masked/tail data and sign operations: H for SEW16/32, S for SEW64",
+        "minmax_ties": "vs1 wins exact ties including signed zero",
+        "reductions": "per-lane accumulator and halving-fold graph with DLEN128 on compute /256 on hart2",
+        "vstart": "nonzero traps illegal with PC tval after core FP/VS legality checks",
+        "sew8": "absent from source decoder: architectural illegal"
+      }
+    },
+    "1": {
+      "same_capabilities_as_hart": 0,
+      "scalar_bitmanip": [
+        "Zba",
+        "Zbb",
+        "Zbs"
+      ],
+      "vector_bitmanip": [
+        "Zvbb"
+      ]
+    },
+    "2": {
+      "scalar_ieee_fma": [
+        "FP16",
+        "FP32",
+        "FP64"
+      ],
+      "vector_ieee_fma": [
+        "FP16",
+        "FP32",
+        "FP64"
+      ],
+      "vector_integer_arithmetic_and_moves": "source-backed-enabled; memcpy-only comment does not disable Unified functional units",
+      "vector_bf16_ofp8": "not advertised by launcher; no verified Mx datapath",
+      "vme": "absent-architectural-illegal-instruction",
+      "scalar_bf16": "absent-decoder-both-conversion-opcodes-source-proven-illegal",
+      "vector_ieee_flags": "shared scalar FPU returns full IEEE exception flags; source differs from compute SIMD",
+      "scalar_bitmanip": [],
+      "vector_bitmanip": [
+        "Zvbb"
+      ],
+      "vector_ieee_fma_policy": {
+        "forms": 45,
+        "ordinary": 23,
+        "widening": 18,
+        "reductions": 4,
+        "input_nan_policy": "H-to-S/S-to-D widening quiets signaling NaN, converter exception flags ignored; ordinary input signals NV",
+        "flags": "full IEEE flags even for masked elements; mask suppresses VRF/accumulator writes only",
+        "scalar_vf": "raw low FPR bits; no NaN-box check, extraction dirties FS even at VL0",
+        "reduction_order": "ascending scalar accumulation plus final +0 for both ordered/unordered opcodes",
+        "vstart": "nonzero is architectural illegal on non-memory instructions"
+      },
+      "vector_fpcomp": {
+        "forms": 22,
+        "ordinary_compare_minmax_sign_forms": 20,
+        "minmax_reductions": 2,
+        "formats": [
+          "physical FP16",
+          "physical FP32",
+          "physical FP64"
+        ],
+        "altfmt": "ignored by unit at all3 widths; no ideal BF16/OFP8 semantics implied",
+        "flags": "source-selected full physical chunks, including masked/tail data and sign operations: H for SEW16/32, S for SEW64",
+        "minmax_ties": "vs1 wins exact ties including signed zero",
+        "reductions": "per-lane accumulator and halving-fold graph with DLEN128 on compute /256 on hart2",
+        "vstart": "nonzero traps illegal with PC tval after core FP/VS legality checks",
+        "sew8": "absent from source decoder: architectural illegal"
+      }
+    }
+  },
+  "fail_closed_gaps": [
+    "BF16 divide and other non-FPComp/non-FMA paths without verified format selection retain explicit model diagnostics.",
+    "OPU column-move-out datapath is absent in elaborated hardware; explicit model diagnostic.",
+    "Reserved FP8 rounding-mode encodings are unverified; explicit model diagnostic.",
+    "FP8 divide/comparison are not verified configured Mx datapaths; explicit model diagnostic.",
+    "FPComp consumes physical tail state: VRF/v0 reset is uninitialized in RTL, while current model reset zeroes are not definedness-tracked or certified. Corpus initializes all consumed data; fail-closed unknown-state handling remains required."
+  ],
+  "test_contract": {
+    "cpu-dtypes": "IEEE scalar/vector FMA exact raw bits on all three harts; compute BF16 FMA/widening and both OFP8 widening formats",
+    "handler_fp8_integer_oracle": {
+      "cases": 10260,
+      "conversions": 512,
+      "host_floating_point_used": false,
+      "special_values": [
+        "signed-zero",
+        "subnormal",
+        "max-finite",
+        "infinity",
+        "quiet-NaN",
+        "signaling-NaN",
+        "cancellation",
+        "overflow"
+      ],
+      "flags_initial_values": [
+        0,
+        4,
+        31
+      ]
+    },
+    "vme-fp8-directed": "Unmodified pinned original test_mm_fp8 section invoked by a small wrapper; sequential-FP32 embedded scalar golden",
+    "vme-fp8-gemm": "Unmodified pinned MX1 benchmark across four input-format combinations",
+    "vme-directed_and_mx_target": "Expected model column-read capability refusal, not a correctness pass for the whole original corpus",
+    "upstream_reference": "Untouched upstream Zvt retained; FP8 bulk-dot/round-to-odd semantics intentionally differ from sequential Iris FMA and are not a bit-exact Iris oracle",
+    "native_fp8": {
+      "integer_math_cases": 20480,
+      "widened_cases": 11520,
+      "reduction_graph_cases": 640,
+      "ordinary_forms": 23,
+      "wide_forms": 18,
+      "reduce_forms": 4,
+      "host_float_used": false,
+      "rtl_executed": false
+    },
+    "native_multicore_guests": [
+      "native-fp8: h0/h1 parallel both formats/all rounding/masks/tails/LMULmf2..m8, h2 IEEE32 input producer and result-signature consumer",
+      "wide-reduce-fp8: h0/h1 parallel 11520 widened and640 reduction golden cases while h2 runs IEEE32 jobs"
+    ],
+    "scalar_bf16": {
+      "source_pattern_proof": "both conversion masks disjoint from835 pinned Rocket32-bit BitPats (807 normal and28 custom)",
+      "handler_illegal_cases": 6,
+      "guest_illegal_cases": 6
+    },
+    "ieee_bf16_source_policy": {
+      "operation_cases": 23360,
+      "reduction_graph_cases": 1120,
+      "forms": 45,
+      "formats": 4,
+      "rounding_modes": 5,
+      "host_float_used": false,
+      "rtl_executed": false,
+      "guest": "h0/h1 parallel golden cases, h2 simultaneous overflowing IEEE32 FMA work and six scalarBF16 illegal traps"
+    },
+    "shared_scalar_fpu": {
+      "operation_cases": 21000,
+      "reduction_cases": 1200,
+      "forms": 45,
+      "formats": 3,
+      "rounding_modes": 5,
+      "host_float_used": false,
+      "rtl_executed": false,
+      "guest": "hart2 independent goldens while h0/h1 concurrently exercise dedicated-FMA exception behavior",
+      "decoder_proof": "17 elaborated PLA terms have zero intersections with all21 VF/WF forms; no image attestation"
+    },
+    "fpcomp_source_policy": {
+      "oracle_cases": 8448,
+      "handler_executions": 12672,
+      "forms": 22,
+      "illegal_sew8_cases": 132,
+      "generic_semantics_cases": 9,
+      "core_priority_cases": 6,
+      "vector_config_refusals": 2,
+      "host_float_used": false,
+      "rtl_executed": false,
+      "guest": "4224 oracle cases per hart concurrently;132 wrong-SEW traps; both alt values at all3 H/S/D widths",
+      "decoder_modules_checked": 5,
+      "vf_forms_per_decoder": 11,
+      "source": "fpcomp-policy.json"
+    }
+  },
+  "bitmanip_coverage": {
+    "guest": "bitmanip",
+    "scalar_cases_per_compute_hart": 12,
+    "hart2_scalar_illegal_cases": 4,
+    "vector_sew_cases_per_hart": 4,
+    "rtl_certified": false
+  },
+  "source_operation_gaps": {
+    "rocket_cease": "CEASE0x30500073 halts-until-reset and misa.X are not implemented; explicit M-mode hart2 capability refusal is tested, true illegal probes pass on compute harts"
+  },
+  "vector_configuration_policy": {
+    "altfmt": "source VType.fromUInt accepts this field without an ISA-extension gate on all3 harts at every legal SEW; individual datapaths consume or ignore it",
+    "source": "fpcomp-policy.json",
+    "rtl_certified": false
+  },
+  "reset_definedness": {
+    "physical_vrf_v0_initialized_by_rtl": false,
+    "model_tracks_unknown_vrf_v0": false,
+    "model_initial_zeros_are_rtl_certified": false,
+    "numeric_coverage_requires_initialized_source_groups": true,
+    "source": "fpcomp-policy.json",
+    "status": "explicit-unresolved-functional-certification-gap"
+  }
+}
