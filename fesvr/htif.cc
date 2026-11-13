@@ -2,6 +2,14 @@
 
 #include "config.h"
 #include "htif.h"
+#include <algorithm>
+
+void htif_t::iris_read_transport(addr_t address,size_t bytes,void* data,uint8_t* known) {
+  memif().read(address,bytes,data);std::fill_n(known,bytes,0xff);
+}
+void htif_t::iris_write_transport(addr_t address,size_t bytes,const void* data,const uint8_t*) {
+  memif().write(address,bytes,data);
+}
 #include "rfb.h"
 #include "elfloader.h"
 #include "platform.h"
