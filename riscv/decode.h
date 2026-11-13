@@ -2,6 +2,7 @@
 
 #ifndef _RISCV_DECODE_H
 #define _RISCV_DECODE_H
+#include "iris_definedness.hpp"
 
 #if (-1 != ~0) || ((-1 >> 1) != -1)
 # error spike requires a two''s-complement c++ implementation
@@ -229,11 +230,19 @@ public:
   void write(size_t i, T value)
   {
     if (!zero_reg || i != 0)
-      data[i] = value;
+      {data[i] = value;known[i].fill(0xff);}
   }
   const T& operator [] (size_t i) const
   {
     return data[i];
+  }
+  iris_definedness::Value<T> read_transport(size_t i) const {return {data[i],known[i]};}
+  void write_transport(size_t i,const iris_definedness::Value<T>& value) {
+    if(!zero_reg||i!=0){data[i]=value.value;known[i]=value.known;}
+  }
+  void require_defined(size_t i,size_t bytes,iris_definedness::Context where) const {
+    iris_definedness::bounds(0,bytes,sizeof(T));
+    for(size_t byte=0;byte<bytes;++byte)iris_definedness::require_byte(known[i][byte],0xff,i*sizeof(T)+byte,where);
   }
   regfile_t()
   {
@@ -242,9 +251,12 @@ public:
   void reset()
   {
     memset(data, 0, sizeof(data));
+    for(auto& mask:known)mask.fill(0);
+    if constexpr(zero_reg)known[0].fill(0xff);
   }
 private:
   T data[N];
+  std::array<std::array<uint8_t,sizeof(T)>,N> known;
 };
 
 #define get_field(reg, mask) \
