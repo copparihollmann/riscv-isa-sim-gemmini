@@ -5,5 +5,5 @@ require(insn.rvc_rd() != 0);
 if (xlen == 32) {
   WRITE_RD_PAIR(MMU.load<int64_t>(RVC_SP + insn.rvc_ldsp_imm()));
 } else {
-  WRITE_RD(MMU.load<int64_t>(RVC_SP + insn.rvc_ldsp_imm()));
+  IRIS_LOAD_XPR(int64_t,insn.rd(),RVC_SP + insn.rvc_ldsp_imm());
 }
