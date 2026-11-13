@@ -1,3 +1,6 @@
+if(P.VU.iris_mode){
+#include "iris_fpcomp_body.h"
+}else{
 // vfmin vd, vs2, rs1
 
 require_zvfbfa
@@ -12,3 +15,5 @@ VI_VFP_VF_LOOP
 {
   vd = f64_min(vs2, rs1);
 })
+
+}
