@@ -1473,6 +1473,8 @@ VI_VX_ULOOP({ \
 // vector: vfp helper
 //
 #define VI_VFP_BASE \
+  if (P.VU.iris_mode && P.get_id() >= 2 && (P.VU.vsew == 8 || (P.VU.vsew == 16 && P.VU.altfmt))) \
+    throw std::runtime_error("IRIS_UNSUPPORTED_DATATYPE: hart 2 has no Mx floating datapath"); \
   require_fp; \
   require_vector(true); \
   reg_t UNUSED vl = P.VU.vl->read(); \
@@ -2300,13 +2302,14 @@ c_t generic_dot_product(const std::vector<a_t>& a, const std::vector<b_t>& b, c_
   require_extension(EXT_ZVTBASE); \
   require_vector(false); \
   require(P.VU.widen > 0); \
-  require(STATE.sstatus->enabled(SSTATUS_MS))
+  require(P.VU.iris_mode || STATE.sstatus->enabled(SSTATUS_MS))
 
 #define ZVT_END \
-  STATE.sstatus->dirty(SSTATUS_MS); \
+  if (!P.VU.iris_mode) STATE.sstatus->dirty(SSTATUS_MS); \
   VECTOR_END
 
 #define ZVT_LDST(type, is_store) \
+  require(!P.VU.iris_mode); \
   ZVT_LDST_BASE; \
   reg_t base = RS1; \
   reg_t tss = RS2; \
