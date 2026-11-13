@@ -6,6 +6,7 @@
 #define DECODE_MACRO_USAGE_LOGGED 0
 
 #define PROLOGUE \
+  vectorUnit_t::iris_instruction_scope iris_scope(p->VU,insn.bits(),pc); \
   reg_t npc = sext_xlen(pc + insn_length(OPCODE)); \
   if (!p->extension_enabled(EXT_ZCA)) assume(insn_length(OPCODE) % 4 == 0)
 
