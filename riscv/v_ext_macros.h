@@ -539,26 +539,50 @@ static inline bool is_overlapped_widen(const int astart, int asize,
 
 // merge and copy loop
 #define VI_MERGE_VARS \
-  bool UNUSED use_first = P.VU.iris_unmasked_move()?false:P.VU.mask_elt(0, i);
+  bool UNUSED use_first = insn.v_vm()?false:P.VU.mask_elt(0, i);
 
 #define VI_MERGE_LOOP_BASE \
   VI_GENERAL_LOOP_BASE \
   VI_MERGE_VARS
 
+// A merge consumes only its selected value. Eager PARAMS reads make unused,
+// undefined lanes observable to the Iris definedness checker. Unmasked moves
+// consume their first operand without consulting v0; vector copies retain the
+// existing copy_element_mask propagation.
+#define VI_VV_MERGE_PARAMS(x) \
+  type_sew_t<x>::type vs1 = (insn.v_vm() || use_first) ? P.VU.elt<type_sew_t<x>::type>(rs1_num, i) : 0; \
+  type_sew_t<x>::type UNUSED vs2 = (!insn.v_vm() && !use_first) ? P.VU.elt<type_sew_t<x>::type>(rs2_num, i) : 0; \
+  type_sew_t<x>::type &vd = P.VU.elt<type_sew_t<x>::type>(rd_num, i, true);
+
+#define VI_VX_MERGE_PARAMS(x) \
+  type_sew_t<x>::type rs1 = (insn.v_vm() || use_first) ? (type_sew_t<x>::type)RS1 : 0; \
+  type_sew_t<x>::type UNUSED vs2 = (!insn.v_vm() && !use_first) ? P.VU.elt<type_sew_t<x>::type>(rs2_num, i) : 0; \
+  type_sew_t<x>::type &vd = P.VU.elt<type_sew_t<x>::type>(rd_num, i, true);
+
+#define VI_VI_MERGE_PARAMS(x) \
+  type_sew_t<x>::type UNUSED simm5 = (type_sew_t<x>::type)insn.v_simm5(); \
+  type_sew_t<x>::type UNUSED vs2 = (!insn.v_vm() && !use_first) ? P.VU.elt<type_sew_t<x>::type>(rs2_num, i) : 0; \
+  type_sew_t<x>::type &vd = P.VU.elt<type_sew_t<x>::type>(rd_num, i, true);
+
+#define VI_VF_MERGE_PARAMS(width) \
+  float##width##_t rs1 = (insn.v_vm() || use_first) ? f##width(READ_FREG(rs1_num), P.VU.altfmt) : float##width##_t{}; \
+  float##width##_t UNUSED vs2 = (!insn.v_vm() && !use_first) ? P.VU.elt<float##width##_t>(rs2_num, i) : float##width##_t{}; \
+  float##width##_t &vd = P.VU.elt<float##width##_t>(rd_num, i, true);
+
 #define VI_VV_MERGE_LOOP(BODY) \
   VI_CHECK_SSS(true); \
   VI_MERGE_LOOP_BASE \
   if (sew == e8) { \
-    VV_PARAMS(e8); \
+    VI_VV_MERGE_PARAMS(e8); \
     BODY; \
   } else if (sew == e16) { \
-    VV_PARAMS(e16); \
+    VI_VV_MERGE_PARAMS(e16); \
     BODY; \
   } else if (sew == e32) { \
-    VV_PARAMS(e32); \
+    VI_VV_MERGE_PARAMS(e32); \
     BODY; \
   } else if (sew == e64) { \
-    VV_PARAMS(e64); \
+    VI_VV_MERGE_PARAMS(e64); \
     BODY; \
   } \
   VI_LOOP_END
@@ -567,16 +591,16 @@ static inline bool is_overlapped_widen(const int astart, int asize,
   VI_CHECK_SSS(false); \
   VI_MERGE_LOOP_BASE \
   if (sew == e8) { \
-    VX_PARAMS(e8); \
+    VI_VX_MERGE_PARAMS(e8); \
     BODY; \
   } else if (sew == e16) { \
-    VX_PARAMS(e16); \
+    VI_VX_MERGE_PARAMS(e16); \
     BODY; \
   } else if (sew == e32) { \
-    VX_PARAMS(e32); \
+    VI_VX_MERGE_PARAMS(e32); \
     BODY; \
   } else if (sew == e64) { \
-    VX_PARAMS(e64); \
+    VI_VX_MERGE_PARAMS(e64); \
     BODY; \
   } \
   VI_LOOP_END
@@ -585,16 +609,16 @@ static inline bool is_overlapped_widen(const int astart, int asize,
   VI_CHECK_SSS(false); \
   VI_MERGE_LOOP_BASE \
   if (sew == e8) { \
-    VI_PARAMS(e8); \
+    VI_VI_MERGE_PARAMS(e8); \
     BODY; \
   } else if (sew == e16) { \
-    VI_PARAMS(e16); \
+    VI_VI_MERGE_PARAMS(e16); \
     BODY; \
   } else if (sew == e32) { \
-    VI_PARAMS(e32); \
+    VI_VI_MERGE_PARAMS(e32); \
     BODY; \
   } else if (sew == e64) { \
-    VI_PARAMS(e64); \
+    VI_VI_MERGE_PARAMS(e64); \
     BODY; \
   } \
   VI_LOOP_END
@@ -605,13 +629,13 @@ static inline bool is_overlapped_widen(const int astart, int asize,
   for (reg_t i = P.VU.vstart->read_defined(pc); i < vl; ++i) { \
   VI_MERGE_VARS \
   if (P.VU.vsew == e16) { \
-    VFP_VF_PARAMS(16); \
+    VI_VF_MERGE_PARAMS(16); \
     BODY; \
   } else if (P.VU.vsew == e32) { \
-    VFP_VF_PARAMS(32); \
+    VI_VF_MERGE_PARAMS(32); \
     BODY; \
   } else if (P.VU.vsew == e64) { \
-    VFP_VF_PARAMS(64); \
+    VI_VF_MERGE_PARAMS(64); \
     BODY; \
   } \
   VI_LOOP_END
@@ -980,24 +1004,32 @@ static inline bool is_overlapped_widen(const int astart, int asize,
   } \
   VI_LOOP_END
 
+// var2 is the instruction's explicit accumulator term (0 or vd_w).
+// Read the old destination only for a real accumulate. Materialize the result
+// before the write accessor so undefined RMW operands still refuse execution.
+#define VI_WIDE_ACC_VALUE_0(wide_t) ((wide_t)0)
+#define VI_WIDE_ACC_VALUE_vd_w(wide_t) P.VU.elt<wide_t>(rd_num, i)
+#define VI_WIDE_ACC_VALUE_INNER(value, wide_t) VI_WIDE_ACC_VALUE_##value(wide_t)
+#define VI_WIDE_ACC_VALUE(value, wide_t) VI_WIDE_ACC_VALUE_INNER(value, wide_t)
+
 #define VI_WIDE_OP_AND_ASSIGN(var0, var1, var2, op0, op1, sign) \
   switch (P.VU.vsew) { \
   case e8: { \
-    sign##16_t UNUSED vd_w = P.VU.elt<sign##16_t>(rd_num, i); \
-    P.VU.elt<uint16_t>(rd_num, i, true) = \
-      op1((sign##16_t)(sign##8_t)var0 op0 (sign##16_t)(sign##8_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign##16_t)(sign##8_t)var0 op0 (sign##16_t)(sign##8_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##16_t); \
+    P.VU.elt<uint16_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   case e16: { \
-    sign##32_t UNUSED vd_w = P.VU.elt<sign##32_t>(rd_num, i); \
-    P.VU.elt<uint32_t>(rd_num, i, true) = \
-      op1((sign##32_t)(sign##16_t)var0 op0 (sign##32_t)(sign##16_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign##32_t)(sign##16_t)var0 op0 (sign##32_t)(sign##16_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##32_t); \
+    P.VU.elt<uint32_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   default: { \
-    sign##64_t UNUSED vd_w = P.VU.elt<sign##64_t>(rd_num, i); \
-    P.VU.elt<uint64_t>(rd_num, i, true) = \
-      op1((sign##64_t)(sign##32_t)var0 op0 (sign##64_t)(sign##32_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign##64_t)(sign##32_t)var0 op0 (sign##64_t)(sign##32_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##64_t); \
+    P.VU.elt<uint64_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   }
@@ -1005,21 +1037,21 @@ static inline bool is_overlapped_widen(const int astart, int asize,
 #define VI_WIDE_OP_MACRO_AND_ASSIGN(var0, var1, var2, op, sign) \
   switch (P.VU.vsew) { \
   case e8: { \
-    sign##16_t UNUSED vd_w = P.VU.elt<sign##16_t>(rd_num, i); \
-    P.VU.elt<uint16_t>(rd_num, i, true) = \
-      op((sign##16_t)(sign##8_t)var0, (sign##16_t)(sign##8_t)var1) + var2; \
+    const auto result_w = \
+      op((sign##16_t)(sign##8_t)var0, (sign##16_t)(sign##8_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##16_t); \
+    P.VU.elt<uint16_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   case e16: { \
-    sign##32_t UNUSED vd_w = P.VU.elt<sign##32_t>(rd_num, i); \
-    P.VU.elt<uint32_t>(rd_num, i, true) = \
-      op((sign##32_t)(sign##16_t)var0, (sign##32_t)(sign##16_t)var1) + var2; \
+    const auto result_w = \
+      op((sign##32_t)(sign##16_t)var0, (sign##32_t)(sign##16_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##32_t); \
+    P.VU.elt<uint32_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   default: { \
-    sign##64_t UNUSED vd_w = P.VU.elt<sign##64_t>(rd_num, i); \
-    P.VU.elt<uint64_t>(rd_num, i, true) = \
-      op((sign##64_t)(sign##32_t)var0, (sign##64_t)(sign##32_t)var1) + var2; \
+    const auto result_w = \
+      op((sign##64_t)(sign##32_t)var0, (sign##64_t)(sign##32_t)var1) + VI_WIDE_ACC_VALUE(var2, sign##64_t); \
+    P.VU.elt<uint64_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   }
@@ -1027,21 +1059,21 @@ static inline bool is_overlapped_widen(const int astart, int asize,
 #define VI_WIDE_OP_AND_ASSIGN_MIX(var0, var1, var2, op0, op1, sign_d, sign_1, sign_2) \
   switch (P.VU.vsew) { \
   case e8: { \
-    sign_d##16_t UNUSED vd_w = P.VU.elt<sign_d##16_t>(rd_num, i); \
-    P.VU.elt<uint16_t>(rd_num, i, true) = \
-      op1((sign_1##16_t)(sign_1##8_t)var0 op0 (sign_2##16_t)(sign_2##8_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign_1##16_t)(sign_1##8_t)var0 op0 (sign_2##16_t)(sign_2##8_t)var1) + VI_WIDE_ACC_VALUE(var2, sign_d##16_t); \
+    P.VU.elt<uint16_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   case e16: { \
-    sign_d##32_t UNUSED vd_w = P.VU.elt<sign_d##32_t>(rd_num, i); \
-    P.VU.elt<uint32_t>(rd_num, i, true) = \
-      op1((sign_1##32_t)(sign_1##16_t)var0 op0 (sign_2##32_t)(sign_2##16_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign_1##32_t)(sign_1##16_t)var0 op0 (sign_2##32_t)(sign_2##16_t)var1) + VI_WIDE_ACC_VALUE(var2, sign_d##32_t); \
+    P.VU.elt<uint32_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   default: { \
-    sign_d##64_t UNUSED vd_w = P.VU.elt<sign_d##64_t>(rd_num, i); \
-    P.VU.elt<uint64_t>(rd_num, i, true) = \
-      op1((sign_1##64_t)(sign_1##32_t)var0 op0 (sign_2##64_t)(sign_2##32_t)var1) + var2; \
+    const auto result_w = \
+      op1((sign_1##64_t)(sign_1##32_t)var0 op0 (sign_2##64_t)(sign_2##32_t)var1) + VI_WIDE_ACC_VALUE(var2, sign_d##64_t); \
+    P.VU.elt<uint64_t>(rd_num, i, true) = result_w; \
     } \
     break; \
   }
