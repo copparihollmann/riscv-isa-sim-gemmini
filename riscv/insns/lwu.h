@@ -1,2 +1,2 @@
 require_rv64;
-WRITE_RD(MMU.load<uint32_t>(RS1 + insn.i_imm()));
+IRIS_LOAD_XPR(uint32_t,insn.rd(),RS1 + insn.i_imm());

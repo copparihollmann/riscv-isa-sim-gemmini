@@ -1,3 +1,8 @@
+if (P.VU.iris_mode) {
+#include "iris_vtfmm_body.h"
+} else {
+// Iris fork: preserve strict upstream matching outside --iris-vme.
+require(P.VU.iris_mode || ((insn.bits() & 0xfe0071ff) == 0xf2001077));
 ZVT_MTD(8);
 ZVT_CHECK_ALIGN_RS1;
 ZVT_CHECK_ALIGN_RS2;
@@ -120,3 +125,5 @@ if (P.VU.vsew == 64 && P.VU.widen == 1 && !P.VU.altfmt) {
 }
 
 set_fp_exceptions;
+
+}
