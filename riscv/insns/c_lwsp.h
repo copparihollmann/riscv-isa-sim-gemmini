@@ -1,3 +1,3 @@
 require_extension(EXT_ZCA);
 require(insn.rvc_rd() != 0);
-WRITE_RD(MMU.load<int32_t>(RVC_SP + insn.rvc_lwsp_imm()));
+IRIS_LOAD_XPR(int32_t,insn.rd(),RVC_SP + insn.rvc_lwsp_imm());

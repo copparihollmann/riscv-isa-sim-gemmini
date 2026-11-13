@@ -5,6 +5,7 @@
 #include "simif.h"
 #include "sim.h"
 #include "dts.h"
+#include "../../../board/iris_plic.hpp"
 
 #define PLIC_MAX_CONTEXTS 15872
 
@@ -77,6 +78,29 @@ plic_t::plic_t(const simif_t* sim, uint32_t ndev)
   : num_ids(ndev + 1), num_ids_word(((ndev + 1) + (32 - 1)) / 32),
   max_prio((1UL << PLIC_PRIO_BITS) - 1), priority{}, level{}
 {
+  if (!sim->get_cfg().iris_bootrom_file.empty()) {
+    const auto& harts = sim->get_harts();
+    if (ndev != 1 || harts.size() != 3 || !harts.count(0) || !harts.count(1) || !harts.count(2))
+      throw std::runtime_error("Iris PLIC requires one source and architectural harts 0/1/2");
+    for (const auto& pair : harts)
+      if (!pair.second->extension_enabled_const('S'))
+        throw std::runtime_error("Iris PLIC requires M/S contexts on every hart");
+    iris_sim_ = sim;
+    iris_plic_ = std::make_shared<iris_board::PlicRegisters>();
+    iris_plic_->on_interrupt([this, sim](unsigned, unsigned hart, bool supervisor,
+                                 iris_board::PlicRegisters::Line line) {
+      const reg_t mask = supervisor ? MIP_SEIP : MIP_MEIP;
+      // Unknown line values remain guarded at instruction/CSR observation.
+      // Clear the placeholder bit so an unknown cannot enter a guest handler
+      // before validate_iris_interrupts() reports the missing initialization.
+      sim->get_harts().at(hart)->get_state()->mip->backdoor_write_with_mask(
+          mask, line.value_or(false) ? mask : 0);
+      // A parked WFI hart might not execute another instruction before an
+      // external source changes. Reject an enabled unknown immediately too.
+      if (!line.has_value()) validate_iris_interrupts(hart, false);
+    });
+    return;
+  }
   // PLIC contexts are contiguous in memory even if harts are discontiguous.
   for (const auto& [hart_id, hart] : sim->get_harts()) {
     contexts.push_back(plic_context_t(hart, true));
@@ -289,6 +313,10 @@ bool plic_t::context_write(plic_context_t *c,
 
 void plic_t::set_interrupt_level(uint32_t id, int lvl)
 {
+  if (iris_plic_) {
+    iris_plic_->set_interrupt_level(id, lvl);
+    return;
+  }
   if (id <= 0 || num_ids <= id) {
     return;
   }
@@ -329,6 +357,7 @@ void plic_t::set_interrupt_level(uint32_t id, int lvl)
 
 bool plic_t::load(reg_t addr, size_t len, uint8_t* bytes)
 {
+  if (iris_plic_) return iris_plic_->load(addr, len, bytes);
   bool ret = false;
   uint32_t val = 0;
 
@@ -369,6 +398,7 @@ bool plic_t::load(reg_t addr, size_t len, uint8_t* bytes)
 
 bool plic_t::store(reg_t addr, size_t len, const uint8_t* bytes)
 {
+  if (iris_plic_) return iris_plic_->store(addr, len, bytes);
   bool ret = false;
   uint32_t val = 0;
 
@@ -401,6 +431,27 @@ bool plic_t::store(reg_t addr, size_t len, const uint8_t* bytes)
   }
 
   return ret;
+}
+
+void plic_t::tick(reg_t UNUSED rtc_ticks)
+{
+  // A functional gateway sampling opportunity at each device update. This is
+  // not a calibrated PLIC bus/fan-in/interrupt pipeline latency.
+  if (iris_plic_) iris_plic_->advance_gateway();
+}
+
+void plic_t::validate_iris_interrupts(unsigned hart, bool read_pending) const
+{
+  if (!iris_plic_) return;
+  const auto* state = iris_sim_->get_harts().at(hart)->get_state();
+  for (unsigned kind = 0; kind < 2; ++kind) {
+    const unsigned context = 2 * hart + kind;
+    const reg_t mask = kind ? MIP_SEIP : MIP_MEIP;
+    if (!iris_plic_->irq(context).has_value() && (read_pending || (state->mie->read() & mask)))
+      throw std::runtime_error("IRIS_PLIC_UNKNOWN_MIP hart=" + std::to_string(hart) +
+          " context=" + std::to_string(context) +
+          " initialize priority, enable and threshold before enabling external interrupts or reading mip");
+  }
 }
 
 std::string plic_generate_dts(const sim_t* sim, const std::vector<std::string>& sargs UNUSED)
