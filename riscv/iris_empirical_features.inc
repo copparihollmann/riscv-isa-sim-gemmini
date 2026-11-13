@@ -72,6 +72,7 @@ void iris_timing_adapter::empirical_write_prefix(const CounterRead&r){
  out<<",\"memory_counter_units\":\"accesses=count accepted intents; hits/misses=count64B line probes; bytes=requested bytes including SC attempts\",\"async_compute_pending\":"<<(r.async_pending?"true":"false")<<",\"async_pending_count\":"<<r.async_pending_count<<",\"async_backend_end\":"<<r.async_backend_end<<",\"calibration_identity\":"<<std::quoted(profile_.empirical_identity)<<"}\n";out.flush();if(!out)throw std::runtime_error("IRIS_EMPIRICAL_FEATURE_OUTPUT_FAILED");
 }
 void iris_timing_adapter::empirical_write_totals(std::ostream&out)const{
+ vle8_write_totals(out);
  if(profile_.empirical_opu_entry)opu_write_totals(out);
  if(profile_.empirical_fadd_eg)fadd_eg_write_totals(out);
  if(profile_.empirical_vadd_eg)vadd_eg_write_totals(out);

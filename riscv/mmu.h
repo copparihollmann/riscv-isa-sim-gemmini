@@ -123,6 +123,13 @@ public:
     if(!iris_pma(a,n,iris_board::Access::Write)||!pmp_ok(a,n,STORE,PRV_M,false))return false;
     for(unsigned i=0;i<n;++i)if(!sim->addr_to_mem(a+i))return false;return true;
   }
+  // Side-effect-free admission only. No load/TLB/tag/knownness mutation.
+  bool iris_pipeline_vle8_permitted(reg_t a,unsigned n) {
+    if(!proc||target_big_endian||check_triggers_load||!n||n>32||a<0x80000000ull||a>=0x180000000ull||n>0x180000000ull-a||(a&31)+n>32||(a&4095)+n>4096)return false;
+    const auto*s=proc->get_state();if(s->prv!=PRV_M||s->v||s->debug_mode||(s->mstatus->read()&MSTATUS_MPRV))return false;
+    for(unsigned i=0;i<n;++i)if(!iris_pma(a+i,1,iris_board::Access::Read)||!pmp_ok(a+i,1,LOAD,PRV_M,false)||!sim->addr_to_mem(a+i))return false;
+    return true;
+  }
   mmu_t(simif_t* sim, endianness_t endianness, processor_t* proc, reg_t cache_blocksz);
   ~mmu_t();
 
