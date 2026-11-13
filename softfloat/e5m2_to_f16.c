@@ -43,56 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float16_t e5m2_to_f16( float8_t a )
 {
-    union ui8_f8 uA;
-    uint_fast8_t uiA;
-    bool sign;
-    int_fast8_t exp;
-    uint_fast8_t frac;
-    struct commonNaN commonNaN;
-    uint_fast16_t uiZ;
-    struct exp8_sig8 normExpSig;
-    union ui16_f16 uZ;
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signE5M2UI( uiA );
-    exp  = expE5M2UI( uiA );
-    frac = fracE5M2UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp == 0xF ) {
-        if ( frac ) {
-            /* NaN */
-            softfloat_E5M2UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
-        } else {
-            /* Inf */
-            uiZ = packToF16UI( sign, 0x1F, 0 );
-        }
-        goto uiZ;
+    // E5M2 and binary16 share their five-bit exponent and bias. Every finite
+    // input (including subnormals) is an exact eight-bit left shift.
+    const uint8_t raw = a.v;
+    if ((raw & 0x7c) == 0x7c && (raw & 3)) {
+        if ((raw & 3) == 1) softfloat_raiseFlags(softfloat_flag_invalid);
+        return (float16_t){ .v = 0x7e00 };
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ! exp ) {
-        if ( ! frac ) {
-            /* zero */
-            uiZ = packToF16UI( sign, 0, 0 );
-            goto uiZ;
-        }
-        /* subnormal */
-        normExpSig = softfloat_normSubnormalE5M2Sig( frac );
-        //TODO: might be unnecessary to implement a dedicated function
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
-    }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    uiZ = packToF16UI( sign, exp, (uint_fast16_t) frac<<8);
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return (float16_t){ .v = (uint16_t)raw << 8 };
 }
-
