@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <map>
 #include <cassert>
+#include <exception>
 #include "debug_rom_defines.h"
 #include "entropy_source.h"
 #include "csrs.h"
@@ -237,6 +238,17 @@ public:
 
   const isa_parser_t &get_isa() const & { return isa; }
   const cfg_t &get_cfg() const & { return *cfg; }
+  void iris_validate_interrupts(bool read_pending = false) const;
+  // Decode without execution, for the online model adapter and handler corpus.
+  insn_func_t decode_for_model(insn_t insn) { return decode_insn(insn); }
+  iris_definedness::Value<uint64_t> iris_frontend_read_beat(reg_t address);
+  void iris_fabric_commit_cached_store(reg_t address,unsigned bytes,uint64_t value);
+  uint64_t iris_fabric_external_io_read(reg_t address,unsigned bytes);
+  void iris_fabric_external_io_write(reg_t address,unsigned bytes,uint64_t value,uint64_t mask);
+  std::array<std::pair<uint8_t,uint64_t>,8> iris_frontend_pmp() const;
+  bool iris_pipeline_context_safe() const;
+  bool iris_pipeline_can_prefetch(reg_t pc, bool allow_compressed=false, bool allow_split_pages=false) const;
+  std::exception_ptr iris_pipeline_interrupt_exception();
 
   void set_debug(bool value);
   void set_histogram(bool value);
@@ -245,13 +257,43 @@ public:
   void reset();
   void step(size_t n); // run for n cycles
   void put_csr(int which, reg_t val);
+  bool iris_fcsr_instruction(insn_t insn,reg_t pc);
   uint32_t get_id() const { return id; }
   reg_t get_csr(int which, insn_t insn, bool write, bool peek = 0);
   reg_t get_csr(int which) { return get_csr(which, insn_t(0), false, true); }
   mmu_t* get_mmu() { return mmu; }
   state_t* get_state() { return &state; }
+  reg_t iris_read_xpr(unsigned reg,reg_t pc) const {
+    if(VU.iris_mode) {
+      const uint64_t bits=VU.iris_insn;
+      const bool same=((bits>>15)&31)==((bits>>20)&31);
+      const uint64_t operation=bits&0xfe00707f;
+      const bool constant=VU.iris_executing&&same&&(operation==0x40000033||operation==0x4000003b||operation==0x4033||
+        ((bits&0x7f)==0x63));
+      if(!constant)state.XPR.require_defined(reg,sizeof(reg_t),{id,pc,"XPR"});
+    }
+    return state.XPR[reg];
+  }
+  const freg_t& iris_read_fpr(unsigned reg,reg_t pc) const {
+    if(VU.iris_mode)state.FPR.require_defined(reg,8,{id,pc,"FPR"});
+    return state.FPR[reg];
+  }
+  void iris_write_xpr_transport(unsigned reg,const iris_definedness::Value<reg_t>& value) {
+    if(VU.iris_mode&&!reg)return;
+    if(VU.iris_mode&&get_log_commits_enabled())
+      for(auto mask:value.known)iris_definedness::require_byte(mask,0xff,reg,{id,VU.iris_pc,"opaque-commit-log"});
+    if(get_log_commits_enabled())state.log_reg_write[reg<<4]={value.value,0};
+    state.XPR.write_transport(reg,value);
+  }
+  void iris_write_fpr_transport(unsigned reg,const iris_definedness::Value<freg_t>& value) {
+    if(VU.iris_mode&&get_log_commits_enabled())
+      for(size_t byte=0;byte<8;++byte)iris_definedness::require_byte(value.known[byte],0xff,reg,{id,VU.iris_pc,"opaque-commit-log"});
+    if(get_log_commits_enabled())state.log_reg_write[(reg<<4)|1]=value.value;
+    state.FPR.write_transport(reg,value);
+    state.sstatus->dirty(SSTATUS_FS);
+  }
   unsigned get_xlen() const { return xlen; }
-  unsigned paddr_bits() { return isa.get_max_xlen() == 64 ? 56 : 34; }
+  unsigned paddr_bits() { return cfg->iris_vme ? 35 : isa.get_max_xlen() == 64 ? 56 : 34; }
   unsigned get_const_xlen() const {
     // Any code that assumes a const xlen should use this method to
     // document that assumption. If Spike ever changes to allow
