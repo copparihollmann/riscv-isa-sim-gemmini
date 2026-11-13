@@ -10,6 +10,10 @@
 #include <vector>
 #include <utility>
 #include <cassert>
+#include <memory>
+#include <optional>
+
+namespace iris_board { class TimerRegisters; }
 
 class processor_t;
 class simif_t;
@@ -98,8 +102,10 @@ class clint_t : public abstract_device_t {
   bool store(reg_t addr, size_t len, const uint8_t* bytes) override;
   reg_t size() override { return CLINT_SIZE; }
   void tick(reg_t rtc_ticks) override;
-  uint64_t get_mtimecmp(reg_t hartid) { return mtimecmp[hartid]; }
-  uint64_t get_mtime() { return mtime; }
+  uint64_t get_mtimecmp(reg_t hartid);
+  std::optional<uint64_t> timer_compare(reg_t hartid);
+  uint64_t get_mtime();
+  void validate_iris_interrupts(unsigned hart, bool read_pending) const;
  private:
   typedef uint64_t mtime_t;
   typedef uint64_t mtimecmp_t;
@@ -111,6 +117,7 @@ class clint_t : public abstract_device_t {
   uint64_t real_time_ref_usecs;
   mtime_t mtime;
   std::map<size_t, mtimecmp_t> mtimecmp;
+  std::shared_ptr<iris_board::TimerRegisters> iris_timer;
 };
 
 #define PLIC_MAX_DEVICES 1024
@@ -130,14 +137,20 @@ struct plic_context_t {
   uint32_t claimed[PLIC_MAX_DEVICES/32] {};
 };
 
+namespace iris_board { class PlicRegisters; }
+
 class plic_t : public abstract_device_t, public abstract_interrupt_controller_t {
  public:
   plic_t(const simif_t*, uint32_t ndev);
   bool load(reg_t addr, size_t len, uint8_t* bytes) override;
   bool store(reg_t addr, size_t len, const uint8_t* bytes) override;
   void set_interrupt_level(uint32_t id, int lvl) override;
-  reg_t size() override { return PLIC_SIZE; }
+  reg_t size() override { return iris_plic_ ? 0x4000000 : PLIC_SIZE; }
+  void tick(reg_t rtc_ticks) override;
+  void validate_iris_interrupts(unsigned hart, bool read_pending) const;
  private:
+  const simif_t* iris_sim_ = nullptr;
+  std::shared_ptr<iris_board::PlicRegisters> iris_plic_;
   std::vector<plic_context_t> contexts;
   uint32_t num_ids;
   uint32_t num_ids_word;
