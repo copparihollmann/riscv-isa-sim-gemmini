@@ -297,14 +297,19 @@ bool processor_t::slow_path() const
 // fetch/decode/execute loop
 void processor_t::step(size_t n)
 {
+  iris_step_timing_waited_ = false;
+  iris_step_architectural_event_ = false;
   mmu_t* _mmu = mmu;
 
   if (!state.debug_mode) {
     if (halt_request == HR_REGULAR) {
+      iris_step_architectural_event_ = true;
       enter_debug_mode(DCSR_CAUSE_DEBUGINT, 0);
     } else if (halt_request == HR_GROUP) {
+      iris_step_architectural_event_ = true;
       enter_debug_mode(DCSR_CAUSE_GROUP, 0);
     } else if (halt_on_reset) {
+      iris_step_architectural_event_ = true;
       halt_on_reset = false;
       enter_debug_mode(DCSR_CAUSE_HALT, 0);
     }
@@ -414,12 +419,14 @@ void processor_t::step(size_t n)
     }
     catch(iris_timing_wait&)
     {
+      iris_step_timing_waited_ = true;
       // Fetch/issue has occurred, but no instruction side effects may run until
       // the shared scheduler grants the completion event.
       n = instret;
     }
     catch(trap_t& t)
     {
+      iris_step_architectural_event_ = true;
       take_trap(t, pc);
       n = instret;
 
@@ -444,6 +451,7 @@ void processor_t::step(size_t n)
     }
     catch (triggers::matched_t& t)
     {
+      iris_step_architectural_event_ = true;
       take_trigger_action(t.action, t.address, pc, t.gva);
       // End this step at the trigger boundary.  In particular, a timing-before
       // trigger retires no instruction, so continuing would immediately execute
@@ -452,6 +460,7 @@ void processor_t::step(size_t n)
     }
     catch(trap_debug_mode&)
     {
+      iris_step_architectural_event_ = true;
       enter_debug_mode(DCSR_CAUSE_SWBP, 0);
     }
 
